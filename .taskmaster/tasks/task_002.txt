@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Guided Customer Journey Builder
+# Status: pending
+# Dependencies: 1 (Not found)
+# Priority: high
+# Description: Develop the core journey builder functionality that allows marketers to define customer journeys and automatically suggests appropriate journey steps.
+# Details:
+Create a system that enables marketers to identify campaign purpose and automatically suggests journey steps through stages like Awareness, Consideration, Conversion, and Retention. Include pre-built journey templates for different campaign types and support for multiple journeys per brand or persona.
+
+# Test Strategy:
+Test journey template creation, journey step suggestions, template customization, and multi-journey support. Validate that suggested content types and channel strategies align with journey stages.

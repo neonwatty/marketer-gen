@@ -1,0 +1,11 @@
+# Task ID: 12
+# Title: Template System & Journey Frameworks
+# Status: pending
+# Dependencies: 2 (Not found)
+# Priority: medium
+# Description: Develop the template system for pre-built journey frameworks and campaign structures.
+# Details:
+Create a comprehensive template system with journey templates for different campaign types (Product Launch, Lead Gen Funnel, Re-Engagement, etc.), customizable frameworks, and industry-specific templates.
+
+# Test Strategy:
+Test template creation, customization capabilities, template effectiveness, and industry-specific adaptations. Validate that templates provide solid starting points for campaign creation.
