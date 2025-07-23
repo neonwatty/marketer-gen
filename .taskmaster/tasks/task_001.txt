@@ -5,17 +5,17 @@
 # Priority: high
 # Description: Design and implement the core user authentication and account management system for the AI-driven content generation platform using Ruby on Rails 8.
 # Details:
-This should include user registration, login, profile management, and role-based access control for different user types (marketers, team members, administrators). The system should leverage Rails 8's built-in authentication features, Devise gem for enhanced functionality, and secure session management. Documentation: https://guides.rubyonrails.org/security.html, https://github.com/heartcombo/devise, https://guides.rubyonrails.org/action_controller_overview.html#session
+This should include user registration, login, profile management, and role-based access control for different user types (marketers, team members, administrators). The system should leverage Rails 8's built-in authentication generator, which provides secure authentication out of the box without external gems. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session, https://edgeguides.rubyonrails.org/authentication.html
 
 # Test Strategy:
 Unit tests for authentication flows using RSpec, integration tests for user management, security testing for access controls, and user acceptance testing for the complete registration/login experience.
 
 # Subtasks:
-## 1.1. Rails 8 Authentication Setup & Devise Integration [pending]
+## 1.1. Rails 8 Built-in Authentication Setup [done]
 ### Dependencies: None
-### Description: Set up Rails 8 authentication system with Devise gem for enhanced user management.
+### Description: Set up Rails 8's built-in authentication system for user management.
 ### Details:
-Install and configure Devise gem, set up User model with Rails 8 conventions, configure authentication routes, and implement basic registration/login functionality. Use Rails 8's built-in session management and CSRF protection. Documentation: https://github.com/heartcombo/devise, https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session
+Generate authentication using 'rails generate authentication', which creates User model, authentication controllers, views, and database migrations. Configure authentication routes and implement basic registration/login functionality. Rails 8's authentication generator includes secure password handling, session management, and CSRF protection out of the box. Documentation: https://edgeguides.rubyonrails.org/authentication.html, https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session
 
 ## 1.2. Role-Based Access Control with Pundit [pending]
 ### Dependencies: None
@@ -23,11 +23,11 @@ Install and configure Devise gem, set up User model with Rails 8 conventions, co
 ### Details:
 Integrate Pundit gem for authorization, create user roles (marketer, team member, admin), implement policy classes for different resources, and add authorization checks to controllers and views. Documentation: https://github.com/varvet/pundit, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters
 
-## 1.3. Password Reset & Account Recovery with Devise [pending]
+## 1.3. Password Reset & Account Recovery [pending]
 ### Dependencies: None
-### Description: Configure Devise's built-in password reset functionality with email delivery.
+### Description: Implement password reset functionality with email delivery using Rails 8.
 ### Details:
-Configure Devise's recoverable module, set up Action Mailer for email delivery, customize password reset emails, and implement account recovery options. Use Rails 8's built-in rate limiting. Documentation: https://github.com/heartcombo/devise/wiki/How-To:-Use-custom-mailer, https://guides.rubyonrails.org/action_mailer_basics.html
+Build password reset functionality using Rails 8's authentication system, set up Action Mailer for email delivery, create password reset tokens and forms, and implement account recovery options. Use Rails 8's built-in rate limiting for security. Documentation: https://guides.rubyonrails.org/action_mailer_basics.html, https://guides.rubyonrails.org/security.html#password-management
 
 ## 1.4. User Profile Management with Active Storage [pending]
 ### Dependencies: None
@@ -40,12 +40,6 @@ Create user profile pages with avatar upload using Active Storage, personal info
 ### Description: Implement secure session management using Rails 8's built-in security features.
 ### Details:
 Configure Rails 8's session management, implement secure cookie handling, CSRF protection, and security headers. Use Rails 8's built-in rate limiting and request throttling. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session
-
-## 1.6. Multi-Factor Authentication with Devise-Two-Factor [pending]
-### Dependencies: None
-### Description: Implement optional multi-factor authentication using Devise-Two-Factor gem.
-### Details:
-Integrate Devise-Two-Factor gem for TOTP-based MFA, implement authenticator app integration, SMS-based verification, and backup codes. Create MFA enrollment and recovery flows. Documentation: https://github.com/tinfoil/devise-two-factor, https://github.com/speakeasyjs/speakeasy
 
 ## 1.7. User Activity Monitoring with Rails Logging [pending]
 ### Dependencies: None

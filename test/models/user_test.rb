@@ -56,4 +56,35 @@ class UserTest < ActiveSupport::TestCase
       user.destroy
     end
   end
+  
+  test "should have default role of marketer" do
+    user = User.create!(email_address: "default@example.com", password: "password123")
+    assert_equal "marketer", user.role
+    assert user.marketer?
+    assert_not user.team_member?
+    assert_not user.admin?
+  end
+  
+  test "should be able to set role to team_member" do
+    user = User.create!(email_address: "team@example.com", password: "password123", role: :team_member)
+    assert_equal "team_member", user.role
+    assert user.team_member?
+    assert_not user.marketer?
+    assert_not user.admin?
+  end
+  
+  test "should be able to set role to admin" do
+    user = User.create!(email_address: "admin@example.com", password: "password123", role: :admin)
+    assert_equal "admin", user.role
+    assert user.admin?
+    assert_not user.marketer?
+    assert_not user.team_member?
+  end
+  
+  test "should have role enum methods" do
+    user = User.new
+    assert user.respond_to?(:marketer?)
+    assert user.respond_to?(:team_member?)
+    assert user.respond_to?(:admin?)
+  end
 end
