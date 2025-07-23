@@ -17,7 +17,7 @@ Unit tests for authentication flows using RSpec, integration tests for user mana
 ### Details:
 Generate authentication using 'rails generate authentication', which creates User model, authentication controllers, views, and database migrations. Configure authentication routes and implement basic registration/login functionality. Rails 8's authentication generator includes secure password handling, session management, and CSRF protection out of the box. Documentation: https://edgeguides.rubyonrails.org/authentication.html, https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session
 
-## 1.2. Role-Based Access Control with Pundit [pending]
+## 1.2. Role-Based Access Control with Pundit [done]
 ### Dependencies: None
 ### Description: Implement role-based access control using Pundit gem for authorization.
 ### Details:

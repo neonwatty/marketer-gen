@@ -24,7 +24,7 @@
             "title": "Role-Based Access Control with Pundit",
             "description": "Implement role-based access control using Pundit gem for authorization.",
             "details": "Integrate Pundit gem for authorization, create user roles (marketer, team member, admin), implement policy classes for different resources, and add authorization checks to controllers and views. Documentation: https://github.com/varvet/pundit, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
-            "status": "pending",
+            "status": "done",
             "priority": "high"
           },
           {

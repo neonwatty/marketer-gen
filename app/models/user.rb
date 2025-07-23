@@ -22,4 +22,14 @@ class User < ApplicationRecord
   def admin?
     role == "admin"
   end
+  
+  # Password reset token generation
+  def password_reset_token
+    signed_id(purpose: :password_reset, expires_in: 15.minutes)
+  end
+  
+  # Find user by password reset token
+  def self.find_by_password_reset_token!(token)
+    find_signed!(token, purpose: :password_reset)
+  end
 end
