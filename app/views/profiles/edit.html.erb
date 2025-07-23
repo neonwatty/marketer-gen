@@ -1,0 +1,116 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <% if alert.present? %>
+    <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
+  <% end %>
+
+  <div class="mb-8">
+    <h1 class="font-bold text-4xl">Edit Profile</h1>
+  </div>
+
+  <%= form_with model: @user, url: profile_path, method: :patch, local: true, class: "bg-white rounded-lg shadow p-6" do |form| %>
+    <% if @user.errors.any? %>
+      <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-lg mt-3">
+        <h2 class="font-bold mb-2"><%= pluralize(@user.errors.count, "error") %> prohibited this profile from being saved:</h2>
+        <ul>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Avatar Upload -->
+    <div class="mb-6">
+      <label class="block text-gray-700 text-sm font-bold mb-2">Profile Picture</label>
+      <div class="flex items-center space-x-4">
+        <% if @user.avatar.attached? %>
+          <%= image_tag @user.avatar_variant(:medium), class: "rounded-full w-24 h-24 object-cover" %>
+        <% else %>
+          <div class="rounded-full w-24 h-24 bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-500 text-2xl"><%= @user.display_name.first.upcase %></span>
+          </div>
+        <% end %>
+        <div>
+          <%= form.file_field :avatar, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+          <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF or WebP. Max 5MB.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-4">Personal Information</h3>
+      
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="mb-4">
+          <%= form.label :full_name, class: "block text-gray-700 text-sm font-bold mb-2" %>
+          <%= form.text_field :full_name, class: "shadow-sm appearance-none border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-600", placeholder: "John Doe" %>
+        </div>
+
+        <div class="mb-4">
+          <%= form.label :phone_number, class: "block text-gray-700 text-sm font-bold mb-2" %>
+          <%= form.text_field :phone_number, class: "shadow-sm appearance-none border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-600", placeholder: "+1 555-1234" %>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :bio, class: "block text-gray-700 text-sm font-bold mb-2" %>
+        <%= form.text_area :bio, rows: 4, class: "shadow-sm appearance-none border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-600", placeholder: "Tell us about yourself..." %>
+        <p class="text-xs text-gray-500 mt-1">Maximum 500 characters</p>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :timezone, class: "block text-gray-700 text-sm font-bold mb-2" %>
+        <%= form.time_zone_select :timezone, ActiveSupport::TimeZone.all, { default: @user.timezone }, { class: "shadow-sm appearance-none border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-600" } %>
+      </div>
+    </div>
+
+    <!-- Professional Information -->
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-4">Professional Information</h3>
+      
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="mb-4">
+          <%= form.label :company, class: "block text-gray-700 text-sm font-bold mb-2" %>
+          <%= form.text_field :company, class: "shadow-sm appearance-none border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-600", placeholder: "Acme Corp" %>
+        </div>
+
+        <div class="mb-4">
+          <%= form.label :job_title, class: "block text-gray-700 text-sm font-bold mb-2" %>
+          <%= form.text_field :job_title, class: "shadow-sm appearance-none border border-gray-400 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-600", placeholder: "Marketing Manager" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-4">Notification Preferences</h3>
+      
+      <div class="space-y-3">
+        <label class="flex items-center">
+          <%= form.check_box :notification_email, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+          <span class="ml-2 text-gray-700">Email notifications</span>
+          <span class="ml-2 text-xs text-gray-500">Receive important account notifications</span>
+        </label>
+
+        <label class="flex items-center">
+          <%= form.check_box :notification_marketing, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+          <span class="ml-2 text-gray-700">Marketing updates</span>
+          <span class="ml-2 text-xs text-gray-500">Stay informed about new features and promotions</span>
+        </label>
+
+        <label class="flex items-center">
+          <%= form.check_box :notification_product, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+          <span class="ml-2 text-gray-700">Product updates</span>
+          <span class="ml-2 text-xs text-gray-500">Get notified about product improvements</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex items-center justify-between pt-4 border-t">
+      <%= link_to "Cancel", profile_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+      <%= form.submit "Update Profile", class: "bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

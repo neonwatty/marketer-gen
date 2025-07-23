@@ -1,0 +1,102 @@
+<div class="mx-auto md:w-2/3 w-full">
+  <% if notice.present? %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+  <% end %>
+
+  <div class="mb-8">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="font-bold text-4xl">My Profile</h1>
+      <%= link_to "Edit Profile", edit_profile_path, class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium hover:bg-blue-500" %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <!-- Avatar Section -->
+    <div class="mb-6 text-center">
+      <% if @user.avatar.attached? %>
+        <%= image_tag @user.avatar_variant(:large), class: "mx-auto rounded-full w-32 h-32 object-cover mb-4" %>
+      <% else %>
+        <div class="mx-auto rounded-full w-32 h-32 bg-gray-200 flex items-center justify-center mb-4">
+          <span class="text-gray-500 text-4xl"><%= @user.display_name.first.upcase %></span>
+        </div>
+      <% end %>
+      <h2 class="text-2xl font-semibold"><%= @user.display_name %></h2>
+      <p class="text-gray-600"><%= @user.email_address %></p>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Personal Information</h3>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+          <p class="text-gray-900"><%= @user.full_name.presence || "Not set" %></p>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
+          <p class="text-gray-900"><%= @user.phone_number.presence || "Not set" %></p>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Timezone</label>
+          <p class="text-gray-900"><%= @user.timezone %></p>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Professional Information</h3>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Company</label>
+          <p class="text-gray-900"><%= @user.company.presence || "Not set" %></p>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Job Title</label>
+          <p class="text-gray-900"><%= @user.job_title.presence || "Not set" %></p>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>
+          <p class="text-gray-900"><%= @user.role.humanize %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bio Section -->
+    <div class="mt-6">
+      <label class="block text-gray-700 text-sm font-bold mb-2">Bio</label>
+      <p class="text-gray-900 whitespace-pre-wrap"><%= @user.bio.presence || "No bio yet" %></p>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="mt-6">
+      <h3 class="text-lg font-semibold mb-4">Notification Preferences</h3>
+      <div class="space-y-2">
+        <div class="flex items-center">
+          <%= check_box_tag nil, nil, @user.notification_email, disabled: true, class: "h-4 w-4 text-blue-600" %>
+          <label class="ml-2 text-gray-700">Email notifications</label>
+        </div>
+        <div class="flex items-center">
+          <%= check_box_tag nil, nil, @user.notification_marketing, disabled: true, class: "h-4 w-4 text-blue-600" %>
+          <label class="ml-2 text-gray-700">Marketing updates</label>
+        </div>
+        <div class="flex items-center">
+          <%= check_box_tag nil, nil, @user.notification_product, disabled: true, class: "h-4 w-4 text-blue-600" %>
+          <label class="ml-2 text-gray-700">Product updates</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Information -->
+    <div class="mt-6 pt-6 border-t">
+      <h3 class="text-lg font-semibold mb-4">Account Information</h3>
+      <div class="text-sm text-gray-600">
+        <p>Member since: <%= @user.created_at.strftime("%B %d, %Y") %></p>
+        <p>Last updated: <%= @user.updated_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+      </div>
+    </div>
+  </div>
+</div>

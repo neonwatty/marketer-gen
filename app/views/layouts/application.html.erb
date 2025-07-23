@@ -23,6 +23,26 @@
   </head>
 
   <body>
+    <% if authenticated? %>
+      <nav class="bg-white shadow-sm border-b">
+        <div class="container mx-auto px-5">
+          <div class="flex justify-between items-center py-4">
+            <div class="flex items-center space-x-8">
+              <%= link_to "Marketer Gen", root_path, class: "text-xl font-bold text-gray-900" %>
+              <% if current_user.admin? %>
+                <%= link_to "Users", users_path, class: "text-gray-600 hover:text-gray-900" %>
+              <% end %>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-600">Hello, <%= current_user.display_name %></span>
+              <%= link_to "My Profile", profile_path, class: "text-gray-600 hover:text-gray-900" %>
+              <%= button_to "Sign Out", session_path, method: :delete, class: "text-gray-600 hover:text-gray-900" %>
+            </div>
+          </div>
+        </div>
+      </nav>
+    <% end %>
+    
     <main class="container mx-auto mt-28 px-5 flex">
       <%= yield %>
     </main>

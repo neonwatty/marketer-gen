@@ -32,7 +32,7 @@
             "title": "Password Reset & Account Recovery",
             "description": "Implement password reset functionality with email delivery using Rails 8.",
             "details": "Build password reset functionality using Rails 8's authentication system, set up Action Mailer for email delivery, create password reset tokens and forms, and implement account recovery options. Use Rails 8's built-in rate limiting for security. Documentation: https://guides.rubyonrails.org/action_mailer_basics.html, https://guides.rubyonrails.org/security.html#password-management",
-            "status": "pending",
+            "status": "done",
             "priority": "medium"
           },
           {
