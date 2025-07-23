@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_085326) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_23_091823) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -45,6 +45,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_085326) do
     t.string "user_agent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "last_active_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "expires_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["expires_at"], name: "index_sessions_on_expires_at"
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 

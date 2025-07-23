@@ -2,6 +2,11 @@ class ProfilesController < ApplicationController
   before_action :set_user
   before_action :authorize_user
   
+  # Rate limit profile updates to prevent abuse
+  rate_limit to: 30, within: 1.hour, only: :update, with: -> { 
+    redirect_to edit_profile_path, alert: "Too many update attempts. Please try again later." 
+  }
+  
   def show
   end
 

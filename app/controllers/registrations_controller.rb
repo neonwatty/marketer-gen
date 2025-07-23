@@ -1,6 +1,11 @@
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access
   
+  # Rate limit registration attempts to prevent abuse
+  rate_limit to: 5, within: 1.hour, only: :create, with: -> { 
+    redirect_to new_registration_path, alert: "Too many registration attempts. Please try again later." 
+  }
+  
   def new
     @user = User.new
   end

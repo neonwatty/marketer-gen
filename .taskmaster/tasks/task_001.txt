@@ -29,7 +29,7 @@ Integrate Pundit gem for authorization, create user roles (marketer, team member
 ### Details:
 Build password reset functionality using Rails 8's authentication system, set up Action Mailer for email delivery, create password reset tokens and forms, and implement account recovery options. Use Rails 8's built-in rate limiting for security. Documentation: https://guides.rubyonrails.org/action_mailer_basics.html, https://guides.rubyonrails.org/security.html#password-management
 
-## 1.4. User Profile Management with Active Storage [pending]
+## 1.4. User Profile Management with Active Storage [done]
 ### Dependencies: None
 ### Description: Build user profile management using Rails Active Storage for file uploads.
 ### Details:

@@ -40,7 +40,7 @@
             "title": "User Profile Management with Active Storage",
             "description": "Build user profile management using Rails Active Storage for file uploads.",
             "details": "Create user profile pages with avatar upload using Active Storage, personal information management, notification preferences, and account settings. Implement profile data validation using Rails validations. Documentation: https://guides.rubyonrails.org/active_storage_overview.html, https://guides.rubyonrails.org/active_record_validations.html",
-            "status": "pending",
+            "status": "done",
             "priority": "medium"
           },
           {

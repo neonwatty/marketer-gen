@@ -11,5 +11,10 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+    
+    # Helper method for sign in path
+    def sign_in_path
+      new_session_path
+    end
   end
 end

@@ -97,6 +97,9 @@
         <p>Member since: <%= @user.created_at.strftime("%B %d, %Y") %></p>
         <p>Last updated: <%= @user.updated_at.strftime("%B %d, %Y at %I:%M %p") %></p>
       </div>
+      <div class="mt-4">
+        <%= link_to "Manage Active Sessions", user_sessions_path, class: "text-blue-600 hover:text-blue-800 font-medium" %>
+      </div>
     </div>
   </div>
 </div>

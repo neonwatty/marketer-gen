@@ -23,5 +23,26 @@ module MarketerGen
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    
+    # Security configurations
+    # Force SSL in production
+    config.force_ssl = true if Rails.env.production?
+    
+    # Session security
+    config.session_store :cookie_store, 
+      key: '_marketer_gen_session',
+      secure: Rails.env.production?,
+      httponly: true,
+      same_site: :lax,
+      expire_after: 24.hours
+    
+    # Security headers
+    config.action_dispatch.default_headers = {
+      'X-Frame-Options' => 'DENY',
+      'X-Content-Type-Options' => 'nosniff',
+      'X-XSS-Protection' => '0', # Modern browsers don't need this
+      'Referrer-Policy' => 'strict-origin-when-cross-origin',
+      'Permissions-Policy' => 'geolocation=(), microphone=(), camera=()'
+    }
   end
 end
