@@ -64,8 +64,13 @@ end
 # Authorization
 gem "pundit", "~> 2.3"
 
+# Admin interface
+gem "rails_admin", "~> 3.2"
+gem "sassc-rails" # Required for Rails Admin styling
+
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
 end
+gem "cssbundling-rails"

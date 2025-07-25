@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_23_091823) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_25_163115) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_091823) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "admin_audit_logs", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "action"
+    t.string "auditable_type"
+    t.integer "auditable_id"
+    t.text "change_details"
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_admin_audit_logs_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -72,5 +85,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_23_091823) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "admin_audit_logs", "users"
   add_foreign_key "sessions", "users"
 end

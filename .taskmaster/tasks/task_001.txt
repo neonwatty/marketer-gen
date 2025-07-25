@@ -35,7 +35,7 @@ Build password reset functionality using Rails 8's authentication system, set up
 ### Details:
 Create user profile pages with avatar upload using Active Storage, personal information management, notification preferences, and account settings. Implement profile data validation using Rails validations. Documentation: https://guides.rubyonrails.org/active_storage_overview.html, https://guides.rubyonrails.org/active_record_validations.html
 
-## 1.5. Session Management & Security with Rails 8 [pending]
+## 1.5. Session Management & Security with Rails 8 [done]
 ### Dependencies: None
 ### Description: Implement secure session management using Rails 8's built-in security features.
 ### Details:
