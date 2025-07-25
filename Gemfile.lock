@@ -452,6 +452,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
+  kaminari
   letter_opener
   propshaft
   puma (>= 5.0)

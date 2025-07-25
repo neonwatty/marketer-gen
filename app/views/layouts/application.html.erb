@@ -31,11 +31,13 @@
               <%= link_to "Marketer Gen", root_path, class: "text-xl font-bold text-gray-900" %>
               <% if current_user.admin? %>
                 <%= link_to "Users", users_path, class: "text-gray-600 hover:text-gray-900" %>
+                <%= link_to "Admin Panel", rails_admin_path, class: "text-gray-600 hover:text-gray-900" %>
               <% end %>
             </div>
             <div class="flex items-center space-x-4">
               <span class="text-gray-600">Hello, <%= current_user.display_name %></span>
               <%= link_to "My Profile", profile_path, class: "text-gray-600 hover:text-gray-900" %>
+              <%= link_to "Activity Log", activities_path, class: "text-gray-600 hover:text-gray-900" %>
               <%= button_to "Sign Out", session_path, method: :delete, class: "text-gray-600 hover:text-gray-900" %>
             </div>
           </div>

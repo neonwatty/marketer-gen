@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_25_163115) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_25_200103) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,35 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_25_163115) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "activities", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "action", null: false
+    t.string "controller", null: false
+    t.string "request_path"
+    t.string "request_method"
+    t.string "ip_address"
+    t.text "user_agent"
+    t.string "session_id"
+    t.integer "response_status"
+    t.float "response_time"
+    t.text "metadata"
+    t.datetime "occurred_at", null: false
+    t.string "referrer"
+    t.boolean "suspicious", default: false
+    t.string "device_type"
+    t.string "browser_name"
+    t.string "os_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_activities_on_action"
+    t.index ["ip_address"], name: "index_activities_on_ip_address"
+    t.index ["occurred_at"], name: "index_activities_on_occurred_at"
+    t.index ["session_id"], name: "index_activities_on_session_id"
+    t.index ["suspicious"], name: "index_activities_on_suspicious"
+    t.index ["user_id", "occurred_at"], name: "index_activities_on_user_id_and_occurred_at"
+    t.index ["user_id"], name: "index_activities_on_user_id"
   end
 
   create_table "admin_audit_logs", force: :cascade do |t|
@@ -79,12 +108,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_25_163115) do
     t.boolean "notification_email", default: true, null: false
     t.boolean "notification_marketing", default: true, null: false
     t.boolean "notification_product", default: true, null: false
+    t.datetime "locked_at"
+    t.string "lock_reason"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["role"], name: "index_users_on_role"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "activities", "users"
   add_foreign_key "admin_audit_logs", "users"
   add_foreign_key "sessions", "users"
 end

@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_one_attached :avatar
+  has_many :activities, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   
@@ -48,6 +49,19 @@ class User < ApplicationRecord
   # Profile helpers
   def display_name
     full_name.presence || email_address.split("@").first
+  end
+  
+  # Account locking
+  def locked?
+    locked_at.present?
+  end
+  
+  def unlock!
+    update!(locked_at: nil, lock_reason: nil)
+  end
+  
+  def lock!(reason = "Account locked for security reasons")
+    update!(locked_at: Time.current, lock_reason: reason)
   end
   
   def avatar_variant(size)

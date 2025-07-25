@@ -32,6 +32,10 @@ module Authentication
         if Current.session.expired? || Current.session.inactive?
           terminate_session
           false
+        elsif Current.session.user.locked?
+          terminate_session
+          redirect_to new_session_path, alert: "Your account has been locked: #{Current.session.user.lock_reason}"
+          false
         else
           Current.session.touch_activity!
           true
