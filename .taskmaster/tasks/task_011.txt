@@ -1,7 +1,7 @@
 # Task ID: 11
 # Title: User Interface & Dashboard Design
 # Status: pending
-# Dependencies: 1 (Not found), 2 (Not found), 5 (Not found)
+# Dependencies: None
 # Priority: high
 # Description: Design and implement the main user interface with intuitive dashboard and campaign management tools.
 # Details:

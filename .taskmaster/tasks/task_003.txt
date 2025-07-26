@@ -1,7 +1,7 @@
 # Task ID: 3
 # Title: Brand Identity & Messaging Integration
 # Status: pending
-# Dependencies: 1 (Not found)
+# Dependencies: None
 # Priority: high
 # Description: Build the brand identity system that processes uploaded materials and ensures generated content adheres to brand guidelines.
 # Details:

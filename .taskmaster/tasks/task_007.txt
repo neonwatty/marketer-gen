@@ -1,7 +1,7 @@
 # Task ID: 7
 # Title: A/B Testing Workflow System
 # Status: pending
-# Dependencies: 6 (Not found)
+# Dependencies: None
 # Priority: medium
 # Description: Implement A/B testing capabilities for content optimization and performance tracking.
 # Details:

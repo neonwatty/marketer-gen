@@ -1,7 +1,7 @@
 # Task ID: 5
 # Title: Campaign Summary Plan Generator
 # Status: pending
-# Dependencies: 2 (Not found), 4 (Not found)
+# Dependencies: None
 # Priority: medium
 # Description: Create the campaign summary plan feature that generates comprehensive plans before content creation.
 # Details:

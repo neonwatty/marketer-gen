@@ -1,7 +1,7 @@
 # Task ID: 6
 # Title: Content Management & Version Control
 # Status: pending
-# Dependencies: 4 (Not found)
+# Dependencies: None
 # Priority: medium
 # Description: Build the content management system with version control and editing capabilities.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 18
 # Title: Documentation & User Training Materials
 # Status: pending
-# Dependencies: 11 (Not found)
+# Dependencies: None
 # Priority: low
 # Description: Create comprehensive documentation and training materials for users and administrators.
 # Details:

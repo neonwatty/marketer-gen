@@ -1,7 +1,7 @@
 # Task ID: 4
 # Title: LLM Integration for Content Generation
 # Status: pending
-# Dependencies: 3 (Not found)
+# Dependencies: None
 # Priority: high
 # Description: Integrate LLM capabilities for intelligent content generation and campaign planning throughout the platform.
 # Details:

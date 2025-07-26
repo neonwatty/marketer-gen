@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_26_171339) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_26_184452) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -81,6 +81,75 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_171339) do
     t.index ["user_id"], name: "index_admin_audit_logs_on_user_id"
   end
 
+  create_table "journey_steps", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.string "stage", null: false
+    t.integer "position", default: 0, null: false
+    t.string "content_type"
+    t.string "channel"
+    t.integer "duration_days", default: 1
+    t.json "config", default: {}
+    t.json "conditions", default: {}
+    t.json "metadata", default: {}
+    t.boolean "is_entry_point", default: false
+    t.boolean "is_exit_point", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel"], name: "index_journey_steps_on_channel"
+    t.index ["content_type"], name: "index_journey_steps_on_content_type"
+    t.index ["journey_id", "position"], name: "index_journey_steps_on_journey_id_and_position"
+    t.index ["journey_id", "stage"], name: "index_journey_steps_on_journey_id_and_stage"
+    t.index ["journey_id"], name: "index_journey_steps_on_journey_id"
+    t.index ["stage"], name: "index_journey_steps_on_stage"
+  end
+
+  create_table "journey_templates", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "category", null: false
+    t.string "campaign_type"
+    t.boolean "is_active", default: true
+    t.integer "usage_count", default: 0
+    t.json "template_data", default: {}
+    t.json "metadata", default: {}
+    t.string "thumbnail_url"
+    t.integer "estimated_duration_days"
+    t.string "difficulty_level"
+    t.text "best_practices"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_type"], name: "index_journey_templates_on_campaign_type"
+    t.index ["category", "is_active"], name: "index_journey_templates_on_category_and_is_active"
+    t.index ["category"], name: "index_journey_templates_on_category"
+    t.index ["is_active"], name: "index_journey_templates_on_is_active"
+    t.index ["usage_count"], name: "index_journey_templates_on_usage_count"
+  end
+
+  create_table "journeys", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.string "status", default: "draft", null: false
+    t.string "brand_id"
+    t.string "campaign_type"
+    t.text "target_audience"
+    t.text "goals"
+    t.json "metadata", default: {}
+    t.json "settings", default: {}
+    t.datetime "published_at"
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id"], name: "index_journeys_on_brand_id"
+    t.index ["campaign_type"], name: "index_journeys_on_campaign_type"
+    t.index ["published_at"], name: "index_journeys_on_published_at"
+    t.index ["status"], name: "index_journeys_on_status"
+    t.index ["user_id", "status"], name: "index_journeys_on_user_id_and_status"
+    t.index ["user_id"], name: "index_journeys_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -91,6 +160,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_171339) do
     t.datetime "expires_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["expires_at"], name: "index_sessions_on_expires_at"
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "step_transitions", force: :cascade do |t|
+    t.integer "from_step_id", null: false
+    t.integer "to_step_id", null: false
+    t.json "conditions", default: {}
+    t.integer "priority", default: 0
+    t.string "transition_type", default: "sequential"
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["from_step_id", "to_step_id"], name: "index_step_transitions_on_from_step_id_and_to_step_id", unique: true
+    t.index ["from_step_id"], name: "index_step_transitions_on_from_step_id"
+    t.index ["priority"], name: "index_step_transitions_on_priority"
+    t.index ["to_step_id"], name: "index_step_transitions_on_to_step_id"
+    t.index ["transition_type"], name: "index_step_transitions_on_transition_type"
   end
 
   create_table "user_activities", force: :cascade do |t|
@@ -139,7 +224,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_171339) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "admin_audit_logs", "users"
+  add_foreign_key "journey_steps", "journeys"
+  add_foreign_key "journeys", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "step_transitions", "journey_steps", column: "from_step_id"
+  add_foreign_key "step_transitions", "journey_steps", column: "to_step_id"
   add_foreign_key "user_activities", "users"
   add_foreign_key "users", "users", column: "suspended_by_id"
 end

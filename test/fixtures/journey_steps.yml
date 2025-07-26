@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  journey: one
+  name: MyString
+  description: MyText
+  stage: MyString
+  position: 1
+  content_type: MyString
+  channel: MyString
+  duration_days: 1
+
+two:
+  journey: two
+  name: MyString
+  description: MyText
+  stage: MyString
+  position: 1
+  content_type: MyString
+  channel: MyString
+  duration_days: 1

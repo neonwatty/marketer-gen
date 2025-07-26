@@ -1,7 +1,7 @@
 # Task ID: 10
 # Title: Export & Integration System
 # Status: pending
-# Dependencies: 6 (Not found), 8 (Not found)
+# Dependencies: None
 # Priority: medium
 # Description: Create export functionality and platform integrations for seamless campaign deployment.
 # Details:

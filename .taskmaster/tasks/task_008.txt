@@ -1,7 +1,7 @@
 # Task ID: 8
 # Title: Performance Monitoring & Analytics Dashboard
 # Status: pending
-# Dependencies: 6 (Not found)
+# Dependencies: None
 # Priority: medium
 # Description: Develop the performance monitoring system with integrations and analytics dashboard.
 # Details:

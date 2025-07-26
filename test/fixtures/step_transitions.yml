@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  from_step: one
+  to_step: one
+  conditions: MyText
+  priority: 1
+
+two:
+  from_step: two
+  to_step: two
+  conditions: MyText
+  priority: 1

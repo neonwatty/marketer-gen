@@ -1,7 +1,7 @@
 # Task ID: 20
 # Title: Deployment & Infrastructure Setup
 # Status: pending
-# Dependencies: 17 (Not found)
+# Dependencies: None
 # Priority: high
 # Description: Set up production deployment infrastructure and operational processes.
 # Details:

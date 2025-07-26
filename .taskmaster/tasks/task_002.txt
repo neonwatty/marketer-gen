@@ -1,7 +1,7 @@
 # Task ID: 2
 # Title: Guided Customer Journey Builder
 # Status: pending
-# Dependencies: 1 (Not found)
+# Dependencies: None
 # Priority: high
 # Description: Develop the core journey builder functionality that allows marketers to define customer journeys and automatically suggests appropriate journey steps.
 # Details:

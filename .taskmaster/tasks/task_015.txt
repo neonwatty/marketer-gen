@@ -1,7 +1,7 @@
 # Task ID: 15
 # Title: API Development & Third-Party Integrations
 # Status: pending
-# Dependencies: 8 (Not found), 10 (Not found)
+# Dependencies: None
 # Priority: medium
 # Description: Create comprehensive API for third-party integrations and platform extensibility.
 # Details:

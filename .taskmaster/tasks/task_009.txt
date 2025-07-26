@@ -1,7 +1,7 @@
 # Task ID: 9
 # Title: Team Collaboration & Approval Workflows
 # Status: pending
-# Dependencies: 1 (Not found), 6 (Not found)
+# Dependencies: None
 # Priority: medium
 # Description: Implement collaboration features for team-based campaign creation and approval processes.
 # Details:
