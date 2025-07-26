@@ -1,6 +1,10 @@
 class JourneyTemplate < ApplicationRecord
   has_many :journeys
   
+  # Versioning associations
+  belongs_to :original_template, class_name: 'JourneyTemplate', optional: true
+  has_many :versions, class_name: 'JourneyTemplate', foreign_key: 'original_template_id', dependent: :destroy
+  
   CATEGORIES = %w[
     b2b
     b2c
@@ -16,17 +20,21 @@ class JourneyTemplate < ApplicationRecord
   
   DIFFICULTY_LEVELS = %w[beginner intermediate advanced].freeze
   
-  validates :name, presence: true, uniqueness: true
+  validates :name, presence: true
   validates :category, presence: true, inclusion: { in: CATEGORIES }
   validates :campaign_type, inclusion: { in: Journey::CAMPAIGN_TYPES }, allow_blank: true
   validates :difficulty_level, inclusion: { in: DIFFICULTY_LEVELS }, allow_blank: true
   validates :estimated_duration_days, numericality: { greater_than: 0 }, allow_blank: true
+  validates :version, presence: true, numericality: { greater_than: 0 }
+  validates :version, uniqueness: { scope: :original_template_id }, if: :original_template_id?
   
   scope :active, -> { where(is_active: true) }
   scope :by_category, ->(category) { where(category: category) }
   scope :by_campaign_type, ->(type) { where(campaign_type: type) }
   scope :popular, -> { order(usage_count: :desc) }
   scope :recent, -> { order(created_at: :desc) }
+  scope :published_versions, -> { where(is_published_version: true) }
+  scope :latest_versions, -> { joins("LEFT JOIN journey_templates jt2 ON jt2.original_template_id = journey_templates.original_template_id AND jt2.version > journey_templates.version").where("jt2.id IS NULL") }
   
   def create_journey_for_user(user, journey_params = {})
     journey = user.journeys.build(
@@ -72,7 +80,95 @@ class JourneyTemplate < ApplicationRecord
     preview_steps.map { |step| step['content_type'] }.uniq.compact
   end
   
+  def is_original?
+    original_template_id.nil?
+  end
+  
+  def root_template
+    original_template || self
+  end
+  
+  def all_versions
+    if is_original?
+      [self] + versions.order(:version)
+    else
+      original_template.versions.order(:version)
+    end
+  end
+  
+  def latest_version
+    if is_original?
+      versions.order(:version).last || self
+    else
+      original_template.latest_version
+    end
+  end
+  
+  def create_new_version(version_params = {})
+    new_version_number = calculate_next_version_number
+    
+    new_version = self.dup
+    new_version.assign_attributes(
+      original_template: root_template,
+      version: new_version_number,
+      parent_version: version,
+      version_notes: version_params[:version_notes],
+      is_published_version: version_params[:is_published_version] || false,
+      usage_count: 0,
+      is_active: true
+    )
+    
+    # Update name to include version if it's not the original
+    unless new_version.name.match(/v\d+\.\d+/)
+      new_version.name = "#{name} v#{new_version_number}"
+    end
+    
+    new_version
+  end
+  
+  def publish_version!
+    transaction do
+      # Unpublish other versions of the same template
+      root_template.versions.update_all(is_published_version: false)
+      if root_template != self
+        root_template.update!(is_published_version: false)
+      end
+      
+      # Publish this version
+      update!(is_published_version: true)
+    end
+  end
+  
+  def version_history
+    all_versions.map do |version|
+      {
+        version: version.version,
+        created_at: version.created_at,
+        version_notes: version.version_notes,
+        is_published: version.is_published_version,
+        usage_count: version.usage_count
+      }
+    end
+  end
+  
   private
+  
+  def calculate_next_version_number
+    existing_versions = root_template.versions.pluck(:version)
+    existing_versions << root_template.version
+    
+    major_version = existing_versions.map(&:to_i).max || 1
+    minor_versions = existing_versions.select { |v| v.to_i == major_version }.map { |v| (v % 1 * 100).to_i }
+    next_minor = (minor_versions.max || 0) + 1
+    
+    # If minor version reaches 100, increment major version
+    if next_minor >= 100
+      major_version += 1
+      next_minor = 0
+    end
+    
+    major_version + (next_minor / 100.0)
+  end
   
   def create_steps_for_journey(journey)
     return unless template_data['steps'].present?

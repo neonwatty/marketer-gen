@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  resources :journey_templates do
+    member do
+      post :clone
+      post :use_template
+    end
+  end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin' unless Rails.env.test?
   root "home#index"
   

@@ -7,3 +7,7 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# Load journey templates
+puts "Seeding journey templates..."
+load Rails.root.join('db', 'seeds', 'journey_templates.rb')

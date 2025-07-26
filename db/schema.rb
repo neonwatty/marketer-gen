@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_26_185126) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_26_190934) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -142,10 +142,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_185126) do
     t.text "best_practices"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "version", precision: 5, scale: 2, default: "1.0", null: false
+    t.integer "original_template_id"
+    t.decimal "parent_version", precision: 5, scale: 2
+    t.text "version_notes"
+    t.boolean "is_published_version", default: true, null: false
     t.index ["campaign_type"], name: "index_journey_templates_on_campaign_type"
     t.index ["category", "is_active"], name: "index_journey_templates_on_category_and_is_active"
     t.index ["category"], name: "index_journey_templates_on_category"
     t.index ["is_active"], name: "index_journey_templates_on_is_active"
+    t.index ["is_published_version"], name: "index_journey_templates_on_is_published_version"
+    t.index ["original_template_id", "version"], name: "index_journey_templates_on_original_template_id_and_version", unique: true
+    t.index ["original_template_id"], name: "index_journey_templates_on_original_template_id"
     t.index ["usage_count"], name: "index_journey_templates_on_usage_count"
   end
 
@@ -268,6 +276,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_185126) do
   add_foreign_key "journey_executions", "journeys"
   add_foreign_key "journey_executions", "users"
   add_foreign_key "journey_steps", "journeys"
+  add_foreign_key "journey_templates", "journey_templates", column: "original_template_id"
   add_foreign_key "journeys", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "step_executions", "journey_executions"
