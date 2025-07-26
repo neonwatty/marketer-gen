@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_26_184452) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_26_185126) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -79,6 +79,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_184452) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_admin_audit_logs_on_user_id"
+  end
+
+  create_table "journey_executions", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.integer "user_id", null: false
+    t.integer "current_step_id"
+    t.string "status", default: "initialized", null: false
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.datetime "paused_at"
+    t.json "execution_context", default: {}
+    t.json "metadata", default: {}
+    t.text "completion_notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["completed_at"], name: "index_journey_executions_on_completed_at"
+    t.index ["current_step_id"], name: "index_journey_executions_on_current_step_id"
+    t.index ["journey_id"], name: "index_journey_executions_on_journey_id"
+    t.index ["started_at"], name: "index_journey_executions_on_started_at"
+    t.index ["status"], name: "index_journey_executions_on_status"
+    t.index ["user_id", "journey_id"], name: "index_journey_executions_on_user_id_and_journey_id", unique: true
+    t.index ["user_id"], name: "index_journey_executions_on_user_id"
   end
 
   create_table "journey_steps", force: :cascade do |t|
@@ -162,6 +184,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_184452) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "step_executions", force: :cascade do |t|
+    t.integer "journey_execution_id", null: false
+    t.integer "journey_step_id", null: false
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.string "status", default: "pending"
+    t.json "context", default: {}
+    t.json "result_data", default: {}
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["journey_execution_id", "journey_step_id"], name: "index_step_executions_on_execution_and_step"
+    t.index ["journey_execution_id"], name: "index_step_executions_on_journey_execution_id"
+    t.index ["journey_step_id"], name: "index_step_executions_on_journey_step_id"
+    t.index ["started_at"], name: "index_step_executions_on_started_at"
+    t.index ["status"], name: "index_step_executions_on_status"
+  end
+
   create_table "step_transitions", force: :cascade do |t|
     t.integer "from_step_id", null: false
     t.integer "to_step_id", null: false
@@ -224,9 +264,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_184452) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "admin_audit_logs", "users"
+  add_foreign_key "journey_executions", "journey_steps", column: "current_step_id"
+  add_foreign_key "journey_executions", "journeys"
+  add_foreign_key "journey_executions", "users"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journeys", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "step_executions", "journey_executions"
+  add_foreign_key "step_executions", "journey_steps"
   add_foreign_key "step_transitions", "journey_steps", column: "from_step_id"
   add_foreign_key "step_transitions", "journey_steps", column: "to_step_id"
   add_foreign_key "user_activities", "users"

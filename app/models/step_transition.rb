@@ -44,19 +44,19 @@ class StepTransition < ApplicationRecord
   def evaluate_condition(condition_type, condition_value, context)
     case condition_type
     when 'engagement_threshold'
-      context[:engagement_score].to_f >= condition_value.to_f
+      context['engagement_score'].to_f >= condition_value.to_f
     when 'action_completed'
-      Array(context[:completed_actions]).include?(condition_value)
+      Array(context['completed_actions']).include?(condition_value)
     when 'time_elapsed'
-      context[:time_elapsed].to_i >= condition_value.to_i
+      context['time_elapsed'].to_i >= condition_value.to_i
     when 'form_submitted'
-      context[:submitted_forms]&.include?(condition_value)
+      context['submitted_forms']&.include?(condition_value)
     when 'link_clicked'
-      context[:clicked_links]&.include?(condition_value)
+      context['clicked_links']&.include?(condition_value)
     when 'purchase_made'
-      context[:purchases]&.any? { |p| p[:product_id] == condition_value }
+      context['purchases']&.any? { |p| p['product_id'] == condition_value }
     when 'score_range'
-      score = context[:score].to_f
+      score = context['score'].to_f
       score >= condition_value['min'].to_f && score <= condition_value['max'].to_f
     else
       true

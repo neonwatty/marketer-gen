@@ -3,6 +3,8 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_one_attached :avatar
   has_many :activities, dependent: :destroy
+  has_many :journeys, dependent: :destroy
+  has_many :journey_executions, dependent: :destroy
   
   # Self-referential association for suspension tracking
   belongs_to :suspended_by, class_name: "User", optional: true

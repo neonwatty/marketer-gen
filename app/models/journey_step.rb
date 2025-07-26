@@ -74,9 +74,11 @@ class JourneyStep < ApplicationRecord
   end
   
   def add_transition_to(to_step, conditions = {})
+    transition_type = conditions.present? ? 'conditional' : 'sequential'
     transitions_from.create!(
       to_step: to_step,
-      conditions: conditions
+      conditions: conditions,
+      transition_type: transition_type
     )
   end
   
@@ -94,11 +96,11 @@ class JourneyStep < ApplicationRecord
     conditions.all? do |key, value|
       case key
       when 'min_engagement_score'
-        context[:engagement_score].to_i >= value.to_i
+        context['engagement_score'].to_i >= value.to_i
       when 'completed_action'
-        context[:completed_actions]&.include?(value)
+        context['completed_actions']&.include?(value)
       when 'time_since_last_action'
-        context[:time_since_last_action].to_i >= value.to_i
+        context['time_since_last_action'].to_i >= value.to_i
       else
         true
       end

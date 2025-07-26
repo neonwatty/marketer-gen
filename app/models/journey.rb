@@ -2,6 +2,7 @@ class Journey < ApplicationRecord
   belongs_to :user
   has_many :journey_steps, dependent: :destroy
   has_many :step_transitions, through: :journey_steps
+  has_many :journey_executions, dependent: :destroy
   
   STATUSES = %w[draft published archived].freeze
   CAMPAIGN_TYPES = %w[
@@ -34,6 +35,10 @@ class Journey < ApplicationRecord
   
   def archive!
     update!(status: 'archived', archived_at: Time.current)
+  end
+  
+  def published?
+    status == 'published'
   end
   
   def duplicate

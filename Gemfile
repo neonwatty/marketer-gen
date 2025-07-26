@@ -81,3 +81,6 @@ gem "cssbundling-rails"
 
 # Pagination
 gem "kaminari"
+
+# State machine for journey flow
+gem "aasm", "~> 5.5"
