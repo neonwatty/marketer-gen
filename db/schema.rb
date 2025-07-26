@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_26_131525) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_26_171339) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -93,6 +93,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_131525) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "user_activities", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "action"
+    t.string "controller_name"
+    t.string "action_name"
+    t.string "resource_type"
+    t.integer "resource_id"
+    t.string "ip_address"
+    t.text "user_agent"
+    t.text "request_params"
+    t.json "metadata"
+    t.datetime "performed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_activities_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
@@ -123,5 +140,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_131525) do
   add_foreign_key "activities", "users"
   add_foreign_key "admin_audit_logs", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "user_activities", "users"
   add_foreign_key "users", "users", column: "suspended_by_id"
 end
