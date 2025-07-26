@@ -2,4 +2,3 @@
 //= link rails_admin.css
 //= link rails_admin.js
 //= link_tree ../builds
-//= link application.js
