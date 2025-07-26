@@ -9,6 +9,8 @@ class SessionsController < ApplicationController
     if user = User.authenticate_by(params.permit(:email_address, :password))
       if user.locked?
         redirect_to new_session_path, alert: "Your account has been locked: #{user.lock_reason}"
+      elsif user.suspended?
+        redirect_to new_session_path, alert: "Your account has been suspended: #{user.suspension_reason}"
       else
         start_new_session_for(user, remember_me: params[:remember_me] == "1")
         redirect_to after_authentication_url

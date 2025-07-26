@@ -19,6 +19,21 @@ class UserPolicy < ApplicationPolicy
     user.admin? && user != record
   end
   
+  # Only admins can change user roles (but not their own)
+  def change_role?
+    user.admin? && user != record
+  end
+  
+  # Only admins can suspend users (but not themselves)
+  def suspend?
+    user.admin? && user != record
+  end
+  
+  # Only admins can unsuspend users
+  def unsuspend?
+    user.admin?
+  end
+  
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.admin?

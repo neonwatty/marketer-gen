@@ -87,4 +87,53 @@ class UserTest < ActiveSupport::TestCase
     assert user.respond_to?(:team_member?)
     assert user.respond_to?(:admin?)
   end
+  
+  # Suspension functionality tests
+  test "user can be suspended" do
+    admin = User.create!(email_address: "admin@example.com", password: "password", role: "admin")
+    user = User.create!(email_address: "user@example.com", password: "password")
+    
+    assert_not user.suspended?
+    
+    user.suspend!(reason: "Terms violation", by: admin)
+    
+    assert user.suspended?
+    assert_not_nil user.suspended_at
+    assert_equal "Terms violation", user.suspension_reason
+    assert_equal admin, user.suspended_by
+  end
+  
+  test "suspended user can be unsuspended" do
+    admin = User.create!(email_address: "admin@example.com", password: "password", role: "admin")
+    user = User.create!(email_address: "user@example.com", password: "password")
+    
+    user.suspend!(reason: "Test", by: admin)
+    assert user.suspended?
+    
+    user.unsuspend!
+    
+    assert_not user.suspended?
+    assert_nil user.suspended_at
+    assert_nil user.suspension_reason
+    assert_nil user.suspended_by
+  end
+  
+  test "account_accessible? returns false for locked users" do
+    user = User.create!(email_address: "user@example.com", password: "password")
+    
+    assert user.account_accessible?
+    
+    user.lock!("Security breach")
+    assert_not user.account_accessible?
+  end
+  
+  test "account_accessible? returns false for suspended users" do
+    admin = User.create!(email_address: "admin@example.com", password: "password", role: "admin")
+    user = User.create!(email_address: "user@example.com", password: "password")
+    
+    assert user.account_accessible?
+    
+    user.suspend!(reason: "Test", by: admin)
+    assert_not user.account_accessible?
+  end
 end

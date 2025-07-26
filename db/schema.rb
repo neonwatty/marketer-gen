@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_25_200103) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_26_131525) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -110,8 +110,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_25_200103) do
     t.boolean "notification_product", default: true, null: false
     t.datetime "locked_at"
     t.string "lock_reason"
+    t.datetime "suspended_at"
+    t.text "suspension_reason"
+    t.integer "suspended_by_id"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["role"], name: "index_users_on_role"
+    t.index ["suspended_at"], name: "index_users_on_suspended_at"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -119,4 +123,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_25_200103) do
   add_foreign_key "activities", "users"
   add_foreign_key "admin_audit_logs", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "users", "users", column: "suspended_by_id"
 end

@@ -1,10 +1,16 @@
+# Load custom actions first
+require Rails.root.join('config/initializers/rails_admin_custom_actions.rb')
+
 RailsAdmin.config do |config|
   config.asset_source = :importmap
+  
+  # Include custom helpers
+  config.included_models = ["User", "Session", "AdminAuditLog", "Activity"]
 
   ### Popular gems integration
 
   ## == Custom Authentication ==
-  config.parent_controller = "ApplicationController"
+  config.parent_controller = "::RailsAdmin::ApplicationController"
   
   config.authenticate_with do
     unless current_user
@@ -36,6 +42,10 @@ RailsAdmin.config do |config|
     edit
     delete
     show_in_app
+    
+    # Custom actions
+    suspend
+    unsuspend
 
     ## With an audit adapter, you can add:
     # history_index
@@ -56,8 +66,19 @@ RailsAdmin.config do |config|
       end
       field :company
       field :job_title
+      field :suspended_at do
+        label "Status"
+        pretty_value do
+          if bindings[:object].suspended?
+            bindings[:view].content_tag(:span, "Suspended", class: "label label-danger")
+          elsif bindings[:object].locked?
+            bindings[:view].content_tag(:span, "Locked", class: "label label-warning")
+          else
+            bindings[:view].content_tag(:span, "Active", class: "label label-success")
+          end
+        end
+      end
       field :created_at
-      field :updated_at
     end
     
     # Show view configuration
@@ -106,6 +127,24 @@ RailsAdmin.config do |config|
         label "Timestamps"
         field :created_at
         field :updated_at
+      end
+      
+      group :account_status do
+        label "Account Status"
+        field :locked_at
+        field :lock_reason
+        field :suspended_at
+        field :suspension_reason
+        field :suspended_by do
+          pretty_value do
+            if bindings[:object].suspended_by
+              bindings[:view].link_to(bindings[:object].suspended_by.email_address, 
+                bindings[:view].rails_admin.show_path(model_name: 'user', id: bindings[:object].suspended_by.id))
+            else
+              "-"
+            end
+          end
+        end
       end
     end
     
@@ -244,6 +283,93 @@ RailsAdmin.config do |config|
         visible false
       end
       bulk_delete do
+        visible false
+      end
+    end
+  end
+  
+  # Activity model configuration
+  config.model 'Activity' do
+    navigation_label 'System'
+    label 'User Activities'
+    label_plural 'User Activities'
+    weight 90
+    
+    list do
+      field :id
+      field :user
+      field :action
+      field :controller
+      field :ip_address
+      field :suspicious do
+        pretty_value do
+          if bindings[:object].suspicious?
+            bindings[:view].content_tag(:span, "Yes", class: "label label-danger")
+          else
+            bindings[:view].content_tag(:span, "No", class: "label label-default")
+          end
+        end
+      end
+      field :response_status
+      field :response_time do
+        pretty_value do
+          if bindings[:object].response_time
+            "#{(bindings[:object].response_time * 1000).round(2)} ms"
+          else
+            "-"
+          end
+        end
+      end
+      field :occurred_at
+      
+      sort_by :occurred_at
+    end
+    
+    show do
+      field :id
+      field :user
+      field :action
+      field :controller
+      field :request_path
+      field :request_method
+      field :ip_address
+      field :user_agent
+      field :device_type
+      field :browser_name
+      field :os_name
+      field :session_id
+      field :response_status
+      field :response_time do
+        pretty_value do
+          if bindings[:object].response_time
+            "#{(bindings[:object].response_time * 1000).round(2)} ms"
+          else
+            "-"
+          end
+        end
+      end
+      field :suspicious
+      field :metadata do
+        pretty_value do
+          if bindings[:object].metadata.present?
+            bindings[:view].content_tag(:pre, JSON.pretty_generate(bindings[:object].metadata))
+          else
+            "-"
+          end
+        end
+      end
+      field :occurred_at
+    end
+    
+    # Read-only model
+    configure do
+      edit do
+        visible false
+      end
+      new do
+        visible false
+      end
+      delete do
         visible false
       end
     end

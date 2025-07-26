@@ -42,4 +42,12 @@ class RailsAdminPolicy < ApplicationPolicy
   def history_show?
     user&.admin?
   end
+  
+  def suspend?
+    user&.admin?
+  end
+  
+  def unsuspend?
+    user&.admin?
+  end
 end
