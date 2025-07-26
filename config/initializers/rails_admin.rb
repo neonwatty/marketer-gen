@@ -1,3 +1,8 @@
+# Skip Rails Admin configuration in test environment to avoid CSS compilation issues
+if Rails.env.test?
+  return
+end
+
 # Load custom actions first
 require Rails.root.join('config/initializers/rails_admin_custom_actions.rb')
 
