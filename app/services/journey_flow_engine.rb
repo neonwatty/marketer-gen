@@ -46,7 +46,9 @@ class JourneyFlowEngine
     end
     
     def advance!
-      return false unless execution.can_advance?
+      # Check if we can advance (running state and not at exit point)
+      return false unless execution.running?
+      return false if execution.current_step&.is_exit_point?
       
       current_step_execution = execution.step_executions
         .where(journey_step: execution.current_step)
