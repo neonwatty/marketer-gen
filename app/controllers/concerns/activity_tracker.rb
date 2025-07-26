@@ -73,9 +73,7 @@ module ActivityTracker
 
   def filtered_params
     # Remove sensitive parameters
-    params.except(:password, :password_confirmation, :token, :secret)
-          .permit!
-          .to_h
+    request.filtered_parameters.except("controller", "action")
   rescue
     {}
   end

@@ -1,0 +1,48 @@
+<h2>Security Alert: Suspicious Activity Detected</h2>
+
+<p>Suspicious activity has been detected for the following user:</p>
+
+<table style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+  <tr>
+    <td style="padding: 10px; border: 1px solid #ddd;"><strong>User:</strong></td>
+    <td style="padding: 10px; border: 1px solid #ddd;"><%= @user.email_address %> (ID: <%= @user.id %>)</td>
+  </tr>
+  <tr>
+    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Time:</strong></td>
+    <td style="padding: 10px; border: 1px solid #ddd;"><%= @activity.occurred_at.strftime("%B %d, %Y at %I:%M %p %Z") %></td>
+  </tr>
+  <tr>
+    <td style="padding: 10px; border: 1px solid #ddd;"><strong>IP Address:</strong></td>
+    <td style="padding: 10px; border: 1px solid #ddd;"><%= @activity.ip_address %></td>
+  </tr>
+  <tr>
+    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Action:</strong></td>
+    <td style="padding: 10px; border: 1px solid #ddd;"><%= @activity.full_action %></td>
+  </tr>
+  <tr>
+    <td style="padding: 10px; border: 1px solid #ddd;"><strong>Path:</strong></td>
+    <td style="padding: 10px; border: 1px solid #ddd;"><%= @activity.request_path %></td>
+  </tr>
+  <tr>
+    <td style="padding: 10px; border: 1px solid #ddd;"><strong>User Agent:</strong></td>
+    <td style="padding: 10px; border: 1px solid #ddd;"><%= @activity.user_agent %></td>
+  </tr>
+</table>
+
+<h3>Suspicious Activity Reasons:</h3>
+<ul>
+  <% @reasons.each do |reason| %>
+    <li><%= reason.humanize %></li>
+  <% end %>
+</ul>
+
+<p><strong>Action Required:</strong> Please review this activity and take appropriate action if necessary.</p>
+
+<p>
+  <%= link_to "View User in Admin Panel", rails_admin_url_for(@user, :show), 
+    style: "display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;" %>
+</p>
+
+<p style="margin-top: 30px; color: #666;">
+  This is an automated security alert. If you believe this is a false positive, please review the user's activity history for context.
+</p>

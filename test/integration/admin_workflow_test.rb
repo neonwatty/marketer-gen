@@ -61,7 +61,7 @@ class AdminWorkflowTest < ActionDispatch::IntegrationTest
     
     assert_redirected_to new_session_path
     follow_redirect!
-    assert_select ".alert", text: /Your account has been suspended: Test suspension/
+    assert_select "#alert", text: /Your account has been suspended: Test suspension/
   end
 
   test "locked user cannot log in" do
@@ -74,7 +74,7 @@ class AdminWorkflowTest < ActionDispatch::IntegrationTest
     
     assert_redirected_to new_session_path
     follow_redirect!
-    assert_select ".alert", text: /Your account has been locked: Security test/
+    assert_select "#alert", text: /Your account has been locked: Security test/
   end
 
   test "admin actions are audited" do

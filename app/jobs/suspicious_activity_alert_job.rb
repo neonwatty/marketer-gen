@@ -19,18 +19,18 @@ class SuspiciousActivityAlertJob < ApplicationJob
   private
 
   def log_to_security_monitoring(activity, reasons)
-    Rails.logger.tagged("SECURITY") do
-      Rails.logger.warn <<~LOG
-        Suspicious Activity Detected:
-        User: #{activity.user.email_address} (ID: #{activity.user.id})
-        IP: #{activity.ip_address}
-        Action: #{activity.full_action}
-        Path: #{activity.request_path}
-        Reasons: #{reasons.join(", ")}
-        Time: #{activity.occurred_at}
-        User Agent: #{activity.user_agent}
-      LOG
-    end
+    log_message = <<~LOG
+      [SECURITY] Suspicious Activity Detected:
+      User: #{activity.user.email_address} (ID: #{activity.user.id})
+      IP: #{activity.ip_address}
+      Action: #{activity.full_action}
+      Path: #{activity.request_path}
+      Reasons: #{reasons.join(", ")}
+      Time: #{activity.occurred_at}
+      User Agent: #{activity.user_agent}
+    LOG
+    
+    Rails.logger.warn log_message
   end
 
   def check_user_lockout(user, reasons)

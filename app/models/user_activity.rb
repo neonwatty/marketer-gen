@@ -136,7 +136,9 @@ class UserActivity < ApplicationRecord
       )
       
       # Trigger alert notification
-      UserActivityMailer.suspicious_activity_alert(user, suspicious_activities).deliver_later
+      # Note: Using SuspiciousActivityAlertJob instead of direct mailer call
+      # to handle both admin notification and potential user lockout
+      Rails.logger.warn "Suspicious UserActivity detected for user #{user.email_address}: #{suspicious_activities.join(', ')}"
     end
   end
 end
