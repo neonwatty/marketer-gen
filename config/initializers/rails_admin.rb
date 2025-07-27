@@ -51,6 +51,8 @@ RailsAdmin.config do |config|
     # Custom actions
     suspend
     unsuspend
+    bulk_unlock
+    system_maintenance
 
     ## With an audit adapter, you can add:
     # history_index
@@ -62,15 +64,29 @@ RailsAdmin.config do |config|
     # List view configuration
     list do
       field :id
-      field :email_address
-      field :full_name
+      field :email_address do
+        searchable true
+        sortable true
+      end
+      field :full_name do
+        searchable true
+        sortable true
+      end
       field :role do
         pretty_value do
           bindings[:object].role.humanize.titleize
         end
+        searchable [:role]
+        sortable true
       end
-      field :company
-      field :job_title
+      field :company do
+        searchable true
+        sortable true
+      end
+      field :job_title do
+        searchable true
+        sortable true
+      end
       field :suspended_at do
         label "Status"
         pretty_value do
@@ -82,8 +98,24 @@ RailsAdmin.config do |config|
             bindings[:view].content_tag(:span, "Active", class: "label label-success")
           end
         end
+        searchable false
+        sortable true
       end
-      field :created_at
+      field :created_at do
+        sortable true
+      end
+      
+      # Advanced filters
+      filters [:email_address, :full_name, :role, :company, :job_title, :created_at, :suspended_at, :locked_at]
+      
+      # Default sort
+      sort_by :created_at
+      sort_reverse true
+      
+      # Items per page
+      configure :paginate do
+        [20, 50, 100]
+      end
     end
     
     # Show view configuration
@@ -302,10 +334,22 @@ RailsAdmin.config do |config|
     
     list do
       field :id
-      field :user
-      field :action
-      field :controller
-      field :ip_address
+      field :user do
+        searchable [:email_address]
+        sortable true
+      end
+      field :action do
+        searchable true
+        sortable true
+      end
+      field :controller do
+        searchable true
+        sortable true
+      end
+      field :ip_address do
+        searchable true
+        sortable true
+      end
       field :suspicious do
         pretty_value do
           if bindings[:object].suspicious?
@@ -314,8 +358,12 @@ RailsAdmin.config do |config|
             bindings[:view].content_tag(:span, "No", class: "label label-default")
           end
         end
+        searchable [:suspicious]
+        sortable true
       end
-      field :response_status
+      field :response_status do
+        sortable true
+      end
       field :response_time do
         pretty_value do
           if bindings[:object].response_time
@@ -324,10 +372,32 @@ RailsAdmin.config do |config|
             "-"
           end
         end
+        sortable true
       end
-      field :occurred_at
+      field :occurred_at do
+        sortable true
+      end
       
+      # Advanced filters for activity monitoring
+      filters [
+        :user, :action, :controller, :ip_address, :suspicious, 
+        :response_status, :response_time, :occurred_at, :device_type, 
+        :browser_name, :os_name
+      ]
+      
+      # Default sorting by most recent first
       sort_by :occurred_at
+      sort_reverse true
+      
+      # Items per page for activities
+      configure :paginate do
+        [50, 100, 200]
+      end
+      
+      # Batch actions for activities
+      batch_actions do
+        [:bulk_delete]
+      end
     end
     
     show do
