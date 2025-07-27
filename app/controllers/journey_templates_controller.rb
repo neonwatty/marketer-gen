@@ -1,6 +1,6 @@
 class JourneyTemplatesController < ApplicationController
   before_action :require_authentication
-  before_action :set_journey_template, only: [:show, :edit, :update, :destroy, :clone, :use_template]
+  before_action :set_journey_template, only: [:show, :edit, :update, :destroy, :clone, :use_template, :builder]
   
   def index
     @templates = JourneyTemplate.active.includes(:journeys)
@@ -98,11 +98,23 @@ class JourneyTemplatesController < ApplicationController
                   alert: "Failed to create journey: #{journey.errors.full_messages.join(', ')}"
     end
   end
+  
+  def builder
+    # Visual journey builder interface
+    @template ||= JourneyTemplate.new
+    @existing_steps = @template.template_data&.dig('steps') || []
+    @stages = ['awareness', 'consideration', 'conversion', 'retention']
+    @step_types = JourneyStep::STEP_TYPES
+  end
 
   private
 
   def set_journey_template
-    @template = JourneyTemplate.find(params[:id])
+    if params[:id] == 'new'
+      @template = JourneyTemplate.new
+    else
+      @template = JourneyTemplate.find(params[:id])
+    end
   end
 
   def template_params

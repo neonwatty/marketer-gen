@@ -5,6 +5,21 @@ class JourneyStep < ApplicationRecord
   has_many :next_steps, through: :transitions_from, source: :to_step
   has_many :previous_steps, through: :transitions_to, source: :from_step
   
+  STEP_TYPES = %w[
+    blog_post
+    email_sequence
+    social_media
+    lead_magnet
+    webinar
+    case_study
+    sales_call
+    demo
+    trial_offer
+    onboarding
+    newsletter
+    feedback_survey
+  ].freeze
+  
   CONTENT_TYPES = %w[
     email
     blog_post

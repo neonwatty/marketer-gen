@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     member do
       post :clone
       post :use_template
+      get :builder
     end
   end
 
