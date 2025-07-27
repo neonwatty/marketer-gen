@@ -84,3 +84,10 @@ gem "kaminari"
 
 # State machine for journey flow
 gem "aasm", "~> 5.5"
+
+# HTTP client for LLM API integrations
+gem "faraday", "~> 2.7"
+gem "faraday-retry", "~> 2.2"
+
+# JSON parsing
+gem "oj", "~> 3.16"

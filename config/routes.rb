@@ -5,6 +5,29 @@ Rails.application.routes.draw do
       post :use_template
     end
   end
+
+  # Journey management and AI suggestions
+  resources :journeys, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
+    # Journey suggestions endpoints
+    resources :suggestions, controller: 'journey_suggestions', only: [:index] do
+      collection do
+        get 'for_stage/:stage', action: :for_stage, as: :for_stage
+        get 'for_step/:step_id', action: :for_step, as: :for_step
+        post :feedback, action: :create_feedback
+        get :insights
+        get :analytics
+        delete :cache, action: :clear_cache
+      end
+    end
+    
+    # Journey steps management
+    resources :steps, controller: 'journey_steps', except: [:index] do
+      member do
+        patch :move
+        post :duplicate
+      end
+    end
+  end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin' unless Rails.env.test?
   root "home#index"
   

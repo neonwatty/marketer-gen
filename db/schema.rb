@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_26_190934) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_27_182543) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -101,6 +101,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_190934) do
     t.index ["status"], name: "index_journey_executions_on_status"
     t.index ["user_id", "journey_id"], name: "index_journey_executions_on_user_id_and_journey_id", unique: true
     t.index ["user_id"], name: "index_journey_executions_on_user_id"
+  end
+
+  create_table "journey_insights", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.string "insights_type", null: false
+    t.json "data", default: {}
+    t.datetime "calculated_at", null: false
+    t.datetime "expires_at"
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calculated_at"], name: "index_journey_insights_on_calculated_at"
+    t.index ["created_at"], name: "index_journey_insights_on_created_at"
+    t.index ["expires_at"], name: "index_journey_insights_on_expires_at"
+    t.index ["insights_type"], name: "index_journey_insights_on_insights_type"
+    t.index ["journey_id", "insights_type"], name: "index_journey_insights_on_journey_id_and_insights_type"
+    t.index ["journey_id"], name: "index_journey_insights_on_journey_id"
   end
 
   create_table "journey_steps", force: :cascade do |t|
@@ -226,6 +243,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_190934) do
     t.index ["transition_type"], name: "index_step_transitions_on_transition_type"
   end
 
+  create_table "suggestion_feedbacks", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.integer "journey_step_id", null: false
+    t.integer "suggested_step_id"
+    t.integer "user_id", null: false
+    t.string "feedback_type", null: false
+    t.integer "rating", limit: 1
+    t.boolean "selected", default: false, null: false
+    t.text "context"
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_suggestion_feedbacks_on_created_at"
+    t.index ["journey_id", "user_id"], name: "index_suggestion_feedbacks_on_journey_id_and_user_id"
+    t.index ["journey_id"], name: "index_suggestion_feedbacks_on_journey_id"
+    t.index ["journey_step_id", "feedback_type"], name: "idx_on_journey_step_id_feedback_type_3de956939d"
+    t.index ["journey_step_id"], name: "index_suggestion_feedbacks_on_journey_step_id"
+    t.index ["rating"], name: "index_suggestion_feedbacks_on_rating"
+    t.index ["selected"], name: "index_suggestion_feedbacks_on_selected"
+    t.index ["suggested_step_id"], name: "index_suggestion_feedbacks_on_suggested_step_id"
+    t.index ["user_id"], name: "index_suggestion_feedbacks_on_user_id"
+    t.check_constraint "rating >= 1 AND rating <= 5", name: "rating_range"
+  end
+
   create_table "user_activities", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "action"
@@ -275,6 +316,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_190934) do
   add_foreign_key "journey_executions", "journey_steps", column: "current_step_id"
   add_foreign_key "journey_executions", "journeys"
   add_foreign_key "journey_executions", "users"
+  add_foreign_key "journey_insights", "journeys"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journey_templates", "journey_templates", column: "original_template_id"
   add_foreign_key "journeys", "users"
@@ -283,6 +325,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_26_190934) do
   add_foreign_key "step_executions", "journey_steps"
   add_foreign_key "step_transitions", "journey_steps", column: "from_step_id"
   add_foreign_key "step_transitions", "journey_steps", column: "to_step_id"
+  add_foreign_key "suggestion_feedbacks", "journey_steps"
+  add_foreign_key "suggestion_feedbacks", "journeys"
+  add_foreign_key "suggestion_feedbacks", "users"
   add_foreign_key "user_activities", "users"
   add_foreign_key "users", "users", column: "suspended_by_id"
 end

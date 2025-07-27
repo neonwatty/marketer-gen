@@ -3,6 +3,8 @@ class Journey < ApplicationRecord
   has_many :journey_steps, dependent: :destroy
   has_many :step_transitions, through: :journey_steps
   has_many :journey_executions, dependent: :destroy
+  has_many :suggestion_feedbacks, dependent: :destroy
+  has_many :journey_insights, dependent: :destroy
   
   STATUSES = %w[draft published archived].freeze
   CAMPAIGN_TYPES = %w[
