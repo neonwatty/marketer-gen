@@ -1,0 +1,34 @@
+SECURITY SCAN ALERT
+==================
+Scan Time: <%= @scan_time.strftime('%B %d, %Y at %I:%M %p %Z') %>
+
+ALERT: The automated security scan has detected <%= @suspicious_users.count %> users with suspicious activity patterns.
+
+SUSPICIOUS USERS DETECTED
+========================
+<% @suspicious_users.each do |suspicious| %>
+User: <%= suspicious[:user].email_address %> (ID: <%= suspicious[:user].id %>)
+Total activities in last hour: <%= suspicious[:activity_count] %>
+
+Detected Patterns:
+<% suspicious[:patterns].each do |pattern| %>
+- <%= pattern[:pattern].humanize %>: <%= pattern[:value] %> (threshold: <%= pattern[:threshold] %>)
+<% end %>
+
+View User in Admin: <%= rails_admin_url_for(suspicious[:user]) %>
+View User Activities: <%= activities_url(user_id: suspicious[:user].id) %>
+
+---
+
+<% end %>
+
+RECOMMENDED ACTIONS
+==================
+1. Review the activity logs for each flagged user
+2. Check if the activities align with expected user behavior
+3. Consider temporarily locking accounts showing highly suspicious patterns
+4. Verify if users are accessing from expected locations
+5. Contact users if necessary to verify their identity
+
+This is an automated alert from your activity monitoring system.
+View All Activities: <%= activities_url %>

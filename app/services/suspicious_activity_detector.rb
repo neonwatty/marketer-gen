@@ -1,5 +1,90 @@
 class SuspiciousActivityDetector
   attr_reader :activity
+  
+  # Class method for recurring job to scan all users
+  def self.scan_all_users
+    Rails.logger.info "Starting security scan for all users..."
+    suspicious_users = []
+    
+    User.find_each do |user|
+      # Check recent activities
+      recent_activities = user.activities.where("occurred_at > ?", 1.hour.ago)
+      next if recent_activities.empty?
+      
+      # Various suspicious pattern checks
+      suspicious_patterns = []
+      
+      # Rapid requests
+      if recent_activities.count > 200
+        suspicious_patterns << {
+          pattern: 'rapid_requests',
+          value: recent_activities.count,
+          threshold: 200
+        }
+      end
+      
+      # Multiple IPs
+      ip_count = recent_activities.distinct.count(:ip_address)
+      if ip_count > 5
+        suspicious_patterns << {
+          pattern: 'ip_hopping',
+          value: ip_count,
+          threshold: 5
+        }
+      end
+      
+      # Failed requests
+      failed_count = recent_activities.failed_requests.count
+      if failed_count > 20
+        suspicious_patterns << {
+          pattern: 'excessive_errors',
+          value: failed_count,
+          threshold: 20
+        }
+      end
+      
+      # Suspicious activities
+      suspicious_count = recent_activities.suspicious.count
+      if suspicious_count > 3
+        suspicious_patterns << {
+          pattern: 'multiple_suspicious',
+          value: suspicious_count,
+          threshold: 3
+        }
+      end
+      
+      if suspicious_patterns.any?
+        suspicious_users << {
+          user: user,
+          patterns: suspicious_patterns,
+          activity_count: recent_activities.count
+        }
+      end
+    end
+    
+    # Process findings
+    if suspicious_users.any?
+      # Log security event
+      ActivityLogger.security('security_scan_alert', "Security scan detected suspicious users", {
+        user_count: suspicious_users.count,
+        details: suspicious_users.map { |s| 
+          {
+            user_id: s[:user].id,
+            email: s[:user].email_address,
+            patterns: s[:patterns].map { |p| p[:pattern] }
+          }
+        }
+      })
+      
+      # Send alerts if configured
+      if Rails.application.config.activity_alerts.enabled
+        AdminMailer.security_scan_alert(suspicious_users).deliver_later
+      end
+    end
+    
+    Rails.logger.info "Security scan completed. Found #{suspicious_users.count} suspicious users."
+    suspicious_users
+  end
 
   SUSPICIOUS_PATTERNS = {
     rapid_requests: {

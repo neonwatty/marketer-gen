@@ -1,0 +1,42 @@
+DAILY ACTIVITY REPORT
+Date: <%= @date.strftime('%B %d, %Y') %>
+
+SUMMARY
+=======
+Total Activities: <%= @report[:summary][:total_activities] %>
+Average per Hour: <%= (@report[:summary][:total_activities] / 24.0).round(2) %>
+Failed Requests: <%= @report[:summary][:failed_requests] %>
+Suspicious Activities: <%= @report[:summary][:suspicious_count] %>
+Unique IP Addresses: <%= @report[:summary][:unique_ips] %>
+
+<% if @report[:security_events].any? %>
+SECURITY EVENTS
+===============
+<% @report[:security_events].each do |event| %>
+- <%= event[:type].humanize %>: <%= event[:count] %> occurrences<% if event[:last_attempt] %> (last: <%= event[:last_attempt].strftime('%I:%M %p') %>)<% end %>
+<% end %>
+<% end %>
+
+<% if @report[:recommendations].any? %>
+RECOMMENDATIONS
+===============
+<% @report[:recommendations].each do |rec| %>
+- <%= rec[:message] %> (Priority: <%= rec[:priority] %>)
+<% end %>
+<% end %>
+
+TOP ACTIVITIES
+==============
+<% @report[:activity_breakdown].first(10).each do |activity| %>
+<%= activity[:controller] %>#<%= activity[:action] %>: <%= activity[:count] %> (<%= activity[:percentage] %>%)
+<% end %>
+
+<% if @report[:performance_metrics][:slowest_actions]&.any? %>
+SLOWEST ACTIONS
+===============
+<% @report[:performance_metrics][:slowest_actions].first(5).each do |action| %>
+<%= action[:action] %>: <%= action[:response_time_ms] %>ms
+<% end %>
+<% end %>
+
+View Full Report: <%= activity_report_url %>

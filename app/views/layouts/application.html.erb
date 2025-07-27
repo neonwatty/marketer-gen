@@ -38,6 +38,7 @@
               <span class="text-gray-600">Hello, <%= current_user.display_name %></span>
               <%= link_to "My Profile", profile_path, class: "text-gray-600 hover:text-gray-900" %>
               <%= link_to "Activity Log", activities_path, class: "text-gray-600 hover:text-gray-900" %>
+              <%= link_to "Activity Report", activity_report_path, class: "text-gray-600 hover:text-gray-900" %>
               <%= button_to "Sign Out", session_path, method: :delete, class: "text-gray-600 hover:text-gray-900" %>
             </div>
           </div>

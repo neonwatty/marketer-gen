@@ -1,0 +1,43 @@
+<h2 style="color: red;">Security Scan Alert</h2>
+<p>Scan Time: <%= @scan_time.strftime('%B %d, %Y at %I:%M %p %Z') %></p>
+
+<div style="background-color: #fee; padding: 15px; border: 1px solid #fcc; margin: 20px 0;">
+  <p><strong>Alert:</strong> The automated security scan has detected <%= @suspicious_users.count %> users with suspicious activity patterns.</p>
+</div>
+
+<h3>Suspicious Users Detected</h3>
+<% @suspicious_users.each do |suspicious| %>
+  <div style="margin-bottom: 30px; padding: 15px; border: 1px solid #ddd;">
+    <h4>User: <%= suspicious[:user].email_address %> (ID: <%= suspicious[:user].id %>)</h4>
+    <p>Total activities in last hour: <%= suspicious[:activity_count] %></p>
+    
+    <h5>Detected Patterns:</h5>
+    <ul>
+      <% suspicious[:patterns].each do |pattern| %>
+        <li>
+          <strong><%= pattern[:pattern].humanize %>:</strong>
+          <%= pattern[:value] %> (threshold: <%= pattern[:threshold] %>)
+        </li>
+      <% end %>
+    </ul>
+    
+    <p>
+      <%= link_to "View User in Admin", rails_admin_url_for(suspicious[:user]) %> |
+      <%= link_to "View User Activities", activities_url(user_id: suspicious[:user].id) %>
+    </p>
+  </div>
+<% end %>
+
+<h3>Recommended Actions</h3>
+<ol>
+  <li>Review the activity logs for each flagged user</li>
+  <li>Check if the activities align with expected user behavior</li>
+  <li>Consider temporarily locking accounts showing highly suspicious patterns</li>
+  <li>Verify if users are accessing from expected locations</li>
+  <li>Contact users if necessary to verify their identity</li>
+</ol>
+
+<p style="margin-top: 30px;">
+  This is an automated alert from your activity monitoring system. 
+  <%= link_to "View All Activities", activities_url %>
+</p>

@@ -114,12 +114,12 @@ class ActivityTrackingTest < ActionDispatch::IntegrationTest
       password: "password123"
     }
     
-    # Temporarily break activity logging
-    Activity.stub :log_activity, ->(*args) { raise "Logging error" } do
-      # Should still complete the request successfully
-      get root_path
-      assert_response :success
-    end
+    # Mock activity logging to raise an error
+    Activity.expects(:log_activity).raises(StandardError.new("Logging error"))
+    
+    # Should still complete the request successfully
+    get root_path
+    assert_response :success
   end
 
   test "tracks suspicious activity patterns" do
