@@ -1,9 +1,20 @@
 Rails.application.routes.draw do
+  # API endpoints
+  namespace :api do
+    resources :journey_suggestions, only: [:index] do
+      collection do
+        get 'for_stage/:stage', action: :for_stage, as: :for_stage
+        get 'for_step', action: :for_step
+        post :feedback, action: :create_feedback
+      end
+    end
+  end
   resources :journey_templates do
     member do
       post :clone
       post :use_template
       get :builder
+      get :builder_react
     end
   end
 

@@ -64,6 +64,22 @@ class JourneyTemplate < ApplicationRecord
     template_data['steps'] || []
   end
   
+  def steps_data
+    template_data['steps'] || []
+  end
+  
+  def steps_data=(value)
+    self.template_data = (template_data || {}).merge('steps' => value)
+  end
+  
+  def connections_data
+    template_data['connections'] || []
+  end
+  
+  def connections_data=(value)
+    self.template_data = (template_data || {}).merge('connections' => value)
+  end
+  
   def step_count
     preview_steps.size
   end

@@ -1,6 +1,6 @@
 class JourneyTemplatesController < ApplicationController
   before_action :require_authentication
-  before_action :set_journey_template, only: [:show, :edit, :update, :destroy, :clone, :use_template, :builder]
+  before_action :set_journey_template, only: [:show, :edit, :update, :destroy, :clone, :use_template, :builder, :builder_react]
   
   def index
     @templates = JourneyTemplate.active.includes(:journeys)
@@ -48,9 +48,15 @@ class JourneyTemplatesController < ApplicationController
     @template = JourneyTemplate.new(template_params)
     
     if @template.save
-      redirect_to @template, notice: 'Journey template was successfully created.'
+      respond_to do |format|
+        format.html { redirect_to @template, notice: 'Journey template was successfully created.' }
+        format.json { render json: @template, status: :created }
+      end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: { errors: @template.errors }, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -59,9 +65,15 @@ class JourneyTemplatesController < ApplicationController
 
   def update
     if @template.update(template_params)
-      redirect_to @template, notice: 'Journey template was successfully updated.'
+      respond_to do |format|
+        format.html { redirect_to @template, notice: 'Journey template was successfully updated.' }
+        format.json { render json: @template }
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: { errors: @template.errors }, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -106,6 +118,21 @@ class JourneyTemplatesController < ApplicationController
     @stages = ['awareness', 'consideration', 'conversion', 'retention']
     @step_types = JourneyStep::STEP_TYPES
   end
+  
+  def builder_react
+    # React-based visual journey builder interface
+    @template ||= JourneyTemplate.new
+    
+    # Prepare data for React component
+    @journey_data = {
+      id: @template.id,
+      name: @template.name || 'New Journey',
+      description: @template.description || '',
+      steps: @template.steps_data || [],
+      connections: @template.connections_data || [],
+      status: @template.published? ? 'published' : 'draft'
+    }
+  end
 
   private
 
@@ -120,7 +147,8 @@ class JourneyTemplatesController < ApplicationController
   def template_params
     params.require(:journey_template).permit(
       :name, :description, :category, :campaign_type, :difficulty_level,
-      :estimated_duration_days, :is_active, :template_data
+      :estimated_duration_days, :is_active, :template_data, :status,
+      steps_data: [], connections_data: []
     )
   end
   
