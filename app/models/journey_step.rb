@@ -62,6 +62,9 @@ class JourneyStep < ApplicationRecord
   validates :channel, inclusion: { in: CHANNELS }, allow_blank: true
   validates :duration_days, numericality: { greater_than: 0 }, allow_blank: true
   
+  # Brand compliance validations
+  validate :validate_brand_compliance, if: :should_validate_brand_compliance?
+  
   scope :by_position, -> { order(:position) }
   scope :by_stage, ->(stage) { where(stage: stage) }
   scope :entry_points, -> { where(is_entry_point: true) }
@@ -69,6 +72,10 @@ class JourneyStep < ApplicationRecord
   
   before_create :set_position
   after_destroy :reorder_positions
+  
+  # Brand compliance callbacks
+  before_save :check_real_time_compliance, if: :should_check_compliance?
+  after_update :broadcast_compliance_status, if: :saved_change_to_description?
   
   def move_to_position(new_position)
     return if new_position == position
@@ -140,6 +147,145 @@ class JourneyStep < ApplicationRecord
     }
   end
   
+  # Brand compliance methods
+  def check_brand_compliance(options = {})
+    return no_brand_result unless has_brand?
+    
+    compliance_service = Journey::BrandComplianceService.new(
+      journey: journey,
+      step: self,
+      content: compilable_content,
+      context: build_compliance_context
+    )
+    
+    compliance_service.check_compliance(options)
+  end
+  
+  def brand_compliant?(threshold = nil)
+    return true unless has_brand?
+    
+    compliance_service = Journey::BrandComplianceService.new(
+      journey: journey,
+      step: self,
+      content: compilable_content,
+      context: build_compliance_context
+    )
+    
+    compliance_service.meets_minimum_compliance?(threshold)
+  end
+  
+  def quick_compliance_score
+    return 1.0 unless has_brand?
+    
+    compliance_service = Journey::BrandComplianceService.new(
+      journey: journey,
+      step: self,
+      content: compilable_content,
+      context: build_compliance_context
+    )
+    
+    compliance_service.quick_score
+  end
+  
+  def compliance_violations
+    return [] unless has_brand?
+    
+    result = check_brand_compliance
+    result[:violations] || []
+  end
+  
+  def compliance_suggestions
+    return [] unless has_brand?
+    
+    compliance_service = Journey::BrandComplianceService.new(
+      journey: journey,
+      step: self,
+      content: compilable_content,
+      context: build_compliance_context
+    )
+    
+    recommendations = compliance_service.get_recommendations
+    recommendations[:recommendations] || []
+  end
+  
+  def auto_fix_compliance_issues
+    return { fixed: false, content: compilable_content } unless has_brand?
+    
+    compliance_service = Journey::BrandComplianceService.new(
+      journey: journey,
+      step: self,
+      content: compilable_content,
+      context: build_compliance_context
+    )
+    
+    fix_results = compliance_service.auto_fix_violations
+    
+    if fix_results[:fixed_content].present?
+      # Update description with fixed content if auto-fix was successful
+      update_column(:description, fix_results[:fixed_content])
+      { fixed: true, content: fix_results[:fixed_content], fixes: fix_results[:fixes_applied] }
+    else
+      { fixed: false, content: compilable_content, available_fixes: fix_results[:fixes_available] }
+    end
+  end
+  
+  def messaging_compliant?(message_text = nil)
+    return true unless has_brand?
+    
+    content_to_check = message_text || compilable_content
+    
+    compliance_service = Journey::BrandComplianceService.new(
+      journey: journey,
+      step: self,
+      content: content_to_check,
+      context: build_compliance_context
+    )
+    
+    compliance_service.messaging_allowed?(content_to_check)
+  end
+  
+  def applicable_brand_guidelines
+    return [] unless has_brand?
+    
+    compliance_service = Journey::BrandComplianceService.new(
+      journey: journey,
+      step: self,
+      content: compilable_content,
+      context: build_compliance_context
+    )
+    
+    compliance_service.applicable_brand_rules
+  end
+  
+  def brand_context
+    return {} unless has_brand?
+    
+    {
+      brand_id: journey.brand.id,
+      brand_name: journey.brand.name,
+      industry: journey.brand.industry,
+      has_messaging_framework: journey.brand.messaging_framework.present?,
+      has_guidelines: journey.brand.brand_guidelines.active.any?,
+      compliance_level: determine_compliance_level
+    }
+  end
+  
+  def latest_compliance_check
+    journey.journey_insights
+           .where(insights_type: 'brand_compliance')
+           .where("data->>'step_id' = ?", id.to_s)
+           .order(calculated_at: :desc)
+           .first
+  end
+  
+  def compliance_history(days = 30)
+    journey.journey_insights
+           .where(insights_type: 'brand_compliance')
+           .where("data->>'step_id' = ?", id.to_s)
+           .where('calculated_at >= ?', days.days.ago)
+           .order(calculated_at: :desc)
+  end
+  
   private
   
   def set_position
@@ -151,5 +297,148 @@ class JourneyStep < ApplicationRecord
   
   def reorder_positions
     journey.journey_steps.where('position > ?', position).update_all('position = position - 1')
+  end
+  
+  # Brand compliance private methods
+  def should_validate_brand_compliance?
+    has_brand? && 
+    (description_changed? || name_changed?) && 
+    !skip_brand_validation? &&
+    compilable_content.present?
+  end
+  
+  def should_check_compliance?
+    has_brand? && 
+    (will_save_change_to_description? || will_save_change_to_name?) &&
+    !skip_compliance_check?
+  end
+  
+  def validate_brand_compliance
+    return unless compilable_content.present?
+    
+    compliance_service = Journey::BrandComplianceService.new(
+      journey: journey,
+      step: self,
+      content: compilable_content,
+      context: build_compliance_context
+    )
+    
+    # Quick validation check
+    result = compliance_service.pre_generation_check(compilable_content)
+    
+    unless result[:allowed]
+      violations = result[:violations] || []
+      if violations.any?
+        critical_violations = violations.select { |v| v[:severity] == 'critical' }
+        if critical_violations.any?
+          errors.add(:description, "Content violates critical brand guidelines: #{critical_violations.map { |v| v[:message] }.join(', ')}")
+        else
+          # Add warnings for non-critical violations
+          errors.add(:description, "Content may violate brand guidelines: #{violations.first[:message]}") if violations.any?
+        end
+      end
+    end
+  end
+  
+  def check_real_time_compliance
+    return unless compilable_content.present?
+    
+    # Store compliance check in metadata for later reference
+    compliance_score = quick_compliance_score
+    self.metadata ||= {}
+    self.metadata['last_compliance_check'] = {
+      score: compliance_score,
+      checked_at: Time.current.iso8601,
+      compliant: compliance_score >= 0.7
+    }
+    
+    # Log warning for low compliance scores
+    if compliance_score < 0.5
+      Rails.logger.warn "Journey step #{id} has low brand compliance score: #{compliance_score}"
+    end
+  end
+  
+  def broadcast_compliance_status
+    return unless has_brand?
+    
+    # Broadcast real-time compliance status update
+    ActionCable.server.broadcast(
+      "journey_step_compliance_#{id}",
+      {
+        event: 'compliance_updated',
+        step_id: id,
+        journey_id: journey.id,
+        brand_id: journey.brand.id,
+        compliance_score: quick_compliance_score,
+        timestamp: Time.current
+      }
+    )
+  rescue => e
+    Rails.logger.error "Failed to broadcast compliance status: #{e.message}"
+  end
+  
+  def has_brand?
+    journey&.brand_id.present?
+  end
+  
+  def compilable_content
+    # Combine name and description for compliance checking
+    content_parts = [name, description].compact
+    content_parts.join(". ").strip
+  end
+  
+  def build_compliance_context
+    {
+      step_id: id,
+      step_name: name,
+      content_type: content_type,
+      channel: channel,
+      stage: stage,
+      position: position,
+      is_entry_point: is_entry_point,
+      is_exit_point: is_exit_point,
+      journey_context: {
+        campaign_type: journey.campaign_type,
+        target_audience: journey.target_audience,
+        goals: journey.goals
+      }
+    }
+  end
+  
+  def determine_compliance_level
+    # Determine compliance level based on step characteristics
+    if is_entry_point? || stage == 'awareness'
+      :strict  # Entry points need strict brand compliance
+    elsif %w[conversion retention].include?(stage)
+      :standard  # Important stages need standard compliance
+    else
+      :flexible  # Other stages can be more flexible
+    end
+  end
+  
+  def skip_brand_validation?
+    # Allow skipping validation in certain contexts
+    metadata&.dig('skip_brand_validation') == true ||
+    Rails.env.test? && metadata&.dig('test_skip_validation') == true
+  end
+  
+  def skip_compliance_check?
+    # Allow skipping real-time compliance checks
+    metadata&.dig('skip_compliance_check') == true ||
+    Rails.env.test? && metadata&.dig('test_skip_compliance') == true
+  end
+  
+  def no_brand_result
+    {
+      compliant: true,
+      score: 1.0,
+      summary: "No brand associated with journey",
+      violations: [],
+      suggestions: [],
+      step_context: {
+        step_id: id,
+        no_brand: true
+      }
+    }
   end
 end

@@ -89,7 +89,7 @@ class JourneySuggestionEngine
   end
 
   def build_journey_context
-    {
+    base_context = {
       journey: {
         name: journey.name,
         description: journey.description,
@@ -117,6 +117,13 @@ class JourneySuggestionEngine
       historical_performance: get_historical_performance,
       industry_best_practices: get_best_practices_for_campaign_type
     }
+    
+    # Add brand context if journey has an associated brand
+    if journey.brand_id.present?
+      base_context[:brand] = extract_brand_context
+    end
+    
+    base_context
   end
 
   def build_stage_context(stage)
@@ -130,13 +137,20 @@ class JourneySuggestionEngine
   def fetch_ai_suggestions(context, filters)
     prompt = build_suggestion_prompt(context, filters)
     
-    case provider
+    raw_suggestions = case provider
     when :openai
       fetch_openai_suggestions(prompt)
     when :anthropic
       fetch_anthropic_suggestions(prompt)
     else
       raise ArgumentError, "Unsupported provider: #{provider}"
+    end
+    
+    # Apply brand guideline filtering if brand context is available
+    if context[:brand].present?
+      filter_suggestions_by_brand_guidelines(raw_suggestions, context[:brand])
+    else
+      raw_suggestions
     end
   rescue => e
     Rails.logger.error "AI suggestion generation failed: #{e.message}"
@@ -169,7 +183,8 @@ class JourneySuggestionEngine
             "expected_impact": "high|medium|low",
             "priority": 1-5,
             "best_practices": ["practice1", "practice2"],
-            "success_metrics": ["metric1", "metric2"]
+            "success_metrics": ["metric1", "metric2"],
+            "brand_compliance_score": 0.0-1.0
           }
         ]
       }
@@ -181,6 +196,19 @@ class JourneySuggestionEngine
       4. Leveraging successful patterns from similar campaigns
       5. Considering target audience preferences
     PROMPT
+
+    # Add brand-specific guidelines if available
+    if context[:brand].present?
+      base_prompt += <<~BRAND_CONTEXT
+
+        BRAND COMPLIANCE REQUIREMENTS:
+        #{format_brand_guidelines_for_prompt(context[:brand])}
+
+        IMPORTANT: All suggestions must strictly adhere to brand guidelines. 
+        Include a brand_compliance_score (0.0-1.0) for each suggestion indicating 
+        how well it aligns with the brand voice, messaging, and visual guidelines.
+      BRAND_CONTEXT
+    end
 
     if filters[:stage]
       base_prompt += "\n\nSpecial focus: Generate suggestions specifically for the '#{filters[:stage]}' stage."
@@ -269,8 +297,12 @@ class JourneySuggestionEngine
       # Adjust for user preferences
       preference_adjustment = calculate_preference_adjustment(suggestion, context)
       
+      # Adjust for brand compliance if brand context is available
+      brand_adjustment = context[:brand].present? ? 
+        calculate_brand_compliance_adjustment(suggestion, context[:brand]) : 0.0
+      
       final_score = [
-        base_score + feedback_adjustment + completeness_adjustment + preference_adjustment,
+        base_score + feedback_adjustment + completeness_adjustment + preference_adjustment + brand_adjustment,
         1.0
       ].min
 
@@ -280,7 +312,8 @@ class JourneySuggestionEngine
           'base_confidence' => base_score,
           'feedback_adjustment' => feedback_adjustment,
           'completeness_adjustment' => completeness_adjustment,
-          'preference_adjustment' => preference_adjustment
+          'preference_adjustment' => preference_adjustment,
+          'brand_compliance_adjustment' => brand_adjustment
         }
       )
     end.sort_by { |s| -s['calculated_score'] }
@@ -599,6 +632,181 @@ class JourneySuggestionEngine
       Digest::MD5.hexdigest(filters.to_json)
     ]
     
+    # Include brand context in cache key if available
+    if journey.brand_id.present?
+      key_parts << journey.brand_id
+      key_parts << journey.brand.updated_at.to_i
+    end
+    
     key_parts.join(":")
+  end
+  
+  # Brand-related helper methods
+  def extract_brand_context
+    brand = journey.brand
+    return {} unless brand
+    
+    {
+      id: brand.id,
+      name: brand.name,
+      industry: brand.industry,
+      brand_voice: extract_brand_voice(brand),
+      messaging_framework: extract_messaging_framework(brand),
+      guidelines: extract_brand_guidelines(brand),
+      color_scheme: brand.color_scheme || {},
+      typography: brand.typography || {},
+      visual_identity: extract_visual_identity(brand)
+    }
+  end
+  
+  def extract_brand_voice(brand)
+    voice_data = brand.brand_voice_attributes || {}
+    latest_analysis = brand.latest_analysis
+    
+    if latest_analysis&.voice_attributes.present?
+      voice_data.merge(latest_analysis.voice_attributes)
+    else
+      voice_data
+    end
+  end
+  
+  def extract_messaging_framework(brand)
+    framework = brand.messaging_framework
+    return {} unless framework
+    
+    {
+      key_messages: framework.key_messages || {},
+      value_propositions: framework.value_propositions || {},
+      approved_phrases: framework.approved_phrases || [],
+      banned_words: framework.banned_words || [],
+      tone_attributes: framework.tone_attributes || {}
+    }
+  end
+  
+  def extract_brand_guidelines(brand)
+    guidelines = brand.brand_guidelines.active.order(priority: :desc).limit(10)
+    
+    guidelines.map do |guideline|
+      {
+        category: guideline.category,
+        rule_type: guideline.rule_type,
+        rule_text: guideline.rule_text,
+        priority: guideline.priority,
+        compliance_level: guideline.compliance_level
+      }
+    end
+  end
+  
+  def extract_visual_identity(brand)
+    {
+      primary_colors: brand.primary_colors,
+      secondary_colors: brand.secondary_colors,
+      font_families: brand.font_families,
+      has_brand_assets: brand.has_complete_brand_assets?
+    }
+  end
+  
+  def format_brand_guidelines_for_prompt(brand_context)
+    guidelines_text = []
+    
+    # Brand voice and tone
+    if brand_context[:brand_voice].present?
+      guidelines_text << "Brand Voice: #{brand_context[:brand_voice].to_json}"
+    end
+    
+    # Messaging framework
+    framework = brand_context[:messaging_framework]
+    if framework.present?
+      guidelines_text << "Key Messages: #{framework[:key_messages].to_json}" if framework[:key_messages].present?
+      guidelines_text << "Value Propositions: #{framework[:value_propositions].to_json}" if framework[:value_propositions].present?
+      guidelines_text << "Approved Phrases: #{framework[:approved_phrases].join(', ')}" if framework[:approved_phrases].any?
+      guidelines_text << "Banned Words: #{framework[:banned_words].join(', ')}" if framework[:banned_words].any?
+      guidelines_text << "Tone Requirements: #{framework[:tone_attributes].to_json}" if framework[:tone_attributes].present?
+    end
+    
+    # Brand guidelines
+    if brand_context[:guidelines].any?
+      guidelines_text << "Brand Guidelines:"
+      brand_context[:guidelines].each do |guideline|
+        guidelines_text << "- #{guideline[:category]} (#{guideline[:rule_type]}): #{guideline[:rule_text]}"
+      end
+    end
+    
+    # Visual identity
+    visual = brand_context[:visual_identity]
+    if visual.present?
+      guidelines_text << "Primary Colors: #{visual[:primary_colors].join(', ')}" if visual[:primary_colors].any?
+      guidelines_text << "Typography: #{visual[:font_families].keys.join(', ')}" if visual[:font_families].any?
+    end
+    
+    guidelines_text.join("\n")
+  end
+  
+  def filter_suggestions_by_brand_guidelines(suggestions, brand_context)
+    return suggestions unless suggestions.is_a?(Array)
+    
+    framework = brand_context[:messaging_framework] || {}
+    banned_words = framework[:banned_words] || []
+    
+    # Filter out suggestions that contain banned words
+    filtered_suggestions = suggestions.reject do |suggestion|
+      text_content = "#{suggestion['name']} #{suggestion['description']}".downcase
+      banned_words.any? { |word| text_content.include?(word.downcase) }
+    end
+    
+    # Add compliance warnings for potentially problematic suggestions
+    filtered_suggestions.map do |suggestion|
+      warnings = []
+      
+      # Check for tone compliance
+      if framework[:tone_attributes].present?
+        tone_warnings = check_tone_compliance(suggestion, framework[:tone_attributes])
+        warnings.concat(tone_warnings)
+      end
+      
+      suggestion['compliance_warnings'] = warnings if warnings.any?
+      suggestion
+    end
+  end
+  
+  def check_tone_compliance(suggestion, tone_attributes)
+    warnings = []
+    content = "#{suggestion['name']} #{suggestion['description']}".downcase
+    
+    # Check formality level
+    if tone_attributes['formality'] == 'formal'
+      informal_words = ['hey', 'yeah', 'cool', 'awesome', 'gonna', 'wanna']
+      found_informal = informal_words.select { |word| content.include?(word) }
+      if found_informal.any?
+        warnings << "Contains informal language: #{found_informal.join(', ')}"
+      end
+    elsif tone_attributes['formality'] == 'casual'
+      formal_words = ['utilize', 'facilitate', 'endeavor', 'subsequently']
+      found_formal = formal_words.select { |word| content.include?(word) }
+      if found_formal.any?
+        warnings << "Contains overly formal language: #{found_formal.join(', ')}"
+      end
+    end
+    
+    warnings
+  end
+  
+  def calculate_brand_compliance_adjustment(suggestion, brand_context)
+    return 0.0 unless brand_context.present?
+    
+    base_compliance_score = suggestion['brand_compliance_score'] || 0.5
+    
+    # Higher weight for brand compliance in scoring
+    compliance_weight = 0.3
+    
+    # Convert compliance score to adjustment (-0.15 to +0.15)
+    adjustment = (base_compliance_score - 0.5) * compliance_weight
+    
+    # Additional penalty for compliance warnings
+    if suggestion['compliance_warnings']&.any?
+      adjustment -= 0.1
+    end
+    
+    adjustment
   end
 end

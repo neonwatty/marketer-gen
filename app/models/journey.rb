@@ -182,4 +182,105 @@ class Journey < ApplicationRecord
      latest_analytics.engagement_score * engagement_weight +
      (latest_analytics.completed_executions.to_f / [latest_analytics.total_executions, 1].max * 100) * completion_weight).round(1)
   end
+  
+  # Brand compliance analytics methods
+  def brand_compliance_summary(days = 30)
+    return {} unless brand_id.present?
+    
+    JourneyInsight.brand_compliance_summary(id, days)
+  end
+  
+  def brand_compliance_by_step(days = 30)
+    return {} unless brand_id.present?
+    
+    JourneyInsight.brand_compliance_by_step(id, days)
+  end
+  
+  def brand_violations_breakdown(days = 30)
+    return {} unless brand_id.present?
+    
+    JourneyInsight.brand_violations_breakdown(id, days)
+  end
+  
+  def latest_brand_compliance_score
+    return 1.0 unless brand_id.present?
+    
+    latest_compliance = journey_insights
+                        .brand_compliance
+                        .order(calculated_at: :desc)
+                        .first
+    
+    latest_compliance&.data&.dig('score') || 1.0
+  end
+  
+  def brand_compliance_trend(days = 30)
+    return 'stable' unless brand_id.present?
+    
+    compliance_insights = journey_insights
+                          .brand_compliance
+                          .where('calculated_at >= ?', days.days.ago)
+                          .order(calculated_at: :desc)
+    
+    return 'stable' if compliance_insights.count < 3
+    
+    scores = compliance_insights.map { |insight| insight.data['score'] }.compact
+    JourneyInsight.calculate_score_trend(scores)
+  end
+  
+  def overall_brand_health_score
+    return 1.0 unless brand_id.present?
+    
+    compliance_summary = brand_compliance_summary(30)
+    return 1.0 if compliance_summary.empty?
+    
+    # Calculate overall brand health based on multiple factors
+    compliance_score = compliance_summary[:average_score] || 1.0
+    compliance_rate = (compliance_summary[:compliance_rate] || 100) / 100.0
+    violation_penalty = [compliance_summary[:total_violations] * 0.05, 0.5].min
+    
+    # Weighted brand health score
+    health_score = (compliance_score * 0.6) + (compliance_rate * 0.4) - violation_penalty
+    [health_score, 0.0].max.round(3)
+  end
+  
+  def brand_compliance_alerts
+    return [] unless brand_id.present?
+    
+    alerts = []
+    summary = brand_compliance_summary(7)  # Last 7 days
+    
+    if summary.present?
+      # Alert for low average score
+      if summary[:average_score] < 0.7
+        alerts << {
+          type: 'low_compliance_score',
+          severity: 'high',
+          message: "Average brand compliance score is #{(summary[:average_score] * 100).round(1)}%",
+          recommendation: 'Review content against brand guidelines'
+        }
+      end
+      
+      # Alert for declining trend
+      if brand_compliance_trend(7) == 'declining'
+        alerts << {
+          type: 'declining_compliance',
+          severity: 'medium',
+          message: 'Brand compliance trend is declining',
+          recommendation: 'Investigate recent content changes'
+        }
+      end
+      
+      # Alert for high violation count
+      if summary[:total_violations] > 10
+        alerts << {
+          type: 'high_violations',
+          severity: 'medium',
+          message: "#{summary[:total_violations]} brand violations in the last 7 days",
+          recommendation: 'Review and fix flagged content'
+        }
+      end
+    end
+    
+    alerts
+  end
 end
