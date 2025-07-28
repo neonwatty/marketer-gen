@@ -12,7 +12,27 @@ Rails.application.routes.draw do
       end
     end
     resources :brand_guidelines
-    resource :messaging_framework
+    resource :messaging_framework do
+      member do
+        patch :update_key_messages
+        patch :update_value_propositions
+        patch :update_terminology
+        patch :update_approved_phrases
+        patch :update_banned_words
+        patch :update_tone_attributes
+        post :validate_content
+        get :export
+        post :import
+        post :ai_suggestions
+        patch :reorder_key_messages
+        patch :reorder_value_propositions
+        post :add_key_message
+        delete :remove_key_message
+        post :add_value_proposition
+        delete :remove_value_proposition
+        get :search_approved_phrases
+      end
+    end
     resources :brand_analyses, only: [:index, :show, :create] do
       member do
         post :regenerate

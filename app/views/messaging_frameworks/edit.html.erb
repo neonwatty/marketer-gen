@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow-sm rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-bold text-gray-900">Edit Messaging Framework</h1>
+          <a href="<%= brand_messaging_framework_path(@brand) %>" 
+             class="text-gray-600 hover:text-gray-900 transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <%= form_with model: @messaging_framework, 
+                    url: brand_messaging_framework_path(@brand),
+                    local: true,
+                    html: { class: "divide-y divide-gray-200" } do |form| %>
+        
+        <div class="px-6 py-6 space-y-6">
+          <!-- Tagline -->
+          <div>
+            <%= form.label :tagline, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :tagline, 
+                               class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors",
+                               placeholder: "Enter your brand tagline..." %>
+          </div>
+
+          <!-- Mission Statement -->
+          <div>
+            <%= form.label :mission_statement, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :mission_statement, 
+                              rows: 3,
+                              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors resize-none",
+                              placeholder: "Enter your mission statement..." %>
+          </div>
+
+          <!-- Vision Statement -->
+          <div>
+            <%= form.label :vision_statement, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :vision_statement, 
+                              rows: 3,
+                              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors resize-none",
+                              placeholder: "Enter your vision statement..." %>
+          </div>
+
+          <!-- Active Status -->
+          <div>
+            <label class="flex items-center">
+              <%= form.check_box :active, class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" %>
+              <span class="ml-2 text-sm text-gray-700">Framework is active</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="px-6 py-4 bg-gray-50 flex items-center justify-between">
+          <a href="<%= brand_messaging_framework_path(@brand) %>" 
+             class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+            Cancel
+          </a>
+          <%= form.submit "Save Changes", 
+                         class: "px-4 py-2 bg-indigo-600 text-sm font-medium rounded-lg text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-6 text-center">
+      <p class="text-sm text-gray-600">
+        For advanced editing of key messages, value propositions, and other framework elements,
+        <a href="<%= brand_messaging_framework_path(@brand) %>" class="text-indigo-600 hover:text-indigo-700 font-medium">
+          use the interactive framework manager
+        </a>.
+      </p>
+    </div>
+  </div>
+</div>
