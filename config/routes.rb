@@ -1,6 +1,110 @@
 Rails.application.routes.draw do
   # API endpoints
   namespace :api do
+    namespace :v1 do
+      # Journey Management API
+      resources :journeys do
+        member do
+          post :duplicate
+          post :publish
+          post :archive
+          get :analytics
+          get :execution_status
+        end
+        
+        # Journey Steps API
+        resources :steps, controller: :journey_steps do
+          member do
+            patch :reorder
+            post :duplicate
+            post :execute
+            get :transitions
+            post :transitions, action: :create_transition
+            get :analytics
+          end
+        end
+      end
+      
+      # Templates API
+      resources :templates, controller: :journey_templates do
+        member do
+          post :instantiate
+          post :clone
+          post :rate
+        end
+        
+        collection do
+          get :categories
+          get :industries
+          get :popular
+          get :recommended
+        end
+      end
+      
+      # Analytics API
+      resources :analytics, only: [] do
+        collection do
+          get :overview
+          get 'journeys/:id', action: :journey_analytics, as: :journey_analytics
+          get 'campaigns/:id', action: :campaign_analytics, as: :campaign_analytics
+          get 'funnels/:journey_id', action: :funnel_analytics, as: :funnel_analytics
+          get 'ab_tests/:id', action: :ab_test_analytics, as: :ab_test_analytics
+          get :comparative, action: :comparative_analytics
+          get :trends
+          get 'personas/:id/performance', action: :persona_performance, as: :persona_performance
+          post :custom_report
+          get :real_time
+        end
+      end
+      
+      # Campaign Management API
+      resources :campaigns do
+        member do
+          post :activate
+          post :pause
+          get :analytics
+          get :journeys
+          post :journeys, action: :add_journey
+          delete 'journeys/:journey_id', action: :remove_journey
+        end
+        
+        collection do
+          get :industries
+          get :types
+        end
+      end
+      
+      # Persona Management API
+      resources :personas do
+        member do
+          get :campaigns
+          get :performance
+          post :clone
+        end
+        
+        collection do
+          get :templates
+          post :from_template, action: :create_from_template
+          get :analytics_overview
+        end
+      end
+      
+      # AI Suggestions API
+      resources :journey_suggestions, only: [:index] do
+        collection do
+          get 'for_stage/:stage', action: :for_stage, as: :for_stage
+          get 'for_step', action: :for_step
+          post :bulk_suggestions
+          post :personalized_suggestions
+          post :feedback, action: :create_feedback
+          get :feedback_analytics
+          get :suggestion_history
+          post :refresh_cache
+        end
+      end
+    end
+    
+    # Legacy API endpoints (redirect to v1)
     resources :journey_suggestions, only: [:index] do
       collection do
         get 'for_stage/:stage', action: :for_stage, as: :for_stage

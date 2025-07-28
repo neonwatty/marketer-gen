@@ -2,20 +2,22 @@
 
 one:
   user: one
-  name: MyString
-  description: MyText
-  status: MyString
-  brand_id: MyString
-  campaign_type: MyString
-  target_audience: MyText
-  goals: MyText
+  name: "Test Journey One"
+  description: "Description for test journey one"
+  status: "draft"
+  campaign_type: "email_nurture"
+  target_audience: "New subscribers"
+  goals: ["Increase engagement", "Drive conversions"]
+  metadata: {}
+  settings: {}
 
 two:
   user: two
-  name: MyString
-  description: MyText
-  status: MyString
-  brand_id: MyString
-  campaign_type: MyString
-  target_audience: MyText
-  goals: MyText
+  name: "Test Journey Two"
+  description: "Description for test journey two"
+  status: "published"
+  campaign_type: "lead_generation"
+  target_audience: "Website visitors"
+  goals: ["Generate leads", "Build awareness"]
+  metadata: {}
+  settings: {}
