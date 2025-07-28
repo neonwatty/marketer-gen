@@ -1,10 +1,13 @@
 class Brand < ApplicationRecord
+  include Branding::Compliance::CacheInvalidation
+  
   belongs_to :user
   has_many :brand_assets, dependent: :destroy
   has_many :brand_guidelines, dependent: :destroy
   has_one :messaging_framework, dependent: :destroy
   has_many :brand_analyses, dependent: :destroy
   has_many :journeys
+  has_many :compliance_results, dependent: :destroy
 
   # Validations
   validates :name, presence: true, uniqueness: { scope: :user_id }

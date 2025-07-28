@@ -1,4 +1,6 @@
 class BrandAnalysis < ApplicationRecord
+  include Branding::Compliance::CacheInvalidation
+  
   belongs_to :brand
 
   # Constants

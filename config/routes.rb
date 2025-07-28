@@ -26,6 +26,17 @@ Rails.application.routes.draw do
   # API endpoints
   namespace :api do
     namespace :v1 do
+      # Brand Compliance API
+      resources :brands, only: [] do
+        namespace :compliance do
+          post :check
+          post :validate_aspect
+          post :preview_fix
+          post :validate_and_fix
+          get :history
+        end
+      end
+      
       # Journey Management API
       resources :journeys do
         member do

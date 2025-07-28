@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_28_161218) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_28_173924) do
   create_table "ab_test_variants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.integer "journey_id", null: false
@@ -230,6 +230,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_161218) do
     t.index ["user_id", "name"], name: "index_campaigns_on_user_id_and_name", unique: true
     t.index ["user_id", "status"], name: "index_campaigns_on_user_id_and_status"
     t.index ["user_id"], name: "index_campaigns_on_user_id"
+  end
+
+  create_table "compliance_results", force: :cascade do |t|
+    t.integer "brand_id", null: false
+    t.string "content_type"
+    t.string "content_hash"
+    t.boolean "compliant"
+    t.decimal "score", precision: 5, scale: 3
+    t.integer "violations_count", default: 0
+    t.json "violations_data", default: []
+    t.json "suggestions_data", default: []
+    t.json "analysis_data", default: {}
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id", "content_type"], name: "index_compliance_results_on_brand_id_and_content_type"
+    t.index ["brand_id"], name: "index_compliance_results_on_brand_id"
+    t.index ["compliant"], name: "index_compliance_results_on_compliant"
+    t.index ["content_hash"], name: "index_compliance_results_on_content_hash"
+    t.index ["created_at"], name: "index_compliance_results_on_created_at"
   end
 
   create_table "conversion_funnels", force: :cascade do |t|
@@ -590,6 +610,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_161218) do
   add_foreign_key "brands", "users"
   add_foreign_key "campaigns", "personas"
   add_foreign_key "campaigns", "users"
+  add_foreign_key "compliance_results", "brands"
   add_foreign_key "conversion_funnels", "campaigns"
   add_foreign_key "conversion_funnels", "journeys"
   add_foreign_key "conversion_funnels", "users"
