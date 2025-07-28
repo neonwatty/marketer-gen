@@ -15,13 +15,13 @@ Test user interface usability, dashboard functionality, journey builder interact
 ### Dependencies: None
 ### Description: Design and implement the main dashboard with navigation and overview components.
 ### Details:
-Create responsive dashboard with campaign overview, quick actions, recent activity, and navigation menu. Implement breadcrumbs, search functionality, and user notifications. Documentation: https://mui.com/material-ui/getting-started/, https://reactrouter.com/en/main
+AGENTS: Use tailwind-css-expert for responsive dashboard design. Use javascript-package-expert for React components. Create responsive dashboard with campaign overview, quick actions, recent activity, and navigation menu. Implement breadcrumbs, search functionality, and user notifications. Documentation: https://mui.com/material-ui/getting-started/, https://reactrouter.com/en/main
 
 ## 11.2. Visual Journey Builder [pending]
 ### Dependencies: None
 ### Description: Build drag-and-drop journey builder with visual campaign flow creation.
 ### Details:
-Create interactive journey builder with drag-and-drop nodes, connection lines, and stage configuration. Implement journey templates, validation, and export capabilities. Documentation: https://reactflow.dev/, https://d3js.org/, https://react-dnd.github.io/react-dnd/
+NOTE: Already completed in Task 2! This subtask can be marked as done. Original: Create interactive journey builder with drag-and-drop nodes, connection lines, and stage configuration. Implement journey templates, validation, and export capabilities. Documentation: https://reactflow.dev/, https://d3js.org/, https://react-dnd.github.io/react-dnd/
 
 ## 11.3. Content Editor & Preview [pending]
 ### Dependencies: None

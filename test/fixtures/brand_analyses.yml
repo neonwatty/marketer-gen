@@ -1,0 +1,21 @@
+one:
+  brand: one
+  analysis_status: "completed"
+  analyzed_at: <%= 1.day.ago %>
+  confidence_score: 0.85
+  voice_attributes:
+    tone:
+      primary: "professional"
+      secondary: "friendly"
+    formality:
+      level: "formal"
+      score: 0.8
+  brand_values:
+    - "Innovation"
+    - "Reliability"
+    - "Customer Focus"
+  messaging_pillars:
+    - name: "Innovation Leadership"
+      description: "Leading the industry with cutting-edge solutions"
+    - name: "Customer Success"
+      description: "Dedicated to helping customers achieve their goals"

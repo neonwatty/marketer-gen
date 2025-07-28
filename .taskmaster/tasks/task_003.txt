@@ -5,7 +5,7 @@
 # Priority: high
 # Description: Build the brand identity system that processes uploaded materials and ensures generated content adheres to brand guidelines.
 # Details:
-Develop file upload and processing system for brand guidelines, compliance documents, messaging playbooks, creative assets, and external links. Create AI processing to extract brand voice, tone, restrictions, and rules. Implement messaging framework definition tools.
+AGENTS: Use ruby-rails-expert for Active Storage file upload system and AI service architecture. Use error-debugger for troubleshooting file processing issues. Develop file upload and processing system for brand guidelines, compliance documents, messaging playbooks, creative assets, and external links. Create AI processing to extract brand voice, tone, restrictions, and rules using LLM integration. Implement messaging framework definition tools with brand rule validation.
 
 # Test Strategy:
 Test file upload functionality, AI processing accuracy, brand rule extraction, and content compliance checking. Validate that generated content follows brand guidelines.

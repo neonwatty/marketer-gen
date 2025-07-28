@@ -1,6 +1,7 @@
 class Journey < ApplicationRecord
   belongs_to :user
   belongs_to :campaign, optional: true
+  belongs_to :brand, optional: true
   has_one :persona, through: :campaign
   has_many :journey_steps, dependent: :destroy
   has_many :step_transitions, through: :journey_steps

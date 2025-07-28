@@ -15,7 +15,7 @@ Test platform integrations, data accuracy, dashboard functionality, and real-tim
 ### Dependencies: None
 ### Description: Integrate with major social media platforms for data collection and campaign management.
 ### Details:
-Connect to Facebook Ads, Instagram, LinkedIn, Twitter, and TikTok APIs. Implement data collection for impressions, engagement, clicks, and conversions. Documentation: https://developers.facebook.com/docs/marketing-api/, https://developer.linkedin.com/docs, https://developer.twitter.com/en/docs
+AGENTS: Use ruby-rails-expert for API integrations. Use error-debugger for OAuth and API authentication issues. Connect to Facebook Ads, Instagram, LinkedIn, Twitter, and TikTok APIs. Implement data collection for impressions, engagement, clicks, and conversions. Documentation: https://developers.facebook.com/docs/marketing-api/, https://developer.linkedin.com/docs, https://developer.twitter.com/en/docs
 
 ## 8.2. Google Ads & Search Integration [pending]
 ### Dependencies: None
@@ -39,7 +39,7 @@ Connect to Salesforce, HubSpot, Marketo, and Pardot. Track lead generation, conv
 ### Dependencies: None
 ### Description: Build real-time analytics dashboard with interactive charts and metrics.
 ### Details:
-Create dashboard with real-time data visualization, interactive charts, and drill-down capabilities. Implement data aggregation and performance alerts. Documentation: https://recharts.org/, https://www.chartjs.org/, https://d3js.org/
+AGENTS: Use javascript-package-expert for chart libraries (Recharts, D3.js). Use tailwind-css-expert for dashboard UI design. Create dashboard with real-time data visualization, interactive charts, and drill-down capabilities. Implement data aggregation and performance alerts. Documentation: https://recharts.org/, https://www.chartjs.org/, https://d3js.org/
 
 ## 8.6. Data Pipeline & ETL Processing [pending]
 ### Dependencies: None

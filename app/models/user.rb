@@ -11,6 +11,7 @@ class User < ApplicationRecord
   has_many :conversion_funnels, dependent: :destroy
   has_many :journey_metrics, dependent: :destroy
   has_many :ab_tests, dependent: :destroy
+  has_many :brands, dependent: :destroy
   
   # Self-referential association for suspension tracking
   belongs_to :suspended_by, class_name: "User", optional: true

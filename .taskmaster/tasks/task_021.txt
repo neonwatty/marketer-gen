@@ -1,0 +1,11 @@
+# Task ID: 21
+# Title: Project Review & Agent Coordination
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Periodic project review and planning sessions using project-orchestrator agent
+# Details:
+AGENTS: Use project-orchestrator for comprehensive project review and planning. This task should be executed after every 2-3 major tasks are completed. The project-orchestrator will: 1) Review completed work and assess quality, 2) Identify any gaps or missing features, 3) Recommend task prioritization changes, 4) Suggest which agents should handle upcoming tasks, 5) Break down complex tasks into manageable subtasks. This ensures optimal agent utilization and project cohesion.
+
+# Test Strategy:
+

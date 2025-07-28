@@ -103,3 +103,8 @@ gem "faraday-retry", "~> 2.2"
 
 # JSON parsing
 gem "oj", "~> 3.16"
+
+# File processing for brand assets
+gem "pdf-reader", "~> 2.11"
+gem "docx", "~> 0.8"
+gem "rubyzip", "~> 2.3"

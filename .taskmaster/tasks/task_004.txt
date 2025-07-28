@@ -15,13 +15,13 @@ Test LLM response quality, brand compliance, content variety, and generation spe
 ### Dependencies: None
 ### Description: Set up integration with multiple LLM providers and configure API connections.
 ### Details:
-Integrate OpenAI GPT-4, Anthropic Claude, and other LLM providers. Implement API key management, rate limiting, and fallback mechanisms. Create provider abstraction layer for easy switching. Documentation: https://platform.openai.com/docs/api-reference, https://anthropic.com/api, https://github.com/vercel/ai
+AGENTS: Use ruby-rails-expert for service architecture and API integration. Use error-debugger for API connection issues. Integrate OpenAI GPT-4, Anthropic Claude, and other LLM providers. Implement API key management, rate limiting, and fallback mechanisms. Create provider abstraction layer for easy switching. Documentation: https://platform.openai.com/docs/api-reference, https://anthropic.com/api, https://github.com/vercel/ai
 
 ## 4.2. Prompt Engineering & Template System [pending]
 ### Dependencies: None
 ### Description: Develop comprehensive prompt engineering system for different content types and use cases.
 ### Details:
-Create prompt templates for social media posts, email sequences, ad copy, and landing pages. Implement dynamic prompt generation based on brand guidelines and campaign context. Documentation: https://www.promptingguide.ai/, https://github.com/promptslab/Promptify
+AGENTS: Use ruby-rails-expert for prompt template system. Use project-orchestrator to design comprehensive prompt strategy. Create prompt templates for social media posts, email sequences, ad copy, and landing pages. Implement dynamic prompt generation based on brand guidelines and campaign context. Documentation: https://www.promptingguide.ai/, https://github.com/promptslab/Promptify
 
 ## 4.3. Brand-Aware Content Generation [pending]
 ### Dependencies: None
@@ -33,7 +33,7 @@ Create brand analysis system that extracts voice, tone, and style from uploaded 
 ### Dependencies: None
 ### Description: Build conversational interface for gathering campaign requirements and context.
 ### Details:
-Create chat-based interface for campaign intake, using LLM to guide users through requirements gathering. Implement conversation memory and context management. Documentation: https://github.com/vercel/ai-sdk, https://www.langchain.com/docs/use_cases/chatbots/
+AGENTS: Use javascript-package-expert for React chat interface. Use ruby-rails-expert for backend conversation management. Create chat-based interface for campaign intake, using LLM to guide users through requirements gathering. Implement conversation memory and context management. Documentation: https://github.com/vercel/ai-sdk, https://www.langchain.com/docs/use_cases/chatbots/
 
 ## 4.5. Content Optimization & A/B Testing [pending]
 ### Dependencies: None

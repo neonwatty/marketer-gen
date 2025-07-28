@@ -1,0 +1,22 @@
+one:
+  name: "Acme Corp"
+  description: "A leading technology company"
+  user: one
+  industry: "Technology"
+  website: "https://acme.com"
+  active: true
+  color_scheme:
+    primary: ["#1E40AF", "#3B82F6"]
+    secondary: ["#10B981", "#F59E0B"]
+  typography:
+    font_families:
+      headings: "Inter"
+      body: "Inter"
+
+two:
+  name: "Beta Industries"
+  description: "Manufacturing excellence"
+  user: two
+  industry: "Manufacturing"
+  website: "https://beta.com"
+  active: true

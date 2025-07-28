@@ -1,0 +1,23 @@
+one:
+  brand: one
+  rule_type: "do"
+  rule_content: "Use clear, concise language"
+  category: "voice"
+  priority: 8
+  active: true
+
+two:
+  brand: one
+  rule_type: "dont"
+  rule_content: "Avoid technical jargon"
+  category: "voice"
+  priority: 9
+  active: true
+
+three:
+  brand: one
+  rule_type: "must"
+  rule_content: "Include value proposition in all marketing materials"
+  category: "messaging"
+  priority: 10
+  active: true

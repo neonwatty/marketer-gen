@@ -1,0 +1,22 @@
+one:
+  brand: one
+  tagline: "Innovation Simplified"
+  mission_statement: "To make advanced technology accessible to everyone"
+  vision_statement: "A world where technology empowers every individual and organization"
+  active: true
+  key_messages:
+    innovation: ["Cutting-edge solutions", "Industry leadership", "Future-focused"]
+    reliability: ["Trusted by thousands", "Proven track record", "24/7 support"]
+  value_propositions:
+    main: ["Faster implementation", "Lower costs", "Better outcomes"]
+  approved_phrases:
+    - "innovation simplified"
+    - "trusted partner"
+    - "proven results"
+  banned_words:
+    - "cheap"
+    - "budget"
+    - "basic"
+  tone_attributes:
+    formality: "professional"
+    style: "friendly"

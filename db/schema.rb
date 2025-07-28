@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_27_234731) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_28_161218) do
   create_table "ab_test_variants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.integer "journey_id", null: false
@@ -131,6 +131,80 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_234731) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_admin_audit_logs_on_user_id"
+  end
+
+  create_table "brand_analyses", force: :cascade do |t|
+    t.integer "brand_id", null: false
+    t.json "analysis_data", default: {}
+    t.json "extracted_rules", default: {}
+    t.json "voice_attributes", default: {}
+    t.json "brand_values", default: []
+    t.json "messaging_pillars", default: []
+    t.json "visual_guidelines", default: {}
+    t.string "analysis_status", default: "pending"
+    t.datetime "analyzed_at"
+    t.float "confidence_score"
+    t.text "analysis_notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["analysis_status"], name: "index_brand_analyses_on_analysis_status"
+    t.index ["brand_id", "created_at"], name: "index_brand_analyses_on_brand_id_and_created_at"
+    t.index ["brand_id"], name: "index_brand_analyses_on_brand_id"
+  end
+
+  create_table "brand_assets", force: :cascade do |t|
+    t.integer "brand_id", null: false
+    t.string "asset_type", null: false
+    t.json "metadata", default: {}
+    t.string "original_filename"
+    t.string "content_type"
+    t.text "extracted_text"
+    t.json "extracted_data", default: {}
+    t.string "processing_status", default: "pending"
+    t.datetime "processed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["asset_type"], name: "index_brand_assets_on_asset_type"
+    t.index ["brand_id", "asset_type"], name: "index_brand_assets_on_brand_id_and_asset_type"
+    t.index ["brand_id"], name: "index_brand_assets_on_brand_id"
+    t.index ["processing_status"], name: "index_brand_assets_on_processing_status"
+  end
+
+  create_table "brand_guidelines", force: :cascade do |t|
+    t.integer "brand_id", null: false
+    t.string "rule_type", null: false
+    t.text "rule_content", null: false
+    t.integer "priority", default: 0
+    t.string "category"
+    t.boolean "active", default: true
+    t.json "examples", default: {}
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id", "active"], name: "index_brand_guidelines_on_brand_id_and_active"
+    t.index ["brand_id", "rule_type"], name: "index_brand_guidelines_on_brand_id_and_rule_type"
+    t.index ["brand_id"], name: "index_brand_guidelines_on_brand_id"
+    t.index ["category"], name: "index_brand_guidelines_on_category"
+    t.index ["priority"], name: "index_brand_guidelines_on_priority"
+    t.index ["rule_type"], name: "index_brand_guidelines_on_rule_type"
+  end
+
+  create_table "brands", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.integer "user_id", null: false
+    t.json "settings", default: {}
+    t.string "industry"
+    t.string "website"
+    t.json "color_scheme", default: {}
+    t.json "typography", default: {}
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_brands_on_active"
+    t.index ["industry"], name: "index_brands_on_industry"
+    t.index ["user_id", "name"], name: "index_brands_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_brands_on_user_id"
   end
 
   create_table "campaigns", force: :cascade do |t|
@@ -336,7 +410,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_234731) do
     t.string "name", null: false
     t.text "description"
     t.string "status", default: "draft", null: false
-    t.string "brand_id"
     t.string "campaign_type"
     t.text "target_audience"
     t.text "goals"
@@ -347,6 +420,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_234731) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "campaign_id"
+    t.integer "brand_id"
     t.index ["brand_id"], name: "index_journeys_on_brand_id"
     t.index ["campaign_id", "status"], name: "index_journeys_on_campaign_id_and_status"
     t.index ["campaign_id"], name: "index_journeys_on_campaign_id"
@@ -355,6 +429,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_234731) do
     t.index ["status"], name: "index_journeys_on_status"
     t.index ["user_id", "status"], name: "index_journeys_on_user_id_and_status"
     t.index ["user_id"], name: "index_journeys_on_user_id"
+  end
+
+  create_table "messaging_frameworks", force: :cascade do |t|
+    t.integer "brand_id", null: false
+    t.json "key_messages", default: {}
+    t.json "value_propositions", default: {}
+    t.json "terminology", default: {}
+    t.text "tagline"
+    t.text "mission_statement"
+    t.text "vision_statement"
+    t.json "approved_phrases", default: []
+    t.json "banned_words", default: []
+    t.json "tone_attributes", default: {}
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id", "active"], name: "index_messaging_frameworks_on_brand_id_and_active"
+    t.index ["brand_id"], name: "index_messaging_frameworks_on_brand_id"
   end
 
   create_table "personas", force: :cascade do |t|
@@ -492,6 +584,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_234731) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "admin_audit_logs", "users"
+  add_foreign_key "brand_analyses", "brands"
+  add_foreign_key "brand_assets", "brands"
+  add_foreign_key "brand_guidelines", "brands"
+  add_foreign_key "brands", "users"
   add_foreign_key "campaigns", "personas"
   add_foreign_key "campaigns", "users"
   add_foreign_key "conversion_funnels", "campaigns"
@@ -509,8 +605,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_234731) do
   add_foreign_key "journey_metrics", "users"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journey_templates", "journey_templates", column: "original_template_id"
+  add_foreign_key "journeys", "brands"
   add_foreign_key "journeys", "campaigns"
   add_foreign_key "journeys", "users"
+  add_foreign_key "messaging_frameworks", "brands"
   add_foreign_key "personas", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "step_executions", "journey_executions"

@@ -1,4 +1,28 @@
 Rails.application.routes.draw do
+  # Brand management
+  resources :brands do
+    resources :brand_assets do
+      member do
+        post :reprocess
+        get :download
+        get :status
+      end
+      collection do
+        get :batch_status
+      end
+    end
+    resources :brand_guidelines
+    resource :messaging_framework
+    resources :brand_analyses, only: [:index, :show, :create] do
+      member do
+        post :regenerate
+      end
+    end
+    member do
+      get :compliance_check
+      post :check_content_compliance
+    end
+  end
   # API endpoints
   namespace :api do
     namespace :v1 do
