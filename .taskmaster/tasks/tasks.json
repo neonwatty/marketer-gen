@@ -78,7 +78,88 @@
         "status": "pending",
         "priority": "high",
         "dependencies": [],
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": "2.1",
+            "title": "Journey Data Model Architecture",
+            "description": "Design and implement comprehensive data models for journeys, steps, and transitions",
+            "details": "COMPLETED: Created Rails models for Journey, JourneyStep, StepTransition, JourneyExecution, StepExecution, JourneyTemplate, JourneyInsights, and SuggestionFeedback. Implemented relationships, validations, and database indexes for optimal performance. All migrations applied and models tested.",
+            "status": "done",
+            "priority": "high"
+          },
+          {
+            "id": "2.2",
+            "title": "Journey Stages & Flow Engine",
+            "description": "Build the journey stage system and flow engine for step progression",
+            "details": "COMPLETED: Implemented 5-stage journey system (Awareness, Consideration, Conversion, Retention, Advocacy) with stage-based color coding. Created flow engine with StepTransition model supporting conditional routing and priority-based transitions. Includes journey execution tracking and step completion logic.",
+            "status": "done",
+            "priority": "high"
+          },
+          {
+            "id": "2.3",
+            "title": "Journey Template Library & Management",
+            "description": "Create template system for pre-built journey frameworks",
+            "details": "COMPLETED: Built comprehensive template library with 10+ pre-built journey templates for different campaign types. Implemented template versioning, usage tracking, and customization capabilities. Added template CRUD operations with duplicate, archive, and version management features.",
+            "status": "done",
+            "priority": "medium"
+          },
+          {
+            "id": "2.4",
+            "title": "AI-Powered Journey Step Suggestions",
+            "description": "Implement AI-powered suggestion engine for journey steps",
+            "details": "COMPLETED: Created JourneySuggestionEngine service with LLM integration (OpenAI/Anthropic), contextual step suggestions based on journey stage and previous steps, confidence scoring, and feedback learning system. Includes caching for performance and RESTful API endpoints.",
+            "status": "done",
+            "priority": "high"
+          },
+          {
+            "id": "2.5",
+            "title": "Visual Journey Builder UI (Tailwind CSS)",
+            "description": "Design and implement the visual journey builder interface",
+            "details": "COMPLETED: Built drag-and-drop journey builder UI with Tailwind CSS design system, stage-based color coding, responsive layout, and interactive components. Includes step palette, canvas area, properties panel, and journey preview functionality.",
+            "status": "done",
+            "priority": "high"
+          },
+          {
+            "id": "2.6",
+            "title": "Interactive JavaScript Logic (React Flow)",
+            "description": "Implement React-based drag-and-drop journey builder",
+            "details": "COMPLETED: Integrated React Flow v11 with TypeScript, custom node components, drag-and-drop functionality, connection logic, zoom/pan controls, and auto-layout. Includes Zustand state management, undo/redo system, auto-save, and real-time validation.",
+            "status": "done",
+            "priority": "high"
+          },
+          {
+            "id": "2.7",
+            "title": "Multi-Journey Support & Analytics Foundation",
+            "description": "Implement support for multiple journeys per brand/persona with analytics",
+            "details": "Create Persona and Campaign models, implement journey comparison features, analytics tracking with JourneyAnalytics model, conversion funnel analysis, and A/B testing framework. Support journey orchestration across different audience segments.",
+            "status": "pending",
+            "priority": "medium"
+          },
+          {
+            "id": "2.8",
+            "title": "Journey Builder API Development",
+            "description": "Create comprehensive API for journey management",
+            "details": "Build RESTful API endpoints for journey CRUD operations, step management, template operations, execution tracking, and analytics retrieval. Include API versioning, authentication, and documentation.",
+            "status": "pending",
+            "priority": "medium"
+          },
+          {
+            "id": "2.9",
+            "title": "Journey Testing & Quality Assurance",
+            "description": "Implement comprehensive testing for journey builder",
+            "details": "Create unit tests for models and services, integration tests for journey workflows, React component tests, E2E tests for journey builder UI, and performance testing for large journeys. Include test coverage reporting.",
+            "status": "pending",
+            "priority": "high"
+          },
+          {
+            "id": "2.10",
+            "title": "Journey Import/Export & Integration",
+            "description": "Build import/export functionality and platform integrations",
+            "details": "Implement JSON/CSV import/export for journeys, integration with marketing platforms (HubSpot, Marketo, Salesforce), webhook support for journey events, and API for third-party integrations. Include data validation and error handling.",
+            "status": "pending",
+            "priority": "low"
+          }
+        ]
       },
       {
         "id": "3",

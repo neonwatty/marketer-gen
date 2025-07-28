@@ -10,7 +10,59 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_27_182543) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_27_234731) do
+  create_table "ab_test_variants", force: :cascade do |t|
+    t.integer "ab_test_id", null: false
+    t.integer "journey_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.string "variant_type", default: "treatment", null: false
+    t.decimal "traffic_percentage", precision: 5, scale: 2, default: "50.0"
+    t.boolean "is_control", default: false
+    t.integer "total_visitors", default: 0
+    t.integer "conversions", default: 0
+    t.decimal "conversion_rate", precision: 5, scale: 2, default: "0.0"
+    t.decimal "confidence_interval", precision: 5, scale: 2, default: "0.0"
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ab_test_id", "is_control"], name: "index_ab_test_variants_on_ab_test_id_and_is_control"
+    t.index ["ab_test_id", "name"], name: "index_ab_test_variants_on_ab_test_id_and_name", unique: true
+    t.index ["ab_test_id"], name: "index_ab_test_variants_on_ab_test_id"
+    t.index ["conversion_rate"], name: "index_ab_test_variants_on_conversion_rate"
+    t.index ["journey_id"], name: "index_ab_test_variants_on_journey_id"
+    t.index ["traffic_percentage"], name: "index_ab_test_variants_on_traffic_percentage"
+    t.index ["variant_type"], name: "index_ab_test_variants_on_variant_type"
+  end
+
+  create_table "ab_tests", force: :cascade do |t|
+    t.integer "campaign_id", null: false
+    t.integer "user_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.text "hypothesis"
+    t.string "test_type", default: "conversion", null: false
+    t.string "status", default: "draft", null: false
+    t.decimal "confidence_level", precision: 5, scale: 2, default: "95.0"
+    t.decimal "significance_threshold", precision: 5, scale: 2, default: "5.0"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer "winner_variant_id"
+    t.json "metadata", default: {}
+    t.json "settings", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "name"], name: "index_ab_tests_on_campaign_id_and_name", unique: true
+    t.index ["campaign_id", "status"], name: "index_ab_tests_on_campaign_id_and_status"
+    t.index ["campaign_id"], name: "index_ab_tests_on_campaign_id"
+    t.index ["end_date"], name: "index_ab_tests_on_end_date"
+    t.index ["start_date"], name: "index_ab_tests_on_start_date"
+    t.index ["status"], name: "index_ab_tests_on_status"
+    t.index ["test_type"], name: "index_ab_tests_on_test_type"
+    t.index ["user_id", "status"], name: "index_ab_tests_on_user_id_and_status"
+    t.index ["user_id"], name: "index_ab_tests_on_user_id"
+  end
+
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -81,6 +133,87 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_182543) do
     t.index ["user_id"], name: "index_admin_audit_logs_on_user_id"
   end
 
+  create_table "campaigns", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.integer "persona_id", null: false
+    t.integer "user_id", null: false
+    t.string "status", default: "draft", null: false
+    t.string "campaign_type"
+    t.text "goals"
+    t.json "target_metrics", default: {}
+    t.json "metadata", default: {}
+    t.json "settings", default: {}
+    t.datetime "started_at"
+    t.datetime "ended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_type"], name: "index_campaigns_on_campaign_type"
+    t.index ["ended_at"], name: "index_campaigns_on_ended_at"
+    t.index ["persona_id", "status"], name: "index_campaigns_on_persona_id_and_status"
+    t.index ["persona_id"], name: "index_campaigns_on_persona_id"
+    t.index ["started_at"], name: "index_campaigns_on_started_at"
+    t.index ["user_id", "name"], name: "index_campaigns_on_user_id_and_name", unique: true
+    t.index ["user_id", "status"], name: "index_campaigns_on_user_id_and_status"
+    t.index ["user_id"], name: "index_campaigns_on_user_id"
+  end
+
+  create_table "conversion_funnels", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.integer "campaign_id", null: false
+    t.integer "user_id", null: false
+    t.string "funnel_name", null: false
+    t.string "stage", null: false
+    t.integer "stage_order", null: false
+    t.integer "visitors", default: 0
+    t.integer "conversions", default: 0
+    t.decimal "conversion_rate", precision: 5, scale: 2, default: "0.0"
+    t.decimal "drop_off_rate", precision: 5, scale: 2, default: "0.0"
+    t.datetime "period_start", null: false
+    t.datetime "period_end", null: false
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "period_start"], name: "index_conversion_funnels_on_campaign_id_and_period_start"
+    t.index ["campaign_id"], name: "index_conversion_funnels_on_campaign_id"
+    t.index ["conversion_rate"], name: "index_conversion_funnels_on_conversion_rate"
+    t.index ["funnel_name", "stage_order"], name: "index_conversion_funnels_on_funnel_name_and_stage_order"
+    t.index ["journey_id", "funnel_name", "stage_order"], name: "index_conversion_funnels_on_journey_funnel_stage"
+    t.index ["journey_id"], name: "index_conversion_funnels_on_journey_id"
+    t.index ["period_start"], name: "index_conversion_funnels_on_period_start"
+    t.index ["stage"], name: "index_conversion_funnels_on_stage"
+    t.index ["user_id", "period_start"], name: "index_conversion_funnels_on_user_id_and_period_start"
+    t.index ["user_id"], name: "index_conversion_funnels_on_user_id"
+  end
+
+  create_table "journey_analytics", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.integer "campaign_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "period_start", null: false
+    t.datetime "period_end", null: false
+    t.integer "total_executions", default: 0
+    t.integer "completed_executions", default: 0
+    t.integer "abandoned_executions", default: 0
+    t.float "average_completion_time", default: 0.0
+    t.decimal "conversion_rate", precision: 5, scale: 2, default: "0.0"
+    t.decimal "engagement_score", precision: 5, scale: 2, default: "0.0"
+    t.json "metrics", default: {}
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "period_start"], name: "index_journey_analytics_on_campaign_id_and_period_start"
+    t.index ["campaign_id"], name: "index_journey_analytics_on_campaign_id"
+    t.index ["conversion_rate"], name: "index_journey_analytics_on_conversion_rate"
+    t.index ["engagement_score"], name: "index_journey_analytics_on_engagement_score"
+    t.index ["journey_id", "period_start"], name: "index_journey_analytics_on_journey_id_and_period_start"
+    t.index ["journey_id"], name: "index_journey_analytics_on_journey_id"
+    t.index ["period_end"], name: "index_journey_analytics_on_period_end"
+    t.index ["period_start"], name: "index_journey_analytics_on_period_start"
+    t.index ["user_id", "period_start"], name: "index_journey_analytics_on_user_id_and_period_start"
+    t.index ["user_id"], name: "index_journey_analytics_on_user_id"
+  end
+
   create_table "journey_executions", force: :cascade do |t|
     t.integer "journey_id", null: false
     t.integer "user_id", null: false
@@ -118,6 +251,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_182543) do
     t.index ["insights_type"], name: "index_journey_insights_on_insights_type"
     t.index ["journey_id", "insights_type"], name: "index_journey_insights_on_journey_id_and_insights_type"
     t.index ["journey_id"], name: "index_journey_insights_on_journey_id"
+  end
+
+  create_table "journey_metrics", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.integer "campaign_id", null: false
+    t.integer "user_id", null: false
+    t.string "metric_name", null: false
+    t.decimal "metric_value", precision: 10, scale: 4, default: "0.0"
+    t.string "metric_type", null: false
+    t.string "aggregation_period", null: false
+    t.datetime "calculated_at", null: false
+    t.json "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["aggregation_period"], name: "index_journey_metrics_on_aggregation_period"
+    t.index ["calculated_at"], name: "index_journey_metrics_on_calculated_at"
+    t.index ["campaign_id", "metric_name"], name: "index_journey_metrics_on_campaign_id_and_metric_name"
+    t.index ["campaign_id"], name: "index_journey_metrics_on_campaign_id"
+    t.index ["journey_id", "metric_name", "aggregation_period"], name: "index_journey_metrics_on_journey_metric_period"
+    t.index ["journey_id"], name: "index_journey_metrics_on_journey_id"
+    t.index ["metric_name", "calculated_at"], name: "index_journey_metrics_on_metric_name_and_calculated_at"
+    t.index ["metric_type"], name: "index_journey_metrics_on_metric_type"
+    t.index ["user_id", "calculated_at"], name: "index_journey_metrics_on_user_id_and_calculated_at"
+    t.index ["user_id"], name: "index_journey_metrics_on_user_id"
   end
 
   create_table "journey_steps", force: :cascade do |t|
@@ -189,12 +346,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_182543) do
     t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "campaign_id"
     t.index ["brand_id"], name: "index_journeys_on_brand_id"
+    t.index ["campaign_id", "status"], name: "index_journeys_on_campaign_id_and_status"
+    t.index ["campaign_id"], name: "index_journeys_on_campaign_id"
     t.index ["campaign_type"], name: "index_journeys_on_campaign_type"
     t.index ["published_at"], name: "index_journeys_on_published_at"
     t.index ["status"], name: "index_journeys_on_status"
     t.index ["user_id", "status"], name: "index_journeys_on_user_id_and_status"
     t.index ["user_id"], name: "index_journeys_on_user_id"
+  end
+
+  create_table "personas", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.json "demographics", default: {}
+    t.json "behaviors", default: {}
+    t.json "preferences", default: {}
+    t.json "psychographics", default: {}
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_personas_on_name"
+    t.index ["user_id", "name"], name: "index_personas_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_personas_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -309,17 +484,34 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_27_182543) do
     t.index ["suspended_at"], name: "index_users_on_suspended_at"
   end
 
+  add_foreign_key "ab_test_variants", "ab_tests"
+  add_foreign_key "ab_test_variants", "journeys"
+  add_foreign_key "ab_tests", "campaigns"
+  add_foreign_key "ab_tests", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "admin_audit_logs", "users"
+  add_foreign_key "campaigns", "personas"
+  add_foreign_key "campaigns", "users"
+  add_foreign_key "conversion_funnels", "campaigns"
+  add_foreign_key "conversion_funnels", "journeys"
+  add_foreign_key "conversion_funnels", "users"
+  add_foreign_key "journey_analytics", "campaigns"
+  add_foreign_key "journey_analytics", "journeys"
+  add_foreign_key "journey_analytics", "users"
   add_foreign_key "journey_executions", "journey_steps", column: "current_step_id"
   add_foreign_key "journey_executions", "journeys"
   add_foreign_key "journey_executions", "users"
   add_foreign_key "journey_insights", "journeys"
+  add_foreign_key "journey_metrics", "campaigns"
+  add_foreign_key "journey_metrics", "journeys"
+  add_foreign_key "journey_metrics", "users"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journey_templates", "journey_templates", column: "original_template_id"
+  add_foreign_key "journeys", "campaigns"
   add_foreign_key "journeys", "users"
+  add_foreign_key "personas", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "step_executions", "journey_executions"
   add_foreign_key "step_executions", "journey_steps"

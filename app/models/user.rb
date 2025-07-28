@@ -5,6 +5,12 @@ class User < ApplicationRecord
   has_many :activities, dependent: :destroy
   has_many :journeys, dependent: :destroy
   has_many :journey_executions, dependent: :destroy
+  has_many :personas, dependent: :destroy
+  has_many :campaigns, dependent: :destroy
+  has_many :journey_analytics, class_name: 'JourneyAnalytics', dependent: :destroy
+  has_many :conversion_funnels, dependent: :destroy
+  has_many :journey_metrics, dependent: :destroy
+  has_many :ab_tests, dependent: :destroy
   
   # Self-referential association for suspension tracking
   belongs_to :suspended_by, class_name: "User", optional: true

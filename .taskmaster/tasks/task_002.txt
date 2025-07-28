@@ -9,3 +9,65 @@ Create a system that enables marketers to identify campaign purpose and automati
 
 # Test Strategy:
 Test journey template creation, journey step suggestions, template customization, and multi-journey support. Validate that suggested content types and channel strategies align with journey stages.
+
+# Subtasks:
+## 2.1. Journey Data Model Architecture [done]
+### Dependencies: None
+### Description: Design and implement comprehensive data models for journeys, steps, and transitions
+### Details:
+COMPLETED: Created Rails models for Journey, JourneyStep, StepTransition, JourneyExecution, StepExecution, JourneyTemplate, JourneyInsights, and SuggestionFeedback. Implemented relationships, validations, and database indexes for optimal performance. All migrations applied and models tested.
+
+## 2.2. Journey Stages & Flow Engine [done]
+### Dependencies: None
+### Description: Build the journey stage system and flow engine for step progression
+### Details:
+COMPLETED: Implemented 5-stage journey system (Awareness, Consideration, Conversion, Retention, Advocacy) with stage-based color coding. Created flow engine with StepTransition model supporting conditional routing and priority-based transitions. Includes journey execution tracking and step completion logic.
+
+## 2.3. Journey Template Library & Management [done]
+### Dependencies: None
+### Description: Create template system for pre-built journey frameworks
+### Details:
+COMPLETED: Built comprehensive template library with 10+ pre-built journey templates for different campaign types. Implemented template versioning, usage tracking, and customization capabilities. Added template CRUD operations with duplicate, archive, and version management features.
+
+## 2.4. AI-Powered Journey Step Suggestions [done]
+### Dependencies: None
+### Description: Implement AI-powered suggestion engine for journey steps
+### Details:
+COMPLETED: Created JourneySuggestionEngine service with LLM integration (OpenAI/Anthropic), contextual step suggestions based on journey stage and previous steps, confidence scoring, and feedback learning system. Includes caching for performance and RESTful API endpoints.
+
+## 2.5. Visual Journey Builder UI (Tailwind CSS) [done]
+### Dependencies: None
+### Description: Design and implement the visual journey builder interface
+### Details:
+COMPLETED: Built drag-and-drop journey builder UI with Tailwind CSS design system, stage-based color coding, responsive layout, and interactive components. Includes step palette, canvas area, properties panel, and journey preview functionality.
+
+## 2.6. Interactive JavaScript Logic (React Flow) [done]
+### Dependencies: None
+### Description: Implement React-based drag-and-drop journey builder
+### Details:
+COMPLETED: Integrated React Flow v11 with TypeScript, custom node components, drag-and-drop functionality, connection logic, zoom/pan controls, and auto-layout. Includes Zustand state management, undo/redo system, auto-save, and real-time validation.
+
+## 2.7. Multi-Journey Support & Analytics Foundation [pending]
+### Dependencies: None
+### Description: Implement support for multiple journeys per brand/persona with analytics
+### Details:
+Create Persona and Campaign models, implement journey comparison features, analytics tracking with JourneyAnalytics model, conversion funnel analysis, and A/B testing framework. Support journey orchestration across different audience segments.
+
+## 2.8. Journey Builder API Development [pending]
+### Dependencies: None
+### Description: Create comprehensive API for journey management
+### Details:
+Build RESTful API endpoints for journey CRUD operations, step management, template operations, execution tracking, and analytics retrieval. Include API versioning, authentication, and documentation.
+
+## 2.9. Journey Testing & Quality Assurance [pending]
+### Dependencies: None
+### Description: Implement comprehensive testing for journey builder
+### Details:
+Create unit tests for models and services, integration tests for journey workflows, React component tests, E2E tests for journey builder UI, and performance testing for large journeys. Include test coverage reporting.
+
+## 2.10. Journey Import/Export & Integration [pending]
+### Dependencies: None
+### Description: Build import/export functionality and platform integrations
+### Details:
+Implement JSON/CSV import/export for journeys, integration with marketing platforms (HubSpot, Marketo, Salesforce), webhook support for journey events, and API for third-party integrations. Include data validation and error handling.
+
