@@ -2,19 +2,8 @@ require "test_helper"
 
 class JourneyTest < ActiveSupport::TestCase
   setup do
-    @user = User.create!(
-      email_address: "journey_test@example.com",
-      password: "password123",
-      role: "marketer"
-    )
-    
-    @journey = Journey.create!(
-      user: @user,
-      name: "Test Journey",
-      description: "A test journey for unit tests",
-      status: "draft",
-      campaign_type: "product_launch"
-    )
+    @user = create(:user)
+    @journey = create(:journey, user: @user)
   end
   
   test "should be valid with valid attributes" do
@@ -77,17 +66,9 @@ class JourneyTest < ActiveSupport::TestCase
   end
   
   test "should duplicate journey with steps" do
-    # Create some steps
-    step1 = @journey.journey_steps.create!(
-      name: "Step 1",
-      stage: "awareness",
-      position: 0
-    )
-    step2 = @journey.journey_steps.create!(
-      name: "Step 2", 
-      stage: "consideration",
-      position: 1
-    )
+    # Create some steps using factories
+    step1 = create(:journey_step, journey: @journey, name: "Step 1", stage: "awareness", position: 0)
+    step2 = create(:journey_step, journey: @journey, name: "Step 2", stage: "consideration", position: 1)
     
     duplicate = @journey.duplicate
     
@@ -97,22 +78,22 @@ class JourneyTest < ActiveSupport::TestCase
     assert_nil duplicate.published_at
     assert_nil duplicate.archived_at
     assert_equal @journey.journey_steps.count, duplicate.journey_steps.count
-    assert_equal step1.name, duplicate.journey_steps.first.name
+    assert_equal step1.name, duplicate.journey_steps.order(:position).first.name
   end
   
   test "should count total steps" do
     assert_equal 0, @journey.total_steps
     
-    @journey.journey_steps.create!(name: "Step 1", stage: "awareness")
-    @journey.journey_steps.create!(name: "Step 2", stage: "consideration")
+    create(:journey_step, journey: @journey, name: "Step 1", stage: "awareness")
+    create(:journey_step, journey: @journey, name: "Step 2", stage: "consideration")
     
     assert_equal 2, @journey.total_steps
   end
   
   test "should group steps by stage" do
-    @journey.journey_steps.create!(name: "Step 1", stage: "awareness")
-    @journey.journey_steps.create!(name: "Step 2", stage: "awareness")
-    @journey.journey_steps.create!(name: "Step 3", stage: "consideration")
+    create(:journey_step, journey: @journey, name: "Step 1", stage: "awareness")
+    create(:journey_step, journey: @journey, name: "Step 2", stage: "awareness")
+    create(:journey_step, journey: @journey, name: "Step 3", stage: "consideration")
     
     stages = @journey.steps_by_stage
     
@@ -121,7 +102,8 @@ class JourneyTest < ActiveSupport::TestCase
   end
   
   test "should export to json format" do
-    step = @journey.journey_steps.create!(
+    step = create(:journey_step, 
+      journey: @journey,
       name: "Test Step",
       stage: "awareness",
       content_type: "email",
@@ -138,9 +120,9 @@ class JourneyTest < ActiveSupport::TestCase
   end
   
   test "should have proper scopes" do
-    draft = Journey.create!(user: @user, name: "Draft", status: "draft")
-    published = Journey.create!(user: @user, name: "Published", status: "published")
-    archived = Journey.create!(user: @user, name: "Archived", status: "archived")
+    draft = create(:journey, user: @user, name: "Draft", status: "draft")
+    published = create(:journey, user: @user, name: "Published", status: "published")
+    archived = create(:journey, user: @user, name: "Archived", status: "archived")
     
     assert_includes Journey.draft, draft
     assert_not_includes Journey.draft, published
@@ -157,8 +139,57 @@ class JourneyTest < ActiveSupport::TestCase
   end
   
   test "metadata and settings should default to empty hash" do
-    journey = Journey.create!(user: @user, name: "Test")
+    journey = create(:journey, user: @user, name: "Test", metadata: {}, settings: {})
     assert_equal({}, journey.metadata)
     assert_equal({}, journey.settings)
+  end
+  
+  test "should calculate analytics summary" do
+    # Create some analytics data with campaign
+    campaign = @journey.campaign || create(:campaign, user: @user)
+    @journey.update!(campaign: campaign) unless @journey.campaign
+    
+    create(:journey_analytics, 
+      journey: @journey, 
+      campaign: campaign,
+      user: @user,
+      total_executions: 100, 
+      completed_executions: 80,
+      abandoned_executions: 10
+    )
+    create(:journey_analytics, 
+      journey: @journey, 
+      campaign: campaign,
+      user: @user,
+      total_executions: 150, 
+      completed_executions: 120,
+      abandoned_executions: 20
+    )
+    
+    summary = @journey.analytics_summary(30)
+    
+    assert_equal 250, summary[:total_executions]
+    assert_equal 200, summary[:completed_executions]
+    assert_equal 30, summary[:period_days]
+  end
+  
+  test "should calculate performance score" do
+    campaign = @journey.campaign || create(:campaign, user: @user)
+    @journey.update!(campaign: campaign) unless @journey.campaign
+    
+    create(:journey_analytics, 
+      journey: @journey, 
+      campaign: campaign,
+      user: @user,
+      conversion_rate: 75.0, 
+      engagement_score: 85.0,
+      total_executions: 100,
+      completed_executions: 90,
+      abandoned_executions: 5
+    )
+    
+    score = @journey.latest_performance_score
+    assert score > 0
+    assert score <= 100
   end
 end

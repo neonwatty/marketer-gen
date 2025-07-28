@@ -2,9 +2,10 @@ require "test_helper"
 
 class Api::V1::JourneysControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:one)
-    @journey = journeys(:one)
-    @journey.update!(user: @user)
+    @user = create(:user)
+    @persona = create(:persona, user: @user)
+    @campaign = create(:campaign, user: @user, persona: @persona)
+    @journey = create(:journey, user: @user, campaign: @campaign)
     sign_in_as(@user)
   end
 
@@ -139,9 +140,10 @@ class Api::V1::JourneysControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not show other user's journey" do
-    other_user = users(:two)
-    other_journey = journeys(:two)
-    other_journey.update!(user: other_user)
+    other_user = create(:user, email_address: "other@example.com")
+    other_persona = create(:persona, user: other_user)
+    other_campaign = create(:campaign, user: other_user, persona: other_persona)
+    other_journey = create(:journey, user: other_user, campaign: other_campaign)
 
     get api_v1_journey_url(other_journey), as: :json
     assert_response :not_found

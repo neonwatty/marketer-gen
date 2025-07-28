@@ -2,9 +2,36 @@ require 'test_helper'
 
 class JourneySuggestionEngineTest < ActiveSupport::TestCase
   def setup
-    @user = users(:one)
-    @journey = journeys(:one)
-    @current_step = journey_steps(:one)
+    @user = create(:user)
+    @persona = create(:persona, user: @user)
+    @campaign = create(:campaign, user: @user, persona: @persona)
+    @journey = create(:journey, user: @user, campaign: @campaign)
+    @current_step = create(:journey_step, journey: @journey, stage: 'awareness')
+    
+    # Mock LLM API responses
+    mock_llm_response(
+      JSON.generate({
+        suggestions: [
+          {
+            name: "Welcome Email Sequence",
+            description: "Send a personalized welcome email",
+            stage: "awareness",
+            content_type: "email",
+            channel: "email",
+            confidence_score: 0.85
+          },
+          {
+            name: "Product Demo Video",
+            description: "Share an engaging product demo",
+            stage: "consideration", 
+            content_type: "video",
+            channel: "email",
+            confidence_score: 0.75
+          }
+        ]
+      })
+    )
+    
     @engine = JourneySuggestionEngine.new(
       journey: @journey,
       user: @user,

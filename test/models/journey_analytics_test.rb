@@ -2,36 +2,15 @@ require "test_helper"
 
 class JourneyAnalyticsTest < ActiveSupport::TestCase
   def setup
-    @user = users(:admin)
-    @persona = Persona.create!(
-      user: @user,
-      name: "Test Persona",
-      description: "Test persona description"
-    )
-    @campaign = Campaign.create!(
-      user: @user,
-      persona: @persona,
-      name: "Test Campaign",
-      description: "Test campaign description"
-    )
-    @journey = Journey.create!(
-      user: @user,
-      campaign: @campaign,
-      name: "Test Journey",
-      description: "Test journey description"
-    )
-    @analytics = JourneyAnalytics.new(
+    @user = create(:user)
+    @persona = create(:persona, user: @user)
+    @campaign = create(:campaign, user: @user, persona: @persona)
+    @journey = create(:journey, user: @user, campaign: @campaign)
+    @analytics = build(:journey_analytics, 
       journey: @journey,
-      campaign: @campaign,
-      user: @user,
-      period_start: 1.day.ago,
-      period_end: Time.current,
       total_executions: 1000,
       completed_executions: 650,
-      abandoned_executions: 200,
-      average_completion_time: 3600.0, # 1 hour in seconds
-      conversion_rate: 8.5,
-      engagement_score: 75.2
+      conversion_rate: 65.0
     )
   end
 

@@ -75,6 +75,18 @@ group :test do
   
   # Test coverage
   gem "simplecov", require: false
+  
+  # Mocking and stubbing
+  gem "mocha", require: false
+  
+  # Factory for test data
+  gem "factory_bot_rails"
+  
+  # Mock HTTP requests
+  gem "webmock"
+  
+  # Better test reporting
+  gem "minitest-reporters"
 end
 
 gem "cssbundling-rails"
