@@ -43,6 +43,9 @@ module ActiveSupport
     
     # Include FactoryBot methods
     include FactoryBot::Syntax::Methods
+    
+    # Include ActionMailer test helpers
+    include ActionMailer::TestHelper
 
     # Add more helper methods to be used by all tests here...
     
