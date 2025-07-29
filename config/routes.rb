@@ -78,6 +78,16 @@ Rails.application.routes.draw do
             get :analytics
           end
         end
+        
+        # A/B Tests API
+        resources :ab_tests do
+          member do
+            post :start
+            post :stop
+            post :declare_winner
+            get :results
+          end
+        end
       end
       
       # Templates API
@@ -199,7 +209,7 @@ Rails.application.routes.draw do
       end
     end
   end
-  mount RailsAdmin::Engine => '/admin', as: 'rails_admin' unless Rails.env.test?
+  mount RailsAdmin::Engine => '/admin', as: 'rails_admin' if Rails.env.development? || Rails.env.production?
   root "home#index"
   
   get "sign_up", to: "registrations#new"

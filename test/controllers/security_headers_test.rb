@@ -38,12 +38,14 @@ class SecurityHeadersTest < ActionDispatch::IntegrationTest
     Rails.application.config.force_ssl = true
     
     post session_path, params: {
-      email_address: User.create!(email_address: "test@example.com", password: "password").email_address,
+      email_address: User.create!(email_address: "secure_test@example.com", password: "password").email_address,
       password: "password"
     }
     
     # In production, cookies should have secure flag
     # This test documents expected behavior
+    assert_response :redirect
+    assert_not_nil cookies[:session_id]
   ensure
     Rails.application.config.force_ssl = false
   end
