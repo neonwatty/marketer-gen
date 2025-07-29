@@ -2,11 +2,12 @@ module ApiErrorHandling
   extend ActiveSupport::Concern
 
   included do
-    rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
-    rescue_from ActiveRecord::RecordInvalid, with: :handle_validation_error
-    rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
-    rescue_from Pundit::NotAuthorizedError, with: :handle_unauthorized
+    # Rails processes rescue_from in reverse order, so put StandardError first
     rescue_from StandardError, with: :handle_internal_error
+    rescue_from Pundit::NotAuthorizedError, with: :handle_unauthorized
+    rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
+    rescue_from ActiveRecord::RecordInvalid, with: :handle_validation_error
+    rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
   end
 
   private

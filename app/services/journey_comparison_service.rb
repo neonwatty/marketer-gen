@@ -106,17 +106,17 @@ class JourneyComparisonService
     engagement_comparison = {}
     
     @journeys.each do |journey|
-      metrics = JourneyMetrics.get_journey_dashboard_metrics(journey.id, period)
+      metrics = JourneyMetric.get_journey_dashboard_metrics(journey.id, period)
       
       engagement_metrics = metrics.select { |metric_name, _| 
-        JourneyMetrics::ENGAGEMENT_METRICS.include?(metric_name) 
+        JourneyMetric::ENGAGEMENT_METRICS.include?(metric_name) 
       }
       
       engagement_comparison[journey.id] = {
         journey_name: journey.name,
         engagement_metrics: engagement_metrics,
         engagement_score: calculate_overall_engagement_score(engagement_metrics),
-        engagement_trends: JourneyMetrics.get_metric_trend(journey.id, 'engagement_score', 7, period)
+        engagement_trends: JourneyMetric.get_metric_trend(journey.id, 'engagement_score', 7, period)
       }
     end
     

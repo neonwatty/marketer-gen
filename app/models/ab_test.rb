@@ -25,6 +25,9 @@ class AbTest < ApplicationRecord
   validate :end_date_after_start_date
   validate :variants_traffic_percentage_sum
   
+  # Use settings JSON for additional attributes
+  store_accessor :settings, :minimum_sample_size
+  
   scope :active, -> { where(status: ['running', 'paused']) }
   scope :completed, -> { where(status: 'completed') }
   scope :by_type, ->(type) { where(test_type: type) }
@@ -120,7 +123,7 @@ class AbTest < ApplicationRecord
     treatment_variants = ab_test_variants.where(is_control: false)
     
     treatment_variants.any? do |variant|
-      calculate_statistical_significance(control_variant, variant) >= significance_threshold
+      calculate_statistical_significance_between(control_variant, variant) >= significance_threshold
     end
   end
   
@@ -134,7 +137,7 @@ class AbTest < ApplicationRecord
     significant_variants = ab_test_variants.select do |variant|
       next true if variant.is_control?  # Control is always included
       
-      calculate_statistical_significance(control_variant, variant) >= significance_threshold
+      calculate_statistical_significance_between(control_variant, variant) >= significance_threshold
     end
     
     return if significant_variants.empty?
@@ -145,6 +148,148 @@ class AbTest < ApplicationRecord
   
   def winner_declared?
     winner_variant.present?
+  end
+  
+  def assign_visitor(visitor_id)
+    return nil unless can_start?
+    
+    # Use consistent hashing to assign visitors to variants
+    hash_value = Digest::MD5.hexdigest("#{id}-#{visitor_id}").to_i(16)
+    percentage = hash_value % 100
+    
+    cumulative_percentage = 0
+    ab_test_variants.order(:id).each do |variant|
+      cumulative_percentage += variant.traffic_percentage
+      if percentage < cumulative_percentage
+        variant.record_visitor!
+        return variant
+      end
+    end
+    
+    # Fallback to last variant if rounding errors occur
+    ab_test_variants.last
+  end
+  
+  def performance_report
+    {
+      test_name: name,
+      status: status,
+      start_date: start_date,
+      end_date: end_date,
+      progress_percentage: progress_percentage,
+      variants: ab_test_variants.map(&:detailed_metrics),
+      winner: winner_variant&.name,
+      statistical_significance_reached: statistical_significance_reached?
+    }
+  end
+  
+  def generate_insights
+    insights_array = []
+    
+    if running?
+      insights_array << "Test has been running for #{((Time.current - start_date) / 1.day).round} days"
+      insights_array << "#{progress_percentage}% of planned duration completed"
+      
+      if statistical_significance_reached?
+        insights_array << "Statistical significance has been reached"
+      else
+        insights_array << "More data needed to reach statistical significance"
+      end
+    end
+    
+    if completed?
+      if winner_variant
+        insights_array << "Winner: #{winner_variant.name} with #{winner_variant.conversion_rate}% conversion rate"
+        control = ab_test_variants.find_by(is_control: true)
+        if control && control != winner_variant
+          lift = winner_variant.lift_vs_control
+          insights_array << "Lift vs control: #{lift}%"
+        end
+      else
+        insights_array << "No clear winner could be determined"
+      end
+    end
+    
+    # Return hash format expected by test
+    {
+      performance_summary: performance_report,
+      statistical_summary: calculate_statistical_summary,
+      recommendations: insights_array,
+      next_steps: generate_next_steps
+    }
+  end
+  
+  def calculate_statistical_significance
+    control = ab_test_variants.find_by(is_control: true)
+    return {} unless control
+    
+    best_treatment = ab_test_variants.where(is_control: false)
+                                    .order(conversion_rate: :desc)
+                                    .first
+    
+    return {} unless best_treatment
+    
+    significance_value = calculate_statistical_significance_between(control, best_treatment)
+    
+    {
+      p_value: (1 - significance_value / 100.0).round(4),
+      is_significant: significance_value >= significance_threshold,
+      confidence_interval: significance_value.round(2)
+    }
+  end
+  
+  def complete_test!
+    return false unless can_complete?
+    
+    transaction do
+      determine_winner!
+      update!(
+        status: 'completed',
+        end_date: Time.current
+      )
+    end
+    
+    true
+  end
+  
+  def meets_minimum_sample_size?
+    return true unless minimum_sample_size.present?
+    
+    total_visitors = ab_test_variants.sum(:total_visitors)
+    total_visitors >= minimum_sample_size.to_i
+  end
+  
+  def calculate_statistical_summary
+    {
+      control_conversion_rate: ab_test_variants.control.first&.conversion_rate || 0,
+      best_variant_conversion_rate: ab_test_variants.order(conversion_rate: :desc).first&.conversion_rate || 0,
+      sample_size: ab_test_variants.sum(:total_visitors),
+      total_conversions: ab_test_variants.sum(:conversions)
+    }
+  end
+  
+  def generate_next_steps
+    steps = []
+    
+    if draft?
+      steps << "Configure test variants and traffic allocation"
+      steps << "Set start and end dates"
+      steps << "Review and launch test"
+    elsif running?
+      if !meets_minimum_sample_size?
+        steps << "Continue running test to reach minimum sample size"
+      elsif !statistical_significance_reached?
+        steps << "Continue test to achieve statistical significance"
+      else
+        steps << "Consider ending test and declaring winner"
+      end
+    elsif completed?
+      steps << "Implement winning variant across all traffic"
+      steps << "Document learnings and insights"
+      steps << "Plan follow-up tests based on results"
+    end
+    
+    steps
   end
   
   def results_summary
@@ -263,7 +408,7 @@ class AbTest < ApplicationRecord
     (99.0..101.0).cover?(total_percentage)
   end
   
-  def calculate_statistical_significance(control, treatment)
+  def calculate_statistical_significance_between(control, treatment)
     return 0 if control.total_visitors == 0 || treatment.total_visitors == 0
     
     # Simplified z-test calculation for conversion rates

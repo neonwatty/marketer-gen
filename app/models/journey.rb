@@ -118,8 +118,8 @@ class Journey < ApplicationRecord
     ConversionFunnel.funnel_overview(id, funnel_name, start_date, end_date)
   end
   
-  def compare_with_journey(other_journey_id, metrics = JourneyMetrics::CORE_METRICS)
-    JourneyMetrics.compare_journey_metrics(id, other_journey_id, metrics)
+  def compare_with_journey(other_journey_id, metrics = JourneyMetric::CORE_METRICS)
+    JourneyMetric.compare_journey_metrics(id, other_journey_id, metrics)
   end
   
   def performance_trends(periods = 7)
@@ -161,7 +161,7 @@ class Journey < ApplicationRecord
   end
   
   def calculate_metrics!(period = 'daily')
-    JourneyMetrics.calculate_and_store_metrics(self, period)
+    JourneyMetric.calculate_and_store_metrics(self, period)
   end
   
   def create_conversion_funnel!(period_start = 1.week.ago, period_end = Time.current, funnel_name = 'default')

@@ -40,10 +40,12 @@ FactoryBot.define do
   factory :ab_test_variant do
     association :ab_test
     name { "Variant A" }
-    configuration { 
+    metadata { 
       {
-        "subject_line" => "Welcome to our amazing service!",
-        "template" => "welcome_a"
+        "configuration" => {
+          "subject_line" => "Welcome to our amazing service!",
+          "template" => "welcome_a"
+        }
       }
     }
     traffic_percentage { 50.0 }
@@ -52,29 +54,33 @@ FactoryBot.define do
     trait :control do
       name { "Control" }
       is_control { true }
-      configuration { 
+      metadata { 
         {
-          "subject_line" => "Welcome!",
-          "template" => "welcome_control"
+          "configuration" => {
+            "subject_line" => "Welcome!",
+            "template" => "welcome_control"
+          }
         }
       }
     end
     
     trait :variation do
       name { "Variation B" }
-      configuration { 
+      metadata { 
         {
-          "subject_line" => "You're in! Let's get started",
-          "template" => "welcome_b"
+          "configuration" => {
+            "subject_line" => "You're in! Let's get started",
+            "template" => "welcome_b"
+          }
         }
       }
     end
     
     trait :with_results do
-      users_assigned { 500 }
+      total_visitors { 500 }
       conversions { 50 }
-      conversion_rate { 0.1 }
-      statistical_significance { 0.95 }
+      conversion_rate { 10.0 }
+      confidence_interval { 95.0 }
     end
     
     factory :control_variant, traits: [:control]

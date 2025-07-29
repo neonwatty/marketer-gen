@@ -69,9 +69,46 @@ module ActiveSupport
         )
     end
     
-    # Helper to sign in a user for controller tests
-    def sign_in_as(user, password = "password123")
-      post session_path, params: { email_address: user.email_address, password: password }
+    # Helper to sign in a user (alias for controller tests)
+    def sign_in(user, password = "password")
+      sign_in_as(user, password)
     end
+    
+    # Helper to sign in a user for controller tests
+    def sign_in_as(user, password = "password")
+      # Create session directly for this user
+      session = user.sessions.create!(
+        user_agent: 'Test User Agent',
+        ip_address: '127.0.0.1',
+        expires_at: 24.hours.from_now,
+        last_active_at: Time.current
+      )
+      
+      # For integration tests, set the cookie differently
+      if defined?(cookies) && cookies.respond_to?(:signed)
+        # Controller test
+        cookies.signed[:session_id] = {
+          value: session.id,
+          httponly: true,
+          same_site: :lax,
+          secure: false, # Not secure in test environment
+          expires: 24.hours.from_now
+        }
+      else
+        # Integration test - use plain cookies
+        cookies[:session_id] = session.id
+      end
+      
+      # Set Current.session for immediate use
+      Current.session = session
+    end
+  end
+end
+
+# Simple VCR stub for tests that expect it
+module VCR
+  def self.use_cassette(name, &block)
+    # Simply execute the block without recording
+    yield if block_given?
   end
 end

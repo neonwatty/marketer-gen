@@ -9,6 +9,7 @@ class Api::V1::JourneysControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@user)
   end
 
+
   test "should get index" do
     get api_v1_journeys_url, as: :json
     assert_response :success

@@ -1,5 +1,5 @@
 class Api::V1::JourneysController < Api::V1::BaseController
-  before_action :set_journey, only: [:show, :update, :destroy, :duplicate, :publish, :archive]
+  before_action :set_journey, only: [:show, :update, :destroy, :duplicate, :publish, :archive, :analytics, :execution_status]
   
   # GET /api/v1/journeys
   def index

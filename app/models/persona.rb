@@ -74,6 +74,18 @@ class Persona < ApplicationRecord
     summary.any? ? summary.join(', ') : 'Limited behavior data'
   end
   
+  def demographic_data
+    demographics || {}
+  end
+  
+  def psychographic_data
+    psychographics || {}
+  end
+  
+  def behavioral_data
+    behaviors || {}
+  end
+
   def to_campaign_context
     {
       name: name,

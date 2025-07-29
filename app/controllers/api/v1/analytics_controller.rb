@@ -227,8 +227,8 @@ class Api::V1::AnalyticsController < Api::V1::BaseController
     # Get performance metrics across all user's journeys
     user_journey_ids = current_user.journeys.pluck(:id)
     
-    metrics = JourneyMetrics.where(journey_id: user_journey_ids)
-      .where(period_start: start_date..)
+    metrics = JourneyMetric.where(journey_id: user_journey_ids)
+      .for_date_range(start_date, Time.current)
     
     {
       average_performance_score: calculate_average_performance_score(metrics),
@@ -244,7 +244,7 @@ class Api::V1::AnalyticsController < Api::V1::BaseController
       {
         step_id: step.id,
         step_name: step.name,
-        step_type: step.step_type,
+        step_type: step.content_type,
         execution_count: executions.count,
         completion_rate: calculate_step_completion_rate(executions),
         average_duration: calculate_average_duration(executions)
@@ -374,7 +374,7 @@ class Api::V1::AnalyticsController < Api::V1::BaseController
       .where(period_start: days.days.ago..)
       .order(:period_start)
     
-    trends = analytics.group_by_day(:period_start).average(metric)
+    trends = analytics.group("DATE(period_start)").average(metric)
     
     {
       metric: metric,
@@ -481,5 +481,26 @@ class Api::V1::AnalyticsController < Api::V1::BaseController
       response_time: 'normal',
       uptime: '99.9%'
     }
+  end
+  
+  def calculate_step_completion_rate(executions)
+    return 0.0 if executions.empty?
+    
+    completed_count = executions.completed.count
+    total_count = executions.count
+    
+    return 0.0 if total_count == 0
+    (completed_count.to_f / total_count * 100).round(2)
+  end
+  
+  def calculate_average_duration(executions)
+    completed_executions = executions.completed.where.not(completed_at: nil, started_at: nil)
+    return 0.0 if completed_executions.empty?
+    
+    durations = completed_executions.map do |execution|
+      (execution.completed_at - execution.started_at) / 1.hour # Convert to hours
+    end
+    
+    (durations.sum / durations.count).round(2)
   end
 end

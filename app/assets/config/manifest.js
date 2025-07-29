@@ -3,6 +3,11 @@
 //= link controllers/application.js
 //= link controllers/hello_controller.js
 //= link controllers/index.js
+//= link controllers/asset_filter_controller.js
+//= link controllers/dropdown_controller.js
+//= link controllers/file_upload_controller.js
+//= link controllers/messaging_framework_controller.js
+//= link controllers/sortable_controller.js
 //= link rails_admin.css
 //= link rails_admin.js
 //= link_tree ../builds

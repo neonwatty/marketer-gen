@@ -41,23 +41,26 @@ module ActivityTracker
     end
     
   rescue => e
-    # Track failed activities
+    # Track failed activities, but don't interfere with API error handling
     response_time = start_time ? Time.current - start_time : nil
     
-    # Log the error
-    ActivityLogger.log(:error, "Action failed", {
-      controller: controller_name,
-      action: action_name,
-      error: e.message,
-      backtrace: e.backtrace.first(5),
-      duration_ms: response_time ? (response_time * 1000).round : nil
-    })
+    # Log the error for debugging, but let API controllers handle their own errors
+    unless self.class.ancestors.any? { |a| a.name == 'Api::V1::BaseController' }
+      ActivityLogger.log(:error, "Action failed", {
+        controller: controller_name,
+        action: action_name,
+        error: e.message,
+        backtrace: e.backtrace.first(5),
+        duration_ms: response_time ? (response_time * 1000).round : nil
+      })
+      
+      log_user_activity(
+        response_time: response_time,
+        error: e.message,
+        response_status: 500
+      ) if current_user
+    end
     
-    log_user_activity(
-      response_time: response_time,
-      error: e.message,
-      response_status: 500
-    ) if current_user
     raise e
   ensure
     Thread.current[:request_id] = nil

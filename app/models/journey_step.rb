@@ -1,5 +1,6 @@
 class JourneyStep < ApplicationRecord
   belongs_to :journey
+  has_many :step_executions, dependent: :destroy
   has_many :transitions_from, class_name: 'StepTransition', foreign_key: 'from_step_id', dependent: :destroy
   has_many :transitions_to, class_name: 'StepTransition', foreign_key: 'to_step_id', dependent: :destroy
   has_many :next_steps, through: :transitions_from, source: :to_step

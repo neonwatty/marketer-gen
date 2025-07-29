@@ -2,25 +2,11 @@ require 'test_helper'
 
 class JourneySuggestionsControllerTest < ActionDispatch::IntegrationTest
   def setup
-    @user = User.create!(
-      email_address: 'test@example.com',
-      password_digest: BCrypt::Password.create('password')
-    )
-    @journey = Journey.create!(
-      name: 'Test Journey',
-      description: 'Test Description',
-      campaign_type: 'product_launch',
-      user: @user,
-      status: 'draft'
-    )
-    @journey_step = JourneyStep.create!(
-      journey: @journey,
-      name: 'Test Step',
-      stage: 'awareness',
-      position: 1,
-      content_type: 'email',
-      channel: 'email'
-    )
+    @user = create(:user)
+    @persona = create(:persona, user: @user)
+    @campaign = create(:campaign, user: @user, persona: @persona)
+    @journey = create(:journey, user: @user, campaign: @campaign)
+    @journey_step = create(:journey_step, journey: @journey)
     
     # Mock current_user method
     @controller = JourneySuggestionsController.new

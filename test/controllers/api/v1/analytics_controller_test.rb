@@ -101,7 +101,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
   test "should require authentication" do
     sign_out
     
-    get overview_api_v1_analytics_index_url, as: :json
+    get overview_api_v1_analytics_url, as: :json
     assert_response :unauthorized
   end
 
@@ -110,7 +110,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
     other_journey = journeys(:two)
     other_journey.update!(user: other_user)
 
-    get journey_analytics_api_v1_analytics_index_url(other_journey.id), as: :json
+    get journey_analytics_api_v1_analytics_url(other_journey.id), as: :json
     assert_response :not_found
   end
 

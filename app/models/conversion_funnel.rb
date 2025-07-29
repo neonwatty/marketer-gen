@@ -219,4 +219,42 @@ class ConversionFunnel < ApplicationRecord
                        .distinct
                        .count
   end
+  
+  def self.funnel_step_breakdown(journey_id, funnel_name, period_start, period_end)
+    stages = by_funnel(funnel_name)
+            .where(journey_id: journey_id)
+            .where(period_start: period_start, period_end: period_end)
+            .ordered_by_stage
+    
+    stages.map do |stage|
+      {
+        stage: stage.stage,
+        stage_order: stage.stage_order,
+        visitors: stage.visitors,
+        conversions: stage.conversions,
+        conversion_rate: stage.conversion_rate,
+        drop_off_rate: stage.drop_off_rate
+      }
+    end
+  end
+  
+  def self.funnel_trends(journey_id, funnel_name, period_start, period_end)
+    # Return basic trend data - could be enhanced with historical comparisons
+    stages = by_funnel(funnel_name)
+            .where(journey_id: journey_id)
+            .where(period_start: period_start, period_end: period_end)
+            .ordered_by_stage
+    
+    return [] if stages.empty?
+    
+    {
+      overall_trend: "stable", # placeholder - could calculate based on historical data
+      conversion_trend: stages.average(:conversion_rate).to_f.round(2),
+      drop_off_trend: stages.average(:drop_off_rate).to_f.round(2),
+      period: {
+        start: period_start,
+        end: period_end
+      }
+    }
+  end
 end
