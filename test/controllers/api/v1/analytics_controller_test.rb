@@ -9,7 +9,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get analytics overview" do
-    get overview_api_v1_analytics_index_url, as: :json
+    get overview_api_v1_analytics_url, as: :json
     assert_response :success
     
     response_data = JSON.parse(response.body)
@@ -21,7 +21,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get analytics overview with custom days" do
-    get overview_api_v1_analytics_index_url, params: { days: 30 }, as: :json
+    get overview_api_v1_analytics_url, params: { days: 30 }, as: :json
     assert_response :success
     
     response_data = JSON.parse(response.body)
@@ -30,7 +30,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get journey analytics" do
-    get journey_analytics_api_v1_analytics_index_url(@journey.id), as: :json
+    get journey_analytics_api_v1_analytics_url(@journey.id), as: :json
     assert_response :success
     
     response_data = JSON.parse(response.body)
@@ -41,7 +41,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get funnel analytics" do
-    get funnel_analytics_api_v1_analytics_index_url(@journey.id), as: :json
+    get funnel_analytics_api_v1_analytics_url(@journey.id), as: :json
     assert_response :success
     
     response_data = JSON.parse(response.body)
@@ -52,7 +52,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get trends" do
-    get trends_api_v1_analytics_index_url, params: { metric: 'conversion_rate' }, as: :json
+    get trends_api_v1_analytics_url, params: { metric: 'conversion_rate' }, as: :json
     assert_response :success
     
     response_data = JSON.parse(response.body)
@@ -62,7 +62,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get real time analytics" do
-    get real_time_api_v1_analytics_index_url, as: :json
+    get real_time_api_v1_analytics_url, as: :json
     assert_response :success
     
     response_data = JSON.parse(response.body)
@@ -81,7 +81,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
       filters: { status: "published" }
     }
 
-    post custom_report_api_v1_analytics_index_url, params: report_params, as: :json
+    post custom_report_api_v1_analytics_url, params: report_params, as: :json
     assert_response :success
     
     response_data = JSON.parse(response.body)
@@ -90,7 +90,7 @@ class Api::V1::AnalyticsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should handle invalid metric for trends" do
-    get trends_api_v1_analytics_index_url, params: { metric: 'invalid_metric' }, as: :json
+    get trends_api_v1_analytics_url, params: { metric: 'invalid_metric' }, as: :json
     assert_response :unprocessable_entity
     
     response_data = JSON.parse(response.body)
