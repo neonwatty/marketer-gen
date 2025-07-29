@@ -16,6 +16,9 @@ class ConversionFunnel < ApplicationRecord
   validate :period_end_after_start
   validate :conversions_not_exceed_visitors
   
+  # Use metadata for additional data storage
+  store_accessor :metadata, :funnel_data
+  
   scope :by_funnel, ->(funnel_name) { where(funnel_name: funnel_name) }
   scope :by_stage, ->(stage) { where(stage: stage) }
   scope :ordered_by_stage, -> { order(:stage_order) }

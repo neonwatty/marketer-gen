@@ -96,6 +96,11 @@ class AbTestVariant < ApplicationRecord
     ((conversion_rate - control_variant.conversion_rate) / control_variant.conversion_rate * 100).round(1)
   end
   
+  # Alias for backward compatibility
+  def calculate_lift
+    lift_vs_control
+  end
+  
   def significance_vs_control
     return 0 unless ab_test && ab_test.ab_test_variants.any?
     

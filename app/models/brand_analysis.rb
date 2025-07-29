@@ -57,6 +57,11 @@ class BrandAnalysis < ApplicationRecord
   def voice_tone
     voice_attributes.dig("tone", "primary") || "professional"
   end
+  
+  def keywords
+    # Extract keywords from analysis_data JSON
+    analysis_data&.dig('keywords') || []
+  end
 
   def primary_brand_values
     brand_values.first(3)

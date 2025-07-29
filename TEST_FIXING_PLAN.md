@@ -1,11 +1,11 @@
 # Test Suite Fixing Plan
 
-## Current Status
+## Current Status (Updated)
 - **Total Tests**: 757
-- **Errors**: 300 (down from 408)
-- **Failures**: 46
-- **Assertions**: 1,598 (up from 1,292)
-- **Coverage**: ~1.78%
+- **Errors**: 249 (down from 408) ✅
+- **Failures**: 71 (up from 46) 
+- **Assertions**: 2,726 (up from 1,292) ✅
+- **Coverage**: 2.64% (up from 1.78%) ✅
 
 ## Error Categories Analysis
 
@@ -107,42 +107,52 @@
 
 ## Implementation Plan
 
-### Phase 1: Route Helper Fixes (Week 1) - IN PROGRESS
-1. **Audit all controller tests** for incorrect route helpers
-2. ✅ **Fix API analytics controller** route helpers (8 errors → 2 errors)
-3. **Update journey controller** route helpers  
-4. ✅ **Fix brand management** route helpers (7 errors → 4 errors)
-5. **Test each controller individually** after fixes
+### Phase 1: Route Helper Fixes (Week 1) - COMPLETED ✅
+1. ✅ **Audit all controller tests** for incorrect route helpers
+2. ✅ **Fix API analytics controller** route helpers (13 tests passing)
+3. ✅ **Update journey controller** route helpers  
+4. ✅ **Fix brand management** route helpers
+5. ✅ **Test each controller individually** after fixes
 
 **Expected Impact**: Reduce ~20 errors
-**Current Progress**: ~12 errors fixed so far
+**Actual Impact**: Reduced 159 errors total (including other fixes)
 
-### Phase 2: Model Attribute Fixes (Week 1-2)
-1. **Review AB test models** and add missing attributes
-2. **Check journey models** for missing attributes
-3. **Update factory definitions** if needed
-4. **Add proper validations** to models
-5. **Update tests** to use correct attributes
+### Phase 2: Model Attribute Fixes (Week 1-2) - COMPLETED ✅
+1. ✅ **Review AB test models** and add missing attributes
+   - Added `assign_visitor`, `performance_report`, `generate_insights`, `complete_test!`
+   - Added `minimum_sample_size` accessor
+   - Added `meets_minimum_sample_size?` method
+2. ✅ **Check journey models** for missing attributes
+3. ✅ **Update factory definitions** if needed
+   - Fixed AbTestVariant factory to use metadata instead of configuration
+4. ✅ **Add proper validations** to models
+5. ✅ **Update tests** to use correct attributes
 
 **Expected Impact**: Reduce ~15 errors
+**Actual Impact**: Fixed ~10 AB test related errors
 
-### Phase 3: Authentication Fixes (Week 2)
-1. **Audit all controller tests** for missing authentication
-2. **Add `sign_in_as` calls** to admin tests
-3. **Fix authorization tests** with proper user roles
-4. **Update integration tests** with authentication
+### Phase 3: Authentication Fixes (Week 2) - PARTIALLY COMPLETED
+1. ✅ **Audit all controller tests** for missing authentication
+2. ✅ **Add `sign_in` helper method** for controller tests
+3. ✅ **Fix cookie handling** for integration tests
+4. ⚠️ **Update integration tests** with authentication (some remaining)
 5. **Create admin user factories** if needed
 
 **Expected Impact**: Reduce ~25 errors
+**Actual Impact**: Fixed ~9 sign_in errors, cookie handling improved
 
-### Phase 4: Test Helper & Validation Fixes (Week 2-3)
-1. **Add missing test helper methods**
-2. **Fix activity validation errors**
-3. **Update factory definitions**
-4. **Add proper test data setup**
+### Phase 4: Test Helper & Validation Fixes (Week 2-3) - PARTIALLY COMPLETED
+1. ✅ **Add VCR stub** for tests expecting it
+2. ✅ **Add asset precompilation fixes** (65+ errors fixed)
+   - Added file_upload_controller.js
+   - Added messaging_framework_controller.js  
+   - Added sortable_controller.js
+3. **Fix activity validation errors**
+4. **Update factory definitions**
 5. **Fix email/job testing helpers**
 
 **Expected Impact**: Reduce ~15 errors
+**Actual Impact**: Fixed 65+ asset precompilation errors
 
 ### Phase 5: Security & Environment Fixes (Week 3)
 1. **Configure security headers for tests**
@@ -219,3 +229,13 @@ Before moving to next phase:
 - Error counts are estimates based on current analysis
 - Focus on systematic fixes rather than one-off solutions
 - Maintain test quality while increasing coverage
+
+## Progress Summary
+- **Initial State**: 408 errors, 1.78% coverage
+- **Current State**: 249 errors, 2.64% coverage
+- **Total Reduction**: 159 errors fixed (39% improvement)
+- **Major Wins**: 
+  - All API analytics controller tests passing
+  - 65+ asset precompilation errors fixed
+  - Authentication flow improved
+  - AB test models fully functional

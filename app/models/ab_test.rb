@@ -259,6 +259,14 @@ class AbTest < ApplicationRecord
     total_visitors >= minimum_sample_size.to_i
   end
   
+  def can_complete?
+    running? && (
+      end_date.present? && Time.current >= end_date ||
+      statistical_significance_reached? ||
+      meets_minimum_sample_size?
+    )
+  end
+  
   def calculate_statistical_summary
     {
       control_conversion_rate: ab_test_variants.control.first&.conversion_rate || 0,
