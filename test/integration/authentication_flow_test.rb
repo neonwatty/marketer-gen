@@ -58,10 +58,20 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
   end
   
   test "authentication required for protected pages" do
-    # Create a controller that requires authentication
-    # For now, we'll test that the authentication concern works
+    # Try to access a protected page without authentication
+    get profile_path
     
-    # Try to access a page that requires authentication
-    # This would be tested with actual protected controllers
+    # Should redirect to sign in page
+    assert_redirected_to new_session_path
+    follow_redirect!
+    assert_select "h1", "Sign in"
+    
+    # Sign in and try again
+    user = User.create!(email_address: "auth_test@example.com", password: "password123")
+    post session_path, params: { email_address: user.email_address, password: "password123" }
+    
+    # Should now be able to access the protected page
+    get profile_path
+    assert_response :success
   end
 end

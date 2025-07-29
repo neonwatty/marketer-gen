@@ -43,9 +43,12 @@ Rails.application.configure do
 end
 
 # Monkey patch Rails logger to include request ID for better tracing
-Rails.logger.formatter = proc do |severity, timestamp, progname, msg|
-  request_id = Thread.current[:request_id] || 'no-request-id'
-  "[#{timestamp}] [#{severity}] [#{request_id}] #{msg}\n"
+# Skip in test environment to avoid conflicts
+unless Rails.env.test?
+  Rails.logger.formatter = proc do |severity, timestamp, progname, msg|
+    request_id = Thread.current[:request_id] || 'no-request-id'
+    "[#{timestamp}] [#{severity}] [#{request_id}] #{msg}\n"
+  end
 end
 
 # Add custom log subscribers for activity tracking
@@ -67,7 +70,7 @@ end
 ActiveSupport::Notifications.subscribe 'suspicious_activity.security' do |*args|
   event = ActiveSupport::Notifications::Event.new(*args)
   
-  if Rails.application.config.respond_to?(:security_logger)
+  if Rails.application.config.respond_to?(:security_logger) && Rails.application.config.security_logger
     Rails.application.config.security_logger.tagged('SECURITY', 'SUSPICIOUS') do
       Rails.application.config.security_logger.warn event.payload.to_json
     end

@@ -216,39 +216,5 @@ module Branding
         @request_cache.clear
       end
     end
-
-    # Cache warming job
-    class CacheWarmerJob < ApplicationJob
-      queue_as :low
-
-      def perform(brand_id)
-        brand = Brand.find(brand_id)
-        CacheService.preload_brand_cache(brand)
-      end
-    end
-
-    # Cache invalidation concern
-    module CacheInvalidation
-      extend ActiveSupport::Concern
-
-      included do
-        after_commit :invalidate_compliance_cache, on: [:create, :update, :destroy]
-      end
-
-      private
-
-      def invalidate_compliance_cache
-        brand_id = case self
-                   when Brand then id
-                   when BrandGuideline, BrandAnalysis then brand_id
-                   else return
-                   end
-
-        CacheService.invalidate_rules(brand_id)
-        
-        # Queue cache warming to rebuild cache
-        CacheWarmerJob.perform_later(brand_id)
-      end
-    end
   end
 end

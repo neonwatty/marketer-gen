@@ -1,0 +1,19 @@
+{
+  "allowedTools": [
+    "Edit",
+    "Write",
+    "Read",
+    "Bash",
+    "Bash(eval *)",
+    "Grep",
+    "Glob",
+    "LS",
+    "WebSearch",
+    "WebFetch",
+    "MultiEdit",
+    "TodoWrite",
+    "NotebookRead",
+    "NotebookEdit",
+    "Task"
+  ]
+}

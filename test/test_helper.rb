@@ -70,8 +70,8 @@ module ActiveSupport
     end
     
     # Helper to sign in a user for controller tests
-    def sign_in_as(user)
-      post new_session_path, params: { email: user.email, password: "password123" }
+    def sign_in_as(user, password = "password123")
+      post session_path, params: { email_address: user.email_address, password: password }
     end
   end
 end
