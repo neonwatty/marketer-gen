@@ -2,8 +2,8 @@ class JourneysController < ApplicationController
   include Authentication
   include ActivityTracker
   
-  before_action :set_journey, only: [:show, :edit, :update, :destroy, :duplicate, :publish, :archive]
-  before_action :ensure_user_can_access_journey, only: [:show, :edit, :update, :destroy, :duplicate, :publish, :archive]
+  before_action :set_journey, only: [:show, :edit, :update, :destroy, :duplicate, :publish, :archive, :builder]
+  before_action :ensure_user_can_access_journey, only: [:show, :edit, :update, :destroy, :duplicate, :publish, :archive, :builder]
   
   # GET /journeys
   def index
@@ -222,6 +222,22 @@ class JourneysController < ApplicationController
     end
   end
   
+  # GET /journeys/:id/builder
+  def builder
+    @journey_steps = @journey.journey_steps.includes(:transitions_from, :transitions_to).by_position
+    
+    # Track activity
+    log_custom_activity('opened_journey_builder', { 
+      journey_id: @journey.id,
+      journey_name: @journey.name
+    })
+    
+    respond_to do |format|
+      format.html
+      format.json { render json: serialize_journey_for_builder(@journey) }
+    end
+  end
+  
   private
   
   def set_journey
@@ -319,5 +335,60 @@ class JourneysController < ApplicationController
       industry: brand.industry,
       status: brand.status
     }
+  end
+  
+  def serialize_journey_for_builder(journey)
+    {
+      id: journey.id,
+      name: journey.name,
+      description: journey.description,
+      status: journey.status,
+      campaign_type: journey.campaign_type,
+      target_audience: journey.target_audience,
+      goals: journey.goals,
+      metadata: journey.metadata,
+      settings: journey.settings,
+      campaign_id: journey.campaign_id,
+      brand_id: journey.brand_id,
+      steps: serialize_journey_steps_for_builder(journey.journey_steps.by_position),
+      created_at: journey.created_at,
+      updated_at: journey.updated_at
+    }
+  end
+  
+  def serialize_journey_steps_for_builder(steps)
+    steps.map do |step|
+      {
+        id: step.id,
+        name: step.name,
+        description: step.description,
+        stage: step.stage,
+        position: {
+          x: step.metadata&.dig('canvas', 'x') || (step.position * 300 + 100),
+          y: step.metadata&.dig('canvas', 'y') || 100
+        },
+        step_position: step.position,
+        content_type: step.content_type,
+        channel: step.channel,
+        duration_days: step.duration_days,
+        config: step.config || {},
+        conditions: step.conditions || {},
+        metadata: step.metadata || {},
+        is_entry_point: step.is_entry_point,
+        is_exit_point: step.is_exit_point,
+        transitions_from: step.transitions_from.map { |t| { 
+          id: t.id, 
+          to_step_id: t.to_step_id, 
+          conditions: t.conditions || {},
+          transition_type: t.transition_type 
+        }},
+        transitions_to: step.transitions_to.map { |t| { 
+          id: t.id, 
+          from_step_id: t.from_step_id, 
+          conditions: t.conditions || {},
+          transition_type: t.transition_type 
+        }}
+      }
+    end
   end
 end

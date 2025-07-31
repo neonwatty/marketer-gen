@@ -1,4 +1,4 @@
-<div class="mx-auto md:w-2/3 w-full">
+<div class="mx-auto md:w-2/3 w-full" data-controller="form-validation" data-form-validation-mode-value="login">
   <% if alert = flash[:alert] %>
     <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
   <% end %>
@@ -11,11 +11,32 @@
 
   <%= form_with url: session_url, class: "contents" do |form| %>
     <div class="my-5">
-      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Enter your email address", value: params[:email_address], class: "block shadow-sm rounded-md border border-gray-400 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 !px-3 !py-3 mt-2 w-full !min-h-[48px] !text-base !leading-6 !h-12" %>
+      <%= form.email_field :email_address, 
+          required: true, 
+          autofocus: true, 
+          autocomplete: "username", 
+          placeholder: "Enter your email address", 
+          value: params[:email_address], 
+          class: "block shadow-sm rounded-md border border-gray-400 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 !px-3 !py-3 mt-2 w-full !min-h-[48px] !text-base !leading-6 !h-12 transition-colors duration-200",
+          data: { 
+            form_validation_target: "emailField",
+            action: "input->form-validation#validateEmail blur->form-validation#validateEmail"
+          } %>
+      <div class="text-red-500 text-sm mt-1 hidden transition-opacity duration-200" data-form-validation-target="emailError"></div>
     </div>
 
     <div class="my-5">
-      <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72, class: "block shadow-sm rounded-md border border-gray-400 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 !px-3 !py-3 mt-2 w-full !min-h-[48px] !text-base !leading-6 !h-12" %>
+      <%= form.password_field :password, 
+          required: true, 
+          autocomplete: "current-password", 
+          placeholder: "Enter your password", 
+          maxlength: 72, 
+          class: "block shadow-sm rounded-md border border-gray-400 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 !px-3 !py-3 mt-2 w-full !min-h-[48px] !text-base !leading-6 !h-12 transition-colors duration-200",
+          data: { 
+            form_validation_target: "passwordField",
+            action: "input->form-validation#validatePassword blur->form-validation#validatePassword"
+          } %>
+      <div class="text-red-500 text-sm mt-1 hidden transition-opacity duration-200" data-form-validation-target="passwordError"></div>
     </div>
 
     <div class="my-5">
@@ -27,7 +48,9 @@
 
     <div class="col-span-6 sm:flex sm:items-center sm:gap-6">
       <div class="mb-4 sm:mb-0">
-        <%= form.submit "Sign in", class: "w-full sm:w-auto text-center rounded-md !px-6 !py-3 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 text-white font-medium cursor-pointer !min-h-[48px] !text-base !h-12 transition-colors duration-200" %>
+        <%= form.submit "Sign in", 
+            class: "w-full sm:w-auto text-center rounded-md !px-6 !py-3 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 text-white font-medium cursor-pointer !min-h-[48px] !text-base !h-12 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
+            data: { form_validation_target: "submitButton" } %>
       </div>
 
       <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 text-sm text-gray-500">

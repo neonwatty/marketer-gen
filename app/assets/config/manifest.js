@@ -6,6 +6,7 @@
 //= link controllers/asset_filter_controller.js
 //= link controllers/dropdown_controller.js
 //= link controllers/file_upload_controller.js
+//= link controllers/form_validation_controller.js
 //= link controllers/messaging_framework_controller.js
 //= link controllers/sortable_controller.js
 //= link controllers/status_poller_controller.js

@@ -191,8 +191,9 @@ Rails.application.routes.draw do
   resources :journeys, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
     member do
       post :duplicate
-      post :publish
+      post :publish  
       post :archive
+      get :builder
     end
     # Journey suggestions endpoints
     resources :suggestions, controller: 'journey_suggestions', only: [:index] do

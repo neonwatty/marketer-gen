@@ -1,28 +1,113 @@
 <% content_for :title, @journey.name %>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <!-- Header -->
-  <div class="bg-white shadow">
-    <div class="px-4 py-6 sm:p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900"><%= @journey.name %></h1>
-          <p class="mt-1 text-sm text-gray-500">
-            <%= @journey.campaign_type&.humanize || 'No type' %> • 
-            Created <%= time_ago_in_words(@journey.created_at) %> ago
-          </p>
-        </div>
-        <div class="flex space-x-3">
-          <% if @journey.status == 'draft' %>
-            <%= link_to "Publish", publish_journey_path(@journey), method: :post, 
-                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+  <!-- Enhanced Header -->
+  <div class="bg-white shadow-sm rounded-lg mb-6">
+    <div class="px-6 py-6">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <!-- Status Icon -->
+              <% case @journey.status %>
+              <% when 'published' %>
+                <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                  <svg class="h-6 w-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              <% when 'draft' %>
+                <div class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                  <svg class="h-6 w-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              <% else %>
+                <div class="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+                  <svg class="h-6 w-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              <% end %>
+            </div>
+            
+            <div class="ml-4">
+              <h1 class="text-3xl font-bold text-gray-900"><%= @journey.name %></h1>
+              <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
+                <div class="mt-2 flex items-center text-sm text-gray-500">
+                  <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                  </svg>
+                  <%= @journey.campaign_type&.humanize || 'No type' %>
+                </div>
+                <div class="mt-2 flex items-center text-sm text-gray-500">
+                  <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Created <%= time_ago_in_words(@journey.created_at) %> ago
+                </div>
+                <div class="mt-2 flex items-center text-sm text-gray-500">
+                  <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                  </svg>
+                  <%= @journey.total_steps %> steps
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Journey Description -->
+          <% if @journey.description.present? %>
+            <div class="mt-4">
+              <p class="text-gray-600"><%= @journey.description %></p>
+            </div>
           <% end %>
-          
-          <%= link_to "Duplicate", duplicate_journey_path(@journey), method: :post,
-              class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
-          
-          <%= link_to "Edit", edit_journey_path(@journey), 
-              class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span class="hidden sm:block">
+            <%= link_to builder_journey_path(@journey), 
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a1 1 0 01-1-1V9a1 1 0 011-1h1a2 2 0 100-4H4a1 1 0 01-1-1V4a1 1 0 011-1h3a1 1 0 001-1v1a2 2 0 012-2z"/>
+              </svg>
+              Visual Builder
+            <% end %>
+          </span>
+
+          <span class="ml-3">
+            <%= link_to "Duplicate", duplicate_journey_path(@journey), method: :post,
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              Duplicate
+            <% end %>
+          </span>
+
+          <span class="ml-3">
+            <%= link_to edit_journey_path(@journey), 
+                class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+              Edit Journey
+            <% end %>
+          </span>
+
+          <% if @journey.status == 'draft' %>
+            <span class="ml-3">
+              <%= link_to "Publish", publish_journey_path(@journey), method: :post, 
+                  data: { confirm: "Are you sure you want to publish this journey?" },
+                  class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" do %>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                </svg>
+                Publish
+              <% end %>
+            </span>
+          <% end %>
         </div>
       </div>
     </div>
@@ -31,31 +116,178 @@
   <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
     <!-- Main Content -->
     <div class="lg:col-span-2">
-      <!-- Journey Details -->
-      <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:p-6">
-          <h3 class="text-lg leading-6 font-medium text-gray-900">Journey Details</h3>
-          <div class="mt-5">
-            <% if @journey.description.present? %>
-              <p class="text-sm text-gray-600"><%= @journey.description %></p>
-            <% else %>
-              <p class="text-sm text-gray-400 italic">No description provided</p>
+      <!-- Analytics Dashboard -->
+      <% if @analytics_summary && @analytics_summary.any? %>
+        <div class="bg-white shadow rounded-lg mb-8">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Performance Analytics</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Engagement Rate -->
+              <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m-8 4h8m-8 4h8M3 7h1m0 0L5 6m-1 1L5 8m-1-1h6m-6 4h1m0 0l1-1m-1 1l1 1m-1-1h6m-6 4h1m0 0l1-1m-1 1l1 1m-1-1h6"/>
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-2xl font-bold text-blue-900">
+                      <%= number_to_percentage(@analytics_summary[:engagement_rate] || 0, precision: 1) %>
+                    </div>
+                    <div class="text-sm text-blue-700">Engagement Rate</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conversion Rate -->
+              <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-2xl font-bold text-green-900">
+                      <%= number_to_percentage(@analytics_summary[:conversion_rate] || 0, precision: 1) %>
+                    </div>
+                    <div class="text-sm text-green-700">Conversion Rate</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Total Interactions -->
+              <div class="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-2xl font-bold text-purple-900">
+                      <%= number_with_delimiter(@analytics_summary[:total_interactions] || 0) %>
+                    </div>
+                    <div class="text-sm text-purple-700">Total Interactions</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Performance Trend -->
+            <% if @analytics_summary[:trend_data] && @analytics_summary[:trend_data].any? %>
+              <div class="mt-6">
+                <h4 class="text-sm font-medium text-gray-900 mb-3">30-Day Performance Trend</h4>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <div class="flex items-center justify-between text-sm text-gray-600">
+                    <span>Last 30 days</span>
+                    <span class="flex items-center">
+                      <% trend_percentage = (@analytics_summary[:trend_percentage] || 0) %>
+                      <% if trend_percentage > 0 %>
+                        <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-green-600">+<%= number_to_percentage(trend_percentage, precision: 1) %></span>
+                      <% elsif trend_percentage < 0 %>
+                        <svg class="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-red-600"><%= number_to_percentage(trend_percentage, precision: 1) %></span>
+                      <% else %>
+                        <span class="text-gray-500">No change</span>
+                      <% end %>
+                    </span>
+                  </div>
+                </div>
+              </div>
             <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Journey Details -->
+      <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Journey Details</h3>
+            <% if @journey.brand&.has_brand_compliance? %>
+              <div class="flex items-center text-sm">
+                <% compliance_score = @journey.brand_compliance_score %>
+                <% if compliance_score >= 90 %>
+                  <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="text-green-700">Brand Compliant</span>
+                <% elsif compliance_score >= 70 %>
+                  <svg class="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="text-yellow-700">Needs Review</span>
+                <% else %>
+                  <svg class="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="text-red-700">Non-Compliant</span>
+                <% end %>
+                <span class="ml-2 text-gray-500">(<%= compliance_score %>%)</span>
+              </div>
+            <% end %>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="text-sm font-medium text-gray-900 mb-2">Description</h4>
+              <% if @journey.description.present? %>
+                <p class="text-sm text-gray-600"><%= @journey.description %></p>
+              <% else %>
+                <p class="text-sm text-gray-400 italic">No description provided</p>
+              <% end %>
+            </div>
+            
+            <div>
+              <h4 class="text-sm font-medium text-gray-900 mb-2">Journey Information</h4>
+              <dl class="text-sm text-gray-600 space-y-1">
+                <div class="flex justify-between">
+                  <dt class="font-medium">Type:</dt>
+                  <dd><%= @journey.campaign_type&.humanize || 'Not specified' %></dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="font-medium">Total Steps:</dt>
+                  <dd><%= @journey.total_steps %></dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="font-medium">Created:</dt>
+                  <dd><%= @journey.created_at.strftime("%B %d, %Y") %></dd>
+                </div>
+                <% if @journey.published_at %>
+                  <div class="flex justify-between">
+                    <dt class="font-medium">Published:</dt>
+                    <dd><%= @journey.published_at.strftime("%B %d, %Y") %></dd>
+                  </div>
+                <% end %>
+              </dl>
+            </div>
           </div>
           
           <% if @journey.target_audience.present? %>
             <div class="mt-6">
-              <h4 class="text-sm font-medium text-gray-900">Target Audience</h4>
-              <p class="mt-1 text-sm text-gray-600"><%= @journey.target_audience %></p>
+              <h4 class="text-sm font-medium text-gray-900 mb-2">Target Audience</h4>
+              <p class="text-sm text-gray-600"><%= @journey.target_audience %></p>
             </div>
           <% end %>
           
           <% if @journey.goals.present? && @journey.goals.any? %>
             <div class="mt-6">
-              <h4 class="text-sm font-medium text-gray-900">Goals</h4>
-              <ul class="mt-1 list-disc list-inside text-sm text-gray-600">
+              <h4 class="text-sm font-medium text-gray-900 mb-2">Goals</h4>
+              <ul class="text-sm text-gray-600 space-y-1">
                 <% @journey.goals.each do |goal| %>
-                  <li><%= goal %></li>
+                  <li class="flex items-start">
+                    <svg class="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <%= goal %>
+                  </li>
                 <% end %>
               </ul>
             </div>
@@ -63,46 +295,152 @@
         </div>
       </div>
 
-      <!-- Journey Steps -->
-      <div class="mt-8 bg-white shadow rounded-lg">
+      <!-- Enhanced Journey Steps Visualization -->
+      <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between mb-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Journey Steps</h3>
-            <%= link_to "Add Step", new_journey_step_path(@journey),
-                class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+            <div class="flex space-x-3">
+              <%= link_to builder_journey_path(@journey), 
+                  class: "inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a1 1 0 01-1-1V9a1 1 0 011-1h1a2 2 0 100-4H4a1 1 0 01-1-1V4a1 1 0 011-1h3a1 1 0 001-1v1a2 2 0 012-2z"/>
+                </svg>
+                Visual Builder
+              <% end %>
+              <%= link_to "Add Step", new_journey_step_path(@journey),
+                  class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Add Step
+              <% end %>
+            </div>
           </div>
           
           <% if @journey_steps.any? %>
-            <div class="mt-6 flow-root">
+            <!-- Steps by Stage Overview -->
+            <% steps_by_stage = @journey.steps_by_stage %>
+            <% if steps_by_stage.keys.length > 1 %>
+              <div class="mb-6 bg-gray-50 rounded-lg p-4">
+                <h4 class="text-sm font-medium text-gray-900 mb-3">Steps by Stage</h4>
+                <div class="flex flex-wrap gap-2">
+                  <% steps_by_stage.each do |stage, count| %>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                      <%= stage.humanize %>: <%= count %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+
+            <!-- Enhanced Steps Timeline -->
+            <div class="flow-root">
               <ul class="-mb-8">
                 <% @journey_steps.each_with_index do |step, index| %>
                   <li>
                     <div class="relative pb-8">
                       <% unless index == @journey_steps.size - 1 %>
-                        <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                        <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
                       <% end %>
-                      <div class="relative flex space-x-3">
-                        <div>
-                          <span class="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center ring-8 ring-white">
-                            <span class="text-white text-sm font-medium"><%= step.position + 1 %></span>
-                          </span>
-                        </div>
-                        <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                          <div>
-                            <h4 class="text-sm font-medium text-gray-900">
-                              <%= link_to step.name, [@journey, step], class: "hover:text-indigo-600" %>
-                            </h4>
-                            <p class="text-sm text-gray-500">
-                              <%= step.stage.humanize %> • 
-                              <%= step.content_type&.humanize || 'No type' %> • 
-                              <%= step.channel&.humanize || 'No channel' %>
-                            </p>
-                            <% if step.description.present? %>
-                              <p class="mt-1 text-sm text-gray-600"><%= truncate(step.description, length: 100) %></p>
+                      
+                      <div class="relative flex items-start space-x-4">
+                        <!-- Step Number and Stage Indicator -->
+                        <div class="flex-shrink-0">
+                          <div class="relative">
+                            <span class="h-10 w-10 rounded-full <%= 
+                              case step.stage
+                              when 'awareness' then 'bg-blue-500'
+                              when 'consideration' then 'bg-yellow-500'
+                              when 'decision' then 'bg-green-500'
+                              when 'retention' then 'bg-purple-500'
+                              when 'advocacy' then 'bg-pink-500'
+                              else 'bg-gray-500'
+                              end
+                            %> flex items-center justify-center ring-8 ring-white shadow-sm">
+                              <span class="text-white text-sm font-bold"><%= step.position + 1 %></span>
+                            </span>
+                            
+                            <!-- Brand Compliance Indicator -->
+                            <% if step.respond_to?(:brand_compliance_score) && step.brand_compliance_score %>
+                              <% compliance = step.brand_compliance_score %>
+                              <span class="absolute -top-1 -right-1 h-4 w-4 rounded-full <%= 
+                                if compliance >= 90 then 'bg-green-400'
+                                elsif compliance >= 70 then 'bg-yellow-400'
+                                else 'bg-red-400'
+                                end
+                              %> border-2 border-white"></span>
                             <% end %>
                           </div>
-                          <div class="text-right text-sm whitespace-nowrap text-gray-500">
-                            <%= link_to "Edit", edit_journey_step_path(@journey, step), class: "text-indigo-600 hover:text-indigo-900" %>
+                        </div>
+                        
+                        <!-- Step Content -->
+                        <div class="min-w-0 flex-1">
+                          <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between">
+                              <div class="flex-1">
+                                <h4 class="text-base font-semibold text-gray-900">
+                                  <%= link_to step.name, [@journey, step], class: "hover:text-indigo-600 transition-colors" %>
+                                </h4>
+                                
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    <%= step.stage.humanize %>
+                                  </span>
+                                  <% if step.content_type.present? %>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                      <%= step.content_type.humanize %>
+                                    </span>
+                                  <% end %>
+                                  <% if step.channel.present? %>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                      <%= step.channel.humanize %>
+                                    </span>
+                                  <% end %>
+                                  <% if step.duration_days && step.duration_days > 0 %>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                      <%= pluralize(step.duration_days, 'day') %>
+                                    </span>
+                                  <% end %>
+                                </div>
+                                
+                                <% if step.description.present? %>
+                                  <p class="mt-3 text-sm text-gray-600 leading-relaxed">
+                                    <%= step.description.length > 150 ? "#{step.description[0..150]}..." : step.description %>
+                                  </p>
+                                <% end %>
+                                
+                                <!-- Step Transitions -->
+                                <% if step.transitions_from.any? %>
+                                  <div class="mt-3 text-xs text-gray-500">
+                                    <svg class="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                                    </svg>
+                                    Connects to: <%= step.transitions_from.map { |t| t.to_step.name }.join(', ') %>
+                                  </div>
+                                <% end %>
+                              </div>
+                              
+                              <!-- Actions -->
+                              <div class="flex-shrink-0 ml-4">
+                                <div class="flex items-center space-x-2">
+                                  <%= link_to edit_journey_step_path(@journey, step), 
+                                      class: "text-indigo-600 hover:text-indigo-900 text-sm font-medium" do %>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                  <% end %>
+                                  
+                                  <%= link_to [@journey, step], 
+                                      class: "text-gray-600 hover:text-gray-900 text-sm font-medium" do %>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                  <% end %>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -112,15 +450,31 @@
               </ul>
             </div>
           <% else %>
-            <div class="mt-6 text-center py-6">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"/>
+            <!-- Empty State -->
+            <div class="text-center py-12">
+              <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
               </svg>
-              <h4 class="mt-2 text-sm font-medium text-gray-900">No steps yet</h4>
-              <p class="mt-1 text-sm text-gray-500">Get started by adding your first journey step.</p>
-              <div class="mt-4">
-                <%= link_to "Add Step", new_journey_step_path(@journey),
-                    class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+              <h4 class="mt-4 text-lg font-medium text-gray-900">No steps yet</h4>
+              <p class="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
+                Get started by adding your first journey step or use the Visual Builder to create your customer journey flow.
+              </p>
+              <div class="mt-6 flex justify-center space-x-3">
+                <%= link_to "Add First Step", new_journey_step_path(@journey),
+                    class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                  Add First Step
+                <% end %>
+                
+                <%= link_to builder_journey_path(@journey), 
+                    class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a1 1 0 01-1-1V9a1 1 0 011-1h1a2 2 0 100-4H4a1 1 0 01-1-1V4a1 1 0 011-1h3a1 1 0 001-1v1a2 2 0 012-2z"/>
+                  </svg>
+                  Use Visual Builder
+                <% end %>
               </div>
             </div>
           <% end %>
