@@ -10,10 +10,13 @@ module ActivityTracker
 
   def track_activity
     return yield unless current_user && track_activity?
+    
+    # Skip tracking for RailsAdmin controllers to avoid compatibility issues
+    return yield if controller_name.include?('rails_admin') || self.class.name.include?('RailsAdmin')
 
     start_time = Time.current
     
-    # Set request ID for logging correlation
+    # Set request ID for logging correlation  
     Thread.current[:request_id] = request.request_id
     
     # Log the start of the action

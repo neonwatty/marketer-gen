@@ -1,3 +1,4 @@
 // Entry point for your Sass build
-@import "journey_builder";
+@import "../tailwind/application.css";
+@import "journey_builder";  
 @import "messaging_framework";

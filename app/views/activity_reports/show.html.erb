@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-gray-900">Activity Report</h1>
       <div class="flex space-x-4">
-        <%= link_to "Export CSV", export_activity_reports_path(format: :csv, start_date: @start_date, end_date: @end_date), 
+        <%= link_to "Export CSV", export_activity_report_path(format: :csv, start_date: @start_date, end_date: @end_date), 
             class: "bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" %>
         <%= link_to "View Activities", activities_path, 
             class: "bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" %>

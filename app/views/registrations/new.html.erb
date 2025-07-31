@@ -1,5 +1,5 @@
 <div class="mx-auto max-w-md mt-10">
-  <h1 class="text-3xl font-bold mb-6">Sign Up</h1>
+  <h1 class="text-2xl md:text-3xl font-bold mb-6">Sign Up</h1>
 
   <%= form_with model: @user, url: sign_up_path, local: true do |form| %>
     <% if @user.errors.any? %>
@@ -13,24 +13,24 @@
       </div>
     <% end %>
 
-    <div class="mb-4">
-      <%= form.label :email_address, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.email_field :email_address, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder: "email@example.com" %>
+    <div class="mb-5">
+      <%= form.label :email_address, class: "block text-gray-700 text-base font-bold mb-2" %>
+      <%= form.email_field :email_address, class: "shadow appearance-none border rounded w-full !px-3 !py-3 text-gray-700 !leading-6 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 !min-h-[48px] !text-base !h-12", placeholder: "email@example.com" %>
     </div>
 
-    <div class="mb-4">
-      <%= form.label :password, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.password_field :password, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+    <div class="mb-5">
+      <%= form.label :password, class: "block text-gray-700 text-base font-bold mb-2" %>
+      <%= form.password_field :password, class: "shadow appearance-none border rounded w-full !px-3 !py-3 text-gray-700 !leading-6 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 !min-h-[48px] !text-base !h-12" %>
     </div>
 
     <div class="mb-6">
-      <%= form.label :password_confirmation, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.password_field :password_confirmation, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <%= form.label :password_confirmation, class: "block text-gray-700 text-base font-bold mb-2" %>
+      <%= form.password_field :password_confirmation, class: "shadow appearance-none border rounded w-full !px-3 !py-3 text-gray-700 !leading-6 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 !min-h-[48px] !text-base !h-12" %>
     </div>
 
-    <div class="flex items-center justify-between">
-      <%= form.submit "Sign Up", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" %>
-      <%= link_to "Sign In", new_session_path, class: "inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" %>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+      <%= form.submit "Sign Up", class: "w-full sm:w-auto bg-blue-500 hover:bg-blue-700 active:bg-blue-800 text-white font-bold !px-6 !py-3 rounded focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 cursor-pointer !min-h-[48px] !text-base !h-12 transition-colors duration-200" %>
+      <%= link_to "Sign In", new_session_path, class: "inline-block text-center sm:text-left font-bold text-base text-blue-500 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center justify-center sm:justify-start" %>
     </div>
   <% end %>
 </div>

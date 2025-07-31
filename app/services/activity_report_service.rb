@@ -92,7 +92,7 @@ class ActivityReportService
           occurred_at: activity.occurred_at,
           action: activity.full_action,
           ip_address: activity.ip_address,
-          reasons: activity.metadata['suspicious_reasons'] || [],
+          reasons: activity.metadata&.[]('suspicious_reasons') || [],
           user_agent: activity.user_agent
         }
       end,
@@ -229,7 +229,7 @@ class ActivityReportService
     
     # Group by reason
     reasons = suspicious_activities
-      .flat_map { |a| a.metadata['suspicious_reasons'] || [] }
+      .flat_map { |a| a.metadata&.[]('suspicious_reasons') || [] }
       .tally
     
     patterns[:by_reason] = reasons

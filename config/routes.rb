@@ -214,7 +214,13 @@ Rails.application.routes.draw do
       end
     end
   end
-  mount RailsAdmin::Engine => '/admin', as: 'rails_admin' if Rails.env.development? || Rails.env.production?
+  # Custom admin interface as fallback  
+  get '/admin', to: 'admin#index'
+  get '/admin/users', to: 'admin#users'
+  get '/admin/activities', to: 'admin#activities'
+  get '/admin/audit_logs', to: 'admin#audit_logs'
+  
+  # mount RailsAdmin::Engine => '/admin', as: 'rails_admin' if Rails.env.development? || Rails.env.production?
   root "home#index"
   
   get "sign_up", to: "registrations#new"
