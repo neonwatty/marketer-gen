@@ -223,6 +223,7 @@ Rails.application.routes.draw do
   
   # mount RailsAdmin::Engine => '/admin', as: 'rails_admin' if Rails.env.development? || Rails.env.production?
   root "home#index"
+  get "typography-demo", to: "home#typography_demo"
   
   get "sign_up", to: "registrations#new"
   post "sign_up", to: "registrations#create"
@@ -254,6 +255,9 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
+  
+  # Demo routes (development only)
+  get 'loading_demo', to: 'home#loading_demo' if Rails.env.development?
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

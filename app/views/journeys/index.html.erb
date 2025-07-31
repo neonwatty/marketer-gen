@@ -4,8 +4,8 @@
   <!-- Header with Stats -->
   <div class="sm:flex sm:items-start sm:justify-between">
     <div class="sm:flex-auto">
-      <h1 class="text-2xl font-semibold text-gray-900">Customer Journeys</h1>
-      <p class="mt-2 text-sm text-gray-700">Design, manage, and optimize your marketing automation flows.</p>
+      <h1 class="text-heading-h2">Customer Journeys</h1>
+      <p class="mt-2 text-base leading-relaxed text-tertiary">Design, manage, and optimize your marketing automation flows.</p>
       
       <!-- Quick Stats -->
       <div class="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-4">
@@ -21,8 +21,8 @@
               </div>  
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Published</dt>
-                  <dd class="text-lg font-medium text-gray-900"><%= @journeys.published.count %></dd>
+                  <dt class="text-sm font-medium text-muted truncate">Published</dt>
+                  <dd class="text-xl font-semibold text-primary"><%= @journeys.published.count %></dd>
                 </dl>
               </div>
             </div>
@@ -41,8 +41,8 @@
               </div>  
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Draft</dt>
-                  <dd class="text-lg font-medium text-gray-900"><%= @journeys.draft.count %></dd>
+                  <dt class="text-sm font-medium text-muted truncate">Draft</dt>
+                  <dd class="text-xl font-semibold text-primary"><%= @journeys.draft.count %></dd>
                 </dl>
               </div>
             </div>
@@ -61,8 +61,8 @@
               </div>  
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Total Steps</dt>
-                  <dd class="text-lg font-medium text-gray-900"><%= @journeys.joins(:journey_steps).count %></dd>
+                  <dt class="text-sm font-medium text-muted truncate">Total Steps</dt>
+                  <dd class="text-xl font-semibold text-primary"><%= @journeys.joins(:journey_steps).count %></dd>
                 </dl>
               </div>
             </div>
@@ -81,8 +81,8 @@
               </div>  
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Avg. Performance</dt>
-                  <dd class="text-lg font-medium text-gray-900">
+                  <dt class="text-sm font-medium text-muted truncate">Avg. Performance</dt>
+                  <dd class="text-xl font-semibold text-primary">
                     <%= number_to_percentage(@journeys.map(&:latest_performance_score).compact.sum / [@journeys.count, 1].max, precision: 0) %>
                   </dd>
                 </dl>
@@ -202,16 +202,16 @@
                   <% end %>
                 </div>
                 <div class="ml-4">
-                  <h3 class="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  <h3 class="text-heading-h5 group-hover:text-indigo-600 transition-colors">
                     <%= link_to journey.name, journey, class: "block" %>
                   </h3>
-                  <div class="flex items-center space-x-2 text-sm text-gray-500">
+                  <div class="flex items-center space-x-2 text-sm text-muted">
                     <span><%= journey.campaign_type&.humanize || 'No type' %></span>
                     <span>•</span>
                     <span><%= journey.total_steps %> steps</span>
                     <% if journey.brand.present? %>
                       <span>•</span>
-                      <span class="text-blue-600"><%= journey.brand.name %></span>
+                      <span class="text-info"><%= journey.brand.name %></span>
                     <% end %>
                   </div>
                 </div>
@@ -251,7 +251,7 @@
           
           <!-- Content -->
           <div class="px-6 py-4">
-            <p class="text-sm text-gray-600 line-clamp-2 mb-4">
+            <p class="text-base leading-relaxed text-tertiary line-clamp-2 mb-4">
               <%= journey.description.present? ? truncate(journey.description, length: 120) : "No description provided" %>
             </p>
             

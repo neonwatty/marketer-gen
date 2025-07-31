@@ -22,7 +22,15 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body data-controller="loading" data-loading-type-value="page">
+    <!-- Page loading overlay -->
+    <div data-loading-target="overlay">
+      <%= render "shared/page_loader", 
+          message: "Loading page...",
+          hidden: true,
+          id: "page-loader" %>
+    </div>
+    
     <% if authenticated? %>
       <!-- Mobile Menu Controller -->
       <div data-controller="mobile-menu" data-action="keydown@document->mobile-menu#keydown">
@@ -31,28 +39,28 @@
             <!-- Desktop Navigation -->
             <div class="hidden md:flex md:justify-between md:items-center py-4">
               <div class="flex items-center">
-                <%= link_to "Marketer Gen", root_path, class: "text-lg sm:text-xl font-bold text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded" %>
+                <%= link_to "Marketer Gen", root_path, class: "text-xl font-bold text-primary focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded" %>
                 <% if current_user.admin? %>
                   <div class="flex space-x-4 sm:space-x-6 ml-8">
-                    <%= link_to "Users", users_path, class: "text-sm sm:text-base text-gray-600 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-1 min-h-[44px] flex items-center" %>
-                    <%= link_to "Admin Panel", "/admin", class: "text-sm sm:text-base text-gray-600 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-1 min-h-[44px] flex items-center" %>
+                    <%= link_to "Users", users_path, class: "text-base text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-1 min-h-[44px] flex items-center transition-colors" %>
+                    <%= link_to "Admin Panel", "/admin", class: "text-base text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-1 min-h-[44px] flex items-center transition-colors" %>
                   </div>
                 <% end %>
               </div>
               <div class="flex items-center space-x-4">
-                <span class="text-sm sm:text-base text-gray-600">Hello, <%= current_user.display_name %></span>
+                <span class="text-base text-tertiary">Hello, <%= current_user.display_name %></span>
                 <div class="flex gap-4">
-                  <%= link_to "My Profile", profile_path, class: "text-sm text-gray-600 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center" %>
-                  <%= link_to "Activity Log", activities_path, class: "text-sm text-gray-600 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center" %>
-                  <%= link_to "Activity Report", activity_report_path, class: "text-sm text-gray-600 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center" %>
-                  <%= button_to "Sign Out", session_path, method: :delete, class: "text-sm text-gray-600 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center border-0 bg-transparent cursor-pointer" %>
+                  <%= link_to "My Profile", profile_path, class: "text-sm text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center transition-colors" %>
+                  <%= link_to "Activity Log", activities_path, class: "text-sm text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center transition-colors" %>
+                  <%= link_to "Activity Report", activity_report_path, class: "text-sm text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center transition-colors" %>
+                  <%= button_to "Sign Out", session_path, method: :delete, class: "text-sm text-secondary hover:text-primary focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded px-2 py-2 min-h-[44px] flex items-center border-0 bg-transparent cursor-pointer transition-colors" %>
                 </div>
               </div>
             </div>
 
             <!-- Mobile Navigation -->
             <div class="md:hidden flex justify-between items-center py-4">
-              <%= link_to "Marketer Gen", root_path, class: "text-lg font-bold text-gray-900 focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded" %>
+              <%= link_to "Marketer Gen", root_path, class: "text-xl font-bold text-primary focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 rounded" %>
               
               <!-- Hamburger Button -->
               <button 

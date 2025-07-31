@@ -1,0 +1,106 @@
+<%
+  # Page Loader Partial 
+  # Usage: <%= render "shared/page_loader", message: "Loading page...", progress: true %>
+  
+  message = local_assigns[:message] || "Loading..."
+  progress = local_assigns[:progress] || false
+  progress_steps = local_assigns[:progress_steps] || []
+  classes = local_assigns[:classes] || ""
+  id = local_assigns[:id] || "page-loader"
+  hidden = local_assigns[:hidden] != false
+  backdrop = local_assigns[:backdrop] != false
+  
+  overlay_classes = [
+    "fixed inset-0 z-50 flex items-center justify-center",
+    backdrop ? "bg-white bg-opacity-75 backdrop-blur-sm" : "",
+    "transition-opacity duration-300",
+    hidden ? "hidden opacity-0" : "opacity-100",
+    classes
+  ].join(" ").strip
+%>
+
+<!-- Page Loading Overlay -->
+<div class="<%= overlay_classes %>" 
+     id="<%= id %>"
+     role="dialog" 
+     aria-modal="true"
+     aria-live="polite"
+     aria-label="<%= message %>">
+  
+  <div class="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full mx-4 text-center">
+    <!-- Main spinner -->
+    <div class="flex justify-center mb-6">
+      <%= render "shared/loading_spinner", 
+          size: "xl", 
+          color: "blue", 
+          text: nil, 
+          show_text: false,
+          inline: false %>
+    </div>
+    
+    <!-- Loading message -->
+    <h2 class="text-lg font-semibold text-gray-900 mb-2">
+      <%= message %>
+    </h2>
+    
+    <% if progress && progress_steps.any? %>
+      <!-- Progress indicator -->
+      <div class="mb-4" data-loading-target="progress">
+        <!-- Progress bar -->
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+          <div class="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out" 
+               data-loading-target="progressBar"
+               style="width: 0%"
+               role="progressbar"
+               aria-valuenow="0"
+               aria-valuemin="0"
+               aria-valuemax="100">
+          </div>
+        </div>
+        
+        <!-- Current step text -->
+        <p class="text-sm text-gray-600" data-loading-target="progressText">
+          Initializing...
+        </p>
+      </div>
+    <% elsif progress %>
+      <!-- Simple progress indicator -->
+      <div class="mb-4" data-loading-target="progress">
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-3">
+          <div class="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out" 
+               data-loading-target="progressBar"
+               style="width: 0%"
+               role="progressbar"
+               aria-valuenow="0"
+               aria-valuemin="0"
+               aria-valuemax="100">
+          </div>
+        </div>
+        <p class="text-sm text-gray-600" data-loading-target="progressText">
+          0% complete
+        </p>
+      </div>
+    <% end %>
+    
+    <!-- Additional context -->
+    <p class="text-sm text-gray-500">
+      Please wait while we process your request
+    </p>
+    
+    <!-- Cancel button (optional) -->
+    <% if local_assigns[:cancelable] %>
+      <button type="button" 
+              class="mt-4 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md transition-colors"
+              data-action="click->loading#hide">
+        Cancel
+      </button>
+    <% end %>
+  </div>
+  
+  <!-- Screen reader announcements -->
+  <div aria-live="assertive" aria-atomic="true" class="sr-only">
+    <span data-loading-target="announcement">
+      <%= message %>
+    </span>
+  </div>
+</div>

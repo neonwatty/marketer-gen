@@ -1,0 +1,80 @@
+<%
+  # Loading Spinner Partial
+  # Usage: <%= render "shared/loading_spinner", size: "sm", color: "blue", text: "Loading..." %>
+  # Sizes: xs, sm, md, lg, xl
+  # Colors: blue, gray, white, green, red, yellow
+  
+  size = local_assigns[:size] || "md"
+  color = local_assigns[:color] || "blue"
+  text = local_assigns[:text]
+  show_text = local_assigns[:show_text] != false
+  inline = local_assigns[:inline] || false
+  classes = local_assigns[:classes] || ""
+  id = local_assigns[:id]
+  hidden = local_assigns[:hidden] || false
+  
+  # Size mappings
+  size_classes = {
+    "xs" => "w-3 h-3",
+    "sm" => "w-4 h-4", 
+    "md" => "w-6 h-6",
+    "lg" => "w-8 h-8",
+    "xl" => "w-12 h-12"
+  }
+  
+  # Color mappings
+  color_classes = {
+    "blue" => "border-blue-600 border-t-transparent",
+    "white" => "border-white border-t-transparent", 
+    "gray" => "border-gray-600 border-t-transparent",
+    "green" => "border-green-600 border-t-transparent",
+    "red" => "border-red-600 border-t-transparent",
+    "yellow" => "border-yellow-600 border-t-transparent"
+  }
+  
+  # Text size mappings
+  text_size_classes = {
+    "xs" => "text-xs",
+    "sm" => "text-sm",
+    "md" => "text-base", 
+    "lg" => "text-lg",
+    "xl" => "text-xl"
+  }
+  
+  spinner_classes = [
+    size_classes[size] || size_classes["md"],
+    color_classes[color] || color_classes["blue"],
+    "border-2 rounded-full animate-spin"
+  ].join(" ")
+  
+  container_classes = [
+    inline ? "inline-flex" : "flex",
+    "items-center justify-center",
+    inline ? "gap-2" : "gap-3",
+    classes
+  ].join(" ")
+  
+  container_classes += " hidden" if hidden
+%>
+
+<div class="<%= container_classes %>" 
+     <%= "id=\"#{id}\"".html_safe if id %>
+     role="status" 
+     aria-live="polite"
+     aria-label="<%= text || 'Loading' %>">
+  
+  <!-- Spinner -->
+  <div class="<%= spinner_classes %>" aria-hidden="true"></div>
+  
+  <!-- Loading text -->
+  <% if show_text %>
+    <span class="<%= text_size_classes[size] || text_size_classes["md"] %> text-gray-600 font-medium">
+      <%= text || "Loading..." %>
+    </span>
+  <% end %>
+  
+  <!-- Screen reader only text -->
+  <span class="sr-only">
+    <%= text || "Loading, please wait..." %>
+  </span>
+</div>

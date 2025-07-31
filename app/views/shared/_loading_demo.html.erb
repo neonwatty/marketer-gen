@@ -1,0 +1,262 @@
+<%
+  # Loading States Demo Partial (for testing/development)
+  # Usage: <%= render "shared/loading_demo" %>
+%>
+
+<div class="max-w-4xl mx-auto py-8 space-y-8">
+  <div class="text-center">
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Loading States Demo</h2>
+    <p class="text-gray-600">Test all loading component variations</p>
+  </div>
+
+  <!-- Loading Buttons -->
+  <section class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Loading Buttons</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      
+      <!-- Primary variants -->
+      <div class="space-y-2">
+        <h4 class="text-sm font-medium text-gray-700">Primary</h4>
+        <%= render "shared/loading_button", 
+            text: "Submit",
+            loading_text: "Submitting...",
+            variant: "primary",
+            size: "md" %>
+      </div>
+      
+      <!-- Secondary variants -->
+      <div class="space-y-2">
+        <h4 class="text-sm font-medium text-gray-700">Secondary</h4>
+        <%= render "shared/loading_button", 
+            text: "Save Draft",
+            loading_text: "Saving...",
+            variant: "secondary",
+            size: "md" %>
+      </div>
+      
+      <!-- Outline variants -->
+      <div class="space-y-2">
+        <h4 class="text-sm font-medium text-gray-700">Outline</h4>
+        <%= render "shared/loading_button", 
+            text: "Cancel",
+            loading_text: "Cancelling...",
+            variant: "outline",
+            size: "md" %>
+      </div>
+      
+      <!-- Success variants -->
+      <div class="space-y-2">
+        <h4 class="text-sm font-medium text-gray-700">Success</h4>
+        <%= render "shared/loading_button", 
+            text: "Approve",
+            loading_text: "Approving...",
+            variant: "success",
+            size: "md" %>
+      </div>
+      
+      <!-- Danger variants -->
+      <div class="space-y-2">
+        <h4 class="text-sm font-medium text-gray-700">Danger</h4>
+        <%= render "shared/loading_button", 
+            text: "Delete",
+            loading_text: "Deleting...",
+            variant: "danger",
+            size: "md" %>
+      </div>
+      
+      <!-- Size variants -->
+      <div class="space-y-2">
+        <h4 class="text-sm font-medium text-gray-700">Sizes</h4>
+        <div class="space-y-2">
+          <%= render "shared/loading_button", 
+              text: "Small",
+              loading_text: "Loading...",
+              variant: "primary",
+              size: "sm" %>
+          <%= render "shared/loading_button", 
+              text: "Large",
+              loading_text: "Loading...",
+              variant: "primary",
+              size: "lg" %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loading Spinners -->
+  <section class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Loading Spinners</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      
+      <!-- Size variations -->
+      <div class="space-y-4">
+        <h4 class="text-sm font-medium text-gray-700">Sizes</h4>
+        <%= render "shared/loading_spinner", size: "xs", text: "Extra Small" %>
+        <%= render "shared/loading_spinner", size: "sm", text: "Small" %>
+        <%= render "shared/loading_spinner", size: "md", text: "Medium" %>
+        <%= render "shared/loading_spinner", size: "lg", text: "Large" %>
+      </div>
+      
+      <!-- Color variations -->
+      <div class="space-y-4">
+        <h4 class="text-sm font-medium text-gray-700">Colors</h4>
+        <%= render "shared/loading_spinner", color: "blue", text: "Blue" %>
+        <%= render "shared/loading_spinner", color: "green", text: "Green" %>
+        <%= render "shared/loading_spinner", color: "red", text: "Red" %>
+        <%= render "shared/loading_spinner", color: "gray", text: "Gray" %>
+      </div>
+      
+      <!-- Inline variations -->
+      <div class="space-y-4">
+        <h4 class="text-sm font-medium text-gray-700">Inline</h4>
+        <p>Loading <% render "shared/loading_spinner", inline: true, size: "sm", show_text: false %> content...</p>
+        <p>Processing <% render "shared/loading_spinner", inline: true, size: "sm", color: "green", show_text: false %> data...</p>
+      </div>
+      
+      <!-- Text variations -->
+      <div class="space-y-4">
+        <h4 class="text-sm font-medium text-gray-700">Text Options</h4>
+        <%= render "shared/loading_spinner", text: "Custom message", show_text: true %>
+        <%= render "shared/loading_spinner", show_text: false %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skeleton Cards -->
+  <section class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Skeleton Loading</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Basic skeleton -->
+      <div class="space-y-4">
+        <h4 class="text-sm font-medium text-gray-700">Basic Card</h4>
+        <%= render "shared/skeleton_card", lines: 3 %>
+      </div>
+      
+      <!-- Skeleton with avatar -->
+      <div class="space-y-4">
+        <h4 class="text-sm font-medium text-gray-700">With Avatar</h4>
+        <%= render "shared/skeleton_card", lines: 2, avatar: true %>
+      </div>
+      
+      <!-- Different sizes -->
+      <div class="space-y-4">
+        <h4 class="text-sm font-medium text-gray-700">Size Variations</h4>
+        <%= render "shared/skeleton_card", lines: 1, width: "1/2" %>
+        <%= render "shared/skeleton_card", lines: 4, width: "3/4" %>
+      </div>
+      
+      <!-- Multiple lines -->
+      <div class="space-y-4">
+        <h4 class="text-sm font-medium text-gray-700">More Content</h4>
+        <%= render "shared/skeleton_card", lines: 6, avatar: true %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Progress Indicators -->
+  <section class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Progress Indicators</h3>
+    <div class="space-y-8">
+      
+      <!-- Multi-step progress -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-700 mb-4">Multi-Step Process</h4>
+        <%= render "shared/progress_indicator", 
+            steps: ["Account Setup", "Profile Creation", "Email Verification", "Complete"],
+            current: 2,
+            completed: [1],
+            show_details: true %>
+      </div>
+      
+      <!-- Simple progress -->
+      <div>
+        <h4 class="text-sm font-medium text-gray-700 mb-4">Simple Progress</h4>
+        <%= render "shared/progress_indicator", 
+            steps: ["Start", "Process", "Finish"],
+            current: 2,
+            size: "sm" %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Demo -->
+  <section class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Interactive Demo</h3>
+    <div class="space-y-4">
+      
+      <!-- Form with loading -->
+      <div data-controller="loading" data-loading-type-value="form" class="relative">
+        <form class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Test Form</label>
+            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter some text">
+          </div>
+          
+          <div class="flex space-x-2">
+            <%= render "shared/loading_button", 
+                text: "Submit Form",
+                loading_text: "Submitting...",
+                variant: "primary",
+                classes: "test-form-submit" %>
+                
+            <button type="button" 
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                    onclick="testLoadingStates()">
+              Test Loading
+            </button>
+          </div>
+        </form>
+        
+        <!-- Form loading overlay -->
+        <div class="absolute inset-0 bg-white bg-opacity-75 backdrop-blur-sm flex items-center justify-center hidden"
+             data-loading-target="overlay">
+          <%= render "shared/loading_spinner", 
+              size: "lg", 
+              color: "blue", 
+              text: "Processing form...",
+              show_text: true %>
+        </div>
+      </div>
+      
+      <!-- Content loading demo -->
+      <div data-controller="loading" data-loading-type-value="content" class="relative">
+        <button type="button" 
+                class="mb-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                data-action="click->loading#show">
+          Show Content Loading
+        </button>
+        
+        <!-- Skeleton -->
+        <div class="hidden" data-loading-target="skeleton">
+          <%= render "shared/skeleton_card", lines: 4, avatar: true %>
+        </div>
+        
+        <!-- Actual content -->
+        <div data-loading-target="content">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="font-medium text-gray-900 mb-2">Sample Content</h4>
+            <p class="text-gray-600">This is the actual content that would be loaded.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+function testLoadingStates() {
+  // Test button loading
+  const form = document.querySelector('[data-loading-type-value="form"]');
+  const loadingController = application.getControllerForElementAndIdentifier(form, 'loading');
+  
+  if (loadingController) {
+    loadingController.showFormLoading();
+    
+    // Hide loading after 3 seconds
+    setTimeout(() => {
+      loadingController.hideFormLoading();
+    }, 3000);
+  }
+}
+</script>

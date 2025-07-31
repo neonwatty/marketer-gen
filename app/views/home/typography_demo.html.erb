@@ -1,0 +1,213 @@
+<% content_for :title, "Responsive Typography Demo" %>
+
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <!-- Hero Section -->
+  <div class="text-center mb-16">
+    <h1 class="text-heading-h1 mb-6">Responsive Typography System</h1>
+    <p class="text-xl leading-relaxed text-tertiary max-w-3xl mx-auto">
+      Experience our fluid typography system that scales beautifully from mobile to desktop, 
+      ensuring optimal readability across all devices.
+    </p>
+  </div>
+
+  <!-- Heading Demonstrations -->
+  <section class="mb-16">
+    <h2 class="text-heading-h2 mb-8">Heading Scale</h2>
+    <div class="space-y-8">
+      <div>
+        <h1 class="text-heading-h1">Heading 1 - Main Page Titles</h1>
+        <p class="text-sm text-muted mt-2">clamp(1.875rem, 4vw, 3.75rem) - 30px → 60px</p>
+      </div>
+      <div>
+        <h2 class="text-heading-h2">Heading 2 - Section Titles</h2>
+        <p class="text-sm text-muted mt-2">clamp(1.5rem, 3vw, 3rem) - 24px → 48px</p>
+      </div>
+      <div>
+        <h3 class="text-heading-h3">Heading 3 - Subsection Titles</h3>
+        <p class="text-sm text-muted mt-2">clamp(1.25rem, 2.5vw, 2.25rem) - 20px → 36px</p>
+      </div>
+      <div>
+        <h4 class="text-heading-h4">Heading 4 - Component Titles</h4>
+        <p class="text-sm text-muted mt-2">clamp(1.125rem, 2vw, 1.875rem) - 18px → 30px</p>
+      </div>
+      <div>
+        <h5 class="text-heading-h5">Heading 5 - Card Titles</h5>
+        <p class="text-sm text-muted mt-2">clamp(1rem, 1.5vw, 1.5rem) - 16px → 24px</p>
+      </div>
+      <div>
+        <h6 class="text-heading-h6">Heading 6 - Labels</h6>
+        <p class="text-sm text-muted mt-2">clamp(0.875rem, 1.2vw, 1.25rem) - 14px → 20px</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Body Text Demonstrations -->
+  <section class="mb-16">
+    <h2 class="text-heading-h2 mb-8">Body Text & Paragraphs</h2>
+    <div class="space-y-6">
+      <div>
+        <p class="text-xl leading-relaxed text-secondary mb-2">
+          Lead Paragraph - Use for introductory text that needs emphasis. 
+          This size scales from 18px to 20px and maintains excellent readability.
+        </p>
+        <p class="text-sm text-muted">Class: text-xl leading-relaxed</p>
+      </div>
+      
+      <div>
+        <p class="text-lg leading-relaxed text-tertiary mb-2">
+          Large Body Text - Perfect for important body content that needs more prominence. 
+          Scales from 16px to 18px with comfortable line spacing.
+        </p>
+        <p class="text-sm text-muted">Class: text-lg leading-relaxed</p>
+      </div>
+      
+      <div>
+        <p class="text-base leading-relaxed text-tertiary mb-2">
+          Regular Body Text - The standard for most content. Fluid scaling from 14px to 16px 
+          ensures readability across all devices. Line height automatically adjusts for optimal reading.
+        </p>
+        <p class="text-sm text-muted">Class: text-base leading-relaxed</p>
+      </div>
+      
+      <div>
+        <p class="text-sm leading-normal text-muted mb-2">
+          Small Text - Use for captions, helper text, or less important information. 
+          Maintains legibility while saving space.
+        </p>
+        <p class="text-sm text-muted">Class: text-sm leading-normal</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Color Utilities -->
+  <section class="mb-16">
+    <h2 class="text-heading-h2 mb-8">Text Colors & Contrast</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-heading-h4 mb-4">Content Hierarchy</h3>
+        <div class="space-y-3">
+          <p class="text-primary">Primary Text - Highest contrast for main content</p>
+          <p class="text-secondary">Secondary Text - Strong contrast for subheadings</p>
+          <p class="text-tertiary">Tertiary Text - Good contrast for body text</p>
+          <p class="text-muted">Muted Text - Medium contrast for supporting text</p>
+          <p class="text-subtle">Subtle Text - Lower contrast for hints</p>
+        </div>
+      </div>
+      
+      <div>
+        <h3 class="text-heading-h4 mb-4">Interactive & Status</h3>
+        <div class="space-y-3">
+          <p class="text-interactive">Interactive Text - Links and buttons</p>
+          <p class="text-success">Success Text - Positive feedback</p>
+          <p class="text-warning">Warning Text - Cautionary messages</p>
+          <p class="text-error">Error Text - Critical alerts</p>
+          <p class="text-info">Info Text - Informational content</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Line Height Demonstration -->
+  <section class="mb-16">
+    <h2 class="text-heading-h2 mb-8">Line Height Options</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-heading-h5 mb-4">Tight Spacing</h3>
+        <p class="text-base leading-tight text-tertiary mb-4">
+          This paragraph uses tight line spacing (1.25). Best for headings or compact layouts where space is limited. Notice how the lines sit closer together.
+        </p>
+        <p class="text-sm text-muted">Class: leading-tight</p>
+      </div>
+      
+      <div>
+        <h3 class="text-heading-h5 mb-4">Normal Spacing</h3>
+        <p class="text-base leading-normal text-tertiary mb-4">
+          This paragraph uses normal line spacing (1.5). Good balance between readability and density. Works well for most interface text.
+        </p>
+        <p class="text-sm text-muted">Class: leading-normal</p>
+      </div>
+      
+      <div>
+        <h3 class="text-heading-h5 mb-4">Relaxed Spacing</h3>
+        <p class="text-base leading-relaxed text-tertiary mb-4">
+          This paragraph uses relaxed line spacing (1.625). Excellent for body text that needs maximum readability. The extra space makes long-form content easier to read.
+        </p>
+        <p class="text-sm text-muted">Class: leading-relaxed</p>
+      </div>
+      
+      <div>
+        <h3 class="text-heading-h5 mb-4">Loose Spacing</h3>
+        <p class="text-base leading-loose text-tertiary mb-4">
+          This paragraph uses loose line spacing (2.0). Creates an airy, spacious feeling. Best for short content that needs breathing room.
+        </p>
+        <p class="text-sm text-muted">Class: leading-loose</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Font Weight Demonstration -->
+  <section class="mb-16">
+    <h2 class="text-heading-h2 mb-8">Font Weight Scale</h2>
+    <div class="space-y-4">
+      <p class="text-lg font-light text-secondary">Light (300) - Elegant, minimal emphasis</p>
+      <p class="text-lg font-normal text-secondary">Normal (400) - Standard body text weight</p>
+      <p class="text-lg font-medium text-secondary">Medium (500) - Subtle emphasis for UI elements</p>
+      <p class="text-lg font-semibold text-secondary">Semibold (600) - Strong emphasis for headings</p>
+      <p class="text-lg font-bold text-secondary">Bold (700) - Maximum emphasis for titles</p>
+    </div>
+  </section>
+
+  <!-- Responsive Showcase -->
+  <section class="mb-16">
+    <h2 class="text-heading-h2 mb-8">Responsive Behavior</h2>
+    <div class="bg-gray-50 rounded-lg p-8">
+      <div class="text-center">
+        <h3 class="text-heading-h1 mb-4">Resize Your Browser</h3>
+        <p class="text-lg leading-relaxed text-tertiary mb-6">
+          Watch how the text scales smoothly as you change your browser width. 
+          The typography maintains perfect readability at every size.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+          <div class="bg-white p-4 rounded">
+            <h4 class="text-heading-h4 mb-2">Mobile First</h4>
+            <p class="text-base text-tertiary">Optimized for small screens</p>
+          </div>
+          <div class="bg-white p-4 rounded">
+            <h4 class="text-heading-h4 mb-2">Tablet Ready</h4>
+            <p class="text-base text-tertiary">Scales beautifully on tablets</p>
+          </div>
+          <div class="bg-white p-4 rounded">
+            <h4 class="text-heading-h4 mb-2">Desktop Perfect</h4>
+            <p class="text-base text-tertiary">Maximum impact on large screens</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Implementation Examples -->
+  <section class="mb-16">
+    <h2 class="text-heading-h2 mb-8">Implementation Examples</h2>
+    <div class="bg-gray-900 text-white rounded-lg p-6 overflow-x-auto">
+      <pre class="text-sm"><code><!-- Heading Examples -->
+&lt;h1 class="text-heading-h1"&gt;Main Page Title&lt;/h1&gt;
+&lt;h2 class="text-heading-h2"&gt;Section Title&lt;/h2&gt;
+&lt;h3 class="text-heading-h3"&gt;Subsection&lt;/h3&gt;
+
+&lt;!-- Body Text Examples --&gt;
+&lt;p class="text-lg leading-relaxed text-tertiary"&gt;Lead paragraph&lt;/p&gt;
+&lt;p class="text-base leading-relaxed text-tertiary"&gt;Body text&lt;/p&gt;
+&lt;p class="text-sm text-muted"&gt;Helper text&lt;/p&gt;
+
+&lt;!-- Interactive Elements --&gt;
+&lt;a href="#" class="text-interactive"&gt;Link text&lt;/a&gt;
+&lt;span class="text-success"&gt;Success message&lt;/span&gt;
+&lt;span class="text-error"&gt;Error message&lt;/span&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- Back to Home -->
+  <div class="text-center">
+    <%= link_to "← Back to Home", root_path, class: "text-interactive hover:underline" %>
+  </div>
+</div>

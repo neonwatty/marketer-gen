@@ -1,0 +1,93 @@
+<%
+  # Loading Button Partial
+  # Usage: <%= render "shared/loading_button", text: "Save", loading_text: "Saving...", type: "submit" %>
+  
+  text = local_assigns[:text] || "Submit"
+  loading_text = local_assigns[:loading_text] || "Loading..."
+  type = local_assigns[:type] || "submit"
+  variant = local_assigns[:variant] || "primary"
+  size = local_assigns[:size] || "md"
+  disabled = local_assigns[:disabled] || false
+  classes = local_assigns[:classes] || ""
+  id = local_assigns[:id]
+  form = local_assigns[:form]
+  data = local_assigns[:data] || {}
+  
+  # Variant mappings
+  variant_classes = {
+    "primary" => "bg-blue-600 hover:bg-blue-500 active:bg-blue-700 focus-visible:outline-blue-600 text-white",
+    "secondary" => "bg-gray-600 hover:bg-gray-500 active:bg-gray-700 focus-visible:outline-gray-600 text-white",
+    "success" => "bg-green-600 hover:bg-green-500 active:bg-green-700 focus-visible:outline-green-600 text-white",
+    "danger" => "bg-red-600 hover:bg-red-500 active:bg-red-700 focus-visible:outline-red-600 text-white",
+    "outline" => "border-2 border-blue-600 text-blue-600 hover:bg-blue-50 active:bg-blue-100 focus-visible:outline-blue-600",
+    "ghost" => "text-blue-600 hover:bg-blue-50 active:bg-blue-100 focus-visible:outline-blue-600"
+  }
+  
+  # Size mappings
+  size_classes = {
+    "xs" => "px-2 py-1 text-xs min-h-[32px]",
+    "sm" => "px-3 py-2 text-sm min-h-[36px]", 
+    "md" => "px-4 py-2 text-base min-h-[44px]",
+    "lg" => "px-6 py-3 text-lg min-h-[48px]",
+    "xl" => "px-8 py-4 text-xl min-h-[56px]"
+  }
+  
+  button_classes = [
+    "inline-flex items-center justify-center",
+    "rounded-md font-medium transition-all duration-200",
+    "focus-visible:outline-2 focus-visible:outline-offset-2",
+    "disabled:opacity-50 disabled:cursor-not-allowed",
+    "relative overflow-hidden",
+    variant_classes[variant] || variant_classes["primary"],
+    size_classes[size] || size_classes["md"],
+    classes
+  ].join(" ")
+  
+  # Merge data attributes for loading controller
+  loading_data = {
+    loading_target: "button"
+  }.merge(data)
+%>
+
+<button type="<%= type %>" 
+         class="<%= button_classes %>"
+         <%= "disabled" if disabled %>
+         <%= "id=\"#{id}\"" if id %>
+         <%= "form=\"#{form}\"" if form %>
+         data-loading-text="<%= loading_text %>"
+         <%= loading_data.map { |k, v| "data-#{k.to_s.dasherize}=\"#{v}\"" }.join(" ").html_safe %>>
+  
+  <!-- Loading spinner (hidden by default) -->
+  <span class="hidden absolute inset-0 flex items-center justify-center"
+        data-loading-target="spinner">
+    <%= render "shared/loading_spinner", 
+        size: size == "xs" || size == "sm" ? "xs" : "sm",
+        color: variant.include?("outline") || variant == "ghost" ? "blue" : "white",
+        text: nil,
+        show_text: false,
+        inline: true %>
+  </span>
+  
+  <!-- Button content -->
+  <span class="flex items-center justify-center"
+        data-loading-target="content">
+    
+    <!-- Optional icon -->
+    <% if local_assigns[:icon] %>
+      <span class="<%= size == "xs" || size == "sm" ? "mr-1" : "mr-2" %>">
+        <%= local_assigns[:icon].html_safe %>
+      </span>
+    <% end %>
+    
+    <!-- Button text -->
+    <span data-loading-target="text">
+      <%= text %>
+    </span>
+  </span>
+</button>
+
+<% if local_assigns[:help_text] %>
+  <p class="mt-1 text-xs text-gray-500">
+    <%= local_assigns[:help_text] %>
+  </p>
+<% end %>
