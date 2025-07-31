@@ -3,7 +3,13 @@ class ErrorsController < ApplicationController
   skip_before_action :verify_browser_compatibility
   
   def not_found
-    render plain: "404 Not Found", status: 404
+    @error_type = :not_found
+    @error_code = 404
+    @error_message = "Page Not Found"
+    @error_description = "The page you're looking for doesn't exist or has been moved."
+    
+    log_error_details
+    render template: 'errors/404', status: 404
   end
   
   def unprocessable_entity
@@ -13,7 +19,7 @@ class ErrorsController < ApplicationController
     @error_description = "We couldn't process your request due to invalid data or parameters."
     
     log_error_details
-    render template: 'errors/422', status: :unprocessable_entity
+    render template: 'errors/422', status: 422
   end
   
   def internal_server_error
@@ -23,7 +29,7 @@ class ErrorsController < ApplicationController
     @error_description = "Something went wrong on our end. We've been notified and are working to fix it."
     
     log_error_details
-    render template: 'errors/500', status: :internal_server_error
+    render template: 'errors/500', status: 500
   end
   
   def report_error

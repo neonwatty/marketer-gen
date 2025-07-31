@@ -11,6 +11,7 @@
 //= link controllers/sortable_controller.js
 //= link controllers/status_poller_controller.js
 //= link controllers/mobile_menu_controller.js
+//= link controllers/loading_controller.js
 //= link rails_admin.css
 //= link rails_admin.js
 //= link_tree ../builds
