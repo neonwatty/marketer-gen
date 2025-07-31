@@ -127,7 +127,7 @@ class JourneyBuilderWorkflowTest < ActionDispatch::IntegrationTest
 
   test "journey template creation and usage workflow" do
     # Step 1: Create a journey template
-    post api_v1_journey_templates_path,
+    post api_v1_templates_path,
       params: {
         journey_template: {
           name: "Email Nurture Template",
@@ -158,7 +158,7 @@ class JourneyBuilderWorkflowTest < ActionDispatch::IntegrationTest
     template_id = template_data['data']['id']
     
     # Step 2: Create journey from template
-    post create_from_template_api_v1_journey_templates_path(template_id),
+    post instantiate_api_v1_template_path(template_id),
       params: {
         journey: {
           name: "Q1 Email Campaign"

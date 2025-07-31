@@ -74,7 +74,7 @@ class UserTest < ActiveSupport::TestCase
   end
   
   test "should be able to set role to admin" do
-    user = User.create!(email_address: "role_admin@example.com", password: "password123", role: :admin)
+    user = User.create!(email_address: "role_admin_#{SecureRandom.hex(4)}@example.com", password: "password123", role: :admin)
     assert_equal "admin", user.role
     assert user.admin?
     assert_not user.marketer?
@@ -90,8 +90,8 @@ class UserTest < ActiveSupport::TestCase
   
   # Suspension functionality tests
   test "user can be suspended" do
-    admin = User.create!(email_address: "suspension_admin@example.com", password: "password", role: "admin")
-    user = User.create!(email_address: "suspended_user@example.com", password: "password")
+    admin = users(:admin)
+    user = User.create!(email_address: "suspended_user_#{SecureRandom.hex(4)}@example.com", password: "password")
     
     assert_not user.suspended?
     
@@ -104,8 +104,8 @@ class UserTest < ActiveSupport::TestCase
   end
   
   test "suspended user can be unsuspended" do
-    admin = User.create!(email_address: "unsuspend_admin@example.com", password: "password", role: "admin")
-    user = User.create!(email_address: "unsuspended_user@example.com", password: "password")
+    admin = users(:admin)
+    user = User.create!(email_address: "unsuspended_user_#{SecureRandom.hex(4)}@example.com", password: "password")
     
     user.suspend!(reason: "Test", by: admin)
     assert user.suspended?
@@ -128,7 +128,7 @@ class UserTest < ActiveSupport::TestCase
   end
   
   test "account_accessible? returns false for suspended users" do
-    admin = User.create!(email_address: "access_admin@example.com", password: "password", role: "admin")
+    admin = users(:admin)
     user = User.create!(email_address: "access_user@example.com", password: "password")
     
     assert user.account_accessible?

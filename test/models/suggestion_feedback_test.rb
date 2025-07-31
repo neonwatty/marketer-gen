@@ -4,7 +4,7 @@ class SuggestionFeedbackTest < ActiveSupport::TestCase
   def setup
     @user = User.create!(
       email_address: 'test@example.com',
-      password_digest: BCrypt::Password.create('password')
+      password: 'password123'
     )
     @journey = Journey.create!(
       name: 'Test Journey',

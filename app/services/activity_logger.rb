@@ -99,7 +99,7 @@ class ActivityLogger
         user: user,
         action: action,
         auditable: resource,
-        change_details: changes,
+        change_details: sanitize_changes(changes).to_json,
         ip_address: Current.ip_address,
         user_agent: Current.user_agent
       )

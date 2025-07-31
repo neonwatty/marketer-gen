@@ -67,14 +67,14 @@ class JourneySuggestionEngineTest < ActiveSupport::TestCase
     )
 
     # Stub the API call to fail
-    engine.stub(:fetch_openai_suggestions, -> { raise StandardError.new("API Error") }) do
-      suggestions = engine.generate_suggestions
-      
-      assert suggestions.is_a?(Array)
-      assert suggestions.length > 0
-      assert suggestions.first.key?('name')
-      assert suggestions.first.key?('stage')
-    end
+    engine.stubs(:fetch_openai_suggestions).raises(StandardError.new("API Error"))
+    
+    suggestions = engine.generate_suggestions
+    
+    assert suggestions.is_a?(Array)
+    assert suggestions.length > 0
+    assert suggestions.first.key?('name')
+    assert suggestions.first.key?('stage')
   end
 
   test "should generate stage-specific suggestions" do
@@ -335,7 +335,7 @@ class JourneySuggestionEngineTest < ActiveSupport::TestCase
     User.new(
       id: 1,
       email_address: 'test@example.com',
-      password_digest: BCrypt::Password.create('password')
+      password: 'password123'
     )
   end
 end

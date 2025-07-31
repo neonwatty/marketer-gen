@@ -41,6 +41,18 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
     
+    # Ensure proper test isolation
+    parallelize_setup do |worker|
+      # Each worker gets its own database
+      ActiveRecord::Base.connection.reconnect!
+    end
+    
+    # Clean up after each test
+    teardown do
+      # Clear any cached current attributes
+      Current.reset if defined?(Current)
+    end
+    
     # Include FactoryBot methods
     include FactoryBot::Syntax::Methods
     

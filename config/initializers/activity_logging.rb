@@ -44,12 +44,12 @@ end
 
 # Monkey patch Rails logger to include request ID for better tracing
 # Skip in test environment to avoid conflicts
-unless Rails.env.test?
-  Rails.logger.formatter = proc do |severity, timestamp, progname, msg|
-    request_id = Thread.current[:request_id] || 'no-request-id'
-    "[#{timestamp}] [#{severity}] [#{request_id}] #{msg}\n"
-  end
-end
+# unless Rails.env.test?
+#   Rails.logger.formatter = proc do |severity, timestamp, progname, msg|
+#     request_id = Thread.current[:request_id] || 'no-request-id'
+#     "[#{timestamp}] [#{severity}] [#{request_id}] #{msg}\n"
+#   end
+# end
 
 # Add custom log subscribers for activity tracking
 ActiveSupport::Notifications.subscribe 'process_action.action_controller' do |*args|

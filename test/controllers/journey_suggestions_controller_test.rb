@@ -245,7 +245,7 @@ class JourneySuggestionsControllerTest < ActionDispatch::IntegrationTest
   test "should return 403 for unauthorized journey access" do
     other_user = User.create!(
       email_address: 'other@example.com',
-      password_digest: BCrypt::Password.create('password')
+      password: 'password123'
     )
     
     other_journey = Journey.create!(

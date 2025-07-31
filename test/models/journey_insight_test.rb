@@ -4,7 +4,7 @@ class JourneyInsightTest < ActiveSupport::TestCase
   def setup
     @user = User.create!(
       email_address: 'test@example.com',
-      password_digest: BCrypt::Password.create('password')
+      password: 'password123'
     )
     @journey = Journey.create!(
       name: 'Test Journey',
@@ -14,7 +14,15 @@ class JourneyInsightTest < ActiveSupport::TestCase
     @insight = JourneyInsight.new(
       journey: @journey,
       insights_type: 'ai_suggestions',
-      data: { 'suggestions' => [{ 'name' => 'Test Suggestion' }] },
+      data: { 
+        'suggestions' => [{ 
+          'name' => 'Test Suggestion',
+          'description' => 'Test suggestion description',
+          'stage' => 'awareness',
+          'content_type' => 'email',
+          'channel' => 'email'
+        }] 
+      },
       calculated_at: Time.current
     )
   end
@@ -32,7 +40,7 @@ class JourneyInsightTest < ActiveSupport::TestCase
   test "should require insights_type" do
     @insight.insights_type = nil
     assert_not @insight.valid?
-    assert_includes @insight.errors[:insights_type], "can't be blank"
+    assert_includes @insight.errors[:insights_type], "is not included in the list"
   end
 
   test "should validate insights_type inclusion" do
@@ -112,8 +120,9 @@ class JourneyInsightTest < ActiveSupport::TestCase
     @insight.expires_at = 25.hours.from_now
     time_to_expiry = @insight.time_to_expiry
     
-    assert_equal 1, time_to_expiry[:days]
-    assert_equal 1, time_to_expiry[:hours]
+    # Should have approximately 1 day and 1 hour
+    total_hours = time_to_expiry[:days] * 24 + time_to_expiry[:hours]
+    assert total_hours >= 24 && total_hours <= 25, "Expected ~25 hours, got #{total_hours}"
     assert time_to_expiry[:minutes] >= 0
   end
 

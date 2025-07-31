@@ -2,9 +2,9 @@ require "test_helper"
 
 class UsersControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @marketer = User.create!(email_address: "marketer@example.com", password: "password123", role: :marketer)
-    @admin = User.create!(email_address: "admin@example.com", password: "password123", role: :admin)
-    @other_user = User.create!(email_address: "other@example.com", password: "password123", role: :marketer)
+    @marketer = users(:regular)
+    @admin = users(:admin)
+    @other_user = users(:two)
   end
   
   # Index action tests

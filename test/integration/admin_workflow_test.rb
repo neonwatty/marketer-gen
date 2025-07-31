@@ -2,17 +2,8 @@ require "test_helper"
 
 class AdminWorkflowTest < ActionDispatch::IntegrationTest
   setup do
-    @admin = User.create!(
-      email_address: "admin@example.com",
-      password: "password123",
-      role: "admin"
-    )
-    
-    @regular_user = User.create!(
-      email_address: "user@example.com",
-      password: "password123",
-      role: "marketer"
-    )
+    @admin = users(:admin)
+    @regular_user = users(:regular)
   end
 
   test "admin can access rails admin dashboard" do
@@ -21,7 +12,7 @@ class AdminWorkflowTest < ActionDispatch::IntegrationTest
     # Sign in as admin
     post session_path, params: {
       email_address: @admin.email_address,
-      password: "password123"
+      password: "password"
     }
     
     follow_redirect!
@@ -38,7 +29,7 @@ class AdminWorkflowTest < ActionDispatch::IntegrationTest
     # Sign in as regular user
     post session_path, params: {
       email_address: @regular_user.email_address,
-      password: "password123"
+      password: "password"
     }
     
     follow_redirect!
@@ -56,7 +47,7 @@ class AdminWorkflowTest < ActionDispatch::IntegrationTest
     
     post session_path, params: {
       email_address: @regular_user.email_address,
-      password: "password123"
+      password: "password"
     }
     
     assert_redirected_to new_session_path
@@ -69,7 +60,7 @@ class AdminWorkflowTest < ActionDispatch::IntegrationTest
     
     post session_path, params: {
       email_address: @regular_user.email_address,
-      password: "password123"
+      password: "password"
     }
     
     assert_redirected_to new_session_path
@@ -81,7 +72,7 @@ class AdminWorkflowTest < ActionDispatch::IntegrationTest
     # Sign in as admin
     post session_path, params: {
       email_address: @admin.email_address,
-      password: "password123"
+      password: "password"
     }
     
     # Perform an admin action (would need to simulate Rails Admin action)
@@ -116,7 +107,7 @@ class AdminWorkflowTest < ActionDispatch::IntegrationTest
     # Sign in as admin
     post session_path, params: {
       email_address: @admin.email_address,
-      password: "password123"
+      password: "password"
     }
     
     # Access Rails Admin activities

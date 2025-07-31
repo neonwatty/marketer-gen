@@ -1,0 +1,117 @@
+<% content_for :title, "Journeys" %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">Journeys</h1>
+      <p class="mt-2 text-sm text-gray-700">Manage your customer journeys and marketing automation flows.</p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <%= link_to "New Journey", new_journey_path, class: "inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto" %>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="mt-6 bg-white p-4 rounded-lg shadow">
+    <%= form_with url: journeys_path, method: :get, local: true, class: "flex flex-wrap gap-4" do |form| %>
+      <%= form.text_field :search, placeholder: "Search journeys...", value: params[:search], class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+      
+      <%= form.select :status, options_for_select([
+        ['All Statuses', ''],
+        ['Draft', 'draft'],
+        ['Published', 'published'],
+        ['Archived', 'archived']
+      ], params[:status]), {}, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" } %>
+      
+      <%= form.select :campaign_type, options_for_select([
+        ['All Types', '']
+      ] + Journey::CAMPAIGN_TYPES.map { |type| [type.humanize, type] }, params[:campaign_type]), {}, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" } %>
+      
+      <%= form.submit "Filter", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+    <% end %>
+  </div>
+
+  <!-- Journeys Grid -->
+  <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <% @journeys.each do |journey| %>
+      <div class="bg-white overflow-hidden shadow rounded-lg">
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <% case journey.status %>
+                <% when 'published' %>
+                  <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                <% when 'draft' %>
+                  <div class="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <svg class="h-5 w-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                <% else %>
+                  <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
+                    <svg class="h-5 w-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900">
+                  <%= link_to journey.name, journey, class: "hover:text-indigo-600" %>
+                </h3>
+                <p class="text-sm text-gray-500">
+                  <%= journey.campaign_type&.humanize || 'No type' %> • 
+                  <%= journey.total_steps %> steps
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-4">
+            <p class="text-sm text-gray-600 line-clamp-3">
+              <%= journey.description || "No description provided" %>
+            </p>
+          </div>
+          
+          <div class="mt-4 flex items-center justify-between">
+            <div class="flex items-center text-sm text-gray-500">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                <%= journey.status.humanize %>
+              </span>
+            </div>
+            <div class="flex space-x-2">
+              <%= link_to "Edit", edit_journey_path(journey), class: "text-indigo-600 hover:text-indigo-900 text-sm font-medium" %>
+              <%= link_to "View", journey, class: "text-indigo-600 hover:text-indigo-900 text-sm font-medium" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @journeys.empty? %>
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No journeys</h3>
+      <p class="mt-1 text-sm text-gray-500">Get started by creating your first customer journey.</p>
+      <div class="mt-6">
+        <%= link_to "New Journey", new_journey_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Pagination -->
+  <% if @journeys.respond_to?(:total_pages) && @journeys.total_pages > 1 %>
+    <div class="mt-8 flex justify-center">
+      <%= paginate @journeys %>
+    </div>
+  <% end %>
+</div>

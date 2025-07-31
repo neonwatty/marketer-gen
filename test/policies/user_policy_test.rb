@@ -2,10 +2,11 @@ require "test_helper"
 
 class UserPolicyTest < ActiveSupport::TestCase
   def setup
-    @marketer = User.create!(email_address: "marketer@example.com", password: "password123", role: :marketer)
-    @team_member = User.create!(email_address: "team@example.com", password: "password123", role: :team_member)
-    @admin = User.create!(email_address: "admin@example.com", password: "password123", role: :admin)
-    @other_user = User.create!(email_address: "other@example.com", password: "password123", role: :marketer)
+    @marketer = users(:regular)
+    @team_member = users(:one)
+    @team_member.update!(role: :team_member)
+    @admin = users(:admin)
+    @other_user = users(:two)
   end
   
   # Show tests

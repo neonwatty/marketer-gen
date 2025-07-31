@@ -65,20 +65,37 @@ module Branding
         @rules_cache[category].sort_by! { |r| -r[:priority] }
       end
 
+      def build_rule(rule_definition)
+        {
+          id: rule_definition[:id] || "dynamic_#{SecureRandom.hex(8)}",
+          source: "dynamic",
+          category: rule_definition[:category] || "general",
+          type: rule_definition[:type],
+          content: rule_definition[:content],
+          priority: rule_definition[:priority] || 50,
+          mandatory: rule_definition[:mandatory] || false,
+          metadata: rule_definition[:metadata] || {},
+          evaluator: rule_definition[:evaluator] || ->(content, _context) { true }
+        }
+      end
+
       private
 
       def load_rules
-        # Load brand-specific guidelines
-        load_brand_guidelines
+        # Try to load from cache first
+        cached_rules = Rails.cache.read("compiled_rules:#{brand.id}")
         
-        # Load global compliance rules
-        load_global_rules
-        
-        # Load industry-specific rules if applicable
-        load_industry_rules if brand.industry.present?
-        
-        # Cache the compiled rules
-        cache_compiled_rules
+        if cached_rules.present?
+          # Restore cached rules and regenerate evaluators
+          @rules_cache = cached_rules
+          restore_evaluators
+        else
+          # Load fresh rules
+          load_brand_guidelines
+          load_global_rules
+          load_industry_rules if brand.industry.present?
+          cache_compiled_rules
+        end
       end
 
       def load_brand_guidelines
@@ -141,18 +158,16 @@ module Branding
       end
 
       def load_industry_rules
-        # Load industry-specific compliance rules
-        industry_rules = Rails.cache.fetch("industry_rules:#{brand.industry}", expires_in: 1.day) do
-          case brand.industry
-          when "healthcare"
-            load_healthcare_rules
-          when "finance"
-            load_finance_rules
-          when "technology"
-            load_technology_rules
-          else
-            []
-          end
+        # Load industry-specific compliance rules without caching the Proc objects
+        industry_rules = case brand.industry
+        when "healthcare"
+          load_healthcare_rules
+        when "finance"
+          load_finance_rules
+        when "technology"
+          load_technology_rules
+        else
+          []
         end
         
         industry_rules.each do |rule|
@@ -245,6 +260,7 @@ module Branding
         # Filter based on content type
         if context[:content_type].present?
           all_rules = all_rules.select do |rule|
+            rule[:metadata].blank? ||
             rule[:metadata][:content_types].blank? ||
             rule[:metadata][:content_types].include?(context[:content_type])
           end
@@ -253,6 +269,7 @@ module Branding
         # Filter based on channel
         if context[:channel].present?
           all_rules = all_rules.select do |rule|
+            rule[:metadata].blank? ||
             rule[:metadata][:channels].blank? ||
             rule[:metadata][:channels].include?(context[:channel])
           end
@@ -320,6 +337,8 @@ module Branding
         return false unless rule1 && rule2
         
         # Check for contradictory rules
+        (rule1[:type] == "must" && rule2[:type] == "dont") ||
+        (rule1[:type] == "dont" && rule2[:type] == "must") ||
         (rule1[:type] == "must" && rule2[:type] == "must_not") ||
         (rule1[:type] == "must_not" && rule2[:type] == "must")
       end
@@ -343,11 +362,67 @@ module Branding
       end
 
       def cache_compiled_rules
+        # Create a serializable version of rules cache without Proc evaluators
+        serializable_cache = {}
+        @rules_cache.each do |category, rules|
+          serializable_cache[category] = rules.map do |rule|
+            rule.except(:evaluator) # Remove non-serializable Proc evaluators
+          end
+        end
+        
         Rails.cache.write(
           "compiled_rules:#{brand.id}",
-          @rules_cache,
+          serializable_cache,
           expires_in: 1.hour
         )
+      end
+
+      def restore_evaluators
+        @rules_cache.each do |category, rules|
+          rules.each do |rule|
+            next if rule[:evaluator].present? # Skip if evaluator already exists
+            
+            # Regenerate evaluator based on rule type and source
+            rule[:evaluator] = case rule[:source]
+            when "brand_guideline"
+              build_evaluator_for_cached_rule(rule)
+            else
+              build_global_evaluator(rule)
+            end
+          end
+        end
+      end
+
+      def build_evaluator_for_cached_rule(rule)
+        case rule[:type]
+        when "must", "do"
+          ->(content, _context) { content_matches_positive_rule_cached?(content, rule) }
+        when "must_not", "dont", "avoid"
+          ->(content, _context) { !content_matches_negative_rule_cached?(content, rule) }
+        when "should", "prefer"
+          ->(content, _context) { content_follows_suggestion_cached?(content, rule) }
+        else
+          ->(content, _context) { true }
+        end
+      end
+
+      def build_global_evaluator(rule)
+        case rule[:id]
+        when "global_profanity"
+          ->(content, _context) { !contains_profanity?(content) }
+        when "global_legal"
+          ->(content, context) { check_legal_requirements(content, context) }
+        when "global_accessibility"
+          ->(content, context) { check_accessibility(content, context) }
+        when "healthcare_hipaa"
+          ->(content, _context) { !contains_phi?(content) }
+        when "finance_disclaimer"
+          ->(content, context) { contains_required_disclaimer?(content, context) }
+        when "tech_accuracy"
+          ->(content, _context) { validate_technical_accuracy(content) }
+        else
+          ->(content, _context) { true }
+        end
       end
 
       # Helper methods for rule evaluation
@@ -468,6 +543,30 @@ module Branding
       def validate_technical_accuracy(content)
         # Validate technical claims
         true # Placeholder
+      end
+
+      # Cached rule evaluation methods (work with rule hashes instead of guideline objects)
+      def content_matches_positive_rule_cached?(content, rule)
+        keywords = extract_keywords(rule[:content])
+        content_lower = content.downcase
+        
+        keywords.any? { |keyword| content_lower.include?(keyword.downcase) }
+      end
+
+      def content_matches_negative_rule_cached?(content, rule)
+        keywords = extract_keywords(rule[:content])
+        content_lower = content.downcase
+        
+        keywords.any? { |keyword| content_lower.include?(keyword.downcase) }
+      end
+
+      def content_follows_suggestion_cached?(content, rule)
+        # More lenient check for suggestions
+        keywords = extract_keywords(rule[:content])
+        content_lower = content.downcase
+        
+        matching_keywords = keywords.count { |keyword| content_lower.include?(keyword.downcase) }
+        matching_keywords >= (keywords.length * 0.3) # 30% match threshold
       end
     end
   end

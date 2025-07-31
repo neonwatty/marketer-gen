@@ -16,7 +16,7 @@ class JourneysController < ApplicationController
     
     # Apply search
     if params[:search].present?
-      @journeys = @journeys.where("name ILIKE ? OR description ILIKE ?", 
+      @journeys = @journeys.where("name LIKE ? OR description LIKE ?", 
                                   "%#{params[:search]}%", "%#{params[:search]}%")
     end
     
@@ -233,10 +233,17 @@ class JourneysController < ApplicationController
   end
   
   def journey_params
-    params.require(:journey).permit(
+    permitted_params = params.require(:journey).permit(
       :name, :description, :campaign_type, :target_audience, :status,
-      :campaign_id, :brand_id, goals: [], metadata: {}, settings: {}
+      :campaign_id, :brand_id, :goals, metadata: {}, settings: {}
     )
+    
+    # Handle goals conversion from string to array
+    if permitted_params[:goals].is_a?(String)
+      permitted_params[:goals] = permitted_params[:goals].split("\n").map(&:strip).reject(&:blank?)
+    end
+    
+    permitted_params
   end
   
   def serialize_journeys_for_json(journeys)

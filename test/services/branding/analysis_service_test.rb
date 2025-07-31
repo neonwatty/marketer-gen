@@ -94,10 +94,10 @@ class Branding::AnalysisServiceTest < ActiveSupport::TestCase
     service = Branding::AnalysisService.new(@brand)
     
     # Mock environment variables
-    ENV.stub :[], nil do
-      provider = service.send(:determine_best_provider)
-      assert_equal 'gpt-3.5-turbo', provider  # Fallback
-    end
+    ENV.stubs(:[]).returns(nil)
+    
+    provider = service.send(:determine_best_provider)
+    assert_equal 'gpt-3.5-turbo', provider  # Fallback
   end
 
   test "default_voice_attributes returns valid structure" do

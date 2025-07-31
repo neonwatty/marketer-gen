@@ -2,9 +2,10 @@ require "test_helper"
 
 class ApplicationPolicyTest < ActiveSupport::TestCase
   def setup
-    @marketer = User.create!(email_address: "marketer@example.com", password: "password123", role: :marketer)
-    @team_member = User.create!(email_address: "team@example.com", password: "password123", role: :team_member)
-    @admin = User.create!(email_address: "admin@example.com", password: "password123", role: :admin)
+    @marketer = users(:regular)
+    @team_member = users(:one)
+    @team_member.update!(role: :team_member)
+    @admin = users(:admin)
   end
   
   test "default policy should deny all actions" do

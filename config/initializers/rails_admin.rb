@@ -15,7 +15,7 @@ RailsAdmin.config do |config|
   ### Popular gems integration
 
   ## == Custom Authentication ==
-  config.parent_controller = "::RailsAdmin::ApplicationController"
+  config.parent_controller = "::ApplicationController"
   
   config.authenticate_with do
     unless current_user

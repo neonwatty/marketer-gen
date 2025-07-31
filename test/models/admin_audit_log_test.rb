@@ -3,17 +3,8 @@ require "ostruct"
 
 class AdminAuditLogTest < ActiveSupport::TestCase
   setup do
-    @admin = User.create!(
-      email_address: "admin@example.com",
-      password: "password123",
-      role: "admin"
-    )
-    
-    @user = User.create!(
-      email_address: "user@example.com", 
-      password: "password123",
-      role: "marketer"
-    )
+    @admin = users(:admin)
+    @user = users(:regular)
   end
 
   test "should create audit log with valid attributes" do

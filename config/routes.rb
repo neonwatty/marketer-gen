@@ -189,6 +189,11 @@ Rails.application.routes.draw do
 
   # Journey management and AI suggestions
   resources :journeys, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
+    member do
+      post :duplicate
+      post :publish
+      post :archive
+    end
     # Journey suggestions endpoints
     resources :suggestions, controller: 'journey_suggestions', only: [:index] do
       collection do
@@ -201,7 +206,7 @@ Rails.application.routes.draw do
       end
     end
     
-    # Journey steps management
+    # Journey steps management  
     resources :steps, controller: 'journey_steps', except: [:index] do
       member do
         patch :move

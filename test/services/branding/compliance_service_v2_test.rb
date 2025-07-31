@@ -114,12 +114,9 @@ module Branding
       )
       
       # Mock ActionCable broadcast
-      mock_broadcast = Minitest::Mock.new
-      mock_broadcast.expect(:call, nil, [String, Hash])
+      ActionCable.server.stubs(:broadcast).returns(nil)
       
-      ActionCable.server.stub :broadcast, mock_broadcast do
-        service.check_compliance
-      end
+      service.check_compliance
     end
 
     test "handles errors gracefully" do
