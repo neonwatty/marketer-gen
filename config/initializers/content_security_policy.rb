@@ -10,8 +10,14 @@ Rails.application.configure do
     policy.font_src    :self, :https, :data
     policy.img_src     :self, :https, :data, :blob
     policy.object_src  :none
-    policy.script_src  :self, :https
-    policy.style_src   :self, :https, :unsafe_inline
+    
+    # Allow scripts from self, https sources, and nonce-based inline scripts
+    # unsafe-eval is needed for importmap functionality
+    policy.script_src  :self, :https, :unsafe_eval
+    
+    # Allow styles from self, https sources, inline styles (for Tailwind), and specific CDN sources
+    policy.style_src   :self, :https, :unsafe_inline, "https://cdn.jsdelivr.net"
+    
     policy.connect_src :self, :https
     policy.frame_ancestors :none
     policy.base_uri    :self
@@ -22,9 +28,11 @@ Rails.application.configure do
   end
 
   # Generate session nonces for permitted importmap, inline scripts, and inline styles.
-  config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
+  config.content_security_policy_nonce_generator = -> request { 
+    SecureRandom.base64(16)
+  }
   config.content_security_policy_nonce_directives = %w[script-src style-src]
 
-  # Report violations without enforcing the policy
+  # Report violations without enforcing the policy (disable for production)
   # config.content_security_policy_report_only = true
 end

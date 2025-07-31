@@ -2,7 +2,7 @@
 <% content_for :title, "Journey Builder" %>
 <% content_for :head do %>
   <%= javascript_importmap_tags %>
-  <script type="module">
+  <script type="module" nonce="<%= content_security_policy_nonce %>">
     import "journey_builder_react";
   </script>
 <% end %>
