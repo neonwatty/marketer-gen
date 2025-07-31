@@ -1,9 +1,12 @@
 class JourneyTemplatesController < ApplicationController
-  before_action :require_authentication
+  include Authentication
+  include ActivityTracker
+  
   before_action :set_journey_template, only: [:show, :edit, :update, :destroy, :clone, :use_template, :builder, :builder_react]
+  before_action :ensure_user_can_access_template, only: [:show, :edit, :update, :destroy, :clone, :use_template, :builder, :builder_react]
   
   def index
-    @templates = JourneyTemplate.active.includes(:journeys)
+    @templates = policy_scope(JourneyTemplate).active.includes(:journeys)
     
     # Filter by category if specified
     @templates = @templates.by_category(params[:category]) if params[:category].present?
@@ -31,6 +34,9 @@ class JourneyTemplatesController < ApplicationController
     
     @categories = JourneyTemplate::CATEGORIES
     @campaign_types = Journey::CAMPAIGN_TYPES
+    
+    # Track activity
+    track_activity('viewed_journey_templates', { count: @templates.count })
   end
 
   def show
@@ -38,16 +44,31 @@ class JourneyTemplatesController < ApplicationController
     @stages_covered = @template.stages_covered
     @channels_used = @template.channels_used
     @content_types = @template.content_types_included
+    
+    # Track activity
+    track_activity('viewed_journey_template', { 
+      template_id: @template.id,
+      template_name: @template.name
+    })
   end
 
   def new
     @template = JourneyTemplate.new
+    authorize @template
   end
 
   def create
     @template = JourneyTemplate.new(template_params)
+    authorize @template
     
     if @template.save
+      # Track activity
+      track_activity('created_journey_template', { 
+        template_id: @template.id,
+        template_name: @template.name,
+        category: @template.category
+      })
+      
       respond_to do |format|
         format.html { redirect_to @template, notice: 'Journey template was successfully created.' }
         format.json { render json: @template, status: :created }
@@ -65,6 +86,13 @@ class JourneyTemplatesController < ApplicationController
 
   def update
     if @template.update(template_params)
+      # Track activity
+      track_activity('updated_journey_template', { 
+        template_id: @template.id,
+        template_name: @template.name,
+        changes: @template.saved_changes.keys
+      })
+      
       respond_to do |format|
         format.html { redirect_to @template, notice: 'Journey template was successfully updated.' }
         format.json { render json: @template }
@@ -78,7 +106,15 @@ class JourneyTemplatesController < ApplicationController
   end
 
   def destroy
+    template_name = @template.name
     @template.update!(is_active: false)
+    
+    # Track activity
+    track_activity('deactivated_journey_template', { 
+      template_id: @template.id,
+      template_name: template_name
+    })
+    
     redirect_to journey_templates_path, notice: 'Journey template was deactivated.'
   end
   
@@ -89,6 +125,13 @@ class JourneyTemplatesController < ApplicationController
     new_template.is_active = true
     
     if new_template.save
+      # Track activity
+      track_activity('cloned_journey_template', { 
+        original_template_id: @template.id,
+        new_template_id: new_template.id,
+        template_name: new_template.name
+      })
+      
       redirect_to edit_journey_template_path(new_template), 
                   notice: 'Template cloned successfully. You can now customize it.'
     else
@@ -103,6 +146,14 @@ class JourneyTemplatesController < ApplicationController
     )
     
     if journey.persisted?
+      # Track activity
+      track_activity('used_journey_template', { 
+        template_id: @template.id,
+        template_name: @template.name,
+        journey_id: journey.id,
+        journey_name: journey.name
+      })
+      
       redirect_to journey_path(journey), 
                   notice: 'Journey created from template successfully!'
     else
@@ -142,6 +193,10 @@ class JourneyTemplatesController < ApplicationController
     else
       @template = JourneyTemplate.find(params[:id])
     end
+  end
+  
+  def ensure_user_can_access_template
+    authorize @template
   end
 
   def template_params

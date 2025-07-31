@@ -2,20 +2,30 @@
 
 one:
   journey: one
-  name: MyString
-  description: MyText
-  stage: MyString
-  position: 1
-  content_type: MyString
-  channel: MyString
+  name: "Welcome Email"
+  description: "Send a welcome email to new subscribers"
+  stage: "awareness"
+  position: 0
+  content_type: "email"
+  channel: "email"
   duration_days: 1
+  is_entry_point: true
+  is_exit_point: false
+  config: {}
+  conditions: {}
+  metadata: {}
 
 two:
   journey: two
-  name: MyString
-  description: MyText
-  stage: MyString
-  position: 1
-  content_type: MyString
-  channel: MyString
-  duration_days: 1
+  name: "Product Demo"
+  description: "Schedule and conduct product demonstration"
+  stage: "consideration"
+  position: 0
+  content_type: "demo"
+  channel: "sales_call"
+  duration_days: 3
+  is_entry_point: false
+  is_exit_point: false
+  config: {}
+  conditions: {}
+  metadata: {}

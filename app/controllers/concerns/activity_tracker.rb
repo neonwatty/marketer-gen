@@ -66,6 +66,23 @@ module ActivityTracker
     Thread.current[:request_id] = nil
   end
 
+  def log_custom_activity(action_name, metadata = {})
+    return unless current_user
+    
+    Activity.create!(
+      user: current_user,
+      action: action_name,
+      controller: controller_name,
+      path: request.path,
+      method: request.method,
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent,
+      metadata: metadata
+    )
+  rescue => e
+    Rails.logger.error "Failed to log custom activity: #{e.message}"
+  end
+
   def log_user_activity(additional_metadata = {})
     return unless current_user && should_log_activity?
 

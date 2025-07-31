@@ -1,17 +1,59 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  description: MyText
-  category: MyString
-  campaign_type: MyString
-  is_active: false
-  usage_count: 1
+  name: "B2B Email Nurture Template"
+  description: "A comprehensive email nurture campaign for B2B leads"
+  category: "b2b"
+  campaign_type: "email_nurture"
+  difficulty_level: "intermediate"
+  estimated_duration_days: 14
+  is_active: true
+  usage_count: 5
+  version: 1.0
+  template_data: { 
+    "steps": [
+      {
+        "name": "Welcome Email",
+        "description": "Send welcome email to new leads",
+        "stage": "awareness",
+        "content_type": "email",
+        "channel": "email"
+      },
+      {
+        "name": "Value Proposition Email",
+        "description": "Showcase key value propositions",
+        "stage": "consideration",
+        "content_type": "email",
+        "channel": "email"
+      }
+    ]
+  }
 
 two:
-  name: MyString
-  description: MyText
-  category: MyString
-  campaign_type: MyString
-  is_active: false
-  usage_count: 1
+  name: "SaaS Onboarding Template"
+  description: "User onboarding flow for SaaS products"
+  category: "saas"
+  campaign_type: "onboarding"
+  difficulty_level: "beginner"
+  estimated_duration_days: 7
+  is_active: true
+  usage_count: 12
+  version: 1.0
+  template_data: { 
+    "steps": [
+      {
+        "name": "Welcome Message",
+        "description": "Welcome new users",
+        "stage": "awareness",
+        "content_type": "email",
+        "channel": "email"
+      },
+      {
+        "name": "Product Tour",
+        "description": "Guide users through product features",
+        "stage": "consideration",
+        "content_type": "demo",
+        "channel": "website"
+      }
+    ]
+  }

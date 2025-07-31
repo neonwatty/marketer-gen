@@ -1,0 +1,43 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  name: "Enterprise Decision Maker"
+  description: "C-level executives at enterprise companies"
+  demographics: {
+    "age_range": "35-55",
+    "income": "100k+",
+    "location": "Urban areas",
+    "company_size": "1000+"
+  }
+  psychographics: {
+    "values": ["Efficiency", "ROI", "Innovation"],
+    "pain_points": ["Time constraints", "Budget pressure"],
+    "goals": ["Increase productivity", "Reduce costs"]
+  }
+  behaviors: {
+    "channels": ["LinkedIn", "Email", "Industry publications"],
+    "decision_factors": ["ROI", "Security", "Scalability"]
+  }
+  preferences: {}
+
+two:
+  user: two  
+  name: "SMB Owner"
+  description: "Small to medium business owners"
+  demographics: {
+    "age_range": "25-45",
+    "income": "50k-100k",
+    "location": "Suburban/Urban",
+    "company_size": "1-100"
+  }
+  psychographics: {
+    "values": ["Growth", "Flexibility", "Value"],
+    "pain_points": ["Limited budget", "Lack of resources"],
+    "goals": ["Business growth", "Cost savings"]
+  }
+  behaviors: {
+    "channels": ["Google", "Facebook", "Email"],
+    "decision_factors": ["Price", "Ease of use", "Support"]
+  }
+  preferences: {}

@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  persona: one
+  name: "Q1 Product Launch Campaign"
+  description: "Launch campaign for new product in Q1"
+  campaign_type: "product_launch"
+  status: "active"
+  started_at: <%= 1.week.ago %>
+  ended_at: <%= 3.months.from_now %>
+  goals: ["Increase awareness", "Generate leads"]
+  target_metrics: { "leads": 100, "awareness": 0.25 }
+  settings: {}
+  metadata: {}
+
+two:
+  user: two
+  persona: two
+  name: "Brand Awareness Campaign"
+  description: "General brand awareness campaign"
+  campaign_type: "brand_awareness"
+  status: "active"
+  started_at: <%= 2.weeks.ago %>
+  ended_at: <%= 4.months.from_now %>
+  goals: ["Build brand recognition"]
+  target_metrics: { "awareness": 0.15 }
+  settings: {}
+  metadata: {}
