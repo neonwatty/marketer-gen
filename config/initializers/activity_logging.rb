@@ -42,14 +42,25 @@ Rails.application.configure do
   config.activity_rate_limits.failed_logins_per_hour = 10
 end
 
-# Monkey patch Rails logger to include request ID for better tracing
-# Skip in test environment to avoid conflicts
-# unless Rails.env.test?
-#   Rails.logger.formatter = proc do |severity, timestamp, progname, msg|
-#     request_id = Thread.current[:request_id] || 'no-request-id'
-#     "[#{timestamp}] [#{severity}] [#{request_id}] #{msg}\n"
-#   end
-# end
+# Configure Rails logger for request ID tracing across all environments
+# This ensures consistent logging with request IDs in development, test, and production
+unless Rails.env.test?
+  # Configure log tags to include request_id if not already configured
+  if Rails.application.config.log_tags.blank?
+    Rails.application.config.log_tags = [:request_id]
+  elsif !Rails.application.config.log_tags.include?(:request_id)
+    Rails.application.config.log_tags << :request_id
+  end
+  
+  # Ensure we have a tagged logger for consistent behavior
+  # In Rails 8.0, we need to use TaggedLogging instead of setting formatter directly
+  unless Rails.logger.is_a?(ActiveSupport::TaggedLogging)
+    if Rails.env.development?
+      # In development, wrap the existing logger with TaggedLogging
+      Rails.logger = ActiveSupport::TaggedLogging.new(Rails.logger)
+    end
+  end
+end
 
 # Add custom log subscribers for activity tracking
 ActiveSupport::Notifications.subscribe 'process_action.action_controller' do |*args|
