@@ -44,5 +44,8 @@ module MarketerGen
       'Referrer-Policy' => 'strict-origin-when-cross-origin',
       'Permissions-Policy' => 'geolocation=(), microphone=(), camera=()'
     }
+    
+    # Custom error pages configuration
+    config.exceptions_app = ->(env) { ErrorsController.action(:internal_server_error).call(env) }
   end
 end

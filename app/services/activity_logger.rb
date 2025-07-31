@@ -10,6 +10,9 @@ class ActivityLogger
     admin_action
     data_export
     bulk_operation
+    system_error
+    repeated_errors
+    unusual_error_pattern
   ].freeze
   
   PERFORMANCE_EVENTS = %w[
@@ -148,7 +151,7 @@ class ActivityLogger
   end
   
   def critical_security_event?(event_type)
-    %w[suspicious_activity account_locked authorization_failure].include?(event_type.to_s)
+    %w[suspicious_activity account_locked authorization_failure system_error repeated_errors].include?(event_type.to_s)
   end
   
   def notify_security_event(event_type, message, context)
@@ -177,6 +180,82 @@ class ActivityLogger
         sanitized.delete(field)
         sanitized.delete(field.to_sym)
       end
+    end
+  end
+  
+  # Error pattern detection methods
+  def self.track_error_pattern(error_type, context = {})
+    return unless Rails.env.production?
+    
+    # Track error patterns by IP, user, and error type
+    ip_key = "error_pattern_ip_#{context[:ip_address]}_#{error_type}"
+    user_key = "error_pattern_user_#{context[:user_id]}_#{error_type}" if context[:user_id]
+    global_key = "error_pattern_global_#{error_type}"
+    
+    # Increment counters
+    ip_count = Rails.cache.increment(ip_key, 1, expires_in: 1.hour) || 1
+    user_count = Rails.cache.increment(user_key, 1, expires_in: 1.hour) || 1 if user_key
+    global_count = Rails.cache.increment(global_key, 1, expires_in: 1.hour) || 1
+    
+    # Check for suspicious patterns
+    check_error_patterns(error_type, ip_count, user_count, global_count, context)
+  end
+  
+  def self.check_error_patterns(error_type, ip_count, user_count, global_count, context)
+    # IP-based pattern detection
+    if ip_count && ip_count > 20
+      instance.security('repeated_errors', 
+        "Excessive #{error_type} errors from IP", 
+        context.merge(error_count: ip_count, pattern_type: 'ip_based')
+      )
+    end
+    
+    # User-based pattern detection
+    if user_count && user_count > 15
+      instance.security('repeated_errors', 
+        "Excessive #{error_type} errors from user", 
+        context.merge(error_count: user_count, pattern_type: 'user_based')
+      )
+    end
+    
+    # Global pattern detection
+    if global_count && global_count > 100
+      instance.security('unusual_error_pattern', 
+        "Unusual spike in #{error_type} errors globally", 
+        context.merge(error_count: global_count, pattern_type: 'global_spike')
+      )
+    end
+  end
+  
+  def self.error_recovery_suggestions(error_type, context = {})
+    case error_type.to_s
+    when 'not_found'
+      [
+        "Check URL for typos",
+        "Use site navigation",
+        "Search for content",
+        "Contact support if needed"
+      ]
+    when 'unprocessable_entity'
+      [
+        "Review form data for completeness",
+        "Check data format requirements",
+        "Refresh session if expired",
+        "Contact support for permission issues"
+      ]
+    when 'internal_server_error'
+      [
+        "Wait a few minutes and try again",
+        "Check system status page",
+        "Try different browser or device",
+        "Contact support if problem persists"
+      ]
+    else
+      [
+        "Refresh the page",
+        "Try again in a few minutes",
+        "Contact support if issue continues"
+      ]
     end
   end
 end

@@ -256,6 +256,12 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
   
+  # Error pages
+  get '/404', to: 'errors#not_found'
+  get '/422', to: 'errors#unprocessable_entity'
+  get '/500', to: 'errors#internal_server_error'
+  post '/error_report', to: 'errors#report_error'
+  
   # Demo routes (development only)
   get 'loading_demo', to: 'home#loading_demo' if Rails.env.development?
 
