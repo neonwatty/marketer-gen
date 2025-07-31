@@ -9,14 +9,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   
   # Index action tests
   test "admin can access users index" do
-    sign_in_as(@admin)
+    sign_in_as(@admin, "password")
     
     get users_path
     assert_response :success
   end
   
   test "non-admin cannot access users index" do
-    sign_in_as(@marketer)
+    sign_in_as(@marketer, "password")
     
     get users_path
     assert_redirected_to root_path
@@ -30,14 +30,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   
   # Show action tests
   test "user can view their own profile" do
-    sign_in_as(@marketer)
+    sign_in_as(@marketer, "password")
     
     get user_path(@marketer)
     assert_response :success
   end
   
   test "user cannot view other user profiles" do
-    sign_in_as(@marketer)
+    sign_in_as(@marketer, "password")
     
     get user_path(@other_user)
     assert_redirected_to root_path
@@ -45,7 +45,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "admin can view any user profile" do
-    sign_in_as(@admin)
+    sign_in_as(@admin, "password")
     
     get user_path(@marketer)
     assert_response :success
@@ -59,9 +59,4 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
   
-  private
-  
-  def sign_in_as(user)
-    post session_path, params: { email_address: user.email_address, password: "password123" }
-  end
 end

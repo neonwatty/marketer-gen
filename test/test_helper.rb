@@ -89,33 +89,42 @@ module ActiveSupport
       sign_in_as(user, password)
     end
     
-    # Helper to sign in a user for controller tests
+    # Helper to sign in a user for both controller and integration tests
     def sign_in_as(user, password = "password")
-      # Create session directly for this user
-      session = user.sessions.create!(
-        user_agent: 'Test User Agent',
-        ip_address: '127.0.0.1',
-        expires_at: 24.hours.from_now,
-        last_active_at: Time.current
-      )
-      
-      # For integration tests, set the cookie differently
-      if defined?(cookies) && cookies.respond_to?(:signed)
-        # Controller test
-        cookies.signed[:session_id] = {
-          value: session.id,
-          httponly: true,
-          same_site: :lax,
-          secure: false, # Not secure in test environment
-          expires: 24.hours.from_now
+      if self.class < ActionDispatch::IntegrationTest
+        # Integration test - use the proper login flow by posting to sessions
+        post session_path, params: { 
+          email_address: user.email_address, 
+          password: password 
         }
+        # Follow any redirect to complete the login flow
+        follow_redirect! if response.redirect?
       else
-        # Integration test - use plain cookies
-        cookies[:session_id] = session.id
+        # Controller test - set cookies and session directly
+        session = user.sessions.create!(
+          user_agent: 'Test User Agent',
+          ip_address: '127.0.0.1',
+          expires_at: 24.hours.from_now,
+          last_active_at: Time.current
+        )
+        
+        # Set the signed cookie using ActionDispatch cookie jar
+        if defined?(cookies) && cookies.respond_to?(:signed)
+          cookies.signed[:session_id] = {
+            value: session.id,
+            httponly: true,
+            same_site: :lax,
+            secure: false, # Not secure in test environment
+            expires: 24.hours.from_now
+          }
+        end
+        
+        # Set Current.session for immediate use in the current thread
+        Current.session = session
+        
+        # Return the session for any additional test setup
+        session
       end
-      
-      # Set Current.session for immediate use
-      Current.session = session
     end
   end
 end

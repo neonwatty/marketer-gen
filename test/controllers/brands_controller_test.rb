@@ -4,7 +4,7 @@ class BrandsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = User.create!(email_address: "brands_test@example.com", password: "password123")
     @brand = @user.brands.create!(name: "Test Brand")
-    sign_in_as(@user)
+    sign_in_as(@user, "password123")
   end
 
   test "should get index" do
