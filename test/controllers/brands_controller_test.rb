@@ -1,6 +1,6 @@
 require "test_helper"
 
-class BrandsControllerTest < ActionDispatch::IntegrationTest
+class BrandsControllerTest < ActionController::TestCase
   setup do
     @user = User.create!(email_address: "brands_test@example.com", password: "password123")
     @brand = @user.brands.create!(name: "Test Brand")
@@ -8,40 +8,40 @@ class BrandsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get index" do
-    get brands_url
+    get :index
     assert_response :success
   end
 
   test "should get show" do
-    get brand_url(@brand)
+    get :show, params: { id: @brand }
     assert_response :success
   end
 
   test "should get new" do
-    get new_brand_url
+    get :new
     assert_response :success
   end
 
   test "should create brand" do
     assert_difference("Brand.count") do
-      post brands_url, params: { brand: { name: "New Brand" } }
+      post :create, params: { brand: { name: "New Brand" } }
     end
     assert_redirected_to brand_url(Brand.last)
   end
 
   test "should get edit" do
-    get edit_brand_url(@brand)
+    get :edit, params: { id: @brand }
     assert_response :success
   end
 
   test "should update brand" do
-    patch brand_url(@brand), params: { brand: { name: "Updated Brand" } }
+    patch :update, params: { id: @brand, brand: { name: "Updated Brand" } }
     assert_redirected_to brand_url(@brand)
   end
 
   test "should destroy brand" do
     assert_difference("Brand.count", -1) do
-      delete brand_url(@brand)
+      delete :destroy, params: { id: @brand }
     end
     assert_redirected_to brands_url
   end

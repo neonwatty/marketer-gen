@@ -1,6 +1,6 @@
 require "test_helper"
 
-class BrandGuidelinesControllerTest < ActionDispatch::IntegrationTest
+class BrandGuidelinesControllerTest < ActionController::TestCase
   # test "the truth" do
   #   assert true
   # end

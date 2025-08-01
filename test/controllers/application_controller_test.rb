@@ -1,6 +1,6 @@
 require "test_helper"
 
-class ApplicationControllerTest < ActionDispatch::IntegrationTest
+class ApplicationControllerTest < ActionController::TestCase
   setup do
     @user = User.create!(email_address: "test@example.com", password: "password123")
   end

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class BrandAssetsControllerTest < ActionDispatch::IntegrationTest
+class BrandAssetsControllerTest < ActionController::TestCase
   test "basic routes work" do
     # Just test that our controller methods exist
     # Full integration tests would require proper authentication setup

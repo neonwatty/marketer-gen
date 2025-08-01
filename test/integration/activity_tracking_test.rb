@@ -123,15 +123,20 @@ class ActivityTrackingTest < ActionDispatch::IntegrationTest
   end
 
   test "tracks suspicious activity patterns" do
+    # Sign in and verify authentication
     post session_path, params: {
       email_address: @user.email_address,
       password: "password123"
     }
+    assert_response :redirect, "Login should redirect"
     
-    # Simulate suspicious behavior - rapid requests
+    # Follow the redirect to complete login
+    follow_redirect!
+    
+    # Simulate suspicious behavior - rapid requests to a protected route
     assert_enqueued_with(job: SuspiciousActivityAlertJob) do
       105.times do
-        get root_path
+        get profile_path  # Use protected route to ensure activity tracking
       end
     end
     

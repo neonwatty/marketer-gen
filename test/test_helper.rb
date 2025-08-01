@@ -58,6 +58,9 @@ module ActiveSupport
     
     # Include ActionMailer test helpers
     include ActionMailer::TestHelper
+    
+    # Include ActiveJob test helpers for job assertions
+    include ActiveJob::TestHelper
 
     # Add more helper methods to be used by all tests here...
     
