@@ -13,6 +13,7 @@ class Campaign < ApplicationRecord
     seasonal_promotion content_marketing email_nurture social_media
     event_promotion customer_onboarding re_engagement cross_sell
     upsell referral awareness consideration conversion advocacy
+    b2b_lead_generation
   ].freeze
   
   validates :name, presence: true, uniqueness: { scope: :user_id }

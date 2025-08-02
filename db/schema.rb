@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_28_173924) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_02_130057) do
   create_table "ab_test_variants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.integer "journey_id", null: false
@@ -207,6 +207,36 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_173924) do
     t.index ["user_id"], name: "index_brands_on_user_id"
   end
 
+  create_table "campaign_plans", force: :cascade do |t|
+    t.string "name"
+    t.integer "campaign_id", null: false
+    t.integer "user_id", null: false
+    t.string "status"
+    t.string "plan_type"
+    t.text "strategic_rationale"
+    t.text "target_audience"
+    t.text "messaging_framework"
+    t.text "channel_strategy"
+    t.text "timeline_phases"
+    t.text "success_metrics"
+    t.text "budget_allocation"
+    t.text "creative_approach"
+    t.text "market_analysis"
+    t.decimal "version"
+    t.datetime "approved_at"
+    t.integer "approved_by"
+    t.datetime "rejected_at"
+    t.integer "rejected_by"
+    t.text "rejection_reason"
+    t.datetime "submitted_at"
+    t.datetime "archived_at"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_campaign_plans_on_campaign_id"
+    t.index ["user_id"], name: "index_campaign_plans_on_user_id"
+  end
+
   create_table "campaigns", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -250,6 +280,157 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_173924) do
     t.index ["compliant"], name: "index_compliance_results_on_compliant"
     t.index ["content_hash"], name: "index_compliance_results_on_content_hash"
     t.index ["created_at"], name: "index_compliance_results_on_created_at"
+  end
+
+  create_table "content_approvals", force: :cascade do |t|
+    t.integer "content_repository_id", null: false
+    t.integer "workflow_id", null: false
+    t.integer "user_id", null: false
+    t.integer "assigned_approver_id", null: false
+    t.integer "approval_step"
+    t.integer "status"
+    t.integer "step_order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assigned_approver_id"], name: "index_content_approvals_on_assigned_approver_id"
+    t.index ["content_repository_id"], name: "index_content_approvals_on_content_repository_id"
+    t.index ["user_id"], name: "index_content_approvals_on_user_id"
+    t.index ["workflow_id"], name: "index_content_approvals_on_workflow_id"
+  end
+
+  create_table "content_archives", force: :cascade do |t|
+    t.integer "content_repository_id", null: false
+    t.integer "archived_by_id", null: false
+    t.integer "restored_by_id", null: false
+    t.text "archive_reason"
+    t.integer "archive_level"
+    t.integer "status"
+    t.string "retention_period"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "storage_location"
+    t.text "metadata_backup"
+    t.string "metadata_backup_location"
+    t.text "archived_content_body"
+    t.datetime "retention_expires_at"
+    t.datetime "restore_requested_at"
+    t.text "restore_reason"
+    t.datetime "restored_at"
+    t.boolean "auto_delete_on_expiry"
+    t.boolean "metadata_preservation"
+    t.text "failure_reason"
+    t.integer "retention_extended_by_id"
+    t.datetime "retention_extended_at"
+    t.text "retention_extension_reason"
+    t.index ["archived_by_id"], name: "index_content_archives_on_archived_by_id"
+    t.index ["content_repository_id"], name: "index_content_archives_on_content_repository_id"
+    t.index ["restored_by_id"], name: "index_content_archives_on_restored_by_id"
+    t.index ["retention_extended_by_id"], name: "index_content_archives_on_retention_extended_by_id"
+  end
+
+  create_table "content_categories", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.text "description"
+    t.integer "parent_id", null: false
+    t.integer "hierarchy_level"
+    t.string "hierarchy_path"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_content_categories_on_parent_id"
+  end
+
+  create_table "content_permissions", force: :cascade do |t|
+    t.integer "content_repository_id", null: false
+    t.integer "user_id", null: false
+    t.integer "permission_type"
+    t.boolean "active"
+    t.integer "granted_by_id", null: false
+    t.integer "revoked_by_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_repository_id"], name: "index_content_permissions_on_content_repository_id"
+    t.index ["granted_by_id"], name: "index_content_permissions_on_granted_by_id"
+    t.index ["revoked_by_id"], name: "index_content_permissions_on_revoked_by_id"
+    t.index ["user_id"], name: "index_content_permissions_on_user_id"
+  end
+
+  create_table "content_repositories", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "body"
+    t.integer "content_type", null: false
+    t.integer "format", null: false
+    t.string "storage_path", null: false
+    t.string "file_hash", null: false
+    t.integer "status", default: 0
+    t.integer "user_id", null: false
+    t.integer "campaign_id"
+    t.integer "content_category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_content_repositories_on_campaign_id"
+    t.index ["content_category_id"], name: "index_content_repositories_on_content_category_id"
+    t.index ["content_type", "status"], name: "index_content_repositories_on_content_type_and_status"
+    t.index ["file_hash"], name: "index_content_repositories_on_file_hash", unique: true
+    t.index ["user_id", "created_at"], name: "index_content_repositories_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_content_repositories_on_user_id"
+  end
+
+  create_table "content_revisions", force: :cascade do |t|
+    t.integer "content_repository_id", null: false
+    t.integer "revised_by_id", null: false
+    t.text "content_before"
+    t.text "content_after"
+    t.text "revision_reason"
+    t.integer "revision_type"
+    t.integer "status"
+    t.integer "revision_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_repository_id"], name: "index_content_revisions_on_content_repository_id"
+    t.index ["revised_by_id"], name: "index_content_revisions_on_revised_by_id"
+  end
+
+  create_table "content_tags", force: :cascade do |t|
+    t.integer "content_repository_id", null: false
+    t.integer "user_id", null: false
+    t.string "tag_name"
+    t.integer "tag_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_repository_id"], name: "index_content_tags_on_content_repository_id"
+    t.index ["user_id"], name: "index_content_tags_on_user_id"
+  end
+
+  create_table "content_versions", force: :cascade do |t|
+    t.integer "content_repository_id", null: false
+    t.integer "author_id", null: false
+    t.text "body", null: false
+    t.integer "version_number", null: false
+    t.string "commit_hash", null: false
+    t.text "commit_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id", "created_at"], name: "index_content_versions_on_author_id_and_created_at"
+    t.index ["author_id"], name: "index_content_versions_on_author_id"
+    t.index ["commit_hash"], name: "index_content_versions_on_commit_hash", unique: true
+    t.index ["content_repository_id", "version_number"], name: "idx_on_content_repository_id_version_number_2ae3dc1c28", unique: true
+    t.index ["content_repository_id"], name: "index_content_versions_on_content_repository_id"
+  end
+
+  create_table "content_workflows", force: :cascade do |t|
+    t.integer "content_repository_id", null: false
+    t.integer "created_by_id", null: false
+    t.string "name"
+    t.integer "status"
+    t.boolean "parallel_approval"
+    t.boolean "auto_progression"
+    t.integer "step_timeout_hours"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_repository_id"], name: "index_content_workflows_on_content_repository_id"
+    t.index ["created_by_id"], name: "index_content_workflows_on_created_by_id"
   end
 
   create_table "conversion_funnels", force: :cascade do |t|
@@ -484,6 +665,60 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_173924) do
     t.index ["user_id"], name: "index_personas_on_user_id"
   end
 
+  create_table "plan_comments", force: :cascade do |t|
+    t.integer "campaign_plan_id", null: false
+    t.integer "user_id", null: false
+    t.integer "parent_comment_id"
+    t.text "content"
+    t.string "section"
+    t.string "comment_type"
+    t.string "priority"
+    t.integer "line_number"
+    t.boolean "resolved"
+    t.datetime "resolved_at"
+    t.integer "resolved_by_user_id"
+    t.text "mentioned_users"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_plan_id"], name: "index_plan_comments_on_campaign_plan_id"
+    t.index ["parent_comment_id"], name: "index_plan_comments_on_parent_comment_id"
+    t.index ["resolved_by_user_id"], name: "index_plan_comments_on_resolved_by_user_id"
+    t.index ["user_id"], name: "index_plan_comments_on_user_id"
+  end
+
+  create_table "plan_revisions", force: :cascade do |t|
+    t.integer "campaign_plan_id", null: false
+    t.integer "user_id", null: false
+    t.decimal "revision_number"
+    t.text "plan_data"
+    t.text "change_summary"
+    t.text "changes_made"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_plan_id"], name: "index_plan_revisions_on_campaign_plan_id"
+    t.index ["user_id"], name: "index_plan_revisions_on_user_id"
+  end
+
+  create_table "plan_templates", force: :cascade do |t|
+    t.string "name"
+    t.integer "user_id", null: false
+    t.string "industry_type"
+    t.string "template_type"
+    t.text "description"
+    t.text "template_data"
+    t.text "default_channels"
+    t.text "messaging_themes"
+    t.text "success_metrics_template"
+    t.boolean "active"
+    t.boolean "is_public"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_plan_templates_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -608,37 +843,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_28_173924) do
   add_foreign_key "brand_assets", "brands"
   add_foreign_key "brand_guidelines", "brands"
   add_foreign_key "brands", "users"
+  add_foreign_key "campaign_plans", "campaigns"
+  add_foreign_key "campaign_plans", "users"
   add_foreign_key "campaigns", "personas"
   add_foreign_key "campaigns", "users"
   add_foreign_key "compliance_results", "brands"
-  add_foreign_key "conversion_funnels", "campaigns"
-  add_foreign_key "conversion_funnels", "journeys"
-  add_foreign_key "conversion_funnels", "users"
-  add_foreign_key "journey_analytics", "campaigns"
-  add_foreign_key "journey_analytics", "journeys"
-  add_foreign_key "journey_analytics", "users"
-  add_foreign_key "journey_executions", "journey_steps", column: "current_step_id"
-  add_foreign_key "journey_executions", "journeys"
-  add_foreign_key "journey_executions", "users"
-  add_foreign_key "journey_insights", "journeys"
-  add_foreign_key "journey_metrics", "campaigns"
-  add_foreign_key "journey_metrics", "journeys"
-  add_foreign_key "journey_metrics", "users"
-  add_foreign_key "journey_steps", "journeys"
-  add_foreign_key "journey_templates", "journey_templates", column: "original_template_id"
-  add_foreign_key "journeys", "brands"
-  add_foreign_key "journeys", "campaigns"
-  add_foreign_key "journeys", "users"
-  add_foreign_key "messaging_frameworks", "brands"
-  add_foreign_key "personas", "users"
-  add_foreign_key "sessions", "users"
-  add_foreign_key "step_executions", "journey_executions"
-  add_foreign_key "step_executions", "journey_steps"
-  add_foreign_key "step_transitions", "journey_steps", column: "from_step_id"
-  add_foreign_key "step_transitions", "journey_steps", column: "to_step_id"
-  add_foreign_key "suggestion_feedbacks", "journey_steps"
-  add_foreign_key "suggestion_feedbacks", "journeys"
-  add_foreign_key "suggestion_feedbacks", "users"
-  add_foreign_key "user_activities", "users"
-  add_foreign_key "users", "users", column: "suspended_by_id"
+  add_foreign_key "content_archives", "users", column: "retention_extended_by_id"
 end
