@@ -10,7 +10,62 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_02_130057) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_02_133132) do
+  create_table "ab_test_configurations", force: :cascade do |t|
+    t.integer "ab_test_id", null: false
+    t.string "configuration_type"
+    t.json "settings"
+    t.boolean "is_active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ab_test_id"], name: "index_ab_test_configurations_on_ab_test_id"
+  end
+
+  create_table "ab_test_metrics", force: :cascade do |t|
+    t.integer "ab_test_id", null: false
+    t.string "metric_name"
+    t.decimal "value"
+    t.datetime "timestamp"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ab_test_id"], name: "index_ab_test_metrics_on_ab_test_id"
+  end
+
+  create_table "ab_test_recommendations", force: :cascade do |t|
+    t.integer "ab_test_id", null: false
+    t.string "recommendation_type"
+    t.text "content"
+    t.decimal "confidence_score"
+    t.string "status"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ab_test_id"], name: "index_ab_test_recommendations_on_ab_test_id"
+  end
+
+  create_table "ab_test_results", force: :cascade do |t|
+    t.integer "ab_test_id", null: false
+    t.string "event_type"
+    t.decimal "value"
+    t.decimal "confidence"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ab_test_id"], name: "index_ab_test_results_on_ab_test_id"
+  end
+
+  create_table "ab_test_templates", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "template_type"
+    t.json "configuration"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_ab_test_templates_on_user_id"
+  end
+
   create_table "ab_test_variants", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.integer "journey_id", null: false
@@ -831,6 +886,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_130057) do
     t.index ["suspended_at"], name: "index_users_on_suspended_at"
   end
 
+  add_foreign_key "ab_test_configurations", "ab_tests"
+  add_foreign_key "ab_test_metrics", "ab_tests"
+  add_foreign_key "ab_test_recommendations", "ab_tests"
+  add_foreign_key "ab_test_results", "ab_tests"
+  add_foreign_key "ab_test_templates", "users"
   add_foreign_key "ab_test_variants", "ab_tests"
   add_foreign_key "ab_test_variants", "journeys"
   add_foreign_key "ab_tests", "campaigns"

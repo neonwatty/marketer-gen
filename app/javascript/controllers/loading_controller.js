@@ -32,9 +32,9 @@ export default class extends Controller {
     this.currentStep = 0
     
     // Set default values
-    if (!this.hasDelayValue) this.delayValue = 200
-    if (!this.hasMinDurationValue) this.minDurationValue = 500
-    if (!this.hasTypeValue) this.typeValue = "button"
+    if (!this.hasDelayValue) {this.delayValue = 200}
+    if (!this.hasMinDurationValue) {this.minDurationValue = 500}
+    if (!this.hasTypeValue) {this.typeValue = "button"}
     
     // Auto-setup based on type
     this.setupLoadingType()
@@ -277,7 +277,7 @@ export default class extends Controller {
 
   // Progress bar methods
   updateProgress(step, total = null) {
-    if (!this.hasProgressTarget) return
+    if (!this.hasProgressTarget) {return}
     
     total = total || this.progressStepsValue.length || 100
     const percentage = Math.round((step / total) * 100)

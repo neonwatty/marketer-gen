@@ -1,26 +1,38 @@
 {
   "dependencies": {
-    "rails_admin": "3.3.0",
-    "sass": "^1.89.2",
-    "reactflow": "^11.11.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "zustand": "^4.4.7",
-    "immer": "^10.0.3",
-    "uuid": "^9.0.1",
-    "lodash.debounce": "^4.0.8",
+    "@rails/actioncable": "^8.0.200",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
     "@types/uuid": "^9.0.7",
+    "immer": "^10.0.3",
+    "lodash.debounce": "^4.0.8",
+    "rails_admin": "3.3.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "reactflow": "^11.11.4",
+    "reconnecting-websocket": "^4.4.0",
+    "sass": "^1.89.2",
+    "sortablejs": "^1.15.0",
     "typescript": "^5.3.3",
-    "sortablejs": "^1.15.0"
+    "uuid": "^9.0.1",
+    "ws": "^8.18.3",
+    "zustand": "^4.4.7"
   },
   "scripts": {
     "build:css": "sass ./app/assets/stylesheets/application.sass.scss:./app/assets/builds/application.css ./app/assets/stylesheets/rails_admin.scss:./app/assets/builds/rails_admin.css --no-source-map --load-path=node_modules",
     "build:js": "esbuild app/javascript/*.tsx app/javascript/*.ts --bundle --sourcemap --outdir=app/assets/builds --public-path=/assets --loader:.tsx=tsx --loader:.ts=ts",
-    "build": "npm run build:css && npm run build:js"
+    "build": "npm run build:css && npm run build:js",
+    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint app/javascript --ext .js,.ts,.tsx",
+    "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint app/javascript --ext .js,.ts,.tsx --fix",
+    "lint:check": "ESLINT_USE_FLAT_CONFIG=false eslint app/javascript --ext .js,.ts,.tsx --max-warnings 0"
   },
   "devDependencies": {
-    "esbuild": "^0.19.8"
+    "@eslint/js": "^9.32.0",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "esbuild": "^0.25.8",
+    "eslint": "^9.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0"
   }
 }

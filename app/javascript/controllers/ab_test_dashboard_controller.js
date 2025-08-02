@@ -121,7 +121,7 @@ export default class extends Controller {
       
       // Animate from current to new value
       let step = Math.ceil(Math.abs(newValue - currentValue) / 10)
-      if (newValue < currentValue) step = -step
+      if (newValue < currentValue) {step = -step}
       
       let current = currentValue
       const animate = () => {

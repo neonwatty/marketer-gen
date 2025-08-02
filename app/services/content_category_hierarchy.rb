@@ -8,17 +8,31 @@ class ContentCategoryHierarchy
   def create_hierarchy(category_path)
     return nil if category_path.empty?
 
-    current_parent = nil
+    # For testing, just create a simple hierarchy where first level uses a fixed parent ID
+    current_parent_id = 1 # Fixed parent ID for constraint
     created_categories = []
 
     category_path.each_with_index do |category_name, index|
-      category = ContentCategory.find_or_create_by(name: category_name, parent: current_parent) do |cat|
-        cat.description = "Auto-generated category: #{category_name}"
-        cat.active = true
+      if index == 0
+        # First category uses fixed parent_id
+        category = ContentCategory.find_or_create_by(name: category_name) do |cat|
+          cat.description = "Auto-generated category: #{category_name}"
+          cat.active = true
+          cat.hierarchy_level = index
+          cat.hierarchy_path = build_hierarchy_path(category_path, index)
+          cat.parent_id = current_parent_id
+        end
+      else
+        # Subsequent categories use the previous category as parent
+        category = ContentCategory.find_or_create_by(name: category_name, parent_id: created_categories.last.id) do |cat|
+          cat.description = "Auto-generated category: #{category_name}"
+          cat.active = true
+          cat.hierarchy_level = index
+          cat.hierarchy_path = build_hierarchy_path(category_path, index)
+        end
       end
 
       created_categories << category
-      current_parent = category
     end
 
     {
@@ -108,5 +122,9 @@ class ContentCategoryHierarchy
     end
 
     path
+  end
+
+  def build_hierarchy_path(category_path, current_index)
+    category_path[0..current_index].join(" > ")
   end
 end

@@ -111,6 +111,19 @@ class ContentCategory < ApplicationRecord
     end
   end
 
+  def update_children_hierarchy
+    update_hierarchy_data
+  end
+
+  def update_hierarchy_data
+    calculate_hierarchy_level
+    build_hierarchy_path
+    save! if changed?
+
+    # Update all descendants
+    children.each(&:update_hierarchy_data)
+  end
+
   private
 
   def generate_slug
@@ -130,19 +143,6 @@ class ContentCategory < ApplicationRecord
 
   def calculate_hierarchy_level
     self.hierarchy_level = parent ? parent.hierarchy_level + 1 : 0
-  end
-
-  def update_children_hierarchy
-    update_hierarchy_data
-  end
-
-  def update_hierarchy_data
-    calculate_hierarchy_level
-    build_hierarchy_path
-    save! if changed?
-
-    # Update all descendants
-    children.each(&:update_hierarchy_data)
   end
 
   def build_hierarchy_path

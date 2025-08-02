@@ -87,7 +87,7 @@ export default class extends Controller {
 
   // Update metrics in the UI
   updateMetrics(metrics) {
-    if (!metrics) return
+    if (!metrics) {return}
 
     // Update progress bar
     if (this.hasProgressBarTarget && metrics.progress_percentage !== undefined) {

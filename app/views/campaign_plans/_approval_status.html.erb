@@ -1,0 +1,261 @@
+<div class="approval-status-widget" data-controller="approval-workflow">
+  <!-- Current Status -->
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-3">
+      <h4 class="text-sm font-medium text-gray-900">Current Status</h4>
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= status_badge_classes(campaign_plan.status) %>">
+        <%= campaign_plan.status.humanize %>
+      </span>
+    </div>
+    
+    <!-- Status Progress Bar -->
+    <div class="relative">
+      <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200">
+        <% status_progress = status_progress_percentage(campaign_plan.status) %>
+        <div style="width: <%= status_progress %>%" 
+             class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center <%= status_progress_color(campaign_plan.status) %> transition-all duration-300">
+        </div>
+      </div>
+      
+      <!-- Status Steps -->
+      <div class="flex justify-between text-xs text-gray-500 -mt-6 mb-2">
+        <span class="<%= 'text-blue-600 font-medium' if campaign_plan.draft? %>">Draft</span>
+        <span class="<%= 'text-blue-600 font-medium' if campaign_plan.in_review? %>">Review</span>
+        <span class="<%= 'text-green-600 font-medium' if campaign_plan.approved? %>">Approved</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Details -->
+  <div class="space-y-3">
+    <% if campaign_plan.draft? %>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-blue-800">Plan in Draft</h3>
+            <p class="mt-1 text-sm text-blue-700">Continue editing and submit for review when ready.</p>
+            
+            <% if can_edit_plan?(campaign_plan) %>
+              <div class="mt-3">
+                <%= button_to "Submit for Review", 
+                    submit_for_review_campaign_plan_path(campaign_plan), 
+                    method: :post,
+                    class: "inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors",
+                    confirm: "Are you sure you want to submit this plan for review?",
+                    data: { action: "click->approval-workflow#submitForReview" } %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+    <% elsif campaign_plan.in_review? %>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-yellow-800">Under Review</h3>
+            <p class="mt-1 text-sm text-yellow-700">
+              Submitted <%= campaign_plan.submitted_at&.strftime("%B %d, %Y at %I:%M %p") || "recently" %> for stakeholder review.
+            </p>
+            
+            <% if can_approve_plan?(campaign_plan) %>
+              <div class="mt-3 flex gap-2">
+                <%= button_to "Approve", 
+                    approve_campaign_plan_path(campaign_plan), 
+                    method: :post,
+                    class: "inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors",
+                    data: { action: "click->approval-workflow#approve" } %>
+                
+                <button type="button"
+                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                        data-action="click->approval-workflow#showRejectModal">
+                  Reject
+                </button>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+    <% elsif campaign_plan.approved? %>
+      <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-green-800">Approved</h3>
+            <p class="mt-1 text-sm text-green-700">
+              Approved <%= campaign_plan.approved_at&.strftime("%B %d, %Y at %I:%M %p") || "recently" %>.
+              Ready for execution.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+    <% elsif campaign_plan.rejected? %>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Rejected</h3>
+            <p class="mt-1 text-sm text-red-700">
+              Rejected <%= campaign_plan.rejected_at&.strftime("%B %d, %Y at %I:%M %p") || "recently" %>.
+            </p>
+            <% if campaign_plan.rejection_reason.present? %>
+              <div class="mt-2 p-2 bg-red-100 rounded text-xs text-red-800">
+                <strong>Reason:</strong> <%= campaign_plan.rejection_reason %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Stakeholders -->
+  <% if collaboration_data[:stakeholders].present? %>
+    <div class="mt-6 pt-4 border-t border-gray-200">
+      <h5 class="text-sm font-medium text-gray-900 mb-3">Stakeholders</h5>
+      <div class="space-y-2">
+        <% collaboration_data[:stakeholders].each do |stakeholder| %>
+          <div class="flex items-center gap-3">
+            <div class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+              <span class="text-xs font-medium text-gray-600">
+                <%= stakeholder[:name].first.upcase %>
+              </span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-900"><%= stakeholder[:name] %></span>
+                <span class="text-xs text-gray-500"><%= stakeholder[:role] %></span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Approval Workflow Progress -->
+  <% if collaboration_data[:approval_workflow].present? %>
+    <div class="mt-6 pt-4 border-t border-gray-200">
+      <h5 class="text-sm font-medium text-gray-900 mb-3">Approval Workflow</h5>
+      <div class="space-y-2">
+        <% collaboration_data[:approval_workflow][:steps].each do |step| %>
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0">
+              <% if step[:completed] %>
+                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+              <% elsif step[:current] %>
+                <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-4a1 1 0 112 0v-3a1 1 0 10-2 0v3zm0-5a1 1 0 112 0 1 1 0 01-2 0z" clip-rule="evenodd" />
+                </svg>
+              <% else %>
+                <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                </svg>
+              <% end %>
+            </div>
+            <div class="flex-1">
+              <div class="text-sm text-gray-900 <%= 'font-medium' if step[:current] %>">
+                <%= step[:name] %>
+              </div>
+              <% if step[:assignee] %>
+                <div class="text-xs text-gray-500">
+                  Assigned to: <%= step[:assignee] %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Rejection Modal -->
+<div id="rejection-modal" 
+     class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden"
+     data-approval-workflow-target="rejectionModal">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900">Reject Plan</h3>
+        <button type="button" 
+                class="text-gray-400 hover:text-gray-600 transition-colors"
+                data-action="click->approval-workflow#hideRejectModal">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <%= form_with url: reject_campaign_plan_path(campaign_plan), 
+                    method: :post, 
+                    class: "space-y-4",
+                    data: { action: "submit->approval-workflow#submitRejection" } do |form| %>
+        <div>
+          <%= form.label :rejection_reason, "Reason for rejection", 
+              class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_area :rejection_reason, 
+              rows: 4,
+              class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm",
+              placeholder: "Please provide specific feedback..." %>
+        </div>
+        
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" 
+                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  data-action="click->approval-workflow#hideRejectModal">
+            Cancel
+          </button>
+          <%= form.submit "Reject Plan", 
+              class: "px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 transition-colors" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% content_for :javascript do %>
+  <script>
+    function statusProgressPercentage(status) {
+      switch(status) {
+        case 'draft': return 25;
+        case 'in_review': return 50;
+        case 'approved': return 100;
+        case 'rejected': return 75;
+        default: return 0;
+      }
+    }
+    
+    function statusProgressColor(status) {
+      switch(status) {
+        case 'draft': return 'bg-blue-500';
+        case 'in_review': return 'bg-yellow-500';
+        case 'approved': return 'bg-green-500';
+        case 'rejected': return 'bg-red-500';
+        default: return 'bg-gray-500';
+      }
+    }
+  </script>
+<% end %>

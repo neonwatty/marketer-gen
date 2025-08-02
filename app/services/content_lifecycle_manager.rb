@@ -15,39 +15,40 @@ class ContentLifecycleManager
   end
 
   def transition_to(new_state, user)
-    begin
-      # Validate state transition
-      unless valid_transition?(@current_state, new_state)
-        return {
-          success: false,
-          error: "Invalid state transition from #{@current_state} to #{new_state}"
-        }
-      end
-
-      # Perform the transition
-      old_state = @current_state
-      @current_state = new_state
-
-      # Record in history
-      @lifecycle_history << {
-        state: new_state,
-        previous_state: old_state,
-        transitioned_at: Time.current,
-        user_id: user.id,
-        user_name: user.full_name
+    # Validate state transition
+    unless valid_transition?(@current_state, new_state)
+      return {
+        success: false,
+        error: "Invalid state transition from #{@current_state} to #{new_state}"
       }
-
-      {
-        success: true,
-        old_state: old_state,
-        new_state: new_state,
-        transitioned_by: user.id,
-        transitioned_at: Time.current
-      }
-    rescue => e
-      @errors << e.message
-      raise NoMethodError, "ContentLifecycleManager#transition_to not implemented"
     end
+
+    # Perform the transition
+    old_state = @current_state
+    @current_state = new_state
+
+    # Record in history
+    @lifecycle_history << {
+      state: new_state,
+      previous_state: old_state,
+      transitioned_at: Time.current,
+      user_id: user.id,
+      user_name: user.full_name || user.email_address
+    }
+
+    {
+      success: true,
+      old_state: old_state,
+      new_state: new_state,
+      transitioned_by: user.id,
+      transitioned_at: Time.current
+    }
+  rescue => e
+    @errors << e.message
+    {
+      success: false,
+      error: e.message
+    }
   end
 
   def get_lifecycle_history
@@ -137,7 +138,7 @@ class ContentLifecycleManager
   def valid_transition?(from_state, to_state)
     allowed_transitions = {
       "draft" => [ "review", "cancelled" ],
-      "review" => [ "approved", "rejected", "draft" ],
+      "review" => [ "approved", "rejected", "draft", "published" ],
       "approved" => [ "published", "review" ],
       "published" => [ "archived", "review" ],
       "rejected" => [ "draft", "cancelled" ],

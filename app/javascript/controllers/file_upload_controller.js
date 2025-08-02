@@ -65,7 +65,7 @@ export default class extends Controller {
       // Avoid duplicates
       if (!this.selectedFiles.find(f => f.name === file.name && f.size === file.size)) {
         const fileData = {
-          file: file,
+          file,
           id: this.generateId(),
           name: file.name,
           size: file.size,
@@ -103,7 +103,7 @@ export default class extends Controller {
 
   // Upload functionality
   async uploadFiles() {
-    if (this.selectedFiles.length === 0) return
+    if (this.selectedFiles.length === 0) {return}
 
     this.showProgress()
     this.updateUploadButton('Uploading...', true)
@@ -346,13 +346,13 @@ export default class extends Controller {
   }
 
   formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes'
+    if (bytes === 0) {return '0 Bytes'}
     
     const k = 1024
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
     
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))  } ${  sizes[i]}`
   }
 
   generateId() {

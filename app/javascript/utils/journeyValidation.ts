@@ -283,7 +283,7 @@ const validateJourneyFlow = (journey: Journey): ValidationError[] => {
   // Check for logical stage progression
   const stageOrder = ['awareness', 'consideration', 'conversion', 'retention'];
   const stepsByStage = journey.steps.reduce((acc, step) => {
-    if (!acc[step.stage]) acc[step.stage] = [];
+    if (!acc[step.stage]) {acc[step.stage] = [];}
     acc[step.stage].push(step);
     return acc;
   }, {} as Record<string, JourneyStep[]>);

@@ -1,0 +1,218 @@
+<div class="version-history-container" data-controller="version-history">
+  <div class="mb-6 flex items-center justify-between">
+    <h2 class="text-lg font-semibold text-gray-900">Version History</h2>
+    
+    <!-- View Options -->
+    <div class="flex items-center space-x-3">
+      <div class="flex bg-gray-100 rounded-lg p-1">
+        <button data-action="click->version-history#setTimelineView" 
+                data-version-history-target="timelineBtn"
+                class="version-view-btn active px-3 py-1 text-sm font-medium rounded-md transition-colors">
+          Timeline
+        </button>
+        <button data-action="click->version-history#setTreeView" 
+                data-version-history-target="treeBtn"
+                class="version-view-btn px-3 py-1 text-sm font-medium rounded-md transition-colors">
+          Tree
+        </button>
+      </div>
+      
+      <%= link_to new_content_repository_content_version_path(content_repository), 
+          class: "inline-flex items-center px-3 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        New Version
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Timeline View -->
+  <div data-version-history-target="timelineView" class="space-y-4">
+    <% if versions.any? %>
+      <% versions.each_with_index do |version, index| %>
+        <div class="relative">
+          <!-- Timeline Line (except for last item) -->
+          <% unless index == versions.count - 1 %>
+            <div class="absolute top-10 left-6 w-0.5 h-full bg-gray-200"></div>
+          <% end %>
+          
+          <!-- Version Card -->
+          <div class="relative bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <!-- Timeline Dot -->
+            <div class="absolute -left-2 top-6 w-4 h-4 rounded-full border-2 border-white shadow
+              <%= version.is_latest? ? 'bg-green-500' : 'bg-blue-500' %>"></div>
+            
+            <div class="pl-8 p-6">
+              <div class="flex items-start justify-between">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center space-x-3">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                      Version <%= version.version_number %>
+                      <% if version.is_latest? %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 ml-2">
+                          Current
+                        </span>
+                      <% end %>
+                    </h3>
+                    
+                    <div class="flex items-center text-sm text-gray-500">
+                      <div class="w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center mr-2">
+                        <span class="text-xs font-medium text-gray-700">
+                          <%= version.author.display_name.first.upcase %>
+                        </span>
+                      </div>
+                      <%= version.author.display_name %>
+                    </div>
+                  </div>
+                  
+                  <% if version.commit_message.present? %>
+                    <p class="mt-2 text-gray-600"><%= version.commit_message %></p>
+                  <% end %>
+                  
+                  <div class="mt-3 flex items-center space-x-4 text-sm text-gray-500">
+                    <span>
+                      <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <%= version.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                    </span>
+                    
+                    <span>
+                      <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h1a1 1 0 011 1v2h4V2a1 1 0 011-1h1a1 1 0 011 1v2h.5A2.5 2.5 0 0119 6.5v12A2.5 2.5 0 0116.5 21h-9A2.5 2.5 0 015 18.5v-12A2.5 2.5 0 017.5 4H8z"></path>
+                      </svg>
+                      <%= version.commit_hash[0..7] %>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Version Actions -->
+                <div class="flex-shrink-0 ml-4">
+                  <div class="flex items-center space-x-2">
+                    <%= link_to [content_repository, version], 
+                        class: "inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                      View
+                    <% end %>
+
+                    <% if version.previous_version %>
+                      <%= link_to diff_content_repository_content_version_path(content_repository, version), 
+                          class: "inline-flex items-center px-3 py-1.5 border border-orange-300 text-sm font-medium rounded text-orange-700 bg-orange-50 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors" do %>
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Diff
+                      <% end %>
+                    <% end %>
+
+                    <% unless version.is_latest? %>
+                      <%= link_to revert_content_repository_content_version_path(content_repository, version), 
+                          method: :post,
+                          class: "inline-flex items-center px-3 py-1.5 border border-yellow-300 text-sm font-medium rounded text-yellow-700 bg-yellow-50 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors",
+                          data: { confirm: "Are you sure you want to revert to version #{version.version_number}? This will create a new version." } do %>
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                        </svg>
+                        Revert
+                      <% end %>
+                    <% end %>
+
+                    <!-- More Actions -->
+                    <div class="relative" data-controller="dropdown">
+                      <button data-action="click->dropdown#toggle" 
+                              class="inline-flex items-center p-1.5 border border-gray-300 rounded text-gray-400 hover:text-gray-600 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                        </svg>
+                      </button>
+
+                      <div data-dropdown-target="menu" 
+                           class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                        <div class="py-1">
+                          <%= link_to preview_content_repository_content_version_path(content_repository, version), 
+                              target: "_blank",
+                              class: "flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors" do %>
+                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            Preview in New Tab
+                          <% end %>
+
+                          <%= link_to edit_content_repository_content_version_path(content_repository, version), 
+                              class: "flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors" do %>
+                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                            Create New Version From This
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Diff Preview (if available) -->
+              <% if version.previous_version %>
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                  <div class="flex items-center justify-between mb-2">
+                    <h4 class="text-sm font-medium text-gray-700">Changes from previous version</h4>
+                    <button data-action="click->version-history#toggleDiffPreview" 
+                            data-version-id="<%= version.id %>"
+                            class="text-sm text-blue-600 hover:text-blue-500">
+                      Show diff
+                    </button>
+                  </div>
+                  
+                  <div data-version-history-target="diffPreview" 
+                       data-version-id="<%= version.id %>" 
+                       class="hidden mt-3">
+                    <!-- Diff content will be loaded here -->
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No versions yet</h3>
+        <p class="text-gray-500 mb-4">Create the first version of this content to start tracking changes.</p>
+        <%= link_to "Create First Version", new_content_repository_content_version_path(content_repository), 
+            class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Tree View (initially hidden) -->
+  <div data-version-history-target="treeView" class="hidden">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="text-center py-8 text-gray-500">
+        <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+        </svg>
+        <p class="text-lg font-medium">Tree View</p>
+        <p class="mt-2">Visual branch representation coming soon...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% content_for :head do %>
+  <style>
+    .version-view-btn {
+      @apply text-gray-500 hover:text-gray-700;
+    }
+    .version-view-btn.active {
+      @apply bg-white text-gray-900 shadow-sm;
+    }
+  </style>
+<% end %>

@@ -1,3 +1,5 @@
+require "digest"
+
 class ContentStorageSystem
   attr_reader :errors
 
@@ -9,13 +11,19 @@ class ContentStorageSystem
     # Validate required fields
     validate_content_data!(content_data)
 
+    # Generate required fields for storage
+    file_hash = Digest::SHA256.hexdigest("#{content_data[:title]}#{content_data[:body]}#{Time.current.to_f}")
+    storage_path = "content/#{Date.current.strftime('%Y/%m')}/#{file_hash[0..7]}"
+
     repository = ContentRepository.create!(
       title: content_data[:title],
       body: content_data[:body],
       content_type: content_data[:content_type],
       format: content_data[:format],
       user_id: content_data[:user_id],
-      campaign_id: content_data[:campaign_id]
+      campaign_id: content_data[:campaign_id],
+      storage_path: storage_path,
+      file_hash: file_hash
     )
 
     # Return structured response matching test expectations

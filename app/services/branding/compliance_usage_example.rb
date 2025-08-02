@@ -201,31 +201,23 @@ module Branding
         config.async_processing = true
         config.max_processing_time = 60.seconds
       end
+    end
       
-      # Custom validator example
-      class CustomIndustryValidator < Branding::Compliance::BaseValidator
-        def validate
-          # Custom industry-specific validation logic
-          if brand.industry == "healthcare" && content.match?(/medical claim/i)
-            add_violation(
-              type: "unverified_medical_claim",
-              severity: "high",
-              message: "Medical claims must be verified and include disclaimers"
-            )
-          end
-          
-          { violations: @violations, suggestions: @suggestions }
-        end
+  end
+
+  # Custom validator example
+  class CustomIndustryValidator < Branding::Compliance::BaseValidator
+    def validate
+      # Custom industry-specific validation logic
+      if brand.industry == "healthcare" && content.match?(/medical claim/i)
+        add_violation(
+          type: "unverified_medical_claim",
+          severity: "high",
+          message: "Medical claims must be verified and include disclaimers"
+        )
       end
       
-      # Use with custom validator
-      brand = Brand.first
-      service = Branding::ComplianceServiceV2.new(
-        brand,
-        "Content with medical claims",
-        "article",
-        { custom_validators: [CustomIndustryValidator.new(brand, "content")] }
-      )
+      { violations: @violations, suggestions: @suggestions }
     end
   end
 end

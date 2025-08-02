@@ -5,14 +5,12 @@ import ReactFlow, {
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
   Node,
   Edge,
   Connection,
   ConnectionMode,
   ReactFlowProvider,
   useReactFlow,
-  ReactFlowInstance
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -97,7 +95,7 @@ interface JourneyBuilderFlowProps {
 }
 
 const JourneyBuilderFlowContent: React.FC<JourneyBuilderFlowProps> = ({
-  onSave,
+  onSave: _onSave,
   onPreview
 }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -151,10 +149,10 @@ const JourneyBuilderFlowContent: React.FC<JourneyBuilderFlowProps> = ({
   useEffect(() => {
     setNodes(convertStepsToNodes(journey.steps));
     setEdges(convertConnectionsToEdges(journey.connections));
-  }, [journey.steps, journey.connections, convertStepsToNodes, convertConnectionsToEdges]);
+  }, [journey.steps, journey.connections, convertStepsToNodes, convertConnectionsToEdges, setNodes, setEdges]);
 
   // Handle node position changes
-  const handleNodeDrag = useCallback((event: any, node: Node) => {
+  const handleNodeDrag = useCallback((event: React.MouseEvent, node: Node) => {
     moveStep(node.id, node.position);
   }, [moveStep]);
 
@@ -170,12 +168,12 @@ const JourneyBuilderFlowContent: React.FC<JourneyBuilderFlowProps> = ({
     event.preventDefault();
 
     const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
-    if (!reactFlowBounds) return;
+    if (!reactFlowBounds) {return;}
 
     const stepTypeId = event.dataTransfer.getData('application/steptype');
     const stepType = stepTypes.find(type => type.id === stepTypeId);
     
-    if (!stepType) return;
+    if (!stepType) {return;}
 
     const position = screenToFlowPosition({
       x: event.clientX - reactFlowBounds.left,

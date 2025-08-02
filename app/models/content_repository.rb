@@ -12,8 +12,11 @@ class ContentRepository < ApplicationRecord
   validates :format, presence: true
   validates :storage_path, presence: true
   validates :file_hash, presence: true
+  
+  # Virtual attributes for form handling
+  attr_accessor :body
 
-  enum status: {
+  enum :status, {
     draft: 0,
     review: 1,
     approved: 2,
@@ -22,7 +25,7 @@ class ContentRepository < ApplicationRecord
     rejected: 5
   }
 
-  enum content_type: {
+  enum :content_type, {
     email_template: 0,
     social_post: 1,
     blog_post: 2,
@@ -33,7 +36,7 @@ class ContentRepository < ApplicationRecord
     marketing_copy: 7
   }
 
-  enum format: {
+  enum :format, {
     html: 0,
     markdown: 1,
     plain_text: 2,
@@ -46,6 +49,9 @@ class ContentRepository < ApplicationRecord
   scope :by_content_type, ->(type) { where(content_type: type) }
   scope :by_status, ->(status) { where(status: status) }
   scope :recent, -> { order(created_at: :desc) }
+  scope :accessible_by, ->(user) { where(user: user) } # Simple access control - can be enhanced
+  scope :published_content, -> { where(status: 'published') }
+  scope :needs_review, -> { where(status: 'review') }
 
   before_create :generate_file_hash
   before_create :set_storage_path

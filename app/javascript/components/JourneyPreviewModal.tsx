@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Journey, JourneyStep } from '../types/journey';
+import type { Journey } from '../types/journey';
 
 interface JourneyPreviewModalProps {
   isOpen: boolean;
@@ -15,7 +15,7 @@ const JourneyPreviewModal: React.FC<JourneyPreviewModalProps> = ({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isSimulating, setIsSimulating] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   const handleStartSimulation = () => {
     setIsSimulating(true);

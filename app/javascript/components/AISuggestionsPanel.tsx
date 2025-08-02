@@ -71,8 +71,8 @@ const AISuggestionsPanel: React.FC = () => {
   };
 
   const getConfidenceColor = (confidence: number): string => {
-    if (confidence >= 0.9) return '#10b981'; // green
-    if (confidence >= 0.8) return '#f59e0b'; // amber
+    if (confidence >= 0.9) {return '#10b981';} // green
+    if (confidence >= 0.8) {return '#f59e0b';} // amber
     return '#6b7280'; // gray
   };
 

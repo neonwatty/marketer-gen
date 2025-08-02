@@ -5,7 +5,7 @@ class ContentTag < ApplicationRecord
   validates :tag_name, presence: true
   validates :tag_type, presence: true
 
-  enum tag_type: {
+  enum :tag_type, {
     category: 0,
     keyword: 1,
     custom_tag: 2,

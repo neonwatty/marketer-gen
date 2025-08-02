@@ -76,7 +76,7 @@ class JourneyBuilder {
     e.preventDefault();
     this.canvas.classList.remove('canvas-drop-zone', 'drag-over');
     
-    if (!this.draggedElement) return;
+    if (!this.draggedElement) {return;}
     
     // Get drop position relative to canvas
     const rect = this.canvas.getBoundingClientRect();
@@ -100,8 +100,8 @@ class JourneyBuilder {
     this.steps.set(stepId, {
       id: stepId,
       type: stepType,
-      stage: stage,
-      position: position,
+      stage,
+      position,
       element: stepElement,
       data: this.getDefaultStepData(stepType)
     });
@@ -195,7 +195,7 @@ class JourneyBuilder {
     this.deselectStep();
     
     const step = this.steps.get(stepId);
-    if (!step) return;
+    if (!step) {return;}
     
     this.selectedStep = stepId;
     step.element.classList.add('selected');
@@ -215,7 +215,7 @@ class JourneyBuilder {
   
   deleteStep(stepId) {
     const step = this.steps.get(stepId);
-    if (!step) return;
+    if (!step) {return;}
     
     // Remove from DOM
     step.element.remove();
@@ -250,7 +250,7 @@ class JourneyBuilder {
     const noSelection = document.getElementById('no-selection');
     const stepProperties = document.getElementById('step-properties');
     
-    if (noSelection) noSelection.classList.add('hidden');
+    if (noSelection) {noSelection.classList.add('hidden');}
     if (stepProperties) {
       stepProperties.classList.remove('hidden');
       this.populatePropertiesForm(step);
@@ -261,13 +261,13 @@ class JourneyBuilder {
     const noSelection = document.getElementById('no-selection');
     const stepProperties = document.getElementById('step-properties');
     
-    if (noSelection) noSelection.classList.remove('hidden');
-    if (stepProperties) stepProperties.classList.add('hidden');
+    if (noSelection) {noSelection.classList.remove('hidden');}
+    if (stepProperties) {stepProperties.classList.add('hidden');}
   }
   
   populatePropertiesForm(step) {
     const form = document.getElementById('step-properties');
-    if (!form) return;
+    if (!form) {return;}
     
     // Populate form fields with step data
     const nameInput = form.querySelector('#step-name');
@@ -275,10 +275,10 @@ class JourneyBuilder {
     const stageSelect = form.querySelector('#step-stage');
     const timingSelect = form.querySelector('#step-timing');
     
-    if (nameInput) nameInput.value = step.data.title || '';
-    if (descInput) descInput.value = step.data.description || '';
-    if (stageSelect) stageSelect.value = step.stage || '';
-    if (timingSelect) timingSelect.value = step.data.timing || 'immediate';
+    if (nameInput) {nameInput.value = step.data.title || '';}
+    if (descInput) {descInput.value = step.data.description || '';}
+    if (stageSelect) {stageSelect.value = step.stage || '';}
+    if (timingSelect) {timingSelect.value = step.data.timing || 'immediate';}
     
     // Populate step-type specific fields
     this.populateStepTypeFields(form, step);
@@ -290,16 +290,16 @@ class JourneyBuilder {
     const emailTemplate = form.querySelector('#email-template');
     
     if (step.type === 'email_sequence' || step.type === 'newsletter') {
-      if (emailSubject) emailSubject.value = step.data.subject || '';
-      if (emailTemplate) emailTemplate.value = step.data.template || '';
+      if (emailSubject) {emailSubject.value = step.data.subject || '';}
+      if (emailTemplate) {emailTemplate.value = step.data.template || '';}
     }
   }
   
   handlePropertyChange(e) {
-    if (!this.selectedStep) return;
+    if (!this.selectedStep) {return;}
     
     const step = this.steps.get(this.selectedStep);
-    if (!step) return;
+    if (!step) {return;}
     
     const field = e.target.name || e.target.id;
     const value = e.target.value;
@@ -340,15 +340,15 @@ class JourneyBuilder {
     const descElement = step.element.querySelector('.text-xs.text-gray-500');
     const timingElement = step.element.querySelector('.text-xs.text-gray-400 span');
     
-    if (titleElement) titleElement.textContent = step.data.title;
-    if (descElement) descElement.textContent = step.data.description;
-    if (timingElement) timingElement.textContent = step.data.timing;
+    if (titleElement) {titleElement.textContent = step.data.title;}
+    if (descElement) {descElement.textContent = step.data.description;}
+    if (timingElement) {timingElement.textContent = step.data.timing;}
   }
   
   // Step Movement (for existing steps)
   handleStepDragStart(e) {
     const stepElement = e.target.closest('.journey-step');
-    if (!stepElement) return;
+    if (!stepElement) {return;}
     
     this.draggedStep = stepElement.dataset.stepId;
     stepElement.classList.add('dragging');

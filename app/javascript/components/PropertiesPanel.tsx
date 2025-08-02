@@ -19,7 +19,7 @@ const PropertiesPanel: React.FC = () => {
     }
   }, [currentStep]);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -41,7 +41,7 @@ const PropertiesPanel: React.FC = () => {
     }
   };
 
-  const handleDataChange = (field: string, value: any) => {
+  const handleDataChange = (field: string, value: string | number | boolean | Record<string, unknown>) => {
     const newData = {
       ...currentStep?.data,
       [field]: value

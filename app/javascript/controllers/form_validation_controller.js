@@ -87,7 +87,7 @@ export default class extends Controller {
   }
 
   validatePasswordConfirmation() {
-    if (!this.hasPasswordConfirmationFieldTarget) return
+    if (!this.hasPasswordConfirmationFieldTarget) {return}
     
     const password = this.passwordFieldTarget.value
     const confirmation = this.passwordConfirmationFieldTarget.value
@@ -111,7 +111,7 @@ export default class extends Controller {
   }
 
   updatePasswordStrength(password) {
-    if (!this.hasPasswordStrengthTarget) return
+    if (!this.hasPasswordStrengthTarget) {return}
 
     const strength = this.calculatePasswordStrength(password)
     const strengthElement = this.passwordStrengthTarget

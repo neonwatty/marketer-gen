@@ -47,3 +47,27 @@ email_treatment:
   conversions: 18
   conversion_rate: 3.75
   confidence_interval: 80.0
+
+control:
+  ab_test: conversion_test
+  journey: onboarding_control
+  name: "control"
+  variant_type: "control"
+  is_control: true
+  traffic_percentage: 50.0
+  total_visitors: 0
+  conversions: 0
+  conversion_rate: 0.0
+  confidence_interval: 0.0
+
+treatment_a:
+  ab_test: conversion_test
+  journey: onboarding_treatment
+  name: "treatment_a"
+  variant_type: "treatment"
+  is_control: false
+  traffic_percentage: 50.0
+  total_visitors: 0
+  conversions: 0
+  conversion_rate: 0.0
+  confidence_interval: 0.0

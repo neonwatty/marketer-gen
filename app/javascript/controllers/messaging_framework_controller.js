@@ -75,7 +75,7 @@ export default class extends Controller {
     if (energySlider) {
       energySlider.addEventListener('input', (e) => {
         const display = this.element.querySelector('[data-energy-level-display]')
-        if (display) display.textContent = e.target.value
+        if (display) {display.textContent = e.target.value}
         this.updateToneAttribute('energy_level', parseInt(e.target.value))
       })
     }
@@ -108,7 +108,7 @@ export default class extends Controller {
   // Key Messages Management
   async addKeyMessageCategory(event) {
     const categoryName = prompt('Enter category name:')
-    if (!categoryName) return
+    if (!categoryName) {return}
 
     const container = this.element.querySelector('[data-key-messages-container]')
     const categoryHtml = this.createKeyMessageCategoryHtml(categoryName, [])
@@ -186,7 +186,7 @@ export default class extends Controller {
 
   async removeKeyMessageCategory(event) {
     const category = event.currentTarget.dataset.category
-    if (!confirm(`Remove category "${category}" and all its messages?`)) return
+    if (!confirm(`Remove category "${category}" and all its messages?`)) {return}
 
     const categoryElement = this.element.querySelector(`.key-message-category[data-category="${category}"]`)
     if (categoryElement) {
@@ -201,7 +201,7 @@ export default class extends Controller {
     const input = this.element.querySelector(`[data-new-message-input="${category}"]`)
     const message = input.value.trim()
     
-    if (!message) return
+    if (!message) {return}
 
     try {
       const response = await fetch(`/brands/${this.brandId}/messaging_framework/add_key_message`, {
@@ -251,7 +251,7 @@ export default class extends Controller {
     const category = event.currentTarget.dataset.category
     const index = event.currentTarget.dataset.index
     
-    if (!confirm('Remove this message?')) return
+    if (!confirm('Remove this message?')) {return}
 
     try {
       const response = await fetch(`/brands/${this.brandId}/messaging_framework/remove_key_message`, {
@@ -308,7 +308,7 @@ export default class extends Controller {
     const input = this.element.querySelector(`[data-new-value-prop-input="${type}"]`)
     const proposition = input.value.trim()
     
-    if (!proposition) return
+    if (!proposition) {return}
 
     try {
       const response = await fetch(`/brands/${this.brandId}/messaging_framework/add_value_proposition`, {
@@ -361,7 +361,7 @@ export default class extends Controller {
     const type = event.currentTarget.dataset.type
     const index = event.currentTarget.dataset.index
     
-    if (!confirm('Remove this value proposition?')) return
+    if (!confirm('Remove this value proposition?')) {return}
 
     try {
       const response = await fetch(`/brands/${this.brandId}/messaging_framework/remove_value_proposition`, {
@@ -415,10 +415,10 @@ export default class extends Controller {
   // Terminology Management
   async addTerminology(event) {
     const term = prompt('Enter the term:')
-    if (!term) return
+    if (!term) {return}
     
     const definition = prompt('Enter the definition:')
-    if (!definition) return
+    if (!definition) {return}
 
     const container = this.element.querySelector('[data-terminology-container]')
     const termHtml = `
@@ -438,7 +438,7 @@ export default class extends Controller {
     
     // Remove empty state if it exists
     const emptyState = container.parentElement.querySelector('.text-center.py-12')
-    if (emptyState) emptyState.remove()
+    if (emptyState) {emptyState.remove()}
     
     container.insertAdjacentHTML('beforeend', termHtml)
     this.unsavedChanges = true
@@ -447,7 +447,7 @@ export default class extends Controller {
   async removeTerminology(event) {
     const term = event.currentTarget.dataset.term
     
-    if (!confirm(`Remove term "${term}"?`)) return
+    if (!confirm(`Remove term "${term}"?`)) {return}
 
     event.currentTarget.closest('.terminology-item').remove()
     this.unsavedChanges = true
@@ -458,7 +458,7 @@ export default class extends Controller {
     const input = this.element.querySelector('[data-approved-phrases-input]')
     const phrases = input.value.split(',').map(p => p.trim()).filter(p => p)
     
-    if (phrases.length === 0) return
+    if (phrases.length === 0) {return}
 
     try {
       const response = await fetch(`/brands/${this.brandId}/messaging_framework/update_approved_phrases`, {
@@ -479,7 +479,7 @@ export default class extends Controller {
         
         // Remove empty state if it exists
         const emptyState = container.parentElement.querySelector('.text-center.py-12')
-        if (emptyState) emptyState.remove()
+        if (emptyState) {emptyState.remove()}
         
         phrases.forEach(phrase => {
           const phraseHtml = `
@@ -510,7 +510,7 @@ export default class extends Controller {
   async removeApprovedPhrase(event) {
     const phrase = event.currentTarget.dataset.phrase
     
-    if (!confirm(`Remove phrase "${phrase}"?`)) return
+    if (!confirm(`Remove phrase "${phrase}"?`)) {return}
 
     const currentPhrases = this.getCurrentApprovedPhrases()
     const updatedPhrases = currentPhrases.filter(p => p !== phrase)
@@ -566,7 +566,7 @@ export default class extends Controller {
     const phrases = []
     this.element.querySelectorAll('[data-approved-phrases-container] span').forEach(span => {
       const text = span.textContent.trim()
-      if (text) phrases.push(text)
+      if (text) {phrases.push(text)}
     })
     return phrases
   }
@@ -576,7 +576,7 @@ export default class extends Controller {
     const input = this.element.querySelector('[data-banned-words-input]')
     const words = input.value.split(',').map(w => w.trim().toLowerCase()).filter(w => w)
     
-    if (words.length === 0) return
+    if (words.length === 0) {return}
 
     try {
       const response = await fetch(`/brands/${this.brandId}/messaging_framework/update_banned_words`, {
@@ -597,7 +597,7 @@ export default class extends Controller {
         
         // Remove empty state if it exists
         const emptyState = container.parentElement.querySelector('.text-center.py-8')
-        if (emptyState) emptyState.remove()
+        if (emptyState) {emptyState.remove()}
         
         words.forEach(word => {
           const wordHtml = `
@@ -628,7 +628,7 @@ export default class extends Controller {
   async removeBannedWord(event) {
     const word = event.currentTarget.dataset.word
     
-    if (!confirm(`Remove banned word "${word}"?`)) return
+    if (!confirm(`Remove banned word "${word}"?`)) {return}
 
     const currentWords = this.getCurrentBannedWords()
     const updatedWords = currentWords.filter(w => w !== word)
@@ -666,7 +666,7 @@ export default class extends Controller {
     const words = []
     this.element.querySelectorAll('[data-banned-words-container] span').forEach(span => {
       const text = span.textContent.trim()
-      if (text) words.push(text)
+      if (text) {words.push(text)}
     })
     return words
   }
@@ -683,7 +683,7 @@ export default class extends Controller {
     const textarea = this.element.querySelector('[data-compliance-test-input]')
     const content = textarea.value.trim()
     
-    if (!content) return
+    if (!content) {return}
 
     try {
       const response = await fetch(`/brands/${this.brandId}/messaging_framework/validate_content`, {
@@ -852,7 +852,7 @@ export default class extends Controller {
 
   async importFramework(event) {
     const file = event.target.files[0]
-    if (!file) return
+    if (!file) {return}
 
     const formData = new FormData()
     formData.append('file', file)
@@ -991,25 +991,25 @@ export default class extends Controller {
     // Update key messages count
     const keyMessagesCount = this.element.querySelectorAll('.message-item').length
     const keyMessagesDisplay = this.element.querySelector('[data-stat="key-messages-count"]')
-    if (keyMessagesDisplay) keyMessagesDisplay.textContent = keyMessagesCount
+    if (keyMessagesDisplay) {keyMessagesDisplay.textContent = keyMessagesCount}
 
     // Update value propositions count
     const valuePropsCount = this.element.querySelectorAll('.value-prop-item').length
     const valuePropsDisplay = this.element.querySelector('[data-stat="value-props-count"]')
-    if (valuePropsDisplay) valuePropsDisplay.textContent = valuePropsCount
+    if (valuePropsDisplay) {valuePropsDisplay.textContent = valuePropsCount}
 
     // Update approved phrases count
     const approvedPhrasesCount = this.element.querySelectorAll('[data-approved-phrases-container] span').length
     const approvedPhrasesDisplay = this.element.querySelector('[data-stat="approved-phrases-count"]')
-    if (approvedPhrasesDisplay) approvedPhrasesDisplay.textContent = approvedPhrasesCount
+    if (approvedPhrasesDisplay) {approvedPhrasesDisplay.textContent = approvedPhrasesCount}
 
     // Update banned words count
     const bannedWordsCount = this.element.querySelectorAll('[data-banned-words-container] span').length
     const bannedWordsDisplay = this.element.querySelector('[data-stat="banned-words-count"]')
-    if (bannedWordsDisplay) bannedWordsDisplay.textContent = bannedWordsCount
+    if (bannedWordsDisplay) {bannedWordsDisplay.textContent = bannedWordsCount}
     
     const bannedWordsCountBadge = this.element.querySelector('[data-banned-words-count]')
-    if (bannedWordsCountBadge) bannedWordsCountBadge.textContent = bannedWordsCount
+    if (bannedWordsCountBadge) {bannedWordsCountBadge.textContent = bannedWordsCount}
   }
 
   escapeHtml(text) {

@@ -1,0 +1,218 @@
+<div class="channel-strategy-overview" data-controller="channel-allocation">
+  <% if channel_data.present? %>
+    <!-- Channel Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <% channel_data.each do |channel| %>
+        <div class="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow duration-200">
+          <!-- Channel Header -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-blue-100 rounded-lg">
+                <%= channel_icon(channel[:slug]) %>
+              </div>
+              <div>
+                <h4 class="text-sm font-medium text-gray-900"><%= channel[:name] %></h4>
+                <p class="text-xs text-gray-500"><%= channel[:slug].humanize %></p>
+              </div>
+            </div>
+            
+            <!-- Budget Allocation -->
+            <div class="text-right">
+              <div class="text-lg font-bold text-gray-900">
+                $<%= number_with_delimiter(channel[:budget_allocation]) %>
+              </div>
+              <div class="text-xs text-gray-500">
+                <%= budget_percentage(channel[:budget_allocation], budget_data[:total_budget]) %>%
+              </div>
+            </div>
+          </div>
+
+          <!-- Expected Reach -->
+          <div class="mb-4">
+            <div class="flex items-center justify-between text-sm mb-1">
+              <span class="text-gray-600">Expected Reach</span>
+              <span class="font-medium text-gray-900">
+                <%= number_with_delimiter(channel[:expected_reach]) %>
+              </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                   style="width: <%= reach_percentage(channel[:expected_reach], channel_data) %>%"></div>
+            </div>
+          </div>
+
+          <!-- Primary KPIs -->
+          <div>
+            <h5 class="text-xs font-medium text-gray-700 uppercase tracking-wide mb-2">Key Metrics</h5>
+            <div class="flex flex-wrap gap-1">
+              <% channel[:primary_kpis].each do |kpi| %>
+                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                  <%= kpi %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Budget Allocation Chart -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-medium text-gray-900">Budget Allocation</h3>
+        <div class="text-sm text-gray-600">
+          Total: <span class="font-medium text-gray-900">$<%= number_with_delimiter(budget_data[:total_budget]) %></span>
+        </div>
+      </div>
+
+      <!-- Budget Visualization -->
+      <div class="space-y-4">
+        <% channel_data.each do |channel| %>
+          <div class="flex items-center gap-4">
+            <div class="w-24 text-sm text-gray-700 text-right">
+              <%= channel[:name] %>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <div class="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div class="h-full bg-blue-600 rounded-full transition-all duration-500" 
+                       style="width: <%= budget_percentage(channel[:budget_allocation], budget_data[:total_budget]) %>%"></div>
+                </div>
+                <div class="w-20 text-sm text-gray-900 text-right">
+                  $<%= number_with_delimiter(channel[:budget_allocation]) %>
+                </div>
+                <div class="w-12 text-xs text-gray-500 text-right">
+                  <%= budget_percentage(channel[:budget_allocation], budget_data[:total_budget]) %>%
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <!-- Reserve Budget -->
+        <% if budget_data[:recommended_reserves] && budget_data[:recommended_reserves] > 0 %>
+          <div class="flex items-center gap-4 pt-2 border-t border-gray-100">
+            <div class="w-24 text-sm text-gray-500 text-right">
+              Reserve
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <div class="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div class="h-full bg-gray-400 rounded-full transition-all duration-500" 
+                       style="width: <%= budget_percentage(budget_data[:recommended_reserves], budget_data[:total_budget]) %>%"></div>
+                </div>
+                <div class="w-20 text-sm text-gray-700 text-right">
+                  $<%= number_with_delimiter(budget_data[:recommended_reserves]) %>
+                </div>
+                <div class="w-12 text-xs text-gray-500 text-right">
+                  <%= budget_percentage(budget_data[:recommended_reserves], budget_data[:total_budget]) %>%
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Phase Budget Breakdown -->
+    <% if budget_data[:phase_allocation].present? %>
+      <div class="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-6">Budget by Phase</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <% budget_data[:phase_allocation].each do |phase_budget| %>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-medium text-gray-900">
+                  <%= phase_budget[:phase].humanize %>
+                </h4>
+                <span class="text-xs text-gray-500">
+                  <%= phase_budget[:percentage] %>%
+                </span>
+              </div>
+              <div class="text-lg font-bold text-gray-900">
+                $<%= number_with_delimiter(phase_budget[:budget]) %>
+              </div>
+              
+              <!-- Phase Budget Bar -->
+              <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-green-600 h-2 rounded-full transition-all duration-300" 
+                     style="width: <%= phase_budget[:percentage] %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+  <% else %>
+    <!-- Empty State -->
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No channel strategy defined</h3>
+      <p class="mt-1 text-sm text-gray-500">Add marketing channels and budget allocation to get started.</p>
+      <div class="mt-6">
+        <button type="button" 
+                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                data-action="click->channel-allocation#addChannel">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Channels
+        </button>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Channel Performance Insights -->
+<% if channel_data.present? %>
+  <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-blue-800">Channel Strategy Insights</h3>
+        <div class="mt-2 text-sm text-blue-700">
+          <ul class="space-y-1">
+            <li>• You're using <%= channel_data.length %> marketing channels with balanced budget allocation</li>
+            <li>• Top channel by budget: <%= top_channel_by_budget(channel_data)[:name] %> (<%= budget_percentage(top_channel_by_budget(channel_data)[:budget_allocation], budget_data[:total_budget]) %>%)</li>
+            <li>• Expected total reach: <%= number_with_delimiter(total_expected_reach(channel_data)) %> potential customers</li>
+            <% if budget_data[:recommended_reserves] && budget_data[:recommended_reserves] > 0 %>
+              <li>• Reserve budget: $<%= number_with_delimiter(budget_data[:recommended_reserves]) %> (recommended for optimizations)</li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% content_for :javascript do %>
+  <script>
+    // Helper functions for channel strategy
+    function channelIcon(slug) {
+      const icons = {
+        'social_media': '<svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+        'email': '<svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>',
+        'paid_search': '<svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>',
+        'content_marketing': '<svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"></path></svg>'
+      };
+      return icons[slug] || '<svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path></svg>';
+    }
+    
+    function budgetPercentage(amount, total) {
+      return total > 0 ? Math.round((amount / total) * 100) : 0;
+    }
+    
+    function reachPercentage(reach, allChannels) {
+      const maxReach = Math.max(...allChannels.map(c => c.expected_reach));
+      return maxReach > 0 ? Math.round((reach / maxReach) * 100) : 0;
+    }
+  </script>
+<% end %>

@@ -48,6 +48,22 @@ class User < ApplicationRecord
   def admin?
     role == "admin"
   end
+
+  # Generic role checking method for content management system
+  def has_role?(role_symbol)
+    case role_symbol
+    when :content_creator
+      marketer? || team_member? || admin?
+    when :content_reviewer
+      team_member? || admin?
+    when :content_manager
+      admin?
+    when :viewer
+      true
+    else
+      send("#{role_symbol}?") if respond_to?("#{role_symbol}?")
+    end
+  end
   
   # Password reset token generation
   def password_reset_token

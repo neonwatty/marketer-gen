@@ -229,10 +229,10 @@ const importFromJSON = (data: string): ImportResult => {
     // Validate steps
     const errors: string[] = [];
     journeyData.steps.forEach((step: any, index: number) => {
-      if (!step.id) errors.push(`Step ${index + 1}: missing ID`);
-      if (!step.type) errors.push(`Step ${index + 1}: missing type`);
-      if (!step.stage) errors.push(`Step ${index + 1}: missing stage`);
-      if (!step.data) errors.push(`Step ${index + 1}: missing data`);
+      if (!step.id) {errors.push(`Step ${index + 1}: missing ID`);}
+      if (!step.type) {errors.push(`Step ${index + 1}: missing type`);}
+      if (!step.stage) {errors.push(`Step ${index + 1}: missing stage`);}
+      if (!step.data) {errors.push(`Step ${index + 1}: missing data`);}
     });
 
     if (errors.length > 0) {

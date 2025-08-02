@@ -67,7 +67,7 @@ export default class extends Controller {
   // Select template
   selectTemplate(event) {
     const templateId = event.currentTarget.dataset.templateId
-    const template = this.templatesValue.find(t => t.id == templateId)
+    const template = this.templatesValue.find(t => t.id === templateId)
     
     if (template) {
       this.applyTemplate(template)
@@ -206,7 +206,7 @@ export default class extends Controller {
       if (input) {
         let value = trafficPerVariant
         // Add remainder to first variant
-        if (index === 0) value += remainder
+        if (index === 0) {value += remainder}
         input.value = value
       }
     })
@@ -220,9 +220,6 @@ export default class extends Controller {
     const confidenceLevel = parseFloat(document.querySelector('select[name="ab_test[confidence_level]"]')?.value) || 95
     
     // Basic sample size calculation (simplified)
-    const alpha = (100 - confidenceLevel) / 100
-    const beta = (100 - power) / 100
-    
     const p1 = baselineRate / 100
     const p2 = p1 * (1 + mde / 100)
     
@@ -230,8 +227,19 @@ export default class extends Controller {
     const effectSize = Math.abs(p2 - p1)
     
     // Z-scores (approximated)
-    const zAlpha = confidenceLevel === 95 ? 1.96 : confidenceLevel === 90 ? 1.645 : 2.576
-    const zBeta = power === 80 ? 0.84 : power === 90 ? 1.28 : 1.645
+    let zAlpha = 2.576
+    if (confidenceLevel === 95) {
+      zAlpha = 1.96
+    } else if (confidenceLevel === 90) {
+      zAlpha = 1.645
+    }
+    
+    let zBeta = 1.645
+    if (power === 80) {
+      zBeta = 0.84
+    } else if (power === 90) {
+      zBeta = 1.28
+    }
     
     const sampleSizePerVariant = Math.ceil(
       (2 * pooledP * (1 - pooledP) * Math.pow(zAlpha + zBeta, 2)) / Math.pow(effectSize, 2)

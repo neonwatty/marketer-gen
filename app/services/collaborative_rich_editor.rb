@@ -4,49 +4,61 @@ class CollaborativeRichEditor
   def initialize(content_id)
     @content_id = content_id
     @errors = []
+    @active_sessions = {} # Track active collaboration sessions by editor_id
   end
 
   def initialize_editor(user)
-    begin
-      editor_id = generate_editor_id
-      websocket_url = generate_websocket_url(editor_id)
+    editor_id = generate_editor_id
+    websocket_url = generate_websocket_url(editor_id)
 
-      {
-        editor_id: editor_id,
-        user_id: user.id,
-        websocket_connection_url: websocket_url,
-        active_collaborators: []
-      }
-    rescue => e
-      @errors << e.message
-      raise NoMethodError, "CollaborativeRichEditor#initialize_editor not implemented"
-    end
+    # Initialize session with the first user
+    @active_sessions[editor_id] = {
+      editor_id: editor_id,
+      active_collaborators: [{ user_id: user.id, joined_at: Time.current, cursor_position: 0 }],
+      session_started_at: Time.current
+    }
+
+    {
+      editor_id: editor_id,
+      user_id: user.id,
+      websocket_connection_url: websocket_url,
+      active_collaborators: []
+    }
+  rescue => e
+    @errors << e.message
+    { success: false, error: e.message }
   end
 
   def join_collaboration_session(user, editor_id)
-    begin
-      # Simulate user joining the collaboration session
-      {
-        success: true,
-        editor_id: editor_id,
+    session = @active_sessions[editor_id]
+    return { success: false, error: "Session not found" } unless session
+
+    # Add user to session if not already present
+    unless session[:active_collaborators].any? { |c| c[:user_id] == user.id }
+      session[:active_collaborators] << {
         user_id: user.id,
-        joined_at: Time.current
+        joined_at: Time.current,
+        cursor_position: 0
       }
-    rescue => e
-      @errors << e.message
-      { success: false, error: e.message }
     end
+
+    {
+      success: true,
+      editor_id: editor_id,
+      user_id: user.id,
+      joined_at: Time.current
+    }
+  rescue => e
+    @errors << e.message
+    { success: false, error: e.message }
   end
 
   def get_active_session(editor_id)
-    # Simulate active collaboration session with multiple users
-    {
+    @active_sessions[editor_id] || {
       editor_id: editor_id,
-      active_collaborators: [
-        { user_id: 1, joined_at: 5.minutes.ago, cursor_position: 25 },
-        { user_id: 2, joined_at: 2.minutes.ago, cursor_position: 45 }
-      ],
-      session_started_at: 10.minutes.ago
+      active_collaborators: [],
+      session_started_at: nil,
+      error: "Session not found"
     }
   end
 

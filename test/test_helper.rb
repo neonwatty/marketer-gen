@@ -86,6 +86,61 @@ module ActiveSupport
           headers: { 'Content-Type' => 'application/json' }
         )
     end
+
+    # Helper method to mock LLM service responses for campaign planning
+    def mock_campaign_planning_llm_response
+      response_data = {
+        "strategic_rationale" => { "rationale" => "Comprehensive campaign strategy" },
+        "target_audience" => { "primary" => "Tech professionals" },
+        "success_metrics" => { "leads" => 100, "conversions" => 10 },
+        "timeline" => { "duration_weeks" => 8 },
+        "channels" => ["email", "social", "content"]
+      }
+      
+      LlmService.any_instance.stubs(:analyze).returns(response_data.to_json)
+      stub_request(:post, /api\.openai\.com/)
+        .to_return(
+          status: 200,
+          body: {
+            choices: [
+              {
+                message: {
+                  content: response_data.to_json
+                }
+              }
+            ]
+          }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+    end
+
+    # Helper method to mock creative approach responses
+    def mock_creative_approach_llm_response
+      response_data = {
+        "main_theme" => "Innovation meets excellence",
+        "creative_direction" => "Professional, modern approach",
+        "emotional_appeal" => "Confidence and empowerment",
+        "narrative_structure" => "Challenge to solution to success",
+        "key_visuals" => ["Professional team collaboration", "Data visualization"],
+        "content_pillars" => ["Industry expertise", "Customer success"]
+      }
+      
+      LlmService.any_instance.stubs(:analyze).returns(response_data.to_json)
+      stub_request(:post, /api\.openai\.com/)
+        .to_return(
+          status: 200,
+          body: {
+            choices: [
+              {
+                message: {
+                  content: response_data.to_json
+                }
+              }
+            ]
+          }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+    end
     
     # Helper to sign in a user (alias for controller tests)
     def sign_in(user, password = "password")
@@ -139,3 +194,23 @@ module VCR
     yield if block_given?
   end
 end
+
+# A/B Testing service class aliases for backward compatibility
+# Create global aliases for namespaced services to make tests work
+AbTestVariantGenerator = AbTesting::AbTestVariantGenerator
+MessagingVariantEngine = AbTesting::MessagingVariantEngine
+VisualVariantEngine = AbTesting::VisualVariantEngine
+AbTestVariantManager = AbTesting::AbTestVariantManager
+AbTestTrafficSplitter = AbTesting::AbTestTrafficSplitter
+AdaptiveTrafficAllocator = AbTesting::AdaptiveTrafficAllocator
+ConstrainedTrafficAllocator = AbTesting::ConstrainedTrafficAllocator
+RealTimeAbTestMetrics = AbTesting::RealTimeAbTestMetrics
+AbTestStatisticalAnalyzer = AbTesting::AbTestStatisticalAnalyzer
+BayesianAbTestAnalyzer = AbTesting::BayesianAbTestAnalyzer
+AbTestConfidenceCalculator = AbTesting::AbTestConfidenceCalculator
+AbTestEarlyStopping = AbTesting::AbTestEarlyStopping
+AbTestWinnerDeclarator = AbTesting::AbTestWinnerDeclarator
+AbTestAIRecommender = AbTesting::AbTestAiRecommender
+AbTestPatternRecognizer = AbTesting::AbTestPatternRecognizer
+AbTestOptimizationAI = AbTesting::AbTestOptimizationAi
+AbTestOutcomePredictor = AbTesting::AbTestOutcomePredictor

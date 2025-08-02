@@ -33,7 +33,7 @@ export default class extends Controller {
           'Content-Type': 'application/json',
           'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
         },
-        body: JSON.stringify({ items: items })
+        body: JSON.stringify({ items })
       })
       
       if (!response.ok) {

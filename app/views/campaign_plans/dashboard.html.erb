@@ -1,0 +1,266 @@
+<% content_for(:title) { "#{@campaign_plan.name} - Campaign Planning Dashboard" } %>
+
+<div class="campaign-planning-dashboard" data-controller="campaign-dashboard" data-campaign-dashboard-plan-id-value="<%= @campaign_plan.id %>">
+  <!-- Dashboard Header -->
+  <div class="bg-white border-b border-gray-200 mb-8">
+    <div class="px-6 py-4">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-2">
+            <%= link_to campaign_campaign_plans_path(@campaign_plan.campaign), 
+                class: "text-gray-500 hover:text-gray-700 transition-colors" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            <% end %>
+            <h1 class="text-heading-h2 font-bold text-gray-900 m-0"><%= @campaign_plan.name %></h1>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= status_badge_classes(@campaign_plan.status) %>">
+              <%= @campaign_plan.status.humanize %>
+            </span>
+          </div>
+          <p class="text-base text-gray-600">Campaign: <span class="font-medium"><%= @campaign_plan.campaign.name %></span></p>
+          <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
+            <span>Version <%= @campaign_plan.version %></span>
+            <span>•</span>
+            <span>Created <%= @campaign_plan.created_at.strftime("%B %d, %Y") %></span>
+            <span>•</span>
+            <span><%= @campaign_plan.completion_percentage %>% Complete</span>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="hidden lg:flex items-center gap-2">
+            <button type="button" 
+                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    data-action="click->campaign-dashboard#saveTemplate">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              Save as Template
+            </button>
+            
+            <div class="relative" data-controller="dropdown">
+              <button type="button" 
+                      class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                      data-action="click->dropdown#toggle">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                <div class="py-1">
+                  <%= link_to export_campaign_plan_path(@campaign_plan, format: 'pdf'), 
+                      class: "flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors" do %>
+                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Export as PDF
+                  <% end %>
+                  <%= link_to export_campaign_plan_path(@campaign_plan, format: 'pptx'), 
+                      class: "flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors" do %>
+                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Export as PowerPoint
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <% if can_edit_plan?(@campaign_plan) %>
+            <%= link_to edit_campaign_plan_path(@campaign_plan), 
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Plan
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="px-6 space-y-8">
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Timeline</dt>
+                <dd class="text-lg font-semibold text-gray-900"><%= @campaign_plan.estimated_duration_weeks %> weeks</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Budget</dt>
+                <dd class="text-lg font-semibold text-gray-900">$<%= number_with_delimiter(@campaign_plan.total_budget) %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Channels</dt>
+                <dd class="text-lg font-semibold text-gray-900"><%= @campaign_plan.channel_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">Phases</dt>
+                <dd class="text-lg font-semibold text-gray-900"><%= @campaign_plan.phase_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Timeline Visualization -->
+      <div class="lg:col-span-2">
+        <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-medium text-gray-900">Campaign Timeline</h3>
+              <button type="button" 
+                      class="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      data-action="click->campaign-dashboard#toggleTimelineView">
+                Switch View
+              </button>
+            </div>
+          </div>
+          <div class="p-6">
+            <div id="timeline-container" data-campaign-dashboard-target="timeline">
+              <%= render 'timeline_visualization', timeline_data: @timeline_data %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collaboration Panel -->
+      <div class="space-y-6">
+        <!-- Approval Status -->
+        <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Approval Status</h3>
+          </div>
+          <div class="p-6">
+            <%= render 'approval_status', campaign_plan: @campaign_plan, collaboration_data: @collaboration_data %>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+          </div>
+          <div class="p-6">
+            <%= render 'recent_activity', collaboration_data: @collaboration_data %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Channel Strategy Overview -->
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Channel Strategy & Budget Allocation</h3>
+      </div>
+      <div class="p-6">
+        <%= render 'channel_strategy', channel_data: @channel_data, budget_data: @budget_data %>
+      </div>
+    </div>
+
+    <!-- Success Metrics Dashboard -->
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Success Metrics & KPIs</h3>
+      </div>
+      <div class="p-6">
+        <%= render 'success_metrics', metrics_data: @metrics_data %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Action Sheet -->
+<div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 safe-area-bottom">
+  <div class="flex gap-3">
+    <% if can_edit_plan?(@campaign_plan) %>
+      <%= link_to edit_campaign_plan_path(@campaign_plan), 
+          class: "flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit
+      <% end %>
+    <% end %>
+    
+    <button type="button" 
+            class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            data-action="click->campaign-dashboard#showExportMenu">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      Export
+    </button>
+  </div>
+</div>
