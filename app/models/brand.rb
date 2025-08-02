@@ -8,6 +8,17 @@ class Brand < ApplicationRecord
   has_many :brand_analyses, dependent: :destroy
   has_many :journeys
   has_many :compliance_results, dependent: :destroy
+  has_many :social_media_integrations, dependent: :destroy
+  has_many :social_media_metrics, through: :social_media_integrations
+  has_many :email_integrations, dependent: :destroy
+  has_many :email_campaigns, through: :email_integrations
+  has_many :email_metrics, through: :email_integrations
+  has_many :email_subscribers, through: :email_integrations
+  has_many :email_automations, through: :email_integrations
+  has_many :crm_integrations, dependent: :destroy
+  has_many :crm_leads, through: :crm_integrations
+  has_many :crm_opportunities, through: :crm_integrations
+  has_many :crm_analytics, through: :crm_integrations
 
   # Validations
   validates :name, presence: true, uniqueness: { scope: :user_id }

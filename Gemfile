@@ -108,3 +108,34 @@ gem "oj", "~> 3.16"
 gem "pdf-reader", "~> 2.11"
 gem "docx", "~> 0.8"
 gem "rubyzip", "~> 2.3"
+
+# OAuth and social media API integrations
+gem "oauth2", "~> 2.0"
+gem "jwt", "~> 2.7"
+gem "redis", "~> 5.0"
+
+# Google API integrations for analytics
+gem "google-ads-googleads", "~> 34.0"
+gem "google-analytics-data", "~> 0.7"
+gem "google-apis-webmasters_v3", "~> 0.6"
+gem "google-apis-analyticsreporting_v4", "~> 0.17"
+gem "googleauth", "~> 1.8"
+
+# ETL and Background Processing
+gem "sidekiq", "~> 7.2"
+gem "sidekiq-scheduler", "~> 5.0"
+gem "sidekiq-cron", "~> 1.11"
+
+# Data Processing and Compression
+# Note: Using built-in Zlib for compression instead of Snappy
+
+# Data Validation and Transformation
+gem "dry-validation", "~> 1.10"
+gem "dry-transformer", "~> 1.0" 
+gem "dry-types", "~> 1.7"
+
+# Rate Limiting and Circuit Breaker
+gem "rack-attack", "~> 6.7"
+
+# Monitoring and Logging
+gem "lograge", "~> 0.13"

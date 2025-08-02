@@ -60,6 +60,18 @@ Rails.application.routes.draw do
       end
     end
     resources :brand_guidelines
+    
+    # Social Media Integrations
+    resources :social_media_integrations, path: 'social-media' do
+      member do
+        post :refresh_token
+        post :sync_metrics
+      end
+      collection do
+        post :sync_all
+      end
+    end
+    
     resource :messaging_framework do
       member do
         patch :update_key_messages
@@ -238,6 +250,56 @@ Rails.application.routes.draw do
         get :questionnaire
         post :complete
       end
+      
+      # Google Analytics Integration API
+      namespace :google_analytics, path: 'google-analytics' do
+        # Google OAuth Routes
+        get 'oauth/authorize', action: :google_oauth_authorize, controller: :analytics
+        post 'oauth/callback', action: :google_oauth_callback, controller: :analytics
+        delete 'oauth/revoke', action: :google_oauth_revoke, controller: :analytics
+        
+        # Google Ads API Routes
+        namespace :google_ads, path: 'google-ads' do
+          get :accounts, action: :google_ads_accounts, controller: :analytics
+          post :performance, action: :google_ads_performance, controller: :analytics
+          post :conversions, action: :google_ads_conversions, controller: :analytics
+          post :budget_monitoring, action: :google_ads_budget_monitoring, controller: :analytics
+          post :keyword_performance, action: :google_ads_keyword_performance, controller: :analytics
+          post :audience_insights, action: :google_ads_audience_insights, controller: :analytics
+        end
+        
+        # Google Analytics 4 (GA4) API Routes
+        namespace :ga4 do
+          get :properties, action: :ga4_properties, controller: :analytics
+          post :website_analytics, action: :ga4_analytics, controller: :analytics
+          post :user_journey, action: :ga4_user_journey, controller: :analytics
+          post :audience_insights, action: :ga4_audience_insights, controller: :analytics
+          post :ecommerce, action: :ga4_ecommerce, controller: :analytics
+          post :realtime, action: :ga4_realtime, controller: :analytics
+          post :cohort_analysis, action: :ga4_cohort_analysis, controller: :analytics
+        end
+        
+        # Google Search Console API Routes
+        namespace :search_console, path: 'search-console' do
+          get :sites, action: :search_console_sites, controller: :analytics
+          post :search_analytics, action: :search_console_data, controller: :analytics
+          post :keyword_rankings, action: :keyword_rankings, controller: :analytics
+          post :page_performance, action: :search_console_page_performance, controller: :analytics
+          post :search_appearance, action: :search_console_appearance, controller: :analytics
+          post :indexing_status, action: :search_console_indexing, controller: :analytics
+          post :mobile_usability, action: :search_console_mobile, controller: :analytics
+          post :core_web_vitals, action: :search_console_vitals, controller: :analytics
+        end
+        
+        # Cross-Platform Attribution Routes
+        namespace :attribution do
+          post :cross_platform, action: :cross_platform_attribution, controller: :analytics
+          post :customer_journey, action: :customer_journey_analysis, controller: :analytics
+          post :channel_interaction, action: :channel_interaction_analysis, controller: :analytics
+          post :roas_analysis, action: :cross_platform_roas, controller: :analytics
+          post :model_comparison, action: :attribution_model_comparison, controller: :analytics
+        end
+      end
     end
     
     # Legacy API endpoints (redirect to v1)
@@ -412,6 +474,17 @@ Rails.application.routes.draw do
   get '/500', to: 'errors#internal_server_error'
   post '/error_report', to: 'errors#report_error'
   
+  # Social Media OAuth Callbacks
+  get '/social_media/oauth_callback/:platform', to: 'social_media_integrations#oauth_callback', 
+      as: :social_media_oauth_callback
+
+  # Email Platform Webhooks
+  namespace :webhooks do
+    post '/email/:platform/:integration_id', to: 'email_platforms#receive', 
+         as: :email_platform,
+         constraints: { platform: /mailchimp|sendgrid|constant_contact|campaign_monitor|activecampaign|klaviyo/ }
+  end
+
   # Demo routes (development only)
   get 'loading_demo', to: 'home#loading_demo' if Rails.env.development?
 

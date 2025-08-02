@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_02_202043) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_02_232910) do
   create_table "ab_test_configurations", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.string "configuration_type"
@@ -543,6 +543,400 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_202043) do
     t.index ["user_id"], name: "index_conversion_funnels_on_user_id"
   end
 
+  create_table "crm_analytics", force: :cascade do |t|
+    t.integer "crm_integration_id", null: false
+    t.integer "brand_id", null: false
+    t.date "analytics_date", null: false
+    t.string "metric_type", limit: 100, null: false
+    t.integer "total_leads"
+    t.integer "new_leads"
+    t.integer "marketing_qualified_leads"
+    t.integer "sales_qualified_leads"
+    t.integer "converted_leads"
+    t.decimal "lead_conversion_rate", precision: 5, scale: 2
+    t.decimal "mql_conversion_rate", precision: 5, scale: 2
+    t.decimal "sql_conversion_rate", precision: 5, scale: 2
+    t.integer "total_opportunities"
+    t.integer "new_opportunities"
+    t.integer "closed_opportunities"
+    t.integer "won_opportunities"
+    t.integer "lost_opportunities"
+    t.decimal "opportunity_win_rate", precision: 5, scale: 2
+    t.decimal "total_opportunity_value", precision: 15, scale: 2
+    t.decimal "won_opportunity_value", precision: 15, scale: 2
+    t.decimal "average_deal_size", precision: 15, scale: 2
+    t.decimal "pipeline_velocity", precision: 10, scale: 2
+    t.decimal "average_sales_cycle_days", precision: 8, scale: 2
+    t.decimal "pipeline_value", precision: 15, scale: 2
+    t.integer "pipeline_count"
+    t.decimal "weighted_pipeline_value", precision: 15, scale: 2
+    t.string "top_performing_campaign", limit: 255
+    t.decimal "campaign_attributed_revenue", precision: 15, scale: 2
+    t.integer "campaign_attributed_leads"
+    t.integer "campaign_attributed_opportunities"
+    t.json "attribution_breakdown"
+    t.decimal "marketing_to_sales_conversion_rate", precision: 5, scale: 2
+    t.decimal "lead_to_opportunity_conversion_rate", precision: 5, scale: 2
+    t.decimal "opportunity_to_customer_conversion_rate", precision: 5, scale: 2
+    t.decimal "overall_conversion_rate", precision: 5, scale: 2
+    t.decimal "time_to_mql_hours", precision: 10, scale: 2
+    t.decimal "time_to_sql_hours", precision: 10, scale: 2
+    t.decimal "time_to_opportunity_hours", precision: 10, scale: 2
+    t.decimal "time_to_close_hours", precision: 10, scale: 2
+    t.json "channel_performance"
+    t.json "source_performance"
+    t.json "campaign_performance"
+    t.json "lifecycle_stage_breakdown"
+    t.json "stage_progression_metrics"
+    t.json "raw_metrics"
+    t.json "calculated_metrics"
+    t.datetime "calculated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["analytics_date"], name: "index_crm_analytics_on_analytics_date"
+    t.index ["brand_id"], name: "index_crm_analytics_on_brand_id"
+    t.index ["calculated_at"], name: "index_crm_analytics_on_calculated_at"
+    t.index ["crm_integration_id", "analytics_date", "metric_type"], name: "idx_crm_analytics_unique", unique: true
+    t.index ["crm_integration_id"], name: "index_crm_analytics_on_crm_integration_id"
+    t.index ["metric_type"], name: "index_crm_analytics_on_metric_type"
+  end
+
+  create_table "crm_integrations", force: :cascade do |t|
+    t.string "platform", limit: 50, null: false
+    t.string "name", limit: 255, null: false
+    t.text "description"
+    t.integer "brand_id", null: false
+    t.integer "user_id", null: false
+    t.text "access_token_encrypted"
+    t.text "refresh_token_encrypted"
+    t.text "client_id_encrypted"
+    t.text "client_secret_encrypted"
+    t.text "additional_credentials_encrypted"
+    t.datetime "token_expires_at"
+    t.datetime "last_token_refresh_at"
+    t.string "api_version", limit: 20
+    t.string "instance_url", limit: 500
+    t.string "sandbox_mode", default: "f"
+    t.json "api_configuration"
+    t.boolean "active", default: true
+    t.string "status", limit: 50, default: "pending", null: false
+    t.text "last_error_message"
+    t.datetime "last_successful_sync_at"
+    t.datetime "last_attempted_sync_at"
+    t.integer "consecutive_error_count", default: 0
+    t.datetime "rate_limit_reset_at"
+    t.integer "rate_limit_remaining"
+    t.integer "daily_api_calls", default: 0
+    t.integer "monthly_api_calls", default: 0
+    t.json "sync_configuration"
+    t.json "field_mappings"
+    t.datetime "last_sync_cursor"
+    t.boolean "sync_leads", default: true
+    t.boolean "sync_opportunities", default: true
+    t.boolean "sync_contacts", default: true
+    t.boolean "sync_accounts", default: true
+    t.boolean "sync_campaigns", default: true
+    t.integer "total_leads_synced", default: 0
+    t.integer "total_opportunities_synced", default: 0
+    t.integer "total_contacts_synced", default: 0
+    t.bigint "total_revenue_tracked", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_crm_integrations_on_active"
+    t.index ["brand_id"], name: "index_crm_integrations_on_brand_id"
+    t.index ["last_successful_sync_at"], name: "index_crm_integrations_on_last_successful_sync_at"
+    t.index ["platform", "brand_id"], name: "index_crm_integrations_on_platform_and_brand_id", unique: true
+    t.index ["rate_limit_reset_at"], name: "index_crm_integrations_on_rate_limit_reset_at"
+    t.index ["status"], name: "index_crm_integrations_on_status"
+    t.index ["user_id"], name: "index_crm_integrations_on_user_id"
+  end
+
+  create_table "crm_leads", force: :cascade do |t|
+    t.integer "crm_integration_id", null: false
+    t.integer "brand_id", null: false
+    t.string "crm_id", limit: 255, null: false
+    t.string "first_name", limit: 255
+    t.string "last_name", limit: 255
+    t.string "email", limit: 255
+    t.string "phone", limit: 50
+    t.string "company", limit: 255
+    t.string "title", limit: 255
+    t.string "status", limit: 100
+    t.string "source", limit: 255
+    t.text "description"
+    t.string "lead_score", limit: 50
+    t.string "lead_grade", limit: 10
+    t.string "lifecycle_stage", limit: 100
+    t.boolean "marketing_qualified", default: false
+    t.boolean "sales_qualified", default: false
+    t.datetime "mql_date"
+    t.datetime "sql_date"
+    t.string "original_source", limit: 255
+    t.string "original_medium", limit: 255
+    t.string "original_campaign", limit: 255
+    t.string "first_touch_campaign_id", limit: 255
+    t.string "last_touch_campaign_id", limit: 255
+    t.json "utm_parameters"
+    t.decimal "annual_revenue", precision: 15, scale: 2
+    t.integer "number_of_employees"
+    t.string "industry", limit: 255
+    t.datetime "crm_created_at"
+    t.datetime "crm_updated_at"
+    t.datetime "last_synced_at"
+    t.json "raw_data"
+    t.json "custom_fields"
+    t.boolean "converted", default: false
+    t.datetime "converted_at"
+    t.string "converted_contact_id", limit: 255
+    t.string "converted_opportunity_id", limit: 255
+    t.string "converted_account_id", limit: 255
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id"], name: "index_crm_leads_on_brand_id"
+    t.index ["converted"], name: "index_crm_leads_on_converted"
+    t.index ["crm_integration_id", "crm_id"], name: "index_crm_leads_on_crm_integration_id_and_crm_id", unique: true
+    t.index ["crm_integration_id"], name: "index_crm_leads_on_crm_integration_id"
+    t.index ["email"], name: "index_crm_leads_on_email"
+    t.index ["last_synced_at"], name: "index_crm_leads_on_last_synced_at"
+    t.index ["lifecycle_stage"], name: "index_crm_leads_on_lifecycle_stage"
+    t.index ["marketing_qualified"], name: "index_crm_leads_on_marketing_qualified"
+    t.index ["original_campaign"], name: "index_crm_leads_on_original_campaign"
+    t.index ["sales_qualified"], name: "index_crm_leads_on_sales_qualified"
+    t.index ["status"], name: "index_crm_leads_on_status"
+  end
+
+  create_table "crm_opportunities", force: :cascade do |t|
+    t.integer "crm_integration_id", null: false
+    t.integer "brand_id", null: false
+    t.string "crm_id", limit: 255, null: false
+    t.string "name", limit: 500, null: false
+    t.string "account_name", limit: 255
+    t.string "account_id", limit: 255
+    t.string "contact_id", limit: 255
+    t.string "lead_id", limit: 255
+    t.text "description"
+    t.decimal "amount", precision: 15, scale: 2
+    t.string "currency", limit: 10, default: "USD"
+    t.string "stage", limit: 100
+    t.string "type", limit: 100
+    t.decimal "probability", precision: 5, scale: 2
+    t.date "close_date"
+    t.date "expected_close_date"
+    t.string "pipeline_id", limit: 255
+    t.string "pipeline_name", limit: 255
+    t.integer "stage_order"
+    t.datetime "stage_changed_at"
+    t.string "previous_stage", limit: 100
+    t.integer "days_in_current_stage"
+    t.integer "total_days_in_pipeline"
+    t.string "lead_source", limit: 255
+    t.string "original_source", limit: 255
+    t.string "original_medium", limit: 255
+    t.string "original_campaign", limit: 255
+    t.string "first_touch_campaign_id", limit: 255
+    t.string "last_touch_campaign_id", limit: 255
+    t.json "utm_parameters"
+    t.string "owner_id", limit: 255
+    t.string "owner_name", limit: 255
+    t.string "team_id", limit: 255
+    t.string "team_name", limit: 255
+    t.boolean "is_closed", default: false
+    t.boolean "is_won", default: false
+    t.datetime "closed_at"
+    t.string "close_reason", limit: 255
+    t.string "lost_reason", limit: 255
+    t.datetime "crm_created_at"
+    t.datetime "crm_updated_at"
+    t.datetime "last_synced_at"
+    t.json "raw_data"
+    t.json "custom_fields"
+    t.integer "days_to_close"
+    t.decimal "conversion_rate", precision: 5, scale: 2
+    t.integer "pipeline_velocity_score"
+    t.decimal "deal_size_score", precision: 5, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["amount"], name: "index_crm_opportunities_on_amount"
+    t.index ["brand_id"], name: "index_crm_opportunities_on_brand_id"
+    t.index ["close_date"], name: "index_crm_opportunities_on_close_date"
+    t.index ["crm_integration_id", "crm_id"], name: "index_crm_opportunities_on_crm_integration_id_and_crm_id", unique: true
+    t.index ["crm_integration_id"], name: "index_crm_opportunities_on_crm_integration_id"
+    t.index ["is_closed"], name: "index_crm_opportunities_on_is_closed"
+    t.index ["is_won"], name: "index_crm_opportunities_on_is_won"
+    t.index ["last_synced_at"], name: "index_crm_opportunities_on_last_synced_at"
+    t.index ["lead_source"], name: "index_crm_opportunities_on_lead_source"
+    t.index ["original_campaign"], name: "index_crm_opportunities_on_original_campaign"
+    t.index ["owner_id"], name: "index_crm_opportunities_on_owner_id"
+    t.index ["pipeline_id"], name: "index_crm_opportunities_on_pipeline_id"
+    t.index ["stage"], name: "index_crm_opportunities_on_stage"
+  end
+
+  create_table "email_automations", force: :cascade do |t|
+    t.integer "email_integration_id", null: false
+    t.string "platform_automation_id", null: false
+    t.string "name", null: false
+    t.string "automation_type"
+    t.string "status", null: false
+    t.string "trigger_type"
+    t.text "trigger_configuration"
+    t.integer "total_subscribers", default: 0
+    t.integer "active_subscribers", default: 0
+    t.text "configuration"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["automation_type"], name: "index_email_automations_on_automation_type"
+    t.index ["email_integration_id", "platform_automation_id"], name: "idx_email_automations_integration_platform", unique: true
+    t.index ["email_integration_id"], name: "index_email_automations_on_email_integration_id"
+    t.index ["status"], name: "index_email_automations_on_status"
+    t.index ["trigger_type"], name: "index_email_automations_on_trigger_type"
+  end
+
+  create_table "email_campaigns", force: :cascade do |t|
+    t.integer "email_integration_id", null: false
+    t.string "platform_campaign_id", null: false
+    t.string "name", null: false
+    t.string "subject"
+    t.string "status", null: false
+    t.string "campaign_type"
+    t.string "list_id"
+    t.string "template_id"
+    t.datetime "send_time"
+    t.string "created_by"
+    t.integer "total_recipients", default: 0
+    t.text "configuration"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_type"], name: "index_email_campaigns_on_campaign_type"
+    t.index ["created_at"], name: "index_email_campaigns_on_created_at"
+    t.index ["email_integration_id", "platform_campaign_id"], name: "idx_email_campaigns_integration_platform", unique: true
+    t.index ["email_integration_id"], name: "index_email_campaigns_on_email_integration_id"
+    t.index ["send_time"], name: "index_email_campaigns_on_send_time"
+    t.index ["status"], name: "index_email_campaigns_on_status"
+  end
+
+  create_table "email_integrations", force: :cascade do |t|
+    t.integer "brand_id", null: false
+    t.string "platform", null: false
+    t.string "status", default: "pending", null: false
+    t.text "access_token"
+    t.text "refresh_token"
+    t.datetime "expires_at"
+    t.string "platform_account_id"
+    t.string "account_name"
+    t.text "configuration"
+    t.string "api_endpoint"
+    t.string "webhook_secret"
+    t.datetime "last_sync_at"
+    t.integer "error_count", default: 0
+    t.datetime "rate_limit_reset_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id", "platform"], name: "index_email_integrations_on_brand_id_and_platform", unique: true
+    t.index ["brand_id"], name: "index_email_integrations_on_brand_id"
+    t.index ["expires_at"], name: "index_email_integrations_on_expires_at"
+    t.index ["last_sync_at"], name: "index_email_integrations_on_last_sync_at"
+    t.index ["platform"], name: "index_email_integrations_on_platform"
+    t.index ["status"], name: "index_email_integrations_on_status"
+  end
+
+  create_table "email_metrics", force: :cascade do |t|
+    t.integer "email_integration_id", null: false
+    t.integer "email_campaign_id", null: false
+    t.string "metric_type", null: false
+    t.date "metric_date", null: false
+    t.integer "opens", default: 0
+    t.integer "clicks", default: 0
+    t.integer "bounces", default: 0
+    t.integer "unsubscribes", default: 0
+    t.integer "complaints", default: 0
+    t.integer "delivered", default: 0
+    t.integer "sent", default: 0
+    t.integer "unique_opens", default: 0
+    t.integer "unique_clicks", default: 0
+    t.decimal "open_rate", precision: 5, scale: 4, default: "0.0"
+    t.decimal "click_rate", precision: 5, scale: 4, default: "0.0"
+    t.decimal "bounce_rate", precision: 5, scale: 4, default: "0.0"
+    t.decimal "unsubscribe_rate", precision: 5, scale: 4, default: "0.0"
+    t.decimal "complaint_rate", precision: 5, scale: 4, default: "0.0"
+    t.decimal "delivery_rate", precision: 5, scale: 4, default: "0.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_campaign_id", "metric_date"], name: "index_email_metrics_on_email_campaign_id_and_metric_date", unique: true
+    t.index ["email_campaign_id"], name: "index_email_metrics_on_email_campaign_id"
+    t.index ["email_integration_id", "metric_date"], name: "index_email_metrics_on_email_integration_id_and_metric_date"
+    t.index ["email_integration_id"], name: "index_email_metrics_on_email_integration_id"
+    t.index ["metric_date"], name: "index_email_metrics_on_metric_date"
+    t.index ["metric_type"], name: "index_email_metrics_on_metric_type"
+  end
+
+  create_table "email_subscribers", force: :cascade do |t|
+    t.integer "email_integration_id", null: false
+    t.string "platform_subscriber_id", null: false
+    t.string "email", null: false
+    t.string "first_name"
+    t.string "last_name"
+    t.string "status", null: false
+    t.datetime "subscribed_at"
+    t.datetime "unsubscribed_at"
+    t.text "tags"
+    t.text "segments"
+    t.text "location"
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_email_subscribers_on_email"
+    t.index ["email_integration_id", "platform_subscriber_id"], name: "idx_email_subscribers_integration_platform", unique: true
+    t.index ["email_integration_id"], name: "index_email_subscribers_on_email_integration_id"
+    t.index ["source"], name: "index_email_subscribers_on_source"
+    t.index ["status"], name: "index_email_subscribers_on_status"
+    t.index ["subscribed_at"], name: "index_email_subscribers_on_subscribed_at"
+  end
+
+  create_table "etl_pipeline_runs", force: :cascade do |t|
+    t.string "pipeline_id", null: false
+    t.string "source", null: false
+    t.string "status", null: false
+    t.datetime "started_at", null: false
+    t.datetime "completed_at"
+    t.float "duration"
+    t.text "error_message"
+    t.json "error_backtrace"
+    t.json "metrics"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pipeline_id"], name: "index_etl_pipeline_runs_on_pipeline_id"
+    t.index ["source", "started_at"], name: "index_etl_pipeline_runs_on_source_and_started_at"
+    t.index ["source", "status"], name: "index_etl_pipeline_runs_on_source_and_status"
+    t.index ["source"], name: "index_etl_pipeline_runs_on_source"
+    t.index ["started_at", "status"], name: "index_etl_pipeline_runs_on_started_at_and_status"
+    t.index ["started_at"], name: "index_etl_pipeline_runs_on_started_at"
+    t.index ["status"], name: "index_etl_pipeline_runs_on_status"
+  end
+
+  create_table "google_analytics_metrics", force: :cascade do |t|
+    t.date "date", null: false
+    t.integer "sessions", default: 0
+    t.integer "users", default: 0
+    t.integer "new_users", default: 0
+    t.integer "page_views", default: 0
+    t.float "bounce_rate", default: 0.0
+    t.float "avg_session_duration", default: 0.0
+    t.integer "goal_completions", default: 0
+    t.decimal "transaction_revenue", precision: 12, scale: 2, default: "0.0"
+    t.json "dimension_data"
+    t.json "raw_data"
+    t.string "pipeline_id", null: false
+    t.datetime "processed_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date", "sessions"], name: "index_google_analytics_metrics_on_date_and_sessions"
+    t.index ["date", "transaction_revenue"], name: "index_google_analytics_metrics_on_date_and_transaction_revenue"
+    t.index ["date", "users"], name: "index_google_analytics_metrics_on_date_and_users"
+    t.index ["date"], name: "index_google_analytics_metrics_on_date"
+    t.index ["pipeline_id"], name: "index_google_analytics_metrics_on_pipeline_id"
+    t.index ["processed_at"], name: "index_google_analytics_metrics_on_processed_at"
+  end
+
   create_table "journey_analytics", force: :cascade do |t|
     t.integer "journey_id", null: false
     t.integer "campaign_id", null: false
@@ -813,6 +1207,46 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_202043) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "social_media_integrations", force: :cascade do |t|
+    t.integer "brand_id", null: false
+    t.string "platform", null: false
+    t.text "access_token"
+    t.text "refresh_token"
+    t.datetime "expires_at"
+    t.text "scope"
+    t.string "platform_account_id"
+    t.string "status", default: "pending", null: false
+    t.datetime "last_sync_at"
+    t.integer "error_count", default: 0
+    t.datetime "rate_limit_reset_at"
+    t.text "configuration"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id", "platform"], name: "index_social_media_integrations_on_brand_id_and_platform", unique: true
+    t.index ["brand_id"], name: "index_social_media_integrations_on_brand_id"
+    t.index ["platform"], name: "index_social_media_integrations_on_platform"
+    t.index ["platform_account_id"], name: "index_social_media_integrations_on_platform_account_id"
+    t.index ["status"], name: "index_social_media_integrations_on_status"
+  end
+
+  create_table "social_media_metrics", force: :cascade do |t|
+    t.integer "social_media_integration_id", null: false
+    t.string "metric_type", null: false
+    t.string "platform", null: false
+    t.decimal "value", precision: 15, scale: 2
+    t.date "date", null: false
+    t.text "raw_data"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["date"], name: "index_social_media_metrics_on_date"
+    t.index ["metric_type"], name: "index_social_media_metrics_on_metric_type"
+    t.index ["platform", "date"], name: "index_social_media_metrics_on_platform_and_date"
+    t.index ["platform"], name: "index_social_media_metrics_on_platform"
+    t.index ["social_media_integration_id", "metric_type", "date"], name: "index_social_media_metrics_unique", unique: true
+    t.index ["social_media_integration_id"], name: "index_social_media_metrics_on_social_media_integration_id"
+  end
+
   create_table "step_executions", force: :cascade do |t|
     t.integer "journey_execution_id", null: false
     t.integer "journey_step_id", null: false
@@ -938,4 +1372,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_202043) do
   add_foreign_key "campaigns", "users"
   add_foreign_key "compliance_results", "brands"
   add_foreign_key "content_archives", "users", column: "retention_extended_by_id"
+  add_foreign_key "crm_analytics", "brands"
+  add_foreign_key "crm_analytics", "crm_integrations"
+  add_foreign_key "crm_integrations", "brands"
+  add_foreign_key "crm_integrations", "users"
+  add_foreign_key "crm_leads", "brands"
+  add_foreign_key "crm_leads", "crm_integrations"
+  add_foreign_key "crm_opportunities", "brands"
+  add_foreign_key "crm_opportunities", "crm_integrations"
+  add_foreign_key "email_automations", "email_integrations"
+  add_foreign_key "email_campaigns", "email_integrations"
+  add_foreign_key "email_integrations", "brands"
+  add_foreign_key "email_metrics", "email_campaigns"
+  add_foreign_key "email_metrics", "email_integrations"
+  add_foreign_key "email_subscribers", "email_integrations"
+  add_foreign_key "social_media_integrations", "brands"
+  add_foreign_key "social_media_metrics", "social_media_integrations"
 end
