@@ -27,3 +27,17 @@ two:
   target_metrics: { "awareness": 0.15 }
   settings: {}
   metadata: {}
+
+product_launch:
+  user: one
+  persona: tech_startup
+  name: "Product Launch Campaign"
+  description: "Comprehensive product launch campaign"
+  campaign_type: "product_launch"
+  status: "draft"
+  started_at: <%= 1.week.from_now %>
+  ended_at: <%= 3.months.from_now %>
+  goals: ["Launch new product", "Generate awareness", "Drive conversions"]
+  target_metrics: { "leads": 500, "awareness": 0.30, "conversions": 50 }
+  settings: {}
+  metadata: {}

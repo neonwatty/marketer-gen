@@ -1,0 +1,49 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+control_variant:
+  ab_test: conversion_test
+  journey: onboarding_control
+  name: "Control"
+  variant_type: "control"
+  is_control: true
+  traffic_percentage: 50.0
+  total_visitors: 1000
+  conversions: 25
+  conversion_rate: 2.5
+  confidence_interval: 85.0
+
+treatment_variant:
+  ab_test: conversion_test
+  journey: onboarding_treatment
+  name: "Treatment"
+  variant_type: "treatment"
+  is_control: false
+  traffic_percentage: 50.0
+  total_visitors: 950
+  conversions: 35
+  conversion_rate: 3.68
+  confidence_interval: 90.0
+
+email_control:
+  ab_test: one
+  journey: onboarding_control
+  name: "Email Control"
+  variant_type: "control"
+  is_control: true
+  traffic_percentage: 50.0
+  total_visitors: 500
+  conversions: 15
+  conversion_rate: 3.0
+  confidence_interval: 75.0
+
+email_treatment:
+  ab_test: one
+  journey: onboarding_treatment
+  name: "Email Treatment"
+  variant_type: "treatment"
+  is_control: false
+  traffic_percentage: 50.0
+  total_visitors: 480
+  conversions: 18
+  conversion_rate: 3.75
+  confidence_interval: 80.0

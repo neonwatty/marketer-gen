@@ -41,3 +41,24 @@ two:
     "decision_factors": ["Price", "Ease of use", "Support"]
   }
   preferences: {}
+
+tech_startup:
+  user: one
+  name: "Tech Startup Founder"
+  description: "Founders and decision makers at technology startups"
+  demographics: {
+    "age_range": "25-40",
+    "income": "80k-200k",
+    "location": "Tech hubs",
+    "company_size": "10-100"
+  }
+  psychographics: {
+    "values": ["Innovation", "Speed", "Disruption", "Growth"],
+    "pain_points": ["Limited resources", "Fast scaling", "Competition"],
+    "goals": ["Product-market fit", "User growth", "Funding"]
+  }
+  behaviors: {
+    "channels": ["Twitter", "Product Hunt", "Tech blogs", "LinkedIn"],
+    "decision_factors": ["Innovation", "Scalability", "Time-to-market"]
+  }
+  preferences: {}

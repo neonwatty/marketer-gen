@@ -1,129 +1,142 @@
-# Claude Code Instructions
+# Claude Code Agent System
 
-## Task Master AI Instructions
-**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
+## Quick Start
+
+1. **Simple Tasks** → Direct to specialist agent
+2. **Complex Tasks** → Use `project-orchestrator` (Planning Mode)
+3. **Errors** → Auto-escalate to `error-debugger`
+
+## Agent Reference
+
+| Agent | Use For | Trigger Keywords |
+|-------|---------|------------------|
+| 🚂 `ruby-rails-expert` | Rails + Ruby linting (RuboCop) | rails, model, controller, activerecord, rubocop, lint |
+| 📦 `javascript-package-expert` | JS/TS + npm + JS linting (ESLint) | npm, javascript, package, stimulus, eslint, lint |
+| 🎨 `tailwind-css-expert` | Styling, UI, responsive design | css, tailwind, styling, ui |
+| 🧪 `test-runner-fixer` | Write/fix tests, coverage | test, spec, rspec, coverage |
+| 🐛 `error-debugger` | Debug errors, performance | error, bug, failing, debug |
+| 📋 `project-orchestrator` | Planning, coordination, todo lists | plan, coordinate, complex, todo, strategy |
+| 🔀 `git-auto-commit` | Create commits | commit, save changes |
+
+## Workflow
+
+See visual workflow: [workflow-diagram.md](.claude/workflow-diagram.md)
+
+## Agent Communication
+
+Agents communicate through structured completion reports embedded in their responses. Each agent knows when to hand off work to the next appropriate agent.
+
+## Router Configuration
+
+Automatic agent selection rules: [router.yaml](.claude/router.yaml)
+
+## Task Master Integration
+
+**Import Task Master commands:**
 @./.taskmaster/CLAUDE.md
 
-## Development Workflow Guidelines
+All agents automatically:
+- Update task status via `mcp__task-master-ai__set_task_status`
+- Log progress via `mcp__task-master-ai__update_subtask`
 
-### Testing Priority
-- **Always write tests first or immediately after implementing a feature**
-- Prioritize both unit tests and integration tests for all new functionality
-- Run tests frequently during development to catch issues early
-- Ensure all tests pass before moving to the next feature
-- Test coverage should include:
-  - Model validations and business logic (unit tests)
-  - Controller actions and responses (controller tests)
-  - Complete user workflows (integration tests)
-  - Edge cases and error handling
+## Starting Complex Tasks
 
-### Git Workflow
-- **Commit code frequently** - after each meaningful step or feature completion
-- Use clear, descriptive commit messages that explain what was changed
-- Push code to remote repository regularly to ensure work is backed up
-- Typical workflow:
-  1. Implement a small feature or fix
-  2. Write/update tests for that feature
-  3. Run tests to ensure everything passes
-  4. Commit with a descriptive message
-  5. Push to remote repository
-  6. Move to next task
-
-### Example Commit Pattern
 ```bash
-# After creating models
-git add -A && git commit -m "Add User and Session models with authentication"
-git push
-
-# After implementing controllers
-git add -A && git commit -m "Implement registration and session controllers"
-git push
-
-# After adding tests
-git add -A && git commit -m "Add comprehensive tests for authentication flow"
-git push
+Task(description="Brief description",
+     subagent_type="project-orchestrator", 
+     prompt="Create automatic workflow for: [detailed requirements]")
 ```
 
-### Rails-Specific Testing Commands
+The orchestrator will:
+1. Analyze requirements
+2. Create delegation plan
+3. Launch specialist agents
+4. Monitor progress
+5. Handle errors/escalations
+6. Trigger git commit when complete
+
+## Agent Communication Flow
+
+```
+User Request → Analyze → Route to Agent → Execute → Report → Next Agent/Complete
+                  ↓
+              [Complex?] → project-orchestrator → Delegation Plan
+```
+
+## Error Handling
+
+Automatic escalation chain:
+1. Specialist agent attempts fix
+2. Escalate to `error-debugger`
+3. Escalate to `project-orchestrator`
+4. Replan and reassign
+
+## Planning Protocol
+
+**MANDATORY: All complex tasks must begin with proper planning**
+
+1. **Planning Requirement**: Any task involving multiple steps, agents, or phases MUST start with project-orchestrator in Planning Mode
+2. **Plan Storage**: All plans MUST be saved to `@plans/[feature-name]/README.md` before execution
+3. **Todo Tracking**: Use TodoWrite tool to create actionable, trackable task lists
+4. **Execution Flow**: 
+   - User request → project-orchestrator analyzes complexity
+   - Complex task → Planning Mode creates plan
+   - Plan saved to @plans/ directory
+   - TodoWrite creates task list
+   - Execution Mode runs plan
+   - Progress tracked via Task Master
+
+### Plan Structure Requirements
+
+Every plan must include:
+- Clear objectives and success criteria
+- Actionable todo list with agent assignments
+- Test-Driven Development (TDD) approach
+- Linting and code quality phases
+- Implementation phases with timelines
+- Risk assessment and mitigation
+- Automatic execution command
+
+### TDD and Code Quality Protocol
+
+1. **Test First**: All new features MUST start with failing tests
+2. **Implementation**: Code only to make tests pass
+3. **Linting**: Run appropriate linters after each implementation:
+   - Ruby: `ruby-rails-expert` (includes RuboCop)
+   - JavaScript: `javascript-package-expert` (includes ESLint)
+4. **Quality Gates**: No phase proceeds with failing tests or linting errors
+
+### Planning Workflow Example
+
 ```bash
-# Run all tests
-rails test
+# For any complex feature request:
+Task(description="Implement [feature]",
+     subagent_type="project-orchestrator",
+     prompt="[Detailed requirements] - Create plan and execute with automatic handoffs")
 
-# Run specific test file
-rails test test/models/user_test.rb
-
-# Run specific test
-rails test test/models/user_test.rb:15
-
-# Run tests with verbose output
-rails test -v
+# Or if plan already exists:
+Task(description="Execute [feature] plan",
+     subagent_type="project-orchestrator", 
+     prompt="Execute plan at plans/[feature-name]/README.md")
 ```
 
-## Specialized Agents
+## Best Practices
 
-Claude Code has access to specialized agents in the `.claude/agents` directory that can be invoked using the Task tool. These agents are experts in specific domains and should be used proactively when their expertise matches the task at hand.
+- Always start complex tasks with project-orchestrator (Planning Mode)
+- Let orchestrator handle multi-domain tasks
+- Linting is integrated with language experts (not separate agents)
+- Trust automatic handoffs
+- Check Task Master for progress
+- Agents complete work before handoff
+- Use structured completion reports
+- Document all plans in @plans/ directory
 
-### Available Agents
+## Important Instructions
 
-#### error-debugger
-- **When to use**: Encountering any errors, test failures, unexpected behavior, or debugging needs
-- **Expertise**: Build failures, runtime errors, failing tests, performance issues
-- **Usage**: Should be used proactively whenever issues arise during development
+- Do what's asked; nothing more, nothing less
+- Never create files unless necessary
+- Always prefer editing existing files
+- No unsolicited documentation creation
+- ALWAYS plan before executing complex tasks
 
-#### test-runner-fixer
-- **When to use**: Need to run tests and automatically fix any failures
-- **Expertise**: Writing tests, fixing test failures, test coverage improvements
-- **Usage**: After implementing features or when tests are failing
-
-#### ruby-rails-expert
-- **When to use**: Working with Ruby language or Rails framework
-- **Expertise**: Rails 8, ActiveRecord, Action Cable, Hotwire/Turbo, Rails testing, deployment
-- **Usage**: For Rails-specific implementations, debugging Rails apps, or architectural decisions
-
-#### javascript-package-expert
-- **When to use**: Managing JavaScript packages and dependencies
-- **Expertise**: npm/yarn/pnpm, package.json configuration, dependency resolution, security audits
-- **Usage**: When dealing with JS dependencies, bundle optimization, or package conflicts
-
-#### tailwind-css-expert
-- **When to use**: Writing or debugging Tailwind CSS
-- **Expertise**: Utility classes, responsive design, dark mode, custom configurations
-- **Usage**: For styling components, creating layouts, or migrating to Tailwind
-
-#### git-auto-commit
-- **When to use**: Need to commit and push code changes
-- **Expertise**: Analyzing changes, creating detailed commit messages, pushing to remote
-- **Usage**: After code modifications are complete and tested
-
-#### project-orchestrator
-- **When to use**: Need high-level project coordination or planning
-- **Expertise**: Breaking down complex projects, coordinating multiple tasks, strategic planning
-- **Usage**: For complex projects requiring coordination between different development aspects
-
-### How to Use Agents
-
-Agents are invoked using the Task tool with the appropriate `subagent_type` parameter:
-
-```javascript
-// Example: Using the error-debugger agent
-Task(
-  description="Debug test failure",
-  prompt="The user authentication test is failing with a nil error",
-  subagent_type="error-debugger"
-)
-
-// Example: Using multiple agents for a complex task
-Task(
-  description="Plan feature implementation",
-  prompt="Plan the implementation of a new user dashboard with real-time updates",
-  subagent_type="project-orchestrator"
-)
-```
-
-### Best Practices for Agent Usage
-
-1. **Use agents proactively** - Don't wait for the user to ask; if you encounter an error, use error-debugger immediately
-2. **Delegate to specialists** - Let agents handle their domains of expertise rather than trying to do everything yourself
-3. **Chain agents when needed** - Use project-orchestrator to plan, then specific agents to implement
-4. **Trust agent outputs** - Agents are specialized and their recommendations should generally be followed
-5. **Batch when possible** - Launch multiple agents concurrently for independent tasks to maximize efficiency
+For detailed agent capabilities, see individual agent files in `.claude/agents/`

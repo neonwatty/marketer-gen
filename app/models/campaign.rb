@@ -5,6 +5,7 @@ class Campaign < ApplicationRecord
   has_many :journey_analytics, through: :journeys, class_name: 'JourneyAnalytics'
   has_many :campaign_analytics, dependent: :destroy
   has_many :ab_tests, dependent: :destroy
+  has_many :campaign_plans, dependent: :destroy
   
   STATUSES = %w[draft active paused completed archived].freeze
   CAMPAIGN_TYPES = %w[
