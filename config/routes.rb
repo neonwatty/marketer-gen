@@ -1,4 +1,52 @@
 Rails.application.routes.draw do
+  # Content Management System
+  resources :content_repositories, path: 'content' do
+    member do
+      get :preview
+      post :duplicate
+      post :publish
+      post :archive
+      get :analytics
+      get :collaboration
+      post :regenerate
+    end
+    
+    resources :content_versions, path: 'versions' do
+      member do
+        get :diff
+        post :revert
+        get :preview
+        post :approve
+        post :reject
+      end
+    end
+    
+    resources :content_approvals, path: 'approvals', only: [:index, :show, :create, :update]
+    resources :content_tags, path: 'tags', only: [:index, :create, :destroy]
+  end
+  
+  # Content Management API
+  namespace :api do
+    namespace :v1 do
+      resources :content_repositories, path: 'content' do
+        member do
+          get :search
+          post :bulk_operations
+          get :version_history
+          post :auto_save
+        end
+        
+        resources :content_versions, path: 'versions' do
+          member do
+            get :visual_diff
+            post :create_branch
+            post :merge
+          end
+        end
+      end
+    end
+  end
+
   # Brand management
   resources :brands do
     resources :brand_assets do
@@ -137,6 +185,20 @@ Rails.application.routes.draw do
           get :industries
           get :types
         end
+        
+        # Campaign Plans API
+        resources :plans, controller: :campaign_plans do
+          member do
+            post :submit_for_review
+            post :approve
+            post :reject
+            get :export
+            get :notifications
+            patch :auto_save
+            post :save_as_template
+            patch :reorder_phases
+          end
+        end
       end
       
       # Persona Management API
@@ -184,6 +246,82 @@ Rails.application.routes.draw do
       post :use_template
       get :builder
       get :builder_react
+    end
+  end
+
+  # Campaign Plans Management
+  resources :campaigns, only: [:index, :show] do
+    resources :campaign_plans, path: 'plans', except: [:destroy] do
+      member do
+        get :dashboard
+        post :submit_for_review
+        post :approve
+        post :reject
+        get :export
+        patch :reorder_phases
+        post :save_as_template
+      end
+    end
+  end
+  
+  # Direct campaign plan routes
+  resources :campaign_plans, only: [:show, :edit, :update, :destroy] do
+    member do
+      get :dashboard
+      post :submit_for_review
+      post :approve
+      post :reject
+      get :export
+      patch :reorder_phases
+      post :save_as_template
+    end
+    
+    # Plan Comments
+    resources :plan_comments, path: 'comments', only: [:create, :update, :destroy]
+  end
+  
+  # Plan Templates Management
+  resources :plan_templates, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
+    member do
+      get :preview
+      post :clone
+      post :activate
+      post :deactivate
+    end
+    
+    collection do
+      get :public_templates
+      get :user_templates
+    end
+  end
+
+  # A/B Testing Management
+  resources :ab_tests, path: 'ab-tests' do
+    member do
+      post :start
+      post :pause 
+      post :resume
+      post :complete
+      get :results
+      get :analysis
+      get :live_metrics
+      post :declare_winner
+    end
+    
+    collection do
+      get :dashboard, action: :index
+    end
+  end
+  
+  # Campaign-scoped A/B tests
+  resources :campaigns, only: [:index, :show] do
+    resources :ab_tests, path: 'ab-tests', except: [:show] do
+      member do
+        post :start
+        post :pause
+        post :resume
+        post :complete
+      end
     end
   end
 

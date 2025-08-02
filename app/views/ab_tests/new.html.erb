@@ -1,0 +1,402 @@
+<% content_for :title, "Create New A/B Test" %>
+
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+  <!-- Header Section -->
+  <div class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <!-- Breadcrumb -->
+          <nav class="flex mb-4" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+              <li class="inline-flex items-center">
+                <%= link_to ab_tests_path, class: "inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600" do %>
+                  A/B Tests
+                <% end %>
+              </li>
+              <li>
+                <div class="flex items-center">
+                  <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Create Test</span>
+                </div>
+              </li>
+            </ol>
+          </nav>
+
+          <h1 class="text-heading-h2 text-gray-900 font-bold">Create New A/B Test</h1>
+          <p class="mt-2 text-secondary">Set up a new A/B test to optimize your campaigns</p>
+        </div>
+        
+        <%= link_to ab_tests_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Tests
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="px-4 sm:px-6 lg:px-8 py-8">
+    <%= form_with model: @ab_test, local: true, class: "space-y-8", 
+                  data: { controller: "ab-test-form form-validation", 
+                          ab_test_form_templates_value: @test_templates.to_json } do |form| %>
+      
+      <!-- Form Errors -->
+      <% if @ab_test.errors.any? %>
+        <div class="rounded-md bg-red-50 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.864-.833-2.464 0L5.232 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+              <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                <% @ab_test.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Test Templates (Quick Start) -->
+      <% if @test_templates.any? %>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">Quick Start Templates</h2>
+              <p class="text-sm text-gray-500">Choose from pre-configured test templates</p>
+            </div>
+            <button type="button" 
+                    data-action="click->ab-test-form#toggleTemplates"
+                    class="text-sm text-blue-600 hover:text-blue-800">
+              Show All Templates
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-ab-test-form-target="templatesGrid">
+            <% @test_templates.limit(3).each do |template| %>
+              <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 cursor-pointer transition-colors duration-200"
+                   data-action="click->ab-test-form#selectTemplate"
+                   data-template-id="<%= template.id %>">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="font-medium text-gray-900"><%= template.name %></h3>
+                  <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                    <%= template.test_type.humanize %>
+                  </span>
+                </div>
+                <p class="text-sm text-gray-600 mb-3"><%= template.description %></p>
+                <div class="text-xs text-gray-500">
+                  <span class="inline-flex items-center mr-3">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <%= template.default_duration_days %> days
+                  </span>
+                  <span class="inline-flex items-center">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <%= template.confidence_level %>% confidence
+                  </span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Step 1: Basic Information -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm" data-ab-test-form-target="step" data-step="1">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <div class="flex items-center">
+            <span class="flex items-center justify-center w-8 h-8 bg-blue-600 text-white text-sm font-medium rounded-full mr-3">1</span>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">Basic Information</h2>
+              <p class="text-sm text-gray-500">Define your test name, type, and hypothesis</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Test Name -->
+            <div>
+              <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+                Test Name <span class="text-red-500">*</span>
+              <% end %>
+              <%= form.text_field :name, 
+                                  required: true,
+                                  placeholder: "e.g., Homepage Hero Test",
+                                  class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                                  data: { action: "input->form-validation#validateField" } %>
+              <p class="mt-1 text-sm text-gray-500">Choose a descriptive name for easy identification</p>
+            </div>
+
+            <!-- Test Type -->
+            <div>
+              <%= form.label :test_type, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+                Test Type <span class="text-red-500">*</span>
+              <% end %>
+              <%= form.select :test_type, 
+                              options_for_select(AbTest::TEST_TYPES.map { |type| [type.humanize, type] }),
+                              { prompt: "Select test type" },
+                              { required: true,
+                                class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                                data: { action: "change->form-validation#validateField" } } %>
+              <p class="mt-1 text-sm text-gray-500">What metric are you trying to optimize?</p>
+            </div>
+          </div>
+
+          <!-- Campaign Selection -->
+          <% if @campaign %>
+            <%= form.hidden_field :campaign_id, value: @campaign.id %>
+            <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div class="flex items-center">
+                <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                  <div class="text-sm font-medium text-blue-800">Campaign</div>
+                  <div class="text-sm text-blue-700"><%= @campaign.name %></div>
+                </div>
+              </div>
+            </div>
+          <% else %>
+            <div>
+              <%= form.label :campaign_id, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+                Campaign <span class="text-red-500">*</span>
+              <% end %>
+              <%= form.select :campaign_id, 
+                              options_from_collection_for_select(current_user.campaigns, :id, :name),
+                              { prompt: "Select campaign" },
+                              { required: true,
+                                class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+              <p class="mt-1 text-sm text-gray-500">Which campaign will this test belong to?</p>
+            </div>
+          <% end %>
+
+          <!-- Description -->
+          <div>
+            <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :description, 
+                               rows: 3,
+                               placeholder: "Brief description of what you're testing and why...",
+                               class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+
+          <!-- Hypothesis -->
+          <div>
+            <%= form.label :hypothesis, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+              Hypothesis <span class="text-red-500">*</span>
+            <% end %>
+            <%= form.text_area :hypothesis, 
+                               rows: 3,
+                               required: true,
+                               placeholder: "We believe that changing X will result in Y because Z...",
+                               class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                               data: { action: "input->form-validation#validateField" } %>
+            <p class="mt-1 text-sm text-gray-500">State your hypothesis clearly using the format: "We believe that... because..."</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Variants Configuration -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <span class="flex items-center justify-center w-8 h-8 bg-blue-600 text-white text-sm font-medium rounded-full mr-3">2</span>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">Variants Configuration</h2>
+                <p class="text-sm text-gray-500">Set up your control and treatment variants</p>
+              </div>
+            </div>
+            
+            <button type="button" 
+                    data-action="click->ab-test-form#addVariant"
+                    class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Add Variant
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6" data-ab-test-form-target="variantsContainer">
+          <%= form.fields_for :ab_test_variants do |variant_form| %>
+            <%= render 'variant_form', form: variant_form, variant: variant_form.object, journeys: @journeys %>
+          <% end %>
+        </div>
+
+        <!-- Traffic Allocation Summary -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-700">Total Traffic Allocation:</span>
+            <span class="text-lg font-bold" data-ab-test-form-target="totalTraffic">100%</span>
+          </div>
+          <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                 data-ab-test-form-target="trafficBar" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Test Configuration -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <div class="flex items-center">
+            <span class="flex items-center justify-center w-8 h-8 bg-blue-600 text-white text-sm font-medium rounded-full mr-3">3</span>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">Test Configuration</h2>
+              <p class="text-sm text-gray-500">Configure statistical settings and duration</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Confidence Level -->
+            <div>
+              <%= form.label :confidence_level, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+                Confidence Level <span class="text-red-500">*</span>
+              <% end %>
+              <%= form.select :confidence_level,
+                              options_for_select([[95, 95], [90, 90], [99, 99]], 95),
+                              {},
+                              { required: true,
+                                class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+              <p class="mt-1 text-sm text-gray-500">Statistical confidence level (95% recommended)</p>
+            </div>
+
+            <!-- Significance Threshold -->
+            <div>
+              <%= form.label :significance_threshold, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+                Significance Threshold <span class="text-red-500">*</span>
+              <% end %>
+              <%= form.number_field :significance_threshold,
+                                    value: 5,
+                                    min: 1,
+                                    max: 20,
+                                    step: 0.1,
+                                    required: true,
+                                    class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+              <p class="mt-1 text-sm text-gray-500">Minimum lift % to be considered significant</p>
+            </div>
+
+            <!-- Minimum Sample Size -->
+            <div>
+              <%= form.label :minimum_sample_size, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.number_field :minimum_sample_size,
+                                    min: 100,
+                                    step: 100,
+                                    placeholder: "e.g., 1000",
+                                    class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+              <p class="mt-1 text-sm text-gray-500">Minimum visitors before test can be completed</p>
+            </div>
+          </div>
+
+          <!-- Sample Size Calculator -->
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-medium text-blue-800">Sample Size Calculator</h3>
+              <button type="button" 
+                      data-action="click->ab-test-form#calculateSampleSize"
+                      class="text-sm text-blue-600 hover:text-blue-800">
+                Calculate
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+              <div>
+                <label class="block text-xs font-medium text-blue-700 mb-1">Baseline Conversion Rate (%)</label>
+                <input type="number" 
+                       data-ab-test-form-target="baselineRate"
+                       placeholder="5"
+                       min="0.1"
+                       max="100"
+                       step="0.1"
+                       class="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+              </div>
+              
+              <div>
+                <label class="block text-xs font-medium text-blue-700 mb-1">Minimum Detectable Effect (%)</label>
+                <input type="number" 
+                       data-ab-test-form-target="mde"
+                       placeholder="20"
+                       min="1"
+                       max="200"
+                       step="1"
+                       class="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+              </div>
+              
+              <div>
+                <label class="block text-xs font-medium text-blue-700 mb-1">Statistical Power (%)</label>
+                <select data-ab-test-form-target="power"
+                        class="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+                  <option value="80">80%</option>
+                  <option value="90">90%</option>
+                  <option value="95">95%</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="p-3 bg-white rounded border border-blue-200" data-ab-test-form-target="sampleSizeResult">
+              <div class="text-sm text-blue-700">
+                Enter values above and click "Calculate" to determine the recommended sample size for your test.
+              </div>
+            </div>
+          </div>
+
+          <!-- Test Duration -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <%= form.label :start_date, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.datetime_local_field :start_date,
+                                            class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+              <p class="mt-1 text-sm text-gray-500">Leave blank to start manually later</p>
+            </div>
+
+            <div>
+              <%= form.label :end_date, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.datetime_local_field :end_date,
+                                            class: "w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+              <p class="mt-1 text-sm text-gray-500">Leave blank to run indefinitely</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex items-center justify-between space-x-4">
+        <div class="flex items-center space-x-4">
+          <%= link_to ab_tests_path, 
+                      class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200" do %>
+            Cancel
+          <% end %>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <%= form.submit "Save as Draft", 
+                          name: "commit",
+                          value: "draft",
+                          class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200" %>
+          
+          <%= form.submit "Create and Start Test", 
+                          name: "commit",
+                          value: "create_and_start",
+                          class: "inline-flex items-center px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200",
+                          data: { disable_with: "Creating..." } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
