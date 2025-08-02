@@ -1,4 +1,3 @@
-import ReconnectingWebSocket from 'reconnecting-websocket';
 import { createConsumer } from '@rails/actioncable';
 import type {
   ConnectionConfig,
@@ -6,7 +5,6 @@ import type {
   MessageQueue,
   WebSocketMessage,
   RateLimitConfig,
-  RateLimit,
   CollaborationError,
   ErrorHandler,
   CollaborationEvents,
@@ -14,7 +12,7 @@ import type {
 } from '../types/collaboration';
 
 class CollaborationWebSocket {
-  private consumer: any;
+  private consumer: ReturnType<typeof createConsumer>;
   private subscriptions: Map<string, ChannelSubscription> = new Map();
   private connectionState: ConnectionState;
   private messageQueue: MessageQueue;
@@ -113,14 +111,14 @@ class CollaborationWebSocket {
     this.emit('connection:status_changed', this.connectionState);
   }
 
-  public subscribe(channel: string, params: any = {}): ChannelSubscription {
+  public subscribe(channel: string, params: Record<string, unknown> = {}): ChannelSubscription {
     const identifier = JSON.stringify({ channel, ...params });
     
     if (this.subscriptions.has(identifier)) {
       return this.subscriptions.get(identifier)!;
     }
 
-    const subscription = this.consumer.subscriptions.create(
+    const actionCableSubscription = this.consumer.subscriptions.create(
       { channel, ...params },
       {
         connected: () => {
@@ -137,7 +135,7 @@ class CollaborationWebSocket {
           this.updateConnectionState('disconnected');
         },
         
-        received: (data: any) => {
+        received: (data: Record<string, unknown>) => {
           this.handleReceivedMessage(identifier, data);
         }
       }
@@ -148,6 +146,7 @@ class CollaborationWebSocket {
       identifier,
       connected: false,
       subscription_id: this.generateMessageId(),
+      actionCableSubscription,
       callbacks: new Map()
     };
 
@@ -163,7 +162,7 @@ class CollaborationWebSocket {
     }
   }
 
-  private handleReceivedMessage(identifier: string, data: any): void {
+  private handleReceivedMessage(identifier: string, data: Record<string, unknown>): void {
     const subscription = this.subscriptions.get(identifier);
     if (!subscription) {return;}
 
@@ -222,7 +221,7 @@ class CollaborationWebSocket {
           .find(sub => sub.channel === message.channel);
         
         if (subscription) {
-          this.consumer.subscriptions.subscriptions.forEach((sub: any) => {
+          this.consumer.subscriptions.subscriptions.forEach((sub: Record<string, unknown>) => {
             if (sub.identifier === subscription.identifier) {
               sub.perform('receive_message', message.data);
             }
@@ -296,7 +295,7 @@ class CollaborationWebSocket {
       if (message.retry_count < message.max_retries) {
         try {
           await this.sendMessage(message);
-        } catch (error) {
+        } catch {
           this.messageQueue.failed.push(message);
         }
       } else {

@@ -55,7 +55,6 @@ export class OperationalTransformEngine {
 
     let indexA = 0;
     let indexB = 0;
-    const _offsetA = 0;
     let _offsetB = 0;
 
     while (indexA < operationA.length || indexB < operationB.length) {

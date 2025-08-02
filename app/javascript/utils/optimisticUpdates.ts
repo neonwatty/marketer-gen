@@ -360,19 +360,19 @@ export class DOMOptimisticManager extends OptimisticUpdateManager<Element> {
     element.setAttribute('data-optimistic-id', updateId);
   }
 
-  private removeOptimisticMarker(element: Element, updateId: string): void {
+  private removeOptimisticMarker(element: Element, _updateId: string): void {
     element.classList.remove('optimistic-update');
     element.removeAttribute('data-optimistic-id');
   }
 
-  private addConfirmedMarker(element: Element, updateId: string): void {
+  private addConfirmedMarker(element: Element, _updateId: string): void {
     element.classList.add('optimistic-confirmed');
     setTimeout(() => {
       element.classList.remove('optimistic-confirmed');
     }, 1000);
   }
 
-  private addFailureMarker(element: Element, updateId: string): void {
+  private addFailureMarker(element: Element, _updateId: string): void {
     element.classList.add('optimistic-failed');
     setTimeout(() => {
       element.classList.remove('optimistic-failed');

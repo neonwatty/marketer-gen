@@ -1,0 +1,271 @@
+<% content_for :title, @campaign.name %>
+<% content_for :description, @campaign.description %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center space-x-4">
+      <%= link_to campaigns_path, class: "text-gray-600 hover:text-gray-900 transition-colors" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      <% end %>
+      
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900"><%= @campaign.name %></h1>
+        <div class="flex items-center space-x-4 mt-2">
+          <span class="px-3 py-1 text-sm font-medium rounded-full
+            <%= case @campaign.status
+            when 'active' then 'bg-green-100 text-green-800'
+            when 'draft' then 'bg-gray-100 text-gray-800'
+            when 'paused' then 'bg-yellow-100 text-yellow-800'
+            when 'completed' then 'bg-blue-100 text-blue-800'
+            else 'bg-gray-100 text-gray-800'
+            end %>">
+            <%= @campaign.status.humanize %>
+          </span>
+          <span class="text-gray-600"><%= @campaign.campaign_type.humanize %></span>
+          <% if @campaign.industry.present? %>
+            <span class="text-gray-600">• <%= @campaign.industry.humanize %></span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-3">
+      <% if @campaign.draft? %>
+        <button class="btn btn-primary">Activate Campaign</button>
+      <% elsif @campaign.active? %>
+        <button class="btn btn-outline">Pause Campaign</button>
+      <% end %>
+      
+      <button class="btn btn-outline">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+        Edit
+      </button>
+    </div>
+  </div>
+  
+  <!-- Campaign Overview -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-8">
+      <!-- Description -->
+      <div class="bg-white rounded-lg border p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Campaign Overview</h2>
+        <p class="text-gray-600">
+          <%= @campaign.description || "No description provided for this campaign." %>
+        </p>
+        
+        <% if @campaign.goals.present? %>
+          <div class="mt-6">
+            <h3 class="text-sm font-medium text-gray-900 mb-3">Goals</h3>
+            <div class="flex flex-wrap gap-2">
+              <% @campaign.goals.each do |goal| %>
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                  <%= goal %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Performance -->
+      <% if @campaign.active? && @recent_analytics.any? %>
+        <div class="bg-white rounded-lg border p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Performance Summary</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-900"><%= @recent_analytics[:total_executions] %></div>
+              <div class="text-sm text-gray-600">Total Executions</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-900"><%= @recent_analytics[:completion_rate] %>%</div>
+              <div class="text-sm text-gray-600">Completion Rate</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-900"><%= @recent_analytics[:engagement_score] %></div>
+              <div class="text-sm text-gray-600">Engagement Score</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-900"><%= @recent_analytics[:average_duration] %></div>
+              <div class="text-sm text-gray-600">Avg Duration (days)</div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      
+      <!-- Campaign Plans -->
+      <div class="bg-white rounded-lg border p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Campaign Plans</h2>
+          <button class="btn btn-outline btn-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            New Plan
+          </button>
+        </div>
+        
+        <% if @campaign_plans.any? %>
+          <div class="space-y-3">
+            <% @campaign_plans.each do |plan| %>
+              <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                <div>
+                  <h3 class="font-medium text-gray-900"><%= plan.title %></h3>
+                  <p class="text-sm text-gray-600"><%= truncate(plan.description, length: 100) %></p>
+                  <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                    <span>Status: <%= plan.status.humanize %></span>
+                    <span>•</span>
+                    <span>Updated <%= time_ago_in_words(plan.updated_at) %> ago</span>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <button class="p-2 text-gray-400 hover:text-gray-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-8">
+            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p class="mt-2 text-sm text-gray-600">No campaign plans yet.</p>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Journeys -->
+      <div class="bg-white rounded-lg border p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Customer Journeys</h2>
+          <button class="btn btn-outline btn-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            New Journey
+          </button>
+        </div>
+        
+        <% if @journeys.any? %>
+          <div class="space-y-3">
+            <% @journeys.each do |journey| %>
+              <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                <div>
+                  <h3 class="font-medium text-gray-900"><%= journey.name %></h3>
+                  <p class="text-sm text-gray-600"><%= truncate(journey.description, length: 100) %></p>
+                  <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                    <span><%= pluralize(journey.journey_steps.count, 'step') %></span>
+                    <span>•</span>
+                    <span>Status: <%= journey.status.humanize %></span>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <button class="p-2 text-gray-400 hover:text-gray-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-8">
+            <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+            <p class="mt-2 text-sm text-gray-600">No customer journeys yet.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Campaign Info -->
+      <div class="bg-white rounded-lg border p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Campaign Details</h3>
+        <div class="space-y-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-600">Target Persona</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              <%= @campaign.persona&.name || 'No persona assigned' %>
+            </dd>
+          </div>
+          
+          <% if @campaign.budget.present? %>
+            <div>
+              <dt class="text-sm font-medium text-gray-600">Budget</dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                $<%= number_with_delimiter(@campaign.budget) %>
+              </dd>
+            </div>
+          <% end %>
+          
+          <% if @campaign.start_date.present? %>
+            <div>
+              <dt class="text-sm font-medium text-gray-600">Start Date</dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                <%= @campaign.start_date.strftime('%B %d, %Y') %>
+              </dd>
+            </div>
+          <% end %>
+          
+          <% if @campaign.end_date.present? %>
+            <div>
+              <dt class="text-sm font-medium text-gray-600">End Date</dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                <%= @campaign.end_date.strftime('%B %d, %Y') %>
+              </dd>
+            </div>
+          <% end %>
+          
+          <div>
+            <dt class="text-sm font-medium text-gray-600">Created</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              <%= @campaign.created_at.strftime('%B %d, %Y') %>
+            </dd>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-lg border p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+          <button class="w-full btn btn-outline btn-sm justify-start">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            View Analytics
+          </button>
+          
+          <button class="w-full btn btn-outline btn-sm justify-start">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Export Data
+          </button>
+          
+          <button class="w-full btn btn-outline btn-sm justify-start">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            Duplicate Campaign
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

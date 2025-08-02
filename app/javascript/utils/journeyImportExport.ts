@@ -1,4 +1,4 @@
-import type { Journey, JourneyTemplate } from '../types/journey';
+import type { Journey } from '../types/journey';
 
 export interface ExportOptions {
   format: 'json' | 'csv';

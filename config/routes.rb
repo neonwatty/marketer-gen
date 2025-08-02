@@ -229,6 +229,15 @@ Rails.application.routes.draw do
           post :refresh_cache
         end
       end
+      
+      # Campaign Intake API
+      namespace :campaign_intake, path: 'campaign-intake' do
+        post :message
+        post :threads, action: :save_thread
+        get 'threads/:id', action: :get_thread
+        get :questionnaire
+        post :complete
+      end
     end
     
     # Legacy API endpoints (redirect to v1)
@@ -251,6 +260,9 @@ Rails.application.routes.draw do
 
   # Campaign Plans Management
   resources :campaigns, only: [:index, :show] do
+    collection do
+      get :intake
+    end
     resources :campaign_plans, path: 'plans', except: [:destroy] do
       member do
         get :dashboard

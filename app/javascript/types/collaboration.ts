@@ -28,15 +28,15 @@ export interface CampaignCollaborationMessage {
   type: 'plan_update' | 'comment_added' | 'status_change' | 'user_joined' | 'user_left' | 'cursor_move';
   user: User;
   campaign_plan_id: number;
-  data: any;
+  data: PlanUpdate | PlanComment | CursorPosition | Record<string, unknown>;
   timestamp: string;
   message_id: string;
 }
 
 export interface PlanUpdate {
   field: string;
-  old_value: any;
-  new_value: any;
+  old_value: string | number | boolean | null;
+  new_value: string | number | boolean | null;
   version: number;
   conflict_resolution?: 'accept' | 'reject' | 'merge';
 }
@@ -55,7 +55,7 @@ export interface ContentCollaborationMessage {
   type: 'content_update' | 'cursor_move' | 'selection_change' | 'user_joined' | 'user_left';
   user: User;
   content_id: number;
-  data: any;
+  data: OperationalTransform | EditorCursor | EditorSelection | Record<string, unknown>;
   timestamp: string;
   message_id: string;
 }
@@ -96,7 +96,7 @@ export interface EditorCursor {
 export interface AbTestMessage {
   type: 'metric_update' | 'status_change' | 'winner_declared' | 'traffic_update' | 'alert';
   ab_test_id: number;
-  data: any;
+  data: MetricUpdate | TrafficUpdate | TestAlert | Record<string, unknown>;
   timestamp: string;
   message_id: string;
 }
@@ -152,7 +152,7 @@ export interface WebSocketMessage {
   id: string;
   type: string;
   channel: string;
-  data: any;
+  data: Record<string, unknown>;
   timestamp: string;
   retry_count: number;
   max_retries: number;
@@ -199,16 +199,17 @@ export interface ChannelSubscription {
   connected: boolean;
   subscription_id: string;
   callbacks: Map<string, Function[]>;
+  actionCableSubscription?: any; // ActionCable subscription object
 }
 
 // Conflict Resolution Types
 export interface ConflictResolution {
   conflict_id: string;
   field: string;
-  local_value: any;
-  remote_value: any;
+  local_value: string | number | boolean | null;
+  remote_value: string | number | boolean | null;
   resolution_strategy: 'local_wins' | 'remote_wins' | 'merge' | 'manual';
-  resolved_value?: any;
+  resolved_value?: string | number | boolean | null;
   timestamp: string;
 }
 
@@ -234,7 +235,7 @@ export interface CollaborationEvents {
 export interface CollaborationError {
   code: string;
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
   recoverable: boolean;
   timestamp: string;
 }

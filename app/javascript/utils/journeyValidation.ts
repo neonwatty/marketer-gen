@@ -90,7 +90,7 @@ export const validateJourney = (journey: Journey): ValidationResult => {
   };
 };
 
-const validateStep = (step: JourneyStep, journey: Journey): ValidationError[] => {
+const validateStep = (step: JourneyStep, _journey: Journey): ValidationError[] => {
   const errors: ValidationError[] = [];
 
   // Validate step has title

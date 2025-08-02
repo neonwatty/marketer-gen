@@ -204,9 +204,13 @@ export default class extends Controller {
           liftElement.textContent = liftText
           
           // Update color based on lift direction
-          liftElement.className = lift > 0 ? 'font-medium text-green-600' 
-                                          : lift < 0 ? 'font-medium text-red-600' 
-                                          : 'font-medium text-gray-900'
+          if (lift > 0) {
+            liftElement.className = 'font-medium text-green-600';
+          } else if (lift < 0) {
+            liftElement.className = 'font-medium text-red-600';
+          } else {
+            liftElement.className = 'font-medium text-gray-900';
+          }
           
           liftElement.classList.add('animate-pulse')
           setTimeout(() => {

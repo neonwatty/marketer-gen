@@ -30,15 +30,6 @@ Agents communicate through structured completion reports embedded in their respo
 
 Automatic agent selection rules: [router.yaml](.claude/router.yaml)
 
-## Task Master Integration
-
-**Import Task Master commands:**
-@./.taskmaster/CLAUDE.md
-
-All agents automatically:
-- Update task status via `mcp__task-master-ai__set_task_status`
-- Log progress via `mcp__task-master-ai__update_subtask`
-
 ## Starting Complex Tasks
 
 ```bash

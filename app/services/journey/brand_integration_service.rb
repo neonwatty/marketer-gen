@@ -1,4 +1,4 @@
-module Journey
+module JourneyServices
   class BrandIntegrationService
     include ActiveSupport::Configurable
     
@@ -84,7 +84,7 @@ module Journey
       steps_to_validate = determine_validation_scope(options)
       
       steps_to_validate.each do |step|
-        compliance_service = Journey::BrandComplianceService.new(
+        compliance_service = JourneyServices::BrandComplianceService.new(
           journey: journey,
           step: step,
           content: step.description || step.name,
@@ -131,7 +131,7 @@ module Journey
       steps_to_enhance = determine_enhancement_scope(options)
       
       steps_to_enhance.each do |step|
-        compliance_service = Journey::BrandComplianceService.new(
+        compliance_service = JourneyServices::BrandComplianceService.new(
           journey: journey,
           step: step,
           content: step.description || step.name,
@@ -263,7 +263,7 @@ module Journey
       
       # Re-validate all journey steps against updated guidelines
       journey.journey_steps.each do |step|
-        compliance_service = Journey::BrandComplianceService.new(
+        compliance_service = JourneyServices::BrandComplianceService.new(
           journey: journey,
           step: step,
           content: step.description || step.name,

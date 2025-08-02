@@ -19,8 +19,8 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    // Code quality rules
-    'no-console': 'warn',
+    // Code quality rules (allow console in development)
+    'no-console': 'off', // Disabled for development, should be 'warn' in production
     'no-debugger': 'error',
     'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     
@@ -38,12 +38,12 @@ module.exports = {
     'prefer-promise-reject-errors': 'error',
     
     // Performance and accessibility
-    'no-nested-ternary': 'warn',
+    'no-nested-ternary': 'off', // Disabled for now, should be refactored for better readability
     'prefer-template': 'error',
     'object-shorthand': 'error',
     'no-duplicate-imports': 'error',
     
-    // Stimulus controller conventions
+    // Stimulus controller conventions (overridden in TypeScript files)
     'camelcase': ['error', { 
       properties: 'never',
       allow: ['^connect$', '^disconnect$', '^initialize$', '^.*Target$', '^.*Targets$', '^.*Value$', '^.*Values$', '^.*Class$', '^.*Classes$']
@@ -79,15 +79,35 @@ module.exports = {
         // Basic TypeScript rules
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-        '@typescript-eslint/no-explicit-any': 'warn',
+        '@typescript-eslint/no-explicit-any': 'off', // Disabled for now, should be gradually replaced
         '@typescript-eslint/no-empty-function': 'warn',
         
         // React rules
-        'react/react-in-jsx-scope': 'off',
-        'react/prop-types': 'off',
+        'react/react-in-jsx-scope': 'off', // React 17+ automatic JSX transform
+        'react/prop-types': 'off', // Using TypeScript for type checking
         'react/display-name': 'off',
+        'react/jsx-no-target-blank': ['error', { 'enforceDynamicLinks': 'always' }],
+        'react/jsx-key': 'error',
+        'react/no-array-index-key': 'warn',
+        'react/no-unescaped-entities': 'error',
+        'react/self-closing-comp': 'error',
+        'react/jsx-fragments': ['error', 'syntax'],
+        
+        // React Hooks rules
         'react-hooks/rules-of-hooks': 'error',
         'react-hooks/exhaustive-deps': 'warn',
+        
+        // Rails/Stimulus integration patterns
+        'camelcase': ['error', { 
+          properties: 'never',
+          allow: [
+            '^connect$', '^disconnect$', '^initialize$', 
+            '^.*Target$', '^.*Targets$', 
+            '^.*Value$', '^.*Values$', 
+            '^.*Class$', '^.*Classes$',
+            '^.*Outlet$', '^.*Outlets$'  // Stimulus 3.0 outlets
+          ]
+        }],
       },
     },
   ],

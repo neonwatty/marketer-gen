@@ -1,18 +1,171 @@
 import { Controller } from "@hotwired/stimulus"
+import { createConsumer } from "@rails/actioncable"
 import Sortable from "sortablejs"
 
 export default class extends Controller {
-  static targets = ["content"]
+  static targets = [
+    "content", "realTimeValidation", "complianceScore", "validationResults",
+    "suggestionsList", "aiSuggestionsPanel", "contentPreview", "brandCompliance"
+  ]
+  
+  static values = {
+    brandId: Number,
+    frameworkId: Number,
+    enableRealTimeValidation: { type: Boolean, default: true },
+    validationDelay: { type: Number, default: 1000 }
+  }
   
   connect() {
-    this.brandId = document.querySelector('[data-brand-id]').value
-    this.frameworkId = document.querySelector('[data-framework-id]').value
+    console.log("Enhanced messaging framework controller connected")
+    this.brandId = this.brandIdValue || document.querySelector('[data-brand-id]')?.value
+    this.frameworkId = this.frameworkIdValue || document.querySelector('[data-framework-id]')?.value
     this.frameworkData = {}
     this.unsavedChanges = false
+    this.validationTimeouts = new Map()
     
+    this.initializeWebSocket()
     this.initializeSortable()
     this.bindInputListeners()
     this.bindToneControls()
+    this.setupRealTimeValidation()
+  }
+
+  disconnect() {
+    if (this.subscription) {
+      this.subscription.unsubscribe()
+    }
+    // Clear all validation timeouts
+    this.validationTimeouts.forEach(timeout => clearTimeout(timeout))
+  }
+
+  // WebSocket Integration for Real-time Features
+  initializeWebSocket() {
+    if (!this.brandId) {return}
+
+    this.consumer = createConsumer()
+    this.subscription = this.consumer.subscriptions.create(
+      {
+        channel: "MessagingFrameworkChannel",
+        brand_id: this.brandId,
+        framework_id: this.frameworkId
+      },
+      {
+        connected: this.wsConnected.bind(this),
+        disconnected: this.wsDisconnected.bind(this),
+        received: this.wsReceived.bind(this)
+      }
+    )
+  }
+
+  wsConnected() {
+    console.log("Connected to messaging framework channel")
+    this.showNotification("Connected to real-time validation", "success")
+  }
+
+  wsDisconnected() {
+    console.log("Disconnected from messaging framework channel")
+    this.showNotification("Disconnected from real-time validation", "warning")
+  }
+
+  wsReceived(data) {
+    switch (data.event) {
+      case "validation_complete":
+        this.handleValidationComplete(data)
+        break
+      case "suggestion_generated":
+        this.handleSuggestionGenerated(data)
+        break
+      case "compliance_update":
+        this.handleComplianceUpdate(data)
+        break
+      case "framework_updated":
+        this.handleFrameworkUpdated(data)
+        break
+    }
+  }
+
+  // Real-time Validation Setup
+  setupRealTimeValidation() {
+    if (!this.enableRealTimeValidationValue) {return}
+
+    // Set up validation for all text inputs and textareas
+    const validatableElements = this.element.querySelectorAll(
+      'input[data-field], textarea[data-field], [data-validate-realtime]'
+    )
+
+    validatableElements.forEach(element => {
+      element.addEventListener('input', (event) => {
+        this.scheduleValidation(element, event.target.value)
+      })
+
+      element.addEventListener('blur', (event) => {
+        this.performImmediateValidation(element, event.target.value)
+      })
+    })
+  }
+
+  scheduleValidation(element, content) {
+    const elementId = element.id || element.dataset.field || Math.random().toString(36)
+    
+    // Clear existing timeout for this element
+    if (this.validationTimeouts.has(elementId)) {
+      clearTimeout(this.validationTimeouts.get(elementId))
+    }
+
+    // Schedule new validation
+    const timeout = setTimeout(() => {
+      this.performRealTimeValidation(element, content)
+    }, this.validationDelayValue)
+
+    this.validationTimeouts.set(elementId, timeout)
+  }
+
+  async performRealTimeValidation(element, content) {
+    if (!content || content.length < 3) {
+      this.clearValidationResults(element)
+      return
+    }
+
+    try {
+      this.showValidationLoading(element)
+
+      const response = await fetch(`/api/v1/brands/${this.brandId}/messaging_framework/validate_realtime`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          content,
+          field_type: element.dataset.field || 'general',
+          validation_type: 'comprehensive'
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        this.displayInlineValidation(element, data)
+        this.updateComplianceScore(data.compliance_score)
+      } else {
+        this.showValidationError(element, 'Validation failed')
+      }
+
+    } catch (error) {
+      console.error('Real-time validation error:', error)
+      this.showValidationError(element, 'Validation error')
+    }
+  }
+
+  async performImmediateValidation(element, content) {
+    // Cancel any scheduled validation
+    const elementId = element.id || element.dataset.field || Math.random().toString(36)
+    if (this.validationTimeouts.has(elementId)) {
+      clearTimeout(this.validationTimeouts.get(elementId))
+      this.validationTimeouts.delete(elementId)
+    }
+
+    await this.performRealTimeValidation(element, content)
   }
 
   initializeSortable() {
@@ -49,7 +202,293 @@ export default class extends Controller {
       input.addEventListener('input', () => {
         this.unsavedChanges = true
         this.updateFrameworkData(input.dataset.field, input.value)
+        
+        // Also trigger real-time validation if enabled
+        if (this.enableRealTimeValidationValue) {
+          this.scheduleValidation(input, input.value)
+        }
       })
+    })
+  }
+
+  // WebSocket Event Handlers
+  handleValidationComplete(data) {
+    const element = this.element.querySelector(`[data-field="${data.field}"]`)
+    if (element) {
+      this.displayInlineValidation(element, data.results)
+    }
+    
+    if (data.overall_compliance) {
+      this.updateComplianceScore(data.overall_compliance)
+    }
+  }
+
+  handleSuggestionGenerated(data) {
+    if (this.hasAiSuggestionsPanelTarget) {
+      this.displayRealTimeSuggestions(data.suggestions)
+    }
+  }
+
+  handleComplianceUpdate(data) {
+    this.updateComplianceScore(data.score)
+    
+    if (data.violations && this.hasValidationResultsTarget) {
+      this.displayComplianceViolations(data.violations)
+    }
+  }
+
+  handleFrameworkUpdated(data) {
+    this.showNotification("Framework updated by another user", "info")
+    // Optionally refresh the page or merge changes
+  }
+
+  // Validation Display Methods
+  showValidationLoading(element) {
+    this.clearValidationResults(element)
+    const loadingIndicator = this.createValidationIndicator('loading', 'Validating...')
+    this.insertValidationIndicator(element, loadingIndicator)
+  }
+
+  showValidationError(element, message) {
+    this.clearValidationResults(element)
+    const errorIndicator = this.createValidationIndicator('error', message)
+    this.insertValidationIndicator(element, errorIndicator)
+  }
+
+  displayInlineValidation(element, data) {
+    this.clearValidationResults(element)
+    
+    if (data.violations && data.violations.length > 0) {
+      const violationIndicator = this.createViolationIndicator(data.violations)
+      this.insertValidationIndicator(element, violationIndicator)
+    } else if (data.score) {
+      const scoreIndicator = this.createScoreIndicator(data.score)
+      this.insertValidationIndicator(element, scoreIndicator)
+    }
+
+    // Show suggestions if available
+    if (data.suggestions && data.suggestions.length > 0) {
+      this.displayInlineSuggestions(element, data.suggestions)
+    }
+  }
+
+  createValidationIndicator(type, message) {
+    const indicator = document.createElement('div')
+    indicator.className = `validation-indicator mt-2 p-2 rounded-md text-sm ${
+      type === 'loading' ? 'bg-blue-50 text-blue-700' :
+      type === 'error' ? 'bg-red-50 text-red-700' :
+      type === 'success' ? 'bg-green-50 text-green-700' :
+      'bg-gray-50 text-gray-700'
+    }`
+    
+    const icon = type === 'loading' ? 
+      '<svg class="animate-spin h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>' :
+      type === 'error' ?
+      '<svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' :
+      '<svg class="h-4 w-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+    
+    indicator.innerHTML = `${icon}${message}`
+    return indicator
+  }
+
+  createViolationIndicator(violations) {
+    const container = document.createElement('div')
+    container.className = 'validation-indicator mt-2 space-y-2'
+    
+    violations.forEach(violation => {
+      const violationDiv = document.createElement('div')
+      violationDiv.className = 'p-2 bg-red-50 border border-red-200 rounded-md'
+      
+      violationDiv.innerHTML = `
+        <div class="flex items-start">
+          <svg class="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div class="ml-2">
+            <p class="text-sm font-medium text-red-800">${violation.type}</p>
+            <p class="text-xs text-red-600 mt-1">${violation.message}</p>
+            ${violation.suggestion ? `
+              <p class="text-xs text-red-500 mt-1 italic">Suggestion: ${violation.suggestion}</p>
+            ` : ''}
+          </div>
+        </div>
+      `
+      
+      container.appendChild(violationDiv)
+    })
+    
+    return container
+  }
+
+  createScoreIndicator(score) {
+    const indicator = document.createElement('div')
+    const percentage = Math.round(score * 100)
+    const isGood = percentage >= 80
+    
+    indicator.className = `validation-indicator mt-2 p-2 rounded-md text-sm ${
+      isGood ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'
+    }`
+    
+    indicator.innerHTML = `
+      <div class="flex items-center">
+        <svg class="h-4 w-4 mr-2 ${isGood ? 'text-green-500' : 'text-yellow-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Brand compliance: ${percentage}%</span>
+      </div>
+    `
+    
+    return indicator
+  }
+
+  insertValidationIndicator(element, indicator) {
+    const container = element.parentElement
+    let validationContainer = container.querySelector('.validation-container')
+    
+    if (!validationContainer) {
+      validationContainer = document.createElement('div')
+      validationContainer.className = 'validation-container'
+      container.appendChild(validationContainer)
+    }
+    
+    validationContainer.appendChild(indicator)
+  }
+
+  clearValidationResults(element) {
+    const container = element.parentElement
+    const validationContainer = container.querySelector('.validation-container')
+    if (validationContainer) {
+      validationContainer.innerHTML = ''
+    }
+  }
+
+  displayInlineSuggestions(element, suggestions) {
+    if (suggestions.length === 0) {return}
+
+    const suggestionsContainer = document.createElement('div')
+    suggestionsContainer.className = 'suggestions-container mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md'
+    
+    const header = document.createElement('h4')
+    header.className = 'text-sm font-medium text-blue-900 mb-2'
+    header.textContent = 'AI Suggestions:'
+    suggestionsContainer.appendChild(header)
+    
+    const suggestionsList = document.createElement('div')
+    suggestionsList.className = 'space-y-1'
+    
+    suggestions.slice(0, 3).forEach((suggestion, index) => {
+      const suggestionDiv = document.createElement('div')
+      suggestionDiv.className = 'flex items-start text-sm text-blue-800 cursor-pointer hover:bg-blue-100 p-1 rounded'
+      suggestionDiv.innerHTML = `
+        <span class="flex-shrink-0 w-4 h-4 rounded-full bg-blue-200 text-blue-800 text-xs flex items-center justify-center mt-0.5 mr-2">
+          ${index + 1}
+        </span>
+        <span class="flex-1">${suggestion}</span>
+      `
+      
+      suggestionDiv.addEventListener('click', () => {
+        this.applySuggestion(element, suggestion)
+      })
+      
+      suggestionsList.appendChild(suggestionDiv)
+    })
+    
+    suggestionsContainer.appendChild(suggestionsList)
+    
+    // Insert into validation container
+    const container = element.parentElement
+    let validationContainer = container.querySelector('.validation-container')
+    
+    if (!validationContainer) {
+      validationContainer = document.createElement('div')
+      validationContainer.className = 'validation-container'
+      container.appendChild(validationContainer)
+    }
+    
+    validationContainer.appendChild(suggestionsContainer)
+  }
+
+  applySuggestion(element, suggestion) {
+    element.value = suggestion
+    element.dispatchEvent(new Event('input', { bubbles: true }))
+    this.unsavedChanges = true
+    this.showNotification('Suggestion applied', 'success')
+  }
+
+  updateComplianceScore(score) {
+    if (!this.hasComplianceScoreTarget) {return}
+
+    const percentage = Math.round(score * 100)
+    this.complianceScoreTarget.textContent = `${percentage}%`
+    
+    // Update color based on score
+    const scoreElement = this.complianceScoreTarget
+    scoreElement.className = `text-lg font-semibold ${
+      percentage >= 90 ? 'text-green-600' :
+      percentage >= 70 ? 'text-yellow-600' : 'text-red-600'
+    }`
+    
+    // Update compliance indicator if present
+    const indicator = scoreElement.parentElement.querySelector('.compliance-indicator')
+    if (indicator) {
+      indicator.className = `compliance-indicator w-3 h-3 rounded-full ${
+        percentage >= 90 ? 'bg-green-500' :
+        percentage >= 70 ? 'bg-yellow-500' : 'bg-red-500'
+      }`
+    }
+  }
+
+  displayRealTimeSuggestions(suggestions) {
+    if (!this.hasAiSuggestionsPanelTarget) {return}
+
+    this.aiSuggestionsPanelTarget.innerHTML = ''
+
+    if (suggestions.length === 0) {
+      this.aiSuggestionsPanelTarget.innerHTML = `
+        <p class="text-gray-500 text-center py-4">No suggestions available</p>
+      `
+      return
+    }
+
+    suggestions.forEach((suggestion, index) => {
+      const suggestionElement = document.createElement('div')
+      suggestionElement.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2 cursor-pointer hover:bg-blue-100 transition-colors'
+      
+      suggestionElement.innerHTML = `
+        <div class="flex items-start">
+          <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 text-xs font-medium rounded-full flex items-center justify-center mr-3">
+            ${index + 1}
+          </span>
+          <div class="flex-1">
+            <p class="text-sm text-blue-900">${suggestion.text}</p>
+            ${suggestion.confidence ? `
+              <p class="text-xs text-blue-600 mt-1">Confidence: ${Math.round(suggestion.confidence * 100)}%</p>
+            ` : ''}
+          </div>
+        </div>
+      `
+      
+      if (suggestion.target_field) {
+        suggestionElement.addEventListener('click', () => {
+          const targetElement = this.element.querySelector(`[data-field="${suggestion.target_field}"]`)
+          if (targetElement) {
+            this.applySuggestion(targetElement, suggestion.text)
+          }
+        })
+      }
+      
+      this.aiSuggestionsPanelTarget.appendChild(suggestionElement)
+    })
+  }
+
+  displayComplianceViolations(violations) {
+    if (!this.hasValidationResultsTarget) {return}
+
+    this.validationResultsTarget.innerHTML = ''
+
+    violations.forEach(violation => {
+      const violationElement = this.createViolationIndicator([violation])
+      this.validationResultsTarget.appendChild(violationElement)
     })
   }
 

@@ -2,3 +2,4 @@
 import "@hotwired/turbo-rails"
 import "controllers"
 import "./journey_builder"
+import "./campaign_intake_app"

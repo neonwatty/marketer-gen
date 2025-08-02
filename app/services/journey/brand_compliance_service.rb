@@ -1,4 +1,4 @@
-module Journey
+module JourneyServices
   class BrandComplianceService
     include ActiveSupport::Configurable
     

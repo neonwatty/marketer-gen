@@ -13,6 +13,7 @@ class User < ApplicationRecord
   has_many :ab_tests, dependent: :destroy
   has_many :brands, dependent: :destroy
   has_many :suggestion_feedbacks, dependent: :destroy
+  has_many :campaign_intake_sessions, dependent: :destroy
   
   # Self-referential association for suspension tracking
   belongs_to :suspended_by, class_name: "User", optional: true

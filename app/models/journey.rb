@@ -283,4 +283,148 @@ class Journey < ApplicationRecord
     
     alerts
   end
+
+  # Brand-compliant content generation
+  def generate_brand_compliant_content(generation_request)
+    return { success: false, error: "No brand associated with journey" } unless brand_id.present?
+    return { success: false, error: "No messaging framework available" } unless brand.messaging_framework.present?
+    
+    # Generate base content using messaging framework
+    messaging_framework = brand.messaging_framework
+    
+    # Create brand-compliant content based on request
+    case generation_request[:content_type]
+    when 'email'
+      generate_brand_compliant_email(generation_request, messaging_framework)
+    when 'blog_post'
+      generate_brand_compliant_blog_post(generation_request, messaging_framework)
+    when 'social_post'
+      generate_brand_compliant_social_post(generation_request, messaging_framework)
+    else
+      generate_generic_brand_compliant_content(generation_request, messaging_framework)
+    end
+  end
+
+  private
+
+  def generate_brand_compliant_email(request, messaging_framework)
+    # Professional email generation with brand compliance
+    subject_templates = [
+      "Important Update About Our Services",
+      "Exclusive Insights for Our Valued Customers",
+      "Enhancing Your Experience with Our Solutions"
+    ]
+    
+    body_templates = [
+      "We are pleased to inform you about our latest service enhancements. Our commitment to excellence drives us to deliver innovative solutions that provide measurable value to your organization.",
+      "Thank you for being a valued customer. We continue to enhance our platform to better serve your needs and deliver the exceptional results you expect from our partnership.",
+      "Our team is committed to providing you with the highest quality service. We have implemented new features designed to improve your experience and help you achieve your business objectives."
+    ]
+    
+    # Apply brand-specific customization
+    subject = customize_content_for_brand(subject_templates.sample, messaging_framework)
+    body = customize_content_for_brand(body_templates.sample, messaging_framework)
+    
+    # Validate compliance
+    compliance_score = messaging_framework.validate_message_realtime("#{subject} #{body}")[:validation_score]
+    
+    {
+      success: true,
+      content: {
+        subject: subject,
+        body: body
+      },
+      compliance_score: compliance_score,
+      brand_alignment: calculate_brand_alignment(subject + " " + body, messaging_framework)
+    }
+  end
+
+  def generate_brand_compliant_blog_post(request, messaging_framework)
+    title = "Innovation in #{request[:audience] || 'Business'}: Delivering Excellence Through Strategic Solutions"
+    content = "Our commitment to innovation and customer success drives everything we do. Through strategic partnerships and cutting-edge solutions, we deliver measurable results that help organizations achieve their most important objectives."
+    
+    title = customize_content_for_brand(title, messaging_framework)
+    content = customize_content_for_brand(content, messaging_framework)
+    
+    compliance_score = messaging_framework.validate_message_realtime("#{title} #{content}")[:validation_score]
+    
+    {
+      success: true,
+      content: {
+        title: title,
+        body: content
+      },
+      compliance_score: compliance_score,
+      brand_alignment: calculate_brand_alignment(title + " " + content, messaging_framework)
+    }
+  end
+
+  def generate_brand_compliant_social_post(request, messaging_framework)
+    templates = [
+      "Committed to delivering excellence in every interaction. #Innovation #Excellence",
+      "Strategic solutions that drive measurable results for our clients. #Results #Partnership",
+      "Innovation meets reliability in our comprehensive platform. #Innovation #Reliability"
+    ]
+    
+    content = customize_content_for_brand(templates.sample, messaging_framework)
+    compliance_score = messaging_framework.validate_message_realtime(content)[:validation_score]
+    
+    {
+      success: true,
+      content: {
+        body: content
+      },
+      compliance_score: compliance_score,
+      brand_alignment: calculate_brand_alignment(content, messaging_framework)
+    }
+  end
+
+  def generate_generic_brand_compliant_content(request, messaging_framework)
+    content = "We are committed to delivering innovative solutions that provide exceptional value. Our professional approach ensures reliable results that help you achieve your objectives."
+    content = customize_content_for_brand(content, messaging_framework)
+    
+    compliance_score = messaging_framework.validate_message_realtime(content)[:validation_score]
+    
+    {
+      success: true,
+      content: {
+        body: content
+      },
+      compliance_score: compliance_score,
+      brand_alignment: calculate_brand_alignment(content, messaging_framework)
+    }
+  end
+
+  def customize_content_for_brand(content, messaging_framework)
+    # Incorporate approved phrases if available
+    if messaging_framework.approved_phrases.present?
+      # Replace generic terms with approved phrases
+      approved_phrase = messaging_framework.approved_phrases.sample
+      content = content.gsub(/excellent|great|good/, approved_phrase) if approved_phrase
+    end
+    
+    # Adjust tone based on brand attributes
+    if messaging_framework.tone_attributes.present?
+      tone = messaging_framework.tone_attributes
+      
+      if tone["formality"] == "formal"
+        content = content.gsub(/we're/, "we are").gsub(/don't/, "do not")
+      end
+      
+      if tone["style"] == "professional"
+        content = content.gsub(/awesome|great/, "excellent").gsub(/amazing/, "exceptional")
+      end
+    end
+    
+    content
+  end
+
+  def calculate_brand_alignment(content, messaging_framework)
+    validation = messaging_framework.validate_message_realtime(content)
+    {
+      score: validation[:validation_score],
+      violations: validation[:rule_violations].count,
+      suggestions_count: validation[:suggestions].count
+    }
+  end
 end

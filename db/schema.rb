@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_02_133132) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_02_202043) do
   create_table "ab_test_configurations", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.string "configuration_type"
@@ -219,10 +219,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_133132) do
     t.datetime "processed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_url"
+    t.bigint "file_size"
+    t.string "virus_scan_status", default: "pending"
+    t.integer "upload_progress", default: 0
+    t.integer "chunk_count"
+    t.integer "chunks_uploaded", default: 0
     t.index ["asset_type"], name: "index_brand_assets_on_asset_type"
     t.index ["brand_id", "asset_type"], name: "index_brand_assets_on_brand_id_and_asset_type"
     t.index ["brand_id"], name: "index_brand_assets_on_brand_id"
+    t.index ["external_url"], name: "index_brand_assets_on_external_url"
     t.index ["processing_status"], name: "index_brand_assets_on_processing_status"
+    t.index ["virus_scan_status"], name: "index_brand_assets_on_virus_scan_status"
   end
 
   create_table "brand_guidelines", force: :cascade do |t|
@@ -260,6 +268,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_133132) do
     t.index ["industry"], name: "index_brands_on_industry"
     t.index ["user_id", "name"], name: "index_brands_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_brands_on_user_id"
+  end
+
+  create_table "campaign_intake_sessions", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "campaign_id"
+    t.string "thread_id", null: false
+    t.string "status"
+    t.json "context"
+    t.json "messages"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.float "estimated_completion_time"
+    t.float "actual_completion_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_campaign_intake_sessions_on_campaign_id"
+    t.index ["status"], name: "index_campaign_intake_sessions_on_status"
+    t.index ["user_id", "thread_id"], name: "index_campaign_intake_sessions_on_user_id_and_thread_id", unique: true
+    t.index ["user_id"], name: "index_campaign_intake_sessions_on_user_id"
   end
 
   create_table "campaign_plans", force: :cascade do |t|
@@ -903,6 +930,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_133132) do
   add_foreign_key "brand_assets", "brands"
   add_foreign_key "brand_guidelines", "brands"
   add_foreign_key "brands", "users"
+  add_foreign_key "campaign_intake_sessions", "campaigns"
+  add_foreign_key "campaign_intake_sessions", "users"
   add_foreign_key "campaign_plans", "campaigns"
   add_foreign_key "campaign_plans", "users"
   add_foreign_key "campaigns", "personas"

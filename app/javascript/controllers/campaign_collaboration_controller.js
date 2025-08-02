@@ -148,7 +148,7 @@ export default class extends Controller {
     } else if (field.dataset.jsonField) {
       try {
         return JSON.parse(field.value)
-      } catch (_e) {
+      } catch {
         return field.value
       }
     }

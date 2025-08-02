@@ -65,6 +65,7 @@ class JourneyStep < ApplicationRecord
   
   # Brand compliance validations
   validate :validate_brand_compliance, if: :should_validate_brand_compliance?
+  validate :validate_messaging_compliance, if: :should_validate_messaging_compliance?
   
   scope :by_position, -> { order(:position) }
   scope :by_stage, ->(stage) { where(stage: stage) }
@@ -152,40 +153,38 @@ class JourneyStep < ApplicationRecord
   def check_brand_compliance(options = {})
     return no_brand_result unless has_brand?
     
-    compliance_service = Journey::BrandComplianceService.new(
-      journey: journey,
-      step: self,
-      content: compilable_content,
-      context: build_compliance_context
-    )
+    return no_brand_result unless journey.brand.messaging_framework.present?
     
-    compliance_service.check_compliance(options)
+    result = journey.brand.messaging_framework.validate_journey_step(self)
+    
+    {
+      compliant: result[:approved_for_journey],
+      score: result[:validation_score],
+      summary: result[:approved_for_journey] ? "Content meets brand standards" : "Content violates brand compliance",
+      violations: result[:violations] || [],
+      suggestions: result[:suggestions] || [],
+      step_context: build_compliance_context
+    }
   end
   
   def brand_compliant?(threshold = nil)
     return true unless has_brand?
     
-    compliance_service = Journey::BrandComplianceService.new(
-      journey: journey,
-      step: self,
-      content: compilable_content,
-      context: build_compliance_context
-    )
+    return true unless journey.brand.messaging_framework.present?
     
-    compliance_service.meets_minimum_compliance?(threshold)
+    result = journey.brand.messaging_framework.validate_journey_step(self)
+    threshold ||= 0.7
+    
+    result[:validation_score] >= threshold
   end
   
   def quick_compliance_score
     return 1.0 unless has_brand?
     
-    compliance_service = Journey::BrandComplianceService.new(
-      journey: journey,
-      step: self,
-      content: compilable_content,
-      context: build_compliance_context
-    )
+    return 1.0 unless journey.brand.messaging_framework.present?
     
-    compliance_service.quick_score
+    result = journey.brand.messaging_framework.validate_journey_step(self)
+    result[:validation_score] || 1.0
   end
   
   def compliance_violations
@@ -198,64 +197,62 @@ class JourneyStep < ApplicationRecord
   def compliance_suggestions
     return [] unless has_brand?
     
-    compliance_service = Journey::BrandComplianceService.new(
-      journey: journey,
-      step: self,
-      content: compilable_content,
-      context: build_compliance_context
-    )
+    return [] unless journey.brand.messaging_framework.present?
     
-    recommendations = compliance_service.get_recommendations
-    recommendations[:recommendations] || []
+    result = journey.brand.messaging_framework.validate_journey_step(self)
+    result[:suggestions] || []
   end
   
   def auto_fix_compliance_issues
     return { fixed: false, content: compilable_content } unless has_brand?
     
-    compliance_service = Journey::BrandComplianceService.new(
-      journey: journey,
-      step: self,
-      content: compilable_content,
-      context: build_compliance_context
-    )
+    return { fixed: false, content: compilable_content } unless journey.brand.messaging_framework.present?
     
-    fix_results = compliance_service.auto_fix_violations
+    # Simple auto-fix: remove banned words and replace with approved phrases
+    messaging_framework = journey.brand.messaging_framework
+    fixed_content = compilable_content.dup
+    fixes_applied = []
     
-    if fix_results[:fixed_content].present?
-      # Update description with fixed content if auto-fix was successful
-      update_column(:description, fix_results[:fixed_content])
-      { fixed: true, content: fix_results[:fixed_content], fixes: fix_results[:fixes_applied] }
+    # Remove banned words
+    if messaging_framework.banned_words.present?
+      messaging_framework.banned_words.each do |banned_word|
+        if fixed_content.downcase.include?(banned_word.downcase)
+          fixed_content.gsub!(/\b#{Regexp.escape(banned_word)}\b/i, "")
+          fixes_applied << "Removed banned word: #{banned_word}"
+        end
+      end
+    end
+    
+    # Add approved phrases if available
+    if messaging_framework.approved_phrases.present? && fixes_applied.any?
+      approved_phrase = messaging_framework.approved_phrases.sample
+      fixed_content += " #{approved_phrase}"
+      fixes_applied << "Added approved phrase: #{approved_phrase}"
+    end
+    
+    if fixes_applied.any?
+      update_column(:description, fixed_content.strip)
+      { fixed: true, content: fixed_content.strip, fixes: fixes_applied }
     else
-      { fixed: false, content: compilable_content, available_fixes: fix_results[:fixes_available] }
+      { fixed: false, content: compilable_content }
     end
   end
   
   def messaging_compliant?(message_text = nil)
     return true unless has_brand?
     
+    return true unless journey.brand.messaging_framework.present?
+    
     content_to_check = message_text || compilable_content
+    result = journey.brand.messaging_framework.validate_message_realtime(content_to_check)
     
-    compliance_service = Journey::BrandComplianceService.new(
-      journey: journey,
-      step: self,
-      content: content_to_check,
-      context: build_compliance_context
-    )
-    
-    compliance_service.messaging_allowed?(content_to_check)
+    result[:validation_score] >= 0.7
   end
   
   def applicable_brand_guidelines
     return [] unless has_brand?
     
-    compliance_service = Journey::BrandComplianceService.new(
-      journey: journey,
-      step: self,
-      content: compilable_content,
-      context: build_compliance_context
-    )
-    
-    compliance_service.applicable_brand_rules
+    journey.brand.brand_guidelines.active.order(priority: :desc).limit(10)
   end
   
   def brand_context
@@ -307,6 +304,29 @@ class JourneyStep < ApplicationRecord
     !skip_brand_validation? &&
     compilable_content.present?
   end
+
+  def should_validate_messaging_compliance?
+    has_brand? && 
+    journey.brand.messaging_framework.present? &&
+    (config_changed? || description_changed? || name_changed?) && 
+    !skip_brand_validation? &&
+    compilable_content.present?
+  end
+
+  def validate_messaging_compliance
+    return unless journey.brand.messaging_framework.present?
+    
+    result = journey.brand.messaging_framework.validate_journey_step(self)
+    
+    unless result[:approved_for_journey]
+      violations = result[:violations] || []
+      if violations.any?
+        errors.add(:content, "violates brand compliance rules: #{violations.join(', ')}")
+      else
+        errors.add(:content, "does not meet brand compliance standards (score: #{result[:validation_score]})")
+      end
+    end
+  end
   
   def should_check_compliance?
     has_brand? && 
@@ -317,26 +337,17 @@ class JourneyStep < ApplicationRecord
   def validate_brand_compliance
     return unless compilable_content.present?
     
-    compliance_service = Journey::BrandComplianceService.new(
-      journey: journey,
-      step: self,
-      content: compilable_content,
-      context: build_compliance_context
-    )
+    # Use messaging framework for simpler validation instead of complex service
+    return unless journey.brand.messaging_framework.present?
     
-    # Quick validation check
-    result = compliance_service.pre_generation_check(compilable_content)
+    result = journey.brand.messaging_framework.validate_journey_step(self)
     
-    unless result[:allowed]
+    unless result[:approved_for_journey]
       violations = result[:violations] || []
       if violations.any?
-        critical_violations = violations.select { |v| v[:severity] == 'critical' }
-        if critical_violations.any?
-          errors.add(:description, "Content violates critical brand guidelines: #{critical_violations.map { |v| v[:message] }.join(', ')}")
-        else
-          # Add warnings for non-critical violations
-          errors.add(:description, "Content may violate brand guidelines: #{violations.first[:message]}") if violations.any?
-        end
+        errors.add(:description, "Content violates brand guidelines: #{violations.join(', ')}")
+      else
+        errors.add(:description, "Content does not meet brand compliance standards (score: #{result[:validation_score]})")
       end
     end
   end
@@ -385,6 +396,14 @@ class JourneyStep < ApplicationRecord
   def compilable_content
     # Combine name and description for compliance checking
     content_parts = [name, description].compact
+    
+    # Add config hash data if present
+    if config.is_a?(Hash)
+      content_parts << config['subject'] if config['subject'].present?
+      content_parts << config['body'] if config['body'].present?
+      content_parts << config['title'] if config['title'].present?
+    end
+    
     content_parts.join(". ").strip
   end
   
