@@ -19,6 +19,10 @@ class Brand < ApplicationRecord
   has_many :crm_leads, through: :crm_integrations
   has_many :crm_opportunities, through: :crm_integrations
   has_many :crm_analytics, through: :crm_integrations
+  
+  # Custom Reports
+  has_many :custom_reports, dependent: :destroy
+  has_many :report_distribution_lists, dependent: :destroy
 
   # Validations
   validates :name, presence: true, uniqueness: { scope: :user_id }

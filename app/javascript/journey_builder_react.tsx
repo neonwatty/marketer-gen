@@ -12,7 +12,7 @@ interface JourneyBuilderAppProps {
 }
 
 const JourneyBuilderApp: React.FC<JourneyBuilderAppProps> = ({ 
-  templateId, 
+  templateId: _templateId, 
   journeyData 
 }) => {
   const { loadJourney, journey } = useJourneyStore();

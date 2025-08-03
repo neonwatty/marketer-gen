@@ -1,5 +1,20 @@
 // Entry point for your Sass build
 @import "../tailwind/application.css";
+
+// Theme System - Core architecture
+@import "theme_system";
+@import "enhanced_typography";
+@import "theme_components";
+@import "accessibility_enhancements";
+@import "theme_integration";
+
+// UX Optimization - Animation and interaction enhancements
+@import "ux_animations";
+
+// Existing components (now theme-aware)
 @import "typography";
+@import "responsive_mobile";  // Mobile-first responsive design system
 @import "journey_builder";  
 @import "messaging_framework";
+@import "dashboard";
+@import "content_editor";

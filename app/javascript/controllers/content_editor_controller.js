@@ -1,15 +1,27 @@
 import { Controller } from "@hotwired/stimulus"
+import React from "react"
+import { createRoot } from "react-dom/client"
+import ContentEditorInterface from "../components/ContentEditorInterface"
 
 // Connects to data-controller="content-editor"
 export default class extends Controller {
   static targets = [
     "form", "titleField", "contentTypeField", "formatField", "contentField",
     "editorView", "previewView", "previewContent", "previewToggle",
-    "autoSaveStatus", "wordCount", "saveButton", "loadingOverlay", "loadingMessage"
+    "autoSaveStatus", "wordCount", "saveButton", "loadingOverlay", "loadingMessage",
+    "reactMount"
   ]
   
   static values = {
-    autoSaveUrl: String
+    autoSaveUrl: String,
+    contentType: { type: String, default: "rich" },
+    collaborative: { type: Boolean, default: false },
+    showTemplates: { type: Boolean, default: true },
+    showMediaManager: { type: Boolean, default: true },
+    showLivePreview: { type: Boolean, default: true },
+    maxLength: Number,
+    brandColors: Array,
+    collaborators: Array
   }
 
   connect() {
@@ -18,6 +30,58 @@ export default class extends Controller {
     this.isPreviewMode = false
     this.lastSavedContent = ''
     
+    // Initialize React component if mount target exists
+    if (this.hasReactMountTarget) {
+      this.initializeReactEditor()
+    } else {
+      // Fallback to legacy editor
+      this.initializeLegacyEditor()
+    }
+  }
+
+  disconnect() {
+    if (this.reactRoot) {
+      this.reactRoot.unmount()
+    }
+    if (this.autoSaveTimeout) {
+      clearTimeout(this.autoSaveTimeout)
+    }
+    if (this.autoSaveInterval) {
+      clearInterval(this.autoSaveInterval)
+    }
+  }
+
+  initializeReactEditor() {
+    const initialContent = this.hasContentFieldTarget ? this.contentFieldTarget.value : ''
+    
+    const props = {
+      initialContent,
+      contentType: this.contentTypeValue,
+      onSave: this.handleReactSave.bind(this),
+      onAutoSave: this.handleReactAutoSave.bind(this),
+      autoSaveEnabled: Boolean(this.autoSaveUrlValue),
+      autoSaveDelay: 2000,
+      showTemplates: this.showTemplatesValue,
+      showMediaManager: this.showMediaManagerValue,
+      showLivePreview: this.showLivePreviewValue,
+      collaborative: this.collaborativeValue,
+      collaborators: this.collaboratorsValue || [],
+      brand: {
+        colors: this.brandColorsValue || []
+      },
+      onContentChange: this.handleContentChange.bind(this),
+      maxLength: this.maxLengthValue,
+      showCharacterCount: Boolean(this.maxLengthValue),
+      showWordCount: true,
+      editorHeight: '400px',
+      enableAccessibility: true
+    }
+
+    this.reactRoot = createRoot(this.reactMountTarget)
+    this.reactRoot.render(React.createElement(ContentEditorInterface, props))
+  }
+
+  initializeLegacyEditor() {
     // Initialize auto-save
     this.setupAutoSave()
     
@@ -26,6 +90,54 @@ export default class extends Controller {
     
     // Initialize preview content
     this.updatePreview()
+  }
+
+  async handleReactSave(content, metadata) {
+    if (this.hasContentFieldTarget) {
+      this.contentFieldTarget.value = content
+    }
+    
+    if (this.hasFormTarget) {
+      // Submit the form
+      this.formTarget.submit()
+    }
+  }
+
+  async handleReactAutoSave(content) {
+    if (!this.autoSaveUrlValue) {return}
+
+    try {
+      const formData = new FormData()
+      formData.append('content', content)
+      
+      if (this.hasTitleFieldTarget) {
+        formData.append('title', this.titleFieldTarget.value)
+      }
+      
+      const response = await fetch(this.autoSaveUrlValue, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-Token': this.getCSRFToken()
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Auto-save failed')
+      }
+
+      this.lastSavedContent = content
+    } catch (error) {
+      console.error('Auto-save error:', error)
+      throw error
+    }
+  }
+
+  handleContentChange(content) {
+    if (this.hasContentFieldTarget) {
+      this.contentFieldTarget.value = content
+    }
   }
 
   // Content change handlers

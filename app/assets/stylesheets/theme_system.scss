@@ -1,0 +1,524 @@
+// =============================================================================
+// COMPREHENSIVE THEME SYSTEM
+// =============================================================================
+// Advanced theming architecture with CSS variables, accessibility support,
+// and seamless theme switching capabilities
+// =============================================================================
+
+// =============================================================================
+// THEME ARCHITECTURE - CSS CUSTOM PROPERTIES
+// =============================================================================
+
+:root {
+  // ==========================================================================
+  // COLOR SYSTEM - SEMANTIC TOKENS
+  // ==========================================================================
+  
+  // Primary Brand Colors
+  --brand-primary-50: #eff6ff;
+  --brand-primary-100: #dbeafe;
+  --brand-primary-200: #bfdbfe;
+  --brand-primary-300: #93c5fd;
+  --brand-primary-400: #60a5fa;
+  --brand-primary-500: #3b82f6;
+  --brand-primary-600: #2563eb;
+  --brand-primary-700: #1d4ed8;
+  --brand-primary-800: #1e40af;
+  --brand-primary-900: #1e3a8a;
+  --brand-primary-950: #172554;
+  
+  // Secondary Brand Colors
+  --brand-secondary-50: #f0f9ff;
+  --brand-secondary-100: #e0f2fe;
+  --brand-secondary-200: #bae6fd;
+  --brand-secondary-300: #7dd3fc;
+  --brand-secondary-400: #38bdf8;
+  --brand-secondary-500: #0ea5e9;
+  --brand-secondary-600: #0284c7;
+  --brand-secondary-700: #0369a1;
+  --brand-secondary-800: #075985;
+  --brand-secondary-900: #0c4a6e;
+  --brand-secondary-950: #082f49;
+  
+  // Accent Colors
+  --brand-accent-50: #ecfdf5;
+  --brand-accent-100: #d1fae5;
+  --brand-accent-200: #a7f3d0;
+  --brand-accent-300: #6ee7b7;
+  --brand-accent-400: #34d399;
+  --brand-accent-500: #10b981;
+  --brand-accent-600: #059669;
+  --brand-accent-700: #047857;
+  --brand-accent-800: #065f46;
+  --brand-accent-900: #064e3b;
+  --brand-accent-950: #022c22;
+  
+  // Neutral/Gray Scale
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+  --color-neutral-950: #030712;
+  
+  // ==========================================================================
+  // SEMANTIC COLOR MAPPINGS
+  // ==========================================================================
+  
+  // Background Colors
+  --color-bg-primary: var(--color-neutral-50);
+  --color-bg-secondary: var(--color-neutral-100);
+  --color-bg-tertiary: var(--color-neutral-200);
+  --color-bg-inverse: var(--color-neutral-900);
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --color-bg-glass: rgba(255, 255, 255, 0.8);
+  
+  // Surface Colors
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: var(--color-neutral-50);
+  --color-surface-tertiary: var(--color-neutral-100);
+  --color-surface-elevated: #ffffff;
+  --color-surface-sunken: var(--color-neutral-100);
+  
+  // Border Colors
+  --color-border-primary: var(--color-neutral-200);
+  --color-border-secondary: var(--color-neutral-300);
+  --color-border-interactive: var(--brand-primary-300);
+  --color-border-focus: var(--brand-primary-500);
+  --color-border-error: #ef4444;
+  --color-border-success: var(--brand-accent-500);
+  --color-border-warning: #f59e0b;
+  
+  // Text Colors
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-700);
+  --color-text-tertiary: var(--color-neutral-600);
+  --color-text-muted: var(--color-neutral-500);
+  --color-text-subtle: var(--color-neutral-400);
+  --color-text-disabled: var(--color-neutral-300);
+  --color-text-inverse: #ffffff;
+  --color-text-brand: var(--brand-primary-600);
+  
+  // Interactive Colors
+  --color-interactive-primary: var(--brand-primary-500);
+  --color-interactive-primary-hover: var(--brand-primary-600);
+  --color-interactive-primary-active: var(--brand-primary-700);
+  --color-interactive-secondary: var(--color-neutral-600);
+  --color-interactive-secondary-hover: var(--color-neutral-700);
+  --color-interactive-secondary-active: var(--color-neutral-800);
+  
+  // Status Colors
+  --color-status-success: #10b981;
+  --color-status-success-bg: #d1fae5;
+  --color-status-success-border: #a7f3d0;
+  --color-status-warning: #f59e0b;
+  --color-status-warning-bg: #fef3c7;
+  --color-status-warning-border: #fde68a;
+  --color-status-error: #ef4444;
+  --color-status-error-bg: #fee2e2;
+  --color-status-error-border: #fecaca;
+  --color-status-info: #3b82f6;
+  --color-status-info-bg: #dbeafe;
+  --color-status-info-border: #bfdbfe;
+  
+  // ==========================================================================
+  // SPACING SYSTEM
+  // ==========================================================================
+  
+  // Base spacing units
+  --space-0: 0;
+  --space-1: 0.25rem;    // 4px
+  --space-2: 0.5rem;     // 8px
+  --space-3: 0.75rem;    // 12px
+  --space-4: 1rem;       // 16px
+  --space-5: 1.25rem;    // 20px
+  --space-6: 1.5rem;     // 24px
+  --space-8: 2rem;       // 32px
+  --space-10: 2.5rem;    // 40px
+  --space-12: 3rem;      // 48px
+  --space-16: 4rem;      // 64px
+  --space-20: 5rem;      // 80px
+  --space-24: 6rem;      // 96px
+  --space-32: 8rem;      // 128px
+  
+  // Semantic spacing
+  --space-xs: var(--space-2);
+  --space-sm: var(--space-3);
+  --space-md: var(--space-4);
+  --space-lg: var(--space-6);
+  --space-xl: var(--space-8);
+  --space-2xl: var(--space-12);
+  --space-3xl: var(--space-16);
+  
+  // Component spacing
+  --space-component-xs: var(--space-2);
+  --space-component-sm: var(--space-3);
+  --space-component-md: var(--space-4);
+  --space-component-lg: var(--space-6);
+  --space-component-xl: var(--space-8);
+  
+  // Layout spacing
+  --space-layout-xs: var(--space-4);
+  --space-layout-sm: var(--space-6);
+  --space-layout-md: var(--space-8);
+  --space-layout-lg: var(--space-12);
+  --space-layout-xl: var(--space-16);
+  
+  // ==========================================================================
+  // TYPOGRAPHY SYSTEM
+  // ==========================================================================
+  
+  // Font families
+  --font-family-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-family-serif: 'Merriweather', Georgia, 'Times New Roman', serif;
+  --font-family-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+  --font-family-display: 'Inter Display', var(--font-family-sans);
+  
+  // Font weights
+  --font-weight-thin: 100;
+  --font-weight-extralight: 200;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+  
+  // Font sizes with fluid scaling
+  --font-size-xs: clamp(0.75rem, 0.9vw, 0.875rem);
+  --font-size-sm: clamp(0.875rem, 1vw, 1rem);
+  --font-size-base: clamp(0.875rem, 1vw, 1rem);
+  --font-size-lg: clamp(1rem, 1.2vw, 1.125rem);
+  --font-size-xl: clamp(1.125rem, 1.5vw, 1.25rem);
+  --font-size-2xl: clamp(1.25rem, 2vw, 1.5rem);
+  --font-size-3xl: clamp(1.5rem, 2.5vw, 1.875rem);
+  --font-size-4xl: clamp(1.875rem, 3vw, 2.25rem);
+  --font-size-5xl: clamp(2.25rem, 4vw, 3rem);
+  --font-size-6xl: clamp(3rem, 5vw, 3.75rem);
+  
+  // Display font sizes
+  --font-size-display-sm: clamp(1.875rem, 4vw, 2.25rem);
+  --font-size-display-md: clamp(2.25rem, 5vw, 2.875rem);
+  --font-size-display-lg: clamp(2.875rem, 6vw, 3.75rem);
+  --font-size-display-xl: clamp(3.75rem, 7vw, 4.5rem);
+  --font-size-display-2xl: clamp(4.5rem, 8vw, 6rem);
+  
+  // Line heights
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+  
+  // Letter spacing
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+  
+  // ==========================================================================
+  // LAYOUT & STRUCTURE
+  // ==========================================================================
+  
+  // Border radius
+  --radius-none: 0;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  // Shadow system
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+  
+  // Focus shadows
+  --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  --shadow-focus-error: 0 0 0 3px rgba(239, 68, 68, 0.5);
+  --shadow-focus-success: 0 0 0 3px rgba(16, 185, 129, 0.5);
+  
+  // ==========================================================================
+  // TRANSITIONS & ANIMATIONS
+  // ==========================================================================
+  
+  // Transition durations
+  --duration-75: 75ms;
+  --duration-100: 100ms;
+  --duration-150: 150ms;
+  --duration-200: 200ms;
+  --duration-300: 300ms;
+  --duration-500: 500ms;
+  --duration-700: 700ms;
+  --duration-1000: 1000ms;
+  
+  // Transition timing functions
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  // Default transitions
+  --transition-base: all var(--duration-150) var(--ease-out);
+  --transition-colors: color var(--duration-150) var(--ease-out),
+                      background-color var(--duration-150) var(--ease-out),
+                      border-color var(--duration-150) var(--ease-out);
+  --transition-transform: transform var(--duration-150) var(--ease-out);
+  --transition-opacity: opacity var(--duration-150) var(--ease-out);
+  
+  // ==========================================================================
+  // Z-INDEX SYSTEM
+  // ==========================================================================
+  
+  --z-index-hide: -1;
+  --z-index-auto: auto;
+  --z-index-base: 0;
+  --z-index-docked: 10;
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1100;
+  --z-index-banner: 1200;
+  --z-index-overlay: 1300;
+  --z-index-modal: 1400;
+  --z-index-popover: 1500;
+  --z-index-skipLink: 1600;
+  --z-index-toast: 1700;
+  --z-index-tooltip: 1800;
+  
+  // ==========================================================================
+  // COMPONENT-SPECIFIC VARIABLES
+  // ==========================================================================
+  
+  // Button variables
+  --btn-height-sm: 2rem;
+  --btn-height-md: 2.5rem;
+  --btn-height-lg: 3rem;
+  --btn-height-xl: 3.5rem;
+  
+  --btn-padding-x-sm: var(--space-3);
+  --btn-padding-x-md: var(--space-4);
+  --btn-padding-x-lg: var(--space-6);
+  --btn-padding-x-xl: var(--space-8);
+  
+  // Input variables
+  --input-height-sm: 2rem;
+  --input-height-md: 2.5rem;
+  --input-height-lg: 3rem;
+  --input-padding-x: var(--space-3);
+  --input-border-width: 1px;
+  
+  // Card variables
+  --card-padding: var(--space-6);
+  --card-border-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+  
+  // Header variables
+  --header-height: 4rem;
+  --header-bg: var(--color-surface-primary);
+  --header-border: var(--color-border-primary);
+  --header-shadow: var(--shadow-sm);
+  
+  // Sidebar variables
+  --sidebar-width: 16rem;
+  --sidebar-width-collapsed: 4rem;
+  --sidebar-bg: var(--color-surface-primary);
+  --sidebar-border: var(--color-border-primary);
+  
+  // Navigation variables
+  --nav-item-height: 2.5rem;
+  --nav-item-padding-x: var(--space-3);
+  --nav-item-border-radius: var(--radius-md);
+  
+  // ==========================================================================
+  // ACCESSIBILITY VARIABLES
+  // ==========================================================================
+  
+  // High contrast mode overrides
+  --color-text-high-contrast: #000000;
+  --color-bg-high-contrast: #ffffff;
+  --color-border-high-contrast: #000000;
+  
+  // Focus indicators
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-color: var(--brand-primary-500);
+  --focus-ring-style: solid;
+  
+  // Touch targets
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  --touch-target-spacious: 56px;
+}
+
+// =============================================================================
+// HIGH CONTRAST MODE SUPPORT
+// =============================================================================
+
+@media (prefers-contrast: high) {
+  :root {
+    // Override colors for high contrast
+    --color-text-primary: var(--color-text-high-contrast);
+    --color-text-secondary: var(--color-text-high-contrast);
+    --color-text-tertiary: var(--color-text-high-contrast);
+    --color-bg-primary: var(--color-bg-high-contrast);
+    --color-surface-primary: var(--color-bg-high-contrast);
+    --color-border-primary: var(--color-border-high-contrast);
+    --color-border-secondary: var(--color-border-high-contrast);
+    
+    // Increase shadow opacity for better visibility
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// =============================================================================
+// REDUCED MOTION SUPPORT
+// =============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    // Reduce animation durations
+    --duration-75: 1ms;
+    --duration-100: 1ms;
+    --duration-150: 1ms;
+    --duration-200: 1ms;
+    --duration-300: 1ms;
+    --duration-500: 1ms;
+    --duration-700: 1ms;
+    --duration-1000: 1ms;
+    
+    // Use simpler easing functions
+    --ease-in: linear;
+    --ease-out: linear;
+    --ease-in-out: linear;
+    --ease-bounce: linear;
+    --ease-spring: linear;
+  }
+}
+
+// =============================================================================
+// DARK THEME SUPPORT
+// =============================================================================
+
+[data-theme="dark"] {
+  // Color overrides for dark theme
+  --color-bg-primary: var(--color-neutral-900);
+  --color-bg-secondary: var(--color-neutral-800);
+  --color-bg-tertiary: var(--color-neutral-700);
+  --color-bg-inverse: var(--color-neutral-50);
+  --color-bg-overlay: rgba(0, 0, 0, 0.8);
+  --color-bg-glass: rgba(0, 0, 0, 0.8);
+  
+  --color-surface-primary: var(--color-neutral-800);
+  --color-surface-secondary: var(--color-neutral-700);
+  --color-surface-tertiary: var(--color-neutral-600);
+  --color-surface-elevated: var(--color-neutral-700);
+  --color-surface-sunken: var(--color-neutral-900);
+  
+  --color-border-primary: var(--color-neutral-700);
+  --color-border-secondary: var(--color-neutral-600);
+  
+  --color-text-primary: var(--color-neutral-50);
+  --color-text-secondary: var(--color-neutral-200);
+  --color-text-tertiary: var(--color-neutral-300);
+  --color-text-muted: var(--color-neutral-400);
+  --color-text-subtle: var(--color-neutral-500);
+  --color-text-disabled: var(--color-neutral-600);
+  --color-text-inverse: var(--color-neutral-900);
+  
+  --color-interactive-secondary: var(--color-neutral-300);
+  --color-interactive-secondary-hover: var(--color-neutral-200);
+  --color-interactive-secondary-active: var(--color-neutral-100);
+  
+  // Header and navigation for dark theme
+  --header-bg: var(--color-surface-primary);
+  --header-border: var(--color-border-primary);
+  --sidebar-bg: var(--color-surface-primary);
+  --sidebar-border: var(--color-border-primary);
+  
+  // Adjust shadows for dark theme
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+// =============================================================================
+// THEME TRANSITION SUPPORT
+// =============================================================================
+
+* {
+  transition: background-color var(--duration-200) var(--ease-out),
+              color var(--duration-200) var(--ease-out),
+              border-color var(--duration-200) var(--ease-out),
+              box-shadow var(--duration-200) var(--ease-out);
+}
+
+// Disable transitions during theme changes to prevent flash
+.theme-transitioning * {
+  transition: none !important;
+}
+
+// =============================================================================
+// BASE ELEMENT STYLES USING CSS VARIABLES
+// =============================================================================
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-normal);
+  transition: var(--transition-colors);
+}
+
+// Reset and base styles for better consistency
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+// Focus styles using CSS variables
+*:focus-visible {
+  outline: var(--focus-ring-width) var(--focus-ring-style) var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+// Selection styles
+::selection {
+  background-color: var(--brand-primary-200);
+  color: var(--brand-primary-900);
+}
+
+[data-theme="dark"] ::selection {
+  background-color: var(--brand-primary-700);
+  color: var(--brand-primary-100);
+}

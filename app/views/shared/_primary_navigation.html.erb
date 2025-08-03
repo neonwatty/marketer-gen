@@ -1,0 +1,144 @@
+<!-- Primary Navigation -->
+<nav class="primary-navigation bg-white border-b border-gray-200" data-controller="navigation" role="navigation" aria-label="Primary navigation">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      
+      <!-- Main Navigation Links -->
+      <div class="flex space-x-8">
+        <%= link_to root_path, 
+            class: nav_link_classes(request.path == root_path),
+            data: { nav_item: "dashboard" } do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v4H8V5z"></path>
+          </svg>
+          <span>Dashboard</span>
+        <% end %>
+        
+        <%= link_to campaigns_path, 
+            class: nav_link_classes(request.path.start_with?('/campaigns')),
+            data: { nav_item: "campaigns" } do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <span>Campaigns</span>
+        <% end %>
+        
+        <%= link_to journeys_path, 
+            class: nav_link_classes(request.path.start_with?('/journeys')),
+            data: { nav_item: "journeys" } do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+          <span>Journey Builder</span>
+        <% end %>
+        
+        <%= link_to content_repositories_path, 
+            class: nav_link_classes(request.path.start_with?('/content')),
+            data: { nav_item: "content" } do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2h10a2 2 0 012 2zM9 11h6"></path>
+          </svg>
+          <span>Content</span>
+        <% end %>
+        
+        <%= link_to analytics_path, 
+            class: nav_link_classes(request.path.start_with?('/analytics')),
+            data: { nav_item: "analytics" } do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <span>Analytics</span>
+        <% end %>
+        
+        <%= link_to brands_path, 
+            class: nav_link_classes(request.path.start_with?('/brands')),
+            data: { nav_item: "brands" } do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v14a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v14a4 4 0 004-4V5z"></path>
+          </svg>
+          <span>Brand</span>
+        <% end %>
+      </div>
+      
+      <!-- Secondary Navigation Items -->
+      <div class="flex items-center space-x-4">
+        <!-- Notifications -->
+        <button class="nav-notification-btn relative p-2 text-muted hover:text-primary hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2"
+                data-action="click->navigation#showNotifications"
+                aria-label="View notifications">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5v-13l3-3v16z"></path>
+          </svg>
+          <!-- Notification Badge -->
+          <span class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            3
+          </span>
+        </button>
+        
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-nav-toggle md:hidden p-2 text-muted hover:text-primary hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2"
+                data-action="click->navigation#toggleMobileMenu"
+                aria-label="Toggle mobile navigation">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Navigation Menu -->
+    <div data-navigation-target="mobileMenu" 
+         class="mobile-nav-menu md:hidden hidden border-t border-gray-200 py-3">
+      <div class="flex flex-col space-y-1">
+        <%= link_to root_path, 
+            class: mobile_nav_link_classes(request.path == root_path) do %>
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+          </svg>
+          Dashboard
+        <% end %>
+        
+        <%= link_to campaigns_path, 
+            class: mobile_nav_link_classes(request.path.start_with?('/campaigns')) do %>
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          Campaigns
+        <% end %>
+        
+        <%= link_to journeys_path, 
+            class: mobile_nav_link_classes(request.path.start_with?('/journeys')) do %>
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+          Journey Builder
+        <% end %>
+        
+        <%= link_to content_repositories_path, 
+            class: mobile_nav_link_classes(request.path.start_with?('/content')) do %>
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2h10a2 2 0 012 2zM9 11h6"></path>
+          </svg>
+          Content
+        <% end %>
+        
+        <%= link_to analytics_path, 
+            class: mobile_nav_link_classes(request.path.start_with?('/analytics')) do %>
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          Analytics
+        <% end %>
+        
+        <%= link_to brands_path, 
+            class: mobile_nav_link_classes(request.path.start_with?('/brands')) do %>
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v14a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v14a4 4 0 004-4V5z"></path>
+          </svg>
+          Brand
+        <% end %>
+      </div>
+    </div>
+  </div>
+</nav>

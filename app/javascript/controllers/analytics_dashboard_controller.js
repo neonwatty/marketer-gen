@@ -17,6 +17,8 @@ export default class extends Controller {
   connect() {
     console.log("Analytics Dashboard controller connected");
     this.initializeReactComponent();
+    this.initializeAccessibility();
+    this.initializePerformanceMonitoring();
     
     if (this.autoRefreshValue) {
       this.startAutoRefresh();
@@ -301,6 +303,34 @@ export default class extends Controller {
     
     // Add screen reader announcements for data updates
     this.announceDataUpdates();
+    
+    // Add focus management
+    this.setupFocusManagement();
+    
+    // Add skip links
+    this.addSkipLinks();
+  }
+
+  // Setup focus management for dynamic content
+  setupFocusManagement() {
+    // Manage focus for modal dialogs and dynamic content
+    this.focusStack = [];
+    
+    // Store original tabindex values for restoration
+    this.originalTabindices = new Map();
+  }
+
+  // Add skip links for keyboard navigation
+  addSkipLinks() {
+    const skipLinks = document.createElement('div');
+    skipLinks.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50';
+    skipLinks.innerHTML = `
+      <a href="#dashboard-title" class="bg-blue-600 text-white px-3 py-2 rounded">Skip to main content</a>
+      <a href="#summary-metrics" class="bg-blue-600 text-white px-3 py-2 rounded ml-2">Skip to metrics</a>
+      <a href="#main-chart" class="bg-blue-600 text-white px-3 py-2 rounded ml-2">Skip to charts</a>
+    `;
+    
+    this.element.insertBefore(skipLinks, this.element.firstChild);
   }
 
   // Announce data updates for screen readers

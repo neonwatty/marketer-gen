@@ -20,7 +20,7 @@ export default class extends Controller {
     }
   }
   
-  async updateOrder(event) {
+  async updateOrder(_event) {
     const items = Array.from(this.listTarget.children).map((item, index) => ({
       id: item.dataset.id,
       position: index

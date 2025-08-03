@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_02_235252) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_03_133442) do
   create_table "ab_test_configurations", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.string "configuration_type"
@@ -805,6 +805,29 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_235252) do
     t.index ["stage"], name: "index_crm_opportunities_on_stage"
   end
 
+  create_table "custom_reports", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "report_type", default: "standard", null: false
+    t.json "configuration", default: {}
+    t.string "status", default: "draft", null: false
+    t.datetime "last_generated_at"
+    t.integer "generation_time_ms"
+    t.boolean "is_template", default: false
+    t.boolean "is_public", default: false
+    t.integer "user_id", null: false
+    t.integer "brand_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id"], name: "index_custom_reports_on_brand_id"
+    t.index ["is_template"], name: "index_custom_reports_on_is_template"
+    t.index ["last_generated_at"], name: "index_custom_reports_on_last_generated_at"
+    t.index ["report_type"], name: "index_custom_reports_on_report_type"
+    t.index ["status"], name: "index_custom_reports_on_status"
+    t.index ["user_id", "brand_id"], name: "index_custom_reports_on_user_id_and_brand_id"
+    t.index ["user_id"], name: "index_custom_reports_on_user_id"
+  end
+
   create_table "email_automations", force: :cascade do |t|
     t.integer "email_integration_id", null: false
     t.string "platform_automation_id", null: false
@@ -1349,6 +1372,120 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_235252) do
     t.index ["user_id"], name: "index_plan_templates_on_user_id"
   end
 
+  create_table "report_distribution_lists", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.text "email_addresses"
+    t.json "roles", default: []
+    t.json "user_ids", default: []
+    t.boolean "is_active", default: true
+    t.boolean "auto_sync_roles", default: false
+    t.integer "user_id", null: false
+    t.integer "brand_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["auto_sync_roles"], name: "index_report_distribution_lists_on_auto_sync_roles"
+    t.index ["brand_id", "name"], name: "index_report_distribution_lists_on_brand_id_and_name", unique: true
+    t.index ["brand_id"], name: "index_report_distribution_lists_on_brand_id"
+    t.index ["is_active"], name: "index_report_distribution_lists_on_is_active"
+    t.index ["user_id"], name: "index_report_distribution_lists_on_user_id"
+  end
+
+  create_table "report_exports", force: :cascade do |t|
+    t.integer "custom_report_id", null: false
+    t.string "export_format", null: false
+    t.string "file_path"
+    t.string "filename"
+    t.bigint "file_size"
+    t.string "status", default: "pending", null: false
+    t.text "error_message"
+    t.datetime "generated_at"
+    t.datetime "expires_at"
+    t.integer "download_count", default: 0
+    t.datetime "last_downloaded_at"
+    t.json "metadata", default: {}
+    t.integer "user_id", null: false
+    t.integer "report_schedule_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["custom_report_id", "status"], name: "index_report_exports_on_custom_report_id_and_status"
+    t.index ["custom_report_id"], name: "index_report_exports_on_custom_report_id"
+    t.index ["expires_at"], name: "index_report_exports_on_expires_at"
+    t.index ["export_format"], name: "index_report_exports_on_export_format"
+    t.index ["generated_at"], name: "index_report_exports_on_generated_at"
+    t.index ["report_schedule_id"], name: "index_report_exports_on_report_schedule_id"
+    t.index ["status"], name: "index_report_exports_on_status"
+    t.index ["user_id"], name: "index_report_exports_on_user_id"
+  end
+
+  create_table "report_metrics", force: :cascade do |t|
+    t.integer "custom_report_id", null: false
+    t.string "metric_name", null: false
+    t.string "aggregation_type", default: "sum", null: false
+    t.string "data_source", null: false
+    t.string "display_name"
+    t.text "description"
+    t.json "filters", default: {}
+    t.json "visualization_config", default: {}
+    t.integer "sort_order", default: 0
+    t.boolean "is_active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["aggregation_type"], name: "index_report_metrics_on_aggregation_type"
+    t.index ["custom_report_id", "sort_order"], name: "index_report_metrics_on_custom_report_id_and_sort_order"
+    t.index ["custom_report_id"], name: "index_report_metrics_on_custom_report_id"
+    t.index ["data_source"], name: "index_report_metrics_on_data_source"
+    t.index ["is_active"], name: "index_report_metrics_on_is_active"
+    t.index ["metric_name"], name: "index_report_metrics_on_metric_name"
+  end
+
+  create_table "report_schedules", force: :cascade do |t|
+    t.integer "custom_report_id", null: false
+    t.string "schedule_type", default: "manual", null: false
+    t.string "cron_expression"
+    t.text "email_recipients"
+    t.json "distribution_lists", default: []
+    t.json "export_formats", default: ["pdf"]
+    t.datetime "next_run_at"
+    t.datetime "last_run_at"
+    t.datetime "last_success_at"
+    t.text "last_error"
+    t.integer "run_count", default: 0
+    t.boolean "is_active", default: true
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["custom_report_id", "is_active"], name: "index_report_schedules_on_custom_report_id_and_is_active"
+    t.index ["custom_report_id"], name: "index_report_schedules_on_custom_report_id"
+    t.index ["is_active"], name: "index_report_schedules_on_is_active"
+    t.index ["next_run_at"], name: "index_report_schedules_on_next_run_at"
+    t.index ["schedule_type"], name: "index_report_schedules_on_schedule_type"
+    t.index ["user_id"], name: "index_report_schedules_on_user_id"
+  end
+
+  create_table "report_templates", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "category", default: "general", null: false
+    t.string "template_type", default: "standard", null: false
+    t.json "configuration", default: {}
+    t.boolean "is_public", default: false
+    t.boolean "is_active", default: true
+    t.integer "usage_count", default: 0
+    t.decimal "rating", precision: 3, scale: 2, default: "0.0"
+    t.integer "rating_count", default: 0
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_report_templates_on_category"
+    t.index ["is_active"], name: "index_report_templates_on_is_active"
+    t.index ["is_public"], name: "index_report_templates_on_is_public"
+    t.index ["rating"], name: "index_report_templates_on_rating"
+    t.index ["template_type"], name: "index_report_templates_on_template_type"
+    t.index ["usage_count"], name: "index_report_templates_on_usage_count"
+    t.index ["user_id"], name: "index_report_templates_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -1496,6 +1633,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_235252) do
     t.datetime "suspended_at"
     t.text "suspension_reason"
     t.integer "suspended_by_id"
+    t.string "dashboard_layout"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["role"], name: "index_users_on_role"
     t.index ["suspended_at"], name: "index_users_on_suspended_at"
@@ -1537,6 +1675,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_235252) do
   add_foreign_key "crm_leads", "crm_integrations"
   add_foreign_key "crm_opportunities", "brands"
   add_foreign_key "crm_opportunities", "crm_integrations"
+  add_foreign_key "custom_reports", "brands"
+  add_foreign_key "custom_reports", "users"
   add_foreign_key "email_automations", "email_integrations"
   add_foreign_key "email_campaigns", "email_integrations"
   add_foreign_key "email_integrations", "brands"
@@ -1550,6 +1690,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_235252) do
   add_foreign_key "performance_alerts", "users"
   add_foreign_key "performance_thresholds", "campaigns"
   add_foreign_key "performance_thresholds", "journeys"
+  add_foreign_key "report_distribution_lists", "brands"
+  add_foreign_key "report_distribution_lists", "users"
+  add_foreign_key "report_exports", "custom_reports"
+  add_foreign_key "report_exports", "report_schedules"
+  add_foreign_key "report_exports", "users"
+  add_foreign_key "report_metrics", "custom_reports"
+  add_foreign_key "report_schedules", "custom_reports"
+  add_foreign_key "report_schedules", "users"
+  add_foreign_key "report_templates", "users"
   add_foreign_key "social_media_integrations", "brands"
   add_foreign_key "social_media_metrics", "social_media_integrations"
 end

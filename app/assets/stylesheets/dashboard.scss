@@ -1,0 +1,736 @@
+// =============================================================================
+// DASHBOARD STYLES
+// =============================================================================
+// Comprehensive responsive dashboard with widget system, drag-and-drop,
+// animations, and accessibility features
+
+// =============================================================================
+// DASHBOARD LAYOUT VARIABLES
+// =============================================================================
+
+:root {
+  // Dashboard spacing
+  --dashboard-padding: 1.5rem;
+  --dashboard-padding-mobile: 1rem;
+  --widget-gap: 1.5rem;
+  --widget-gap-mobile: 1rem;
+  
+  // Widget dimensions
+  --widget-border-radius: 0.75rem;
+  --widget-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --widget-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --widget-shadow-dragging: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  // Animation timing
+  --dashboard-transition: all 0.2s ease-in-out;
+  --widget-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --collapse-transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
+  
+  // Z-index layers
+  --z-dashboard-grid: 1;
+  --z-widget-default: 10;
+  --z-widget-hover: 20;
+  --z-widget-dragging: 100;
+  --z-dashboard-overlay: 200;
+}
+
+// =============================================================================
+// DASHBOARD CONTAINER
+// =============================================================================
+
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  
+  @media (prefers-color-scheme: dark) {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+}
+
+// Dashboard Header
+.dashboard-header {
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    background: rgba(15, 23, 42, 0.9);
+    border-bottom-color: rgba(71, 85, 105, 0.4);
+  }
+}
+
+// Dashboard Main Content
+.dashboard-main {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+// =============================================================================
+// RESPONSIVE GRID SYSTEM
+// =============================================================================
+
+.dashboard-widgets-grid {
+  display: grid;
+  gap: var(--widget-gap);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  
+  // Responsive breakpoints
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  
+  // Mobile adjustments
+  @media (max-width: 639px) {
+    gap: var(--widget-gap-mobile);
+    grid-template-columns: 1fr;
+  }
+}
+
+// Grid layout variations
+.dashboard-widgets-grid.layout-compact {
+  gap: calc(var(--widget-gap) * 0.75);
+  
+  @media (max-width: 639px) {
+    gap: calc(var(--widget-gap-mobile) * 0.75);
+  }
+}
+
+.dashboard-widgets-grid.layout-spacious {
+  gap: calc(var(--widget-gap) * 1.5);
+  
+  @media (max-width: 639px) {
+    gap: calc(var(--widget-gap-mobile) * 1.25);
+  }
+}
+
+// =============================================================================
+// WIDGET BASE STYLES
+// =============================================================================
+
+.dashboard-widget {
+  background: white;
+  border-radius: var(--widget-border-radius);
+  box-shadow: var(--widget-shadow);
+  transition: var(--widget-transition);
+  position: relative;
+  overflow: hidden;
+  z-index: var(--z-widget-default);
+  
+  // Hover effects
+  &:hover {
+    box-shadow: var(--widget-shadow-hover);
+    transform: translateY(-1px);
+    z-index: var(--z-widget-hover);
+  }
+  
+  // Dark mode
+  @media (prefers-color-scheme: dark) {
+    background: #1e293b;
+    border: 1px solid #334155;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
+// Widget sizes
+.dashboard-widget.col-span-1 { grid-column: span 1; }
+.dashboard-widget.col-span-2 { grid-column: span 2; }
+.dashboard-widget.col-span-3 { grid-column: span 3; }
+.dashboard-widget.col-span-4 { grid-column: span 4; }
+.dashboard-widget.col-span-full { grid-column: 1 / -1; }
+
+.dashboard-widget.row-span-1 { grid-row: span 1; }
+.dashboard-widget.row-span-2 { grid-row: span 2; }
+
+// Mobile responsive adjustments
+@media (max-width: 767px) {
+  .dashboard-widget {
+    grid-column: 1 / -1 !important;
+    grid-row: span 1 !important;
+  }
+}
+
+// Widget header
+.widget-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  background: rgba(249, 250, 251, 0.5);
+  
+  @media (max-width: 639px) {
+    padding: 1rem;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    background: rgba(15, 23, 42, 0.5);
+    border-bottom-color: #334155;
+  }
+}
+
+// Widget content
+.widget-content {
+  transition: var(--collapse-transition);
+  overflow: hidden;
+}
+
+// =============================================================================
+// COLLAPSIBLE WIDGETS
+// =============================================================================
+
+.collapsible-widget {
+  .widget-content {
+    max-height: 1000px; // Arbitrary large value
+    opacity: 1;
+  }
+  
+  &.collapsed {
+    .widget-content {
+      max-height: 0;
+      opacity: 0;
+      padding: 0;
+    }
+    
+    .widget-header {
+      border-bottom: none;
+    }
+  }
+}
+
+// Collapse trigger button
+[data-collapsible-target="trigger"] {
+  transition: transform 0.2s ease;
+  
+  .collapsed & {
+    transform: rotate(180deg);
+  }
+}
+
+// =============================================================================
+// DRAG AND DROP FUNCTIONALITY
+// =============================================================================
+
+.dashboard-widget.draggable {
+  cursor: grab;
+  
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dashboard-widget.dragging {
+  z-index: var(--z-widget-dragging);
+  box-shadow: var(--widget-shadow-dragging);
+  transform: rotate(2deg) scale(1.02);
+  opacity: 0.9;
+}
+
+.dashboard-widget.drag-over {
+  border: 2px dashed #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+// Drop zones
+.widget-drop-zone {
+  min-height: 120px;
+  border: 2px dashed #d1d5db;
+  border-radius: var(--widget-border-radius);
+  background: rgba(249, 250, 251, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--dashboard-transition);
+  
+  &.drag-over {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+  }
+  
+  .drop-zone-content {
+    text-align: center;
+    color: #9ca3af;
+    
+    svg {
+      width: 2rem;
+      height: 2rem;
+      margin: 0 auto 0.5rem;
+    }
+    
+    p {
+      font-size: 0.875rem;
+      margin: 0;
+    }
+  }
+}
+
+// =============================================================================
+// WIDGET LOADING STATES
+// =============================================================================
+
+.widget-loading {
+  position: relative;
+  pointer-events: none;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2rem;
+    height: 2rem;
+    margin: -1rem 0 0 -1rem;
+    border: 2px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: widget-spinner 1s linear infinite;
+    z-index: 11;
+  }
+}
+
+@keyframes widget-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// =============================================================================
+// NAVIGATION STYLES
+// =============================================================================
+
+// Primary Navigation
+.primary-navigation {
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+  
+  @media (prefers-color-scheme: dark) {
+    background: rgba(15, 23, 42, 0.9);
+    border-bottom-color: rgba(71, 85, 105, 0.4);
+  }
+}
+
+.nav-link {
+  position: relative;
+  transition: var(--dashboard-transition);
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #3b82f6;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+  
+  &.active::after {
+    transform: scaleX(1);
+  }
+}
+
+// Mobile Navigation
+.mobile-nav-menu {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Notification Badge
+.notification-badge {
+  animation: notificationPulse 2s infinite;
+}
+
+@keyframes notificationPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+// =============================================================================
+// SEARCH AND DROPDOWN COMPONENTS
+// =============================================================================
+
+// Global Search
+.global-search {
+  .search-input {
+    transition: var(--dashboard-transition);
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+  }
+  
+  .search-results {
+    animation: fadeInDown 0.3s ease-out;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Dropdown Menus
+.quick-actions-menu,
+.user-menu-dropdown {
+  animation: fadeInScale 0.2s ease-out;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// =============================================================================
+// METRIC CARDS AND COMPONENTS
+// =============================================================================
+
+.metric-card {
+  transition: var(--dashboard-transition);
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Trend Indicators
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  
+  &::before {
+    content: attr(data-trend);
+    margin-right: 0.25rem;
+  }
+}
+
+// Progress Bars
+.progress-bar {
+  position: relative;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+  
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    border-radius: inherit;
+    transition: width 1s ease-out;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 0 9999px 9999px 0;
+    }
+  }
+}
+
+// =============================================================================
+// ACTIVITY FEED STYLES
+// =============================================================================
+
+.activity-feed-container {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #9ca3af;
+    }
+  }
+}
+
+.activity-item {
+  transition: var(--dashboard-transition);
+  
+  &:hover {
+    transform: translateX(2px);
+  }
+}
+
+// Filter Tags
+.filter-tag {
+  transition: var(--dashboard-transition);
+  
+  &.active {
+    background: #3b82f6;
+    color: white;
+  }
+}
+
+// =============================================================================
+// RESPONSIVE DESIGN PATTERNS
+// =============================================================================
+
+// Mobile-first breakpoint system
+@media (max-width: 639px) {
+  .dashboard-container {
+    --dashboard-padding: var(--dashboard-padding-mobile);
+    --widget-gap: var(--widget-gap-mobile);
+  }
+  
+  .dashboard-header {
+    padding: var(--dashboard-padding-mobile);
+  }
+  
+  .widget-header {
+    padding: var(--dashboard-padding-mobile);
+  }
+  
+  // Hide complex widgets on mobile or simplify them
+  .dashboard-widget.mobile-hide {
+    display: none;
+  }
+  
+  .dashboard-widget.mobile-simplify {
+    .widget-content {
+      padding: var(--dashboard-padding-mobile);
+    }
+    
+    // Hide secondary information
+    .secondary-info {
+      display: none;
+    }
+  }
+}
+
+// Tablet adjustments
+@media (min-width: 640px) and (max-width: 1023px) {
+  .dashboard-widgets-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .dashboard-widget.col-span-3,
+  .dashboard-widget.col-span-4 {
+    grid-column: span 2;
+  }
+}
+
+// Desktop enhancements
+@media (min-width: 1024px) {
+  .dashboard-widget {
+    // Add subtle animations for larger screens
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+  
+  // Enable advanced interactions
+  .widget-resize-handle {
+    display: block;
+  }
+}
+
+// =============================================================================
+// ACCESSIBILITY ENHANCEMENTS
+// =============================================================================
+
+// Focus styles
+.dashboard-widget:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// Reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .dashboard-widget {
+    transform: none !important;
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .dashboard-widget {
+    border: 2px solid #000;
+  }
+  
+  .widget-header {
+    border-bottom-color: #000;
+  }
+  
+  .metric-card {
+    border: 1px solid #000;
+  }
+}
+
+// =============================================================================
+// PRINT STYLES
+// =============================================================================
+
+@media print {
+  .dashboard-container {
+    background: white !important;
+  }
+  
+  .dashboard-widget {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+    break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+  
+  .widget-header {
+    background: white !important;
+  }
+  
+  // Hide interactive elements
+  .quick-actions,
+  .user-menu,
+  .global-search,
+  [data-action*="click"],
+  button:not(.print-visible) {
+    display: none !important;
+  }
+  
+  // Expand collapsed widgets
+  .collapsible-widget.collapsed .widget-content {
+    max-height: none !important;
+    opacity: 1 !important;
+  }
+}
+
+// =============================================================================
+// UTILITY CLASSES
+// =============================================================================
+
+// Widget states
+.widget-success {
+  border-left: 4px solid #10b981;
+}
+
+.widget-warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.widget-error {
+  border-left: 4px solid #ef4444;
+}
+
+.widget-info {
+  border-left: 4px solid #3b82f6;
+}
+
+// Layout utilities
+.dashboard-section {
+  margin-bottom: 2rem;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.dashboard-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+  margin: 2rem 0;
+}
+
+// Text utilities for dashboard
+.dashboard-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #111827;
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}

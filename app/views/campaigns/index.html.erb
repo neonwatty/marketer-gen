@@ -1,173 +1,390 @@
-<% content_for :title, "My Campaigns" %>
-<% content_for :description, "Manage your marketing campaigns" %>
+<% content_for :title, "Campaign Management" %>
+<% content_for :description, "Manage your marketing campaigns with advanced tools and analytics" %>
 
-<div class="flex items-center justify-between mb-8">
-  <div>
-    <h1 class="text-3xl font-bold text-gray-900">My Campaigns</h1>
-    <p class="text-gray-600 mt-1">Create, manage, and optimize your marketing campaigns</p>
-  </div>
-  
-  <div class="flex items-center space-x-4">
-    <%= link_to campaigns_intake_path, class: "btn btn-primary flex items-center" do %>
-      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.003 9.003 0 01-5.83-2.18L3 21l3.17-3.17c-.49-.87-.82-1.82-.98-2.83C5.01 14.47 5 13.74 5 13v-1c0-4.97 4.03-9 9-9s9 4.03 9 9z"/>
-      </svg>
-      New Campaign (AI Assistant)
-    <% end %>
+<div class="campaign-management-container" role="main" aria-label="Campaign Management Interface">
+  <!-- Header Section -->
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Campaign Management</h1>
+      <p class="text-gray-600">Create, manage, and optimize your marketing campaigns with advanced tools</p>
+    </div>
     
-    <button class="btn btn-outline">
-      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"/>
-      </svg>
-      Filters
-    </button>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      <!-- View Toggle -->
+      <div class="inline-flex rounded-lg border p-1 bg-gray-50" role="tablist" aria-label="View Options">
+        <%= link_to campaigns_path(view: 'table', **request.query_parameters.except(:view)), 
+                    class: "px-3 py-1.5 text-sm font-medium rounded-md transition-colors #{@view_mode == 'table' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'}", 
+                    role: "tab",
+                    aria-selected: @view_mode == 'table' ? 'true' : 'false' do %>
+          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9"/>
+          </svg>
+          Table
+        <% end %>
+        <%= link_to campaigns_path(view: 'grid', **request.query_parameters.except(:view)), 
+                    class: "px-3 py-1.5 text-sm font-medium rounded-md transition-colors #{@view_mode == 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-900'}", 
+                    role: "tab",
+                    aria-selected: @view_mode == 'grid' ? 'true' : 'false' do %>
+          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+          </svg>
+          Grid
+        <% end %>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2">
+        <%= link_to campaigns_intake_path, 
+                    class: "btn btn-primary inline-flex items-center px-4 py-2",
+                    "aria-label": "Create new campaign using AI assistant" do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.003 9.003 0 01-5.83-2.18L3 21l3.17-3.17c-.49-.87-.82-1.82-.98-2.83C5.01 14.47 5 13.74 5 13v-1c0-4.97 4.03-9 9-9s9 4.03 9 9z"/>
+          </svg>
+          AI Assistant
+        <% end %>
+        
+        <%= link_to new_campaign_path, 
+                    class: "btn btn-outline inline-flex items-center px-4 py-2",
+                    "aria-label": "Create new campaign manually" do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          New Campaign
+        <% end %>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- Stats Cards -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-  <div class="bg-white rounded-lg border p-6">
-    <div class="flex items-center">
-      <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+  <!-- Advanced Filters & Search -->
+  <div class="bg-white rounded-lg border mb-6" data-controller="collapsible" data-collapsible-collapsed-value="true">
+    <div class="p-4 border-b cursor-pointer" data-action="click->collapsible#toggle" role="button" aria-expanded="false" tabindex="0">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-medium text-gray-900">Advanced Filters</h3>
+        <svg class="w-5 h-5 text-gray-400 transform transition-transform" data-collapsible-target="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
         </svg>
       </div>
-      <div class="ml-4">
-        <p class="text-sm font-medium text-gray-600">Total Campaigns</p>
-        <p class="text-2xl font-bold text-gray-900"><%= @campaigns.total_count %></p>
-      </div>
     </div>
-  </div>
-  
-  <div class="bg-white rounded-lg border p-6">
-    <div class="flex items-center">
-      <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-        </svg>
-      </div>
-      <div class="ml-4">
-        <p class="text-sm font-medium text-gray-600">Active</p>
-        <p class="text-2xl font-bold text-gray-900"><%= current_user.campaigns.active.count %></p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="bg-white rounded-lg border p-6">
-    <div class="flex items-center">
-      <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <div class="ml-4">
-        <p class="text-sm font-medium text-gray-600">Draft</p>
-        <p class="text-2xl font-bold text-gray-900"><%= current_user.campaigns.draft.count %></p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="bg-white rounded-lg border p-6">
-    <div class="flex items-center">
-      <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <div class="ml-4">
-        <p class="text-sm font-medium text-gray-600">Completed</p>
-        <p class="text-2xl font-bold text-gray-900"><%= current_user.campaigns.completed.count %></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Campaigns Grid -->
-<% if @campaigns.any? %>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <% @campaigns.each do |campaign| %>
-      <div class="bg-white rounded-lg border hover:shadow-lg transition-shadow">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-2">
-              <span class="px-2 py-1 text-xs font-medium rounded-full
-                <%= case campaign.status
-                when 'active' then 'bg-green-100 text-green-800'
-                when 'draft' then 'bg-gray-100 text-gray-800'
-                when 'paused' then 'bg-yellow-100 text-yellow-800'
-                when 'completed' then 'bg-blue-100 text-blue-800'
-                else 'bg-gray-100 text-gray-800'
-                end %>">
-                <%= campaign.status.humanize %>
-              </span>
-              <span class="text-xs text-gray-500"><%= campaign.campaign_type.humanize %></span>
-            </div>
-            
-            <div class="flex items-center space-x-1">
-              <%= link_to campaign_path(campaign), class: "p-1 text-gray-400 hover:text-gray-600" do %>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-              <% end %>
-            </div>
-          </div>
-          
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">
-            <%= link_to campaign.name, campaign_path(campaign), class: "hover:text-blue-600" %>
-          </h3>
-          
-          <p class="text-gray-600 text-sm mb-4 line-clamp-2">
-            <%= campaign.description || "No description provided" %>
-          </p>
-          
-          <div class="flex items-center justify-between text-sm text-gray-500">
-            <div class="flex items-center space-x-4">
-              <span><%= pluralize(campaign.journeys.count, 'journey') %></span>
-              <span>•</span>
-              <span><%= campaign.persona&.name || 'No persona' %></span>
-            </div>
-            <span><%= time_ago_in_words(campaign.updated_at) %> ago</span>
-          </div>
-          
-          <% if campaign.active? && campaign.performance_summary.any? %>
-            <div class="mt-4 pt-4 border-t">
-              <div class="flex items-center justify-between text-sm">
-                <span class="text-gray-600">Performance:</span>
-                <span class="font-medium text-gray-900">
-                  <%= campaign.performance_summary[:completion_rate] %>% completion
-                </span>
-              </div>
-            </div>
-          <% end %>
+    
+    <div class="hidden p-4" data-collapsible-target="content">
+      <%= form_with url: campaigns_path, method: :get, local: true, 
+                    class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+                    "data-controller": "form-validation",
+                    "aria-label": "Campaign filters" do |form| %>
+        
+        <!-- Search -->
+        <div class="lg:col-span-2">
+          <%= form.label :search, "Search campaigns", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.search_field :search, 
+                                value: params[:search], 
+                                placeholder: "Search by name, description, or persona...",
+                                class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                                "aria-describedby": "search-help" %>
+          <p id="search-help" class="text-xs text-gray-500 mt-1">Search across campaign names, descriptions, and personas</p>
         </div>
-      </div>
-    <% end %>
-  </div>
-  
-  <!-- Pagination -->
-  <% if @campaigns.respond_to?(:current_page) %>
-    <div class="mt-8">
-      <%= paginate @campaigns, theme: 'twitter-bootstrap-4' %>
-    </div>
-  <% end %>
-  
-<% else %>
-  <!-- Empty State -->
-  <div class="text-center py-12">
-    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.003 9.003 0 01-5.83-2.18L3 21l3.17-3.17c-.49-.87-.82-1.82-.98-2.83C5.01 14.47 5 13.74 5 13v-1c0-4.97 4.03-9 9-9s9 4.03 9 9z"/>
-    </svg>
-    <h3 class="mt-2 text-sm font-medium text-gray-900">No campaigns yet</h3>
-    <p class="mt-1 text-sm text-gray-500">Get started by creating your first campaign with our AI assistant.</p>
-    <div class="mt-6">
-      <%= link_to campaigns_intake_path, class: "btn btn-primary" do %>
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-        </svg>
-        Create Campaign with AI
+        
+        <!-- Status Filter -->
+        <div>
+          <%= form.label :status, "Status", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :status, 
+                          options_for_select([
+                            ['All Statuses', ''],
+                            ['Draft', 'draft'],
+                            ['Active', 'active'],
+                            ['Paused', 'paused'],
+                            ['Completed', 'completed'],
+                            ['Archived', 'archived']
+                          ], params[:status]),
+                          {},
+                          { class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+        </div>
+        
+        <!-- Type Filter -->
+        <div>
+          <%= form.label :type, "Campaign Type", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :type, 
+                          options_for_select([
+                            ['All Types', '']
+                          ] + Campaign::CAMPAIGN_TYPES.map { |type| [type.humanize, type] }, params[:type]),
+                          {},
+                          { class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+        </div>
+        
+        <!-- Date Range -->
+        <div>
+          <%= form.label :date_from, "Created From", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.date_field :date_from, 
+                              value: params[:date_from],
+                              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+        
+        <div>
+          <%= form.label :date_to, "Created To", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.date_field :date_to, 
+                              value: params[:date_to],
+                              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+        
+        <!-- Persona Filter -->
+        <div>
+          <%= form.label :persona_id, "Persona", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :persona_id, 
+                          options_for_select([
+                            ['All Personas', '']
+                          ] + current_user.personas.pluck(:name, :id), params[:persona_id]),
+                          {},
+                          { class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+        </div>
+        
+        <!-- Results Per Page -->
+        <div>
+          <%= form.label :per_page, "Results Per Page", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :per_page, 
+                          options_for_select([
+                            ['10', '10'],
+                            ['25', '25'],
+                            ['50', '50'],
+                            ['100', '100']
+                          ], params[:per_page] || '25'),
+                          {},
+                          { class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+        </div>
+        
+        <!-- Filter Actions -->
+        <div class="lg:col-span-4 flex items-end gap-2 pt-4">
+          <%= form.submit "Apply Filters", 
+                          class: "btn btn-primary px-6 py-2",
+                          "aria-label": "Apply selected filters" %>
+          <%= link_to "Reset", campaigns_path, 
+                      class: "btn btn-outline px-6 py-2",
+                      "aria-label": "Reset all filters" %>
+        </div>
+        
+        <!-- Preserve view mode and sorting -->
+        <%= form.hidden_field :view, value: @view_mode %>
+        <%= form.hidden_field :sort, value: params[:sort] %>
+        <%= form.hidden_field :direction, value: params[:direction] %>
       <% end %>
     </div>
   </div>
-<% end %>
+
+  <!-- Bulk Actions Toolbar -->
+  <div id="bulk-actions-toolbar" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6" data-controller="bulk-actions">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium text-blue-900">
+          <span data-bulk-actions-target="count">0</span> campaigns selected
+        </span>
+        <button type="button" 
+                class="text-sm text-blue-600 hover:text-blue-700 underline"
+                data-action="click->bulk-actions#selectAll"
+                aria-label="Select all campaigns">
+          Select all
+        </button>
+        <button type="button" 
+                class="text-sm text-blue-600 hover:text-blue-700 underline"
+                data-action="click->bulk-actions#clearSelection"
+                aria-label="Clear selection">
+          Clear selection
+        </button>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <!-- Bulk Status Update -->
+        <%= form_with url: bulk_update_campaigns_path, method: :patch, 
+                      local: true, 
+                      class: "inline-flex items-center gap-2",
+                      "data-bulk-actions-target": "form",
+                      "data-controller": "confirmation",
+                      "data-confirmation-message-value": "Are you sure you want to update the selected campaigns?" do |form| %>
+          <%= form.select :status, 
+                          options_for_select([
+                            ['Update Status...', ''],
+                            ['Draft', 'draft'],
+                            ['Active', 'active'],
+                            ['Paused', 'paused'],
+                            ['Completed', 'completed'],
+                            ['Archived', 'archived']
+                          ]),
+                          {},
+                          { class: "px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                            "data-action": "change->bulk-actions#updateStatus" } %>
+          <input type="hidden" name="campaign_ids" data-bulk-actions-target="idsInput">
+        <% end %>
+        
+        <!-- Bulk Export -->
+        <div class="relative" data-controller="dropdown">
+          <button type="button" 
+                  class="btn btn-outline px-3 py-1.5 text-sm inline-flex items-center"
+                  data-action="click->dropdown#toggle"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-4-4m4 4l4-4m5-5V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2z"/>
+            </svg>
+            Export
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          
+          <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border z-50" data-dropdown-target="menu" role="menu">
+            <div class="py-1">
+              <%= link_to bulk_export_campaigns_path(format: :csv), 
+                          method: :get,
+                          class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
+                          role: "menuitem",
+                          "data-action": "click->bulk-actions#exportSelected",
+                          "data-format": "csv" do %>
+                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Export as CSV
+              <% end %>
+              <%= link_to bulk_export_campaigns_path(format: :xlsx), 
+                          method: :get,
+                          class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
+                          role: "menuitem",
+                          "data-action": "click->bulk-actions#exportSelected",
+                          "data-format": "xlsx" do %>
+                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Export as Excel
+              <% end %>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bulk Delete -->
+        <%= form_with url: bulk_delete_campaigns_path, method: :delete, 
+                      local: true, 
+                      class: "inline",
+                      "data-bulk-actions-target": "deleteForm",
+                      "data-controller": "confirmation",
+                      "data-confirmation-message-value": "Are you sure you want to delete the selected campaigns? This action cannot be undone." do |form| %>
+          <input type="hidden" name="campaign_ids" data-bulk-actions-target="deleteIdsInput">
+          <button type="submit" 
+                  class="btn btn-danger px-3 py-1.5 text-sm inline-flex items-center"
+                  aria-label="Delete selected campaigns">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Delete
+          </button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaign Content -->
+  <% if @campaigns.any? %>
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-lg border p-6">
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Total Campaigns</p>
+            <p class="text-2xl font-bold text-gray-900"><%= @campaigns.total_count %></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg border p-6">
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Active</p>
+            <p class="text-2xl font-bold text-gray-900"><%= current_user.campaigns.active.count %></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg border p-6">
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Draft</p>
+            <p class="text-2xl font-bold text-gray-900"><%= current_user.campaigns.draft.count %></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg border p-6">
+        <div class="flex items-center">
+          <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600">Completed</p>
+            <p class="text-2xl font-bold text-gray-900"><%= current_user.campaigns.completed.count %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaign Table/Grid -->
+    <% if @view_mode == 'table' %>
+      <%= render 'campaigns_table' %>
+    <% else %>
+      <%= render 'campaigns_grid' %>
+    <% end %>
+    
+    <!-- Pagination -->
+    <% if @campaigns.respond_to?(:current_page) && @campaigns.total_pages > 1 %>
+      <div class="mt-8 flex justify-center">
+        <%= paginate @campaigns, 
+                     theme: 'twitter-bootstrap-4',
+                     nav_class: "flex justify-center",
+                     "aria-label": "Campaign pagination" %>
+      </div>
+    <% end %>
+    
+  <% else %>
+    <!-- Empty State -->
+    <div class="text-center py-16">
+      <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.003 9.003 0 01-5.83-2.18L3 21l3.17-3.17c-.49-.87-.82-1.82-.98-2.83C5.01 14.47 5 13.74 5 13v-1c0-4.97 4.03-9 9-9s9 4.03 9 9z"/>
+      </svg>
+      <h3 class="text-xl font-medium text-gray-900 mb-2">No campaigns found</h3>
+      <% if request.query_parameters.any? %>
+        <p class="text-gray-500 mb-6">Try adjusting your filters or search terms.</p>
+        <%= link_to campaigns_path, class: "btn btn-outline mr-3" do %>
+          Clear filters
+        <% end %>
+      <% else %>
+        <p class="text-gray-500 mb-6">Get started by creating your first campaign with our AI assistant.</p>
+      <% end %>
+      
+      <div class="flex justify-center gap-3">
+        <%= link_to campaigns_intake_path, class: "btn btn-primary" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.003 9.003 0 01-5.83-2.18L3 21l3.17-3.17c-.49-.87-.82-1.82-.98-2.83C5.01 14.47 5 13.74 5 13v-1c0-4.97 4.03-9 9-9s9 4.03 9 9z"/>
+          </svg>
+          Create with AI Assistant
+        <% end %>
+        <%= link_to new_campaign_path, class: "btn btn-outline" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          Create Manually
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

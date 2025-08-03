@@ -148,7 +148,7 @@ const CampaignIntakeChat: React.FC<CampaignIntakeChatProps> = ({
         <div>
           <h2 className="text-lg font-semibold">Campaign Assistant</h2>
           <p className="text-sm opacity-90">
-            Let's create your marketing campaign together
+            Let&apos;s create your marketing campaign together
           </p>
         </div>
         {onToggle && (

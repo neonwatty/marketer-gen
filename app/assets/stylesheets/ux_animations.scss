@@ -1,0 +1,684 @@
+// UX Animation Styles and Utilities
+// This file enhances the JavaScript UX components with CSS animations and styles
+
+// Motion Controls
+.reduce-motion {
+  * {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// High Contrast Mode
+.high-contrast {
+  // Enhanced contrast for text
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  
+  * {
+    border-color: #000000 !important;
+  }
+  
+  // Button enhancements
+  button, .btn {
+    background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    
+    &:hover, &:focus {
+      background-color: #000000 !important;
+      color: #ffffff !important;
+    }
+  }
+  
+  // Link enhancements  
+  a {
+    color: #0000ff !important;
+    text-decoration: underline !important;
+    
+    &:visited {
+      color: #800080 !important;
+    }
+    
+    &:hover, &:focus {
+      color: #ff0000 !important;
+      background-color: #ffff00 !important;
+    }
+  }
+  
+  // Form enhancements
+  input, textarea, select {
+    background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    
+    &:focus {
+      background-color: #ffff00 !important;
+      outline: 3px solid #0000ff !important;
+    }
+  }
+}
+
+// Loading States
+@keyframes wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-wave {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: wave 2s infinite;
+    content: '';
+  }
+}
+
+// Skeleton Loading Enhancements
+.skeleton {
+  background: linear-gradient(-45deg, #f0f0f0, #e8e8e8, #f0f0f0, #e8e8e8);
+  background-size: 400% 400%;
+  animation: skeleton-pulse 2s ease-in-out infinite;
+  
+  .dark & {
+    background: linear-gradient(-45deg, #374151, #4b5563, #374151, #4b5563);
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+// Progress Indicators
+.progress-bar {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.2) 50%, rgba(255,255,255,.2) 75%, transparent 75%, transparent);
+    background-size: 30px 30px;
+    animation: progress-stripes 2s linear infinite;
+  }
+  
+  &.animate {
+    &::after {
+      animation-play-state: running;
+    }
+  }
+  
+  &.paused {
+    &::after {
+      animation-play-state: paused;
+    }
+  }
+}
+
+@keyframes progress-stripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 30px 0;
+  }
+}
+
+// Toast Notifications
+.toast-enter {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+.toast-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.toast-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast-exit-active {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 300ms, transform 300ms;
+}
+
+// Error States
+.error-boundary {
+  .error-icon {
+    animation: error-shake 0.5s ease-in-out;
+  }
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+// Success Confirmations
+.success-confirmation {
+  .success-icon {
+    animation: success-checkmark 0.8s ease-in-out;
+  }
+}
+
+@keyframes success-checkmark {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Loading Spinners
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+// Pulse Animation for Brand Elements
+@keyframes brand-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.brand-pulse {
+  animation: brand-pulse 2s ease-in-out infinite;
+}
+
+// Slide Transitions
+.slide-enter {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-enter-active {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+}
+
+.slide-exit {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-exit-active {
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+}
+
+// Fade Transitions
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+// Scale Transitions
+.scale-enter {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+.scale-enter-active {
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+}
+
+.scale-exit {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.scale-exit-active {
+  transform: scale(0.9);
+  opacity: 0;
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+}
+
+// Onboarding Highlights
+.onboarding-highlight {
+  position: relative;
+  z-index: 1001;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    animation: highlight-pulse 2s ease-in-out infinite;
+    z-index: -1;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid #3b82f6;
+    border-radius: 6px;
+    animation: highlight-border 2s ease-in-out infinite;
+    z-index: -1;
+  }
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes highlight-border {
+  0%, 100% {
+    border-color: #3b82f6;
+    opacity: 1;
+  }
+  50% {
+    border-color: #60a5fa;
+    opacity: 0.7;
+  }
+}
+
+// Focus Management
+.focus-trap-active {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+// Accessibility Focus Indicators
+.keyboard-navigation {
+  *:focus {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+  }
+  
+  button:focus,
+  a:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    position: relative;
+    z-index: 10;
+  }
+}
+
+// Service Worker Status
+.sw-status {
+  .status-dot {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      background: inherit;
+      animation: status-pulse 2s ease-in-out infinite;
+    }
+  }
+  
+  .status-dot.online::after {
+    background: #10b981;
+  }
+  
+  .status-dot.offline::after {
+    background: #ef4444;
+  }
+  
+  .status-dot.installing::after {
+    background: #f59e0b;
+  }
+}
+
+@keyframes status-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+// PWA Install Animation
+.pwa-install-prompt {
+  .install-icon {
+    animation: install-bounce 2s ease-in-out infinite;
+  }
+}
+
+@keyframes install-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+// Offline Indicator
+.offline-indicator {
+  animation: offline-slide-down 0.5s ease-out;
+}
+
+@keyframes offline-slide-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Performance Metrics
+.metrics-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Button Loading State
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+  }
+}
+
+// Contextual Help Pointer
+.contextual-help {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+  }
+  
+  &.placement-top::before {
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0 8px;
+    border-color: #374151 transparent transparent transparent;
+  }
+  
+  &.placement-bottom::before {
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 8px 8px 8px;
+    border-color: transparent transparent #374151 transparent;
+  }
+  
+  &.placement-left::before {
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 8px 0 8px 8px;
+    border-color: transparent transparent transparent #374151;
+  }
+  
+  &.placement-right::before {
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 8px 8px 8px 0;
+    border-color: transparent #374151 transparent transparent;
+  }
+}
+
+// Virtual Scrolling
+.virtual-scrolling {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #a0aec0;
+  }
+}
+
+// Image Optimization States
+.optimized-image {
+  &.loading {
+    background: linear-gradient(-45deg, #f7fafc, #edf2f7, #f7fafc, #edf2f7);
+    background-size: 400% 400%;
+    animation: skeleton-pulse 2s ease-in-out infinite;
+  }
+  
+  &.error {
+    background-color: #fed7d7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9b2c2c;
+  }
+}
+
+// Performance Budget indicators
+.performance-warning {
+  animation: performance-alert 2s ease-in-out infinite;
+}
+
+@keyframes performance-alert {
+  0%, 100% {
+    background-color: #fef3c7;
+  }
+  50% {
+    background-color: #fde68a;
+  }
+}
+
+.performance-critical {
+  animation: performance-critical 1s ease-in-out infinite;
+}
+
+@keyframes performance-critical {
+  0%, 100% {
+    background-color: #fecaca;
+  }
+  50% {
+    background-color: #f87171;
+  }
+}
+
+// Responsive Design Helpers
+@media (max-width: 640px) {
+  .mobile-optimized {
+    font-size: 16px; // Prevent zoom on iOS
+    
+    .toast-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+    }
+    
+    .modal-container {
+      margin: 0;
+      height: 100vh;
+      border-radius: 0;
+    }
+    
+    .accessibility-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-radius: 16px 16px 0 0;
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  .no-print,
+  .toast-container,
+  .modal-backdrop,
+  .contextual-help,
+  .onboarding-highlight,
+  .sw-status,
+  .pwa-install-prompt,
+  .offline-indicator {
+    display: none !important;
+  }
+  
+  .print-friendly {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+}
+
+// Dark Mode Enhancements
+@media (prefers-color-scheme: dark) {
+  .auto-theme {
+    .skeleton {
+      background: linear-gradient(-45deg, #374151, #4b5563, #374151, #4b5563);
+    }
+    
+    .contextual-help::before {
+      border-color: #1f2937;
+    }
+    
+    .onboarding-highlight::before {
+      background: rgba(96, 165, 250, 0.3);
+    }
+  }
+}

@@ -1,0 +1,284 @@
+<% content_for :title, "Enhanced Content Editor" %>
+
+<div class="enhanced-content-editor-container" 
+     data-controller="content-editor" 
+     data-content-editor-auto-save-url-value="<%= api_v1_content_repositories_path %>"
+     data-content-editor-content-type-value="rich"
+     data-content-editor-collaborative-value="<%= params[:collaborative] == 'true' %>"
+     data-content-editor-show-templates-value="true"
+     data-content-editor-show-media-manager-value="true"
+     data-content-editor-show-live-preview-value="true"
+     data-content-editor-max-length-value="<%= @content_repository&.content_type == 'social_media' ? 2200 : nil %>"
+     data-content-editor-brand-colors-value="<%= @brand&.colors&.to_json || '[]' %>"
+     data-content-editor-collaborators-value="<%= @collaborators&.to_json || '[]' %>">
+
+  <!-- Header -->
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+    <div>
+      <nav class="flex mb-4" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+          <li class="inline-flex items-center">
+            <%= link_to content_repositories_path, class: "inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              Content Library
+            <% end %>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <%= link_to @content_repository.title, @content_repository, class: "ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 truncate" %>
+            </div>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Enhanced Editor</span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+      
+      <h1 class="text-3xl font-bold text-gray-900">Enhanced Content Editor</h1>
+      <p class="mt-2 text-gray-600">Create and edit content with advanced features</p>
+    </div>
+    
+    <div class="flex space-x-3 mt-4 lg:mt-0">
+      <%= link_to "Standard Editor", edit_content_repository_path(@content_repository), 
+          class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
+      <%= link_to "Cancel", @content_repository, 
+          class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
+    </div>
+  </div>
+
+  <!-- Content Version Info -->
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+    <div class="flex items-start">
+      <div class="flex-shrink-0">
+        <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-blue-800">Enhanced Editor Features</h3>
+        <div class="mt-1 text-sm text-blue-700">
+          <ul class="list-disc list-inside space-y-1">
+            <li>Rich text editing with comprehensive formatting toolbar</li>
+            <li>Live preview with device and channel-specific views</li>
+            <li>Content templates with smart variable system</li>
+            <li>Advanced media management with cropping tools</li>
+            <li>Real-time collaboration and auto-save</li>
+            <li>Accessibility compliance (WCAG 2.1 AA)</li>
+            <li>Markdown support with live preview</li>
+            <li>Emoji picker and brand asset integration</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Container -->
+  <%= form_with model: @content_repository, 
+      class: "enhanced-content-editor-form",
+      data: { 
+        action: "submit->content-editor#handleSubmit",
+        content_editor_target: "form"
+      } do |form| %>
+    
+    <!-- Hidden Fields for Form Submission -->
+    <%= form.hidden_field :title, data: { content_editor_target: "titleField" } %>
+    <%= form.hidden_field :content_type, data: { content_editor_target: "contentTypeField" } %>
+    <%= form.hidden_field :format, data: { content_editor_target: "formatField" } %>
+    <%= form.hidden_field :body, 
+        value: @current_version&.body,
+        data: { content_editor_target: "contentField" } %>
+
+    <!-- React Component Mount Point -->
+    <div data-content-editor-target="reactMount" class="min-h-96 w-full">
+      <!-- React component will be mounted here -->
+      <div class="flex items-center justify-center p-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span class="ml-3 text-gray-600">Loading enhanced editor...</span>
+      </div>
+    </div>
+
+    <!-- Metadata Section (Collapsible) -->
+    <div class="mt-8 bg-white border border-gray-200 rounded-lg">
+      <button 
+        type="button"
+        class="w-full px-6 py-4 text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onclick="this.nextElementSibling.classList.toggle('hidden')"
+      >
+        <h3 class="text-lg font-semibold text-gray-900">Content Metadata</h3>
+        <svg class="w-5 h-5 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+      
+      <div class="hidden px-6 pb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Title -->
+          <div class="md:col-span-2">
+            <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :title, 
+                class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+                placeholder: "Enter content title..." %>
+          </div>
+
+          <!-- Content Type -->
+          <div>
+            <%= form.label :content_type, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.select :content_type, 
+                options_for_select([
+                  ['Blog Post', 'blog_post'],
+                  ['Social Media', 'social_media'],
+                  ['Email Newsletter', 'email_newsletter'],
+                  ['Product Description', 'product_description'],
+                  ['Press Release', 'press_release'],
+                  ['Landing Page', 'landing_page'],
+                  ['General Content', 'general']
+                ], @content_repository.content_type),
+                { prompt: "Select content type..." },
+                { class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" } %>
+          </div>
+
+          <!-- Format -->
+          <div>
+            <%= form.label :format, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.select :format, 
+                options_for_select([
+                  ['Rich Text (HTML)', 'html'],
+                  ['Markdown', 'markdown'],
+                  ['Plain Text', 'text']
+                ], @content_repository.format),
+                { prompt: "Select format..." },
+                { class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" } %>
+          </div>
+
+          <!-- Description -->
+          <div class="md:col-span-2">
+            <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :description, 
+                rows: 3,
+                class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+                placeholder: "Brief description of this content..." %>
+          </div>
+
+          <!-- Target Audience -->
+          <div>
+            <%= form.label :target_audience, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :target_audience, 
+                class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+                placeholder: "e.g., Young professionals, B2B decision makers" %>
+          </div>
+
+          <!-- Keywords -->
+          <div>
+            <%= form.label :keywords, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :keywords, 
+                class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+                placeholder: "marketing, automation, growth" %>
+            <p class="mt-1 text-xs text-gray-500">Comma-separated keywords for searchability</p>
+          </div>
+
+          <!-- Campaign Association -->
+          <div class="md:col-span-2">
+            <%= form.label :campaign_id, "Associate with Campaign", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.select :campaign_id, 
+                options_from_collection_for_select(@campaigns || [], :id, :name, @content_repository.campaign_id),
+                { prompt: "Select campaign (optional)" },
+                { class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" } %>
+            <p class="mt-2 text-xs text-gray-500">Associate this content with a specific campaign for better organization</p>
+          </div>
+        </div>
+
+        <!-- Version Message -->
+        <div class="mt-6">
+          <%= label_tag :commit_message, "Version Message", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= text_field_tag :commit_message, "Enhanced editor updates", 
+              class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+              placeholder: "Describe your changes..." %>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex space-x-3 mt-6">
+          <%= form.submit "Save Changes", 
+              class: "inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
+          
+          <button type="button" 
+                  onclick="document.querySelector('[name=submit_for_review]') || (function() { var input = document.createElement('input'); input.type = 'hidden'; input.name = 'submit_for_review'; input.value = 'true'; document.querySelector('form').appendChild(input); })(); document.querySelector('form').submit();"
+                  class="inline-flex justify-center items-center px-6 py-3 border border-yellow-300 text-base font-medium rounded-md text-yellow-700 bg-yellow-50 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
+            Save & Submit for Review
+          </button>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Accessibility Features -->
+  <div class="sr-only">
+    <h2>Accessibility Information</h2>
+    <p>This enhanced content editor supports keyboard navigation and screen readers.</p>
+    <h3>Keyboard Shortcuts:</h3>
+    <ul>
+      <li>Alt+1: Switch to editor tab</li>
+      <li>Alt+2: Switch to templates tab</li>
+      <li>Alt+3: Switch to media tab</li>
+      <li>Alt+4: Switch to preview tab</li>
+      <li>Ctrl+S or Cmd+S: Save content</li>
+      <li>Tab: Navigate between elements</li>
+      <li>Escape: Close modals</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div data-content-editor-target="loadingOverlay" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+    <div class="flex items-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div class="ml-4">
+        <p class="text-lg font-medium text-gray-900">Processing...</p>
+        <p class="text-sm text-gray-500" data-content-editor-target="loadingMessage">Saving changes...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Feature Tour (Optional) -->
+<% if params[:tour] == 'true' %>
+<div id="feature-tour" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-gray-900">Welcome to Enhanced Editor!</h3>
+      <button onclick="document.getElementById('feature-tour').remove()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="space-y-3 text-sm text-gray-600">
+      <p><strong>✨ New Features:</strong></p>
+      <ul class="list-disc list-inside space-y-1 ml-4">
+        <li>Rich text editing with comprehensive toolbar</li>
+        <li>Live preview across devices and platforms</li>
+        <li>Content templates with smart variables</li>
+        <li>Advanced media management</li>
+        <li>Real-time collaboration</li>
+        <li>Accessibility features</li>
+      </ul>
+    </div>
+    <div class="mt-6 flex justify-end">
+      <button onclick="document.getElementById('feature-tour').remove()" 
+              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+        Get Started
+      </button>
+    </div>
+  </div>
+</div>
+<% end %>

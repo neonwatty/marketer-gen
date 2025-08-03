@@ -1,15 +1,98 @@
-<div class="mx-auto max-w-4xl mt-10">
-  <h1 class="text-heading-h1 mb-6">Welcome to Marketer Gen</h1>
-  <p class="text-lg leading-relaxed text-tertiary mb-8">AI-driven content generation platform for marketers</p>
+<% if authenticated? %>
+  <!-- Main Dashboard Layout -->
+  <div data-controller="dashboard" 
+       data-dashboard-layout-value="<%= current_user.dashboard_layout || 'default' %>"
+       class="dashboard-container max-w-none -mt-8 sm:-mt-16 lg:-mt-28 -mx-4 sm:-mx-6 lg:-mx-8">
+    
+    <!-- Dashboard Header -->
+    <header class="dashboard-header bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <h1 class="text-heading-h2 text-primary mb-0">Dashboard</h1>
+          <%= render 'shared/breadcrumb' %>
+        </div>
+        <div class="flex items-center space-x-4">
+          <%= render 'shared/global_search' %>
+          <%= render 'shared/quick_actions' %>
+          <%= render 'shared/user_menu' %>
+        </div>
+      </div>
+    </header>
+
+    <!-- Primary Navigation -->
+    <%= render 'shared/primary_navigation' %>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-main flex-1 overflow-x-hidden">
+      <!-- Welcome Section -->
+      <section class="welcome-section bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-7xl mx-auto">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-heading-h3 text-primary mb-2">Welcome back, <%= current_user.display_name %>!</h2>
+              <p class="text-secondary">Here's what's happening with your campaigns today.</p>
+            </div>
+            <div class="hidden md:flex items-center space-x-3">
+              <button data-action="click->dashboard#toggleLayout" 
+                      class="btn-secondary px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                </svg>
+                Customize Layout
+              </button>
+              <button data-action="click->dashboard#refreshData" 
+                      class="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Grid -->
+      <section class="dashboard-grid px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-7xl mx-auto">
+          <!-- Responsive Grid Layout -->
+          <div data-dashboard-target="grid" 
+               class="dashboard-widgets-grid grid gap-6
+                      grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
+                      auto-rows-max">
+            
+            <!-- Campaign Overview Widget -->
+            <%= render 'widgets/campaign_overview' %>
+            
+            <!-- Performance Metrics Cards -->
+            <%= render 'widgets/performance_metrics' %>
+            
+            <!-- Quick Stats Summary -->
+            <%= render 'widgets/quick_stats' %>
+            
+            <!-- Recent Activity Feed -->
+            <%= render 'widgets/recent_activity' %>
+            
+            <!-- Task Progress Tracker -->
+            <%= render 'widgets/task_progress' %>
+            
+            <!-- Additional Widgets (conditionally rendered) -->
+            <% if current_user.admin? %>
+              <%= render 'widgets/admin_overview' %>
+            <% end %>
+            
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
   
-  <% if authenticated? %>
-    <div class="bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-      <p class="text-base leading-normal">You are logged in as: <%= Current.user.email_address %></p>
-    </div>
-    <div class="flex flex-col sm:flex-row gap-4">
-      <%= button_to "Sign Out", session_path, method: :delete, class: "bg-red-500 hover:bg-red-700 active:bg-red-800 text-white font-bold px-6 py-3 rounded focus-visible:outline-2 focus-visible:outline-red-600 focus-visible:outline-offset-2 cursor-pointer min-h-[48px] text-base transition-colors duration-200" %>
-    </div>
-  <% else %>
+<% else %>
+  <!-- Non-authenticated Landing -->
+  <div class="mx-auto max-w-4xl mt-10">
+    <h1 class="text-heading-h1 mb-6">Welcome to Marketer Gen</h1>
+    <p class="text-lg leading-relaxed text-tertiary mb-8">AI-driven content generation platform for marketers</p>
+    
     <div class="flex flex-col sm:flex-row gap-4">
       <%= link_to "Sign Up", sign_up_path, class: "bg-blue-500 hover:bg-blue-700 active:bg-blue-800 text-white font-bold px-6 py-3 rounded inline-block text-center focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2 min-h-[48px] text-base flex items-center justify-center transition-colors duration-200" %>
       <%= link_to "Sign In", new_session_path, class: "bg-gray-500 hover:bg-gray-700 active:bg-gray-800 text-white font-bold px-6 py-3 rounded inline-block text-center focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2 min-h-[48px] text-base flex items-center justify-center transition-colors duration-200" %>
@@ -18,5 +101,5 @@
     <div class="mt-8 text-center">
       <%= link_to "Typography Demo →", typography_demo_path, class: "text-interactive hover:underline" %>
     </div>
-  <% end %>
-</div>
+  </div>
+<% end %>

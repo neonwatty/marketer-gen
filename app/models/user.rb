@@ -16,6 +16,13 @@ class User < ApplicationRecord
   has_many :campaign_intake_sessions, dependent: :destroy
   has_many :crm_integrations, dependent: :destroy
   
+  # Custom Reports and Templates
+  has_many :custom_reports, dependent: :destroy
+  has_many :report_templates, dependent: :destroy
+  has_many :report_exports, dependent: :destroy
+  has_many :report_schedules, dependent: :destroy
+  has_many :report_distribution_lists, dependent: :destroy
+  
   # Self-referential association for suspension tracking
   belongs_to :suspended_by, class_name: "User", optional: true
 

@@ -4,7 +4,6 @@ require "test_helper"
 require "webmock/minitest"
 
 class Analytics::GoogleAdsServiceTest < ActiveSupport::TestCase
-  include Minitest::Mocks
 
   def setup
     @user = users(:one)

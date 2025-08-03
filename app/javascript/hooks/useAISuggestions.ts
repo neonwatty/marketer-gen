@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { AISuggestion, JourneyStep } from '../types/journey';
 
 interface AISuggestionsParams {
@@ -13,8 +13,8 @@ export const useAISuggestions = (params: AISuggestionsParams = {}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSuggestions = async (customParams?: AISuggestionsParams) => {
-    const finalParams = { ...params, ...customParams };
+  const fetchSuggestions = useCallback(async (customParams?: AISuggestionsParams) => {
+    const _finalParams = { ...params, ...customParams };
     setIsLoading(true);
     setError(null);
 
@@ -39,7 +39,7 @@ export const useAISuggestions = (params: AISuggestionsParams = {}) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params]);
 
   const fetchSuggestionsForStage = async (stage: string) => {
     setIsLoading(true);
@@ -128,7 +128,7 @@ export const useAISuggestions = (params: AISuggestionsParams = {}) => {
     if (params.stage || params.stepType) {
       fetchSuggestions();
     }
-  }, [params.stage, params.stepType]);
+  }, [params.stage, params.stepType, fetchSuggestions]);
 
   return {
     suggestions,

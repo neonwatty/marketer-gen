@@ -84,7 +84,7 @@ export default class extends Controller {
     const afterElement = this.getDragAfterElement(event.clientY)
     const dropIndicator = this.dropIndicatorTarget
     
-    if (afterElement == null) {
+    if (afterElement === null) {
       this.containerTarget.appendChild(dropIndicator)
     } else {
       this.containerTarget.insertBefore(dropIndicator, afterElement)
@@ -138,8 +138,8 @@ export default class extends Controller {
     }, { offset: Number.NEGATIVE_INFINITY }).element
   }
 
-  movePhase(phase, afterElement, newIndex) {
-    if (afterElement == null) {
+  movePhase(phase, afterElement, _newIndex) {
+    if (afterElement === null) {
       this.containerTarget.appendChild(phase)
     } else {
       this.containerTarget.insertBefore(phase, afterElement)

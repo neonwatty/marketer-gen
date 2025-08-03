@@ -1,4 +1,50 @@
 Rails.application.routes.draw do
+  # Custom Reporting System
+  resources :custom_reports do
+    member do
+      get :builder
+      get :preview
+      post :export
+      post :duplicate
+      get :schedule
+    end
+    
+    collection do
+      get :templates
+    end
+  end
+  
+  # Report Templates
+  resources :report_templates do
+    member do
+      post :clone
+      post :instantiate
+      post :rate
+    end
+    
+    collection do
+      get :public
+      get :categories
+    end
+  end
+  
+  # Report Exports (for downloads)
+  resources :report_exports, only: [:show, :destroy] do
+    member do
+      get :download
+    end
+  end
+  
+  # Report Distribution Lists
+  resources :report_distribution_lists do
+    member do
+      post :add_user
+      delete :remove_user
+      post :add_role
+      delete :remove_role
+      get :preview
+    end
+  end
   # Content Management System
   resources :content_repositories, path: 'content' do
     member do
@@ -327,11 +373,24 @@ Rails.application.routes.draw do
     end
   end
 
-  # Campaign Plans Management
-  resources :campaigns, only: [:index, :show] do
+  # Campaign Management
+  resources :campaigns do
     collection do
       get :intake
+      patch :bulk_update
+      delete :bulk_delete
+      get :bulk_export
     end
+    
+    member do
+      post :duplicate
+      patch :archive
+      get :workflow
+      get :status_history
+      post :approve
+      post :reject
+    end
+    
     resources :campaign_plans, path: 'plans', except: [:destroy] do
       member do
         get :dashboard

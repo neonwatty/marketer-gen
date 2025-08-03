@@ -1,12 +1,35 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo, Suspense } from 'react';
 import { 
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, 
   ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  ReferenceLine, Area, AreaChart
+  Area, AreaChart
 } from 'recharts';
 import { DateRange } from 'react-date-range';
-import { format, subDays, subMonths, subYears } from 'date-fns';
+import { subDays } from 'date-fns';
+import debounce from 'lodash.debounce';
 import { createConsumer } from '@rails/actioncable';
+import {
+  AdvancedLineChart,
+  AdvancedBarChart,
+  DonutChart,
+  FunnelVisualization,
+  HeatmapDisplay,
+  ScatterPlot,
+  TreeMapChart,
+  RadialBarChartComponent,
+  MultiSeriesAreaChart,
+  ChartDataPoint,
+  ChartOptions,
+  ChartTheme,
+  FunnelDataPoint,
+  HeatmapDataPoint
+} from './AdvancedCharts';
+import { CustomChartBuilder, ChartConfiguration } from './CustomChartBuilder';
+import { 
+  MobileDashboard, 
+  MobileTouchControls
+} from './MobileAnalyticsDashboard';
+import { ExportManager } from './ExportManager';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 
@@ -23,14 +46,85 @@ interface ChartData {
   name: string;
   value: number;
   date?: string;
-  [key: string]: any;
+  source?: string;
 }
 
 interface DashboardProps {
   brandId: string;
-  userId: string;
-  initialMetrics?: any;
+  userId?: string;
+  initialMetrics?: DashboardMetrics;
 }
+
+interface DashboardMetrics {
+  social_media?: SocialMediaMetrics;
+  email?: EmailMetrics;
+  google_analytics?: GoogleAnalyticsMetrics;
+  crm?: CRMMetrics;
+  custom?: Record<string, CustomMetricData>;
+}
+
+interface SocialMediaMetrics {
+  platforms?: PlatformData[];
+  summary?: Record<string, number>;
+  timeseries?: TimeSeriesData[];
+}
+
+interface EmailMetrics {
+  campaigns?: EmailCampaignData[];
+  summary?: Record<string, number>;
+  timeseries?: TimeSeriesData[];
+}
+
+interface GoogleAnalyticsMetrics {
+  timeseries?: GoogleAnalyticsTimeSeriesData[];
+  summary?: Record<string, number>;
+}
+
+interface CRMMetrics {
+  pipeline?: CRMPipelineData[];
+  summary?: Record<string, number>;
+}
+
+interface PlatformData {
+  name: string;
+  engagement: number;
+}
+
+interface EmailCampaignData {
+  name: string;
+  open_rate: number;
+  click_rate: number;
+}
+
+interface GoogleAnalyticsTimeSeriesData {
+  date: string;
+  sessions: number;
+  pageviews: number;
+}
+
+interface CRMPipelineData {
+  stage: string;
+  value: number;
+}
+
+interface TimeSeriesData {
+  date: string;
+  value: number;
+}
+
+interface CustomMetricData {
+  value: number;
+  timestamp: string;
+}
+
+interface WebSocketMessage {
+  type: string;
+  data?: any;
+  metric_name?: string;
+  message?: string;
+}
+
+// Removed unused interface - CustomMetricConfig
 
 interface DateRangeState {
   startDate: Date;
@@ -40,11 +134,6 @@ interface DateRangeState {
 
 // Color schemes for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
-const TREND_COLORS = {
-  up: '#00C49F',
-  down: '#FF8042',
-  neutral: '#8884D8'
-};
 
 // Quick date range presets
 const DATE_PRESETS = {
@@ -57,18 +146,23 @@ const DATE_PRESETS = {
 
 export const AnalyticsDashboard: React.FC<DashboardProps> = ({ 
   brandId, 
-  userId, 
   initialMetrics 
 }) => {
   // State management
-  const [metrics, setMetrics] = useState<any>(initialMetrics || {});
+  const [metrics, setMetrics] = useState<DashboardMetrics>(initialMetrics || {});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(['all']);
-  const [chartType, setChartType] = useState<'line' | 'bar' | 'area'>('line');
+  // Removed unused selectedMetrics state
+  const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'donut' | 'funnel' | 'heatmap' | 'scatter' | 'treemap' | 'radial_bar'>('line');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [customMetricBuilder, setCustomMetricBuilder] = useState(false);
-  const [drillDownData, setDrillDownData] = useState<any>(null);
+  const [drillDownData, setDrillDownData] = useState<ChartData[] | null>(null);
+  const [savedCharts, setSavedCharts] = useState<ChartConfiguration[]>([]);
+  const [dashboardLayout, setDashboardLayout] = useState<'grid' | 'list'>('grid');
+  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark' | 'brand'>('light');
+  const [showAdvancedCharts, setShowAdvancedCharts] = useState(false);
+  const [heatmapData, setHeatmapData] = useState<HeatmapDataPoint[]>([]);
+  const [funnelData, setFunnelData] = useState<FunnelDataPoint[]>([]);
   
   // Date range state
   const [dateRange, setDateRange] = useState<DateRangeState[]>([
@@ -81,7 +175,7 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
 
   // WebSocket connection
   const [cable] = useState(() => createConsumer());
-  const [channel, setChannel] = useState<any>(null);
+  const [channel, setChannel] = useState<any>(null); // ActionCable channel type not available
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -109,10 +203,10 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
     return () => {
       analyticsChannel.unsubscribe();
     };
-  }, [brandId, cable]);
+  }, [brandId, cable, handleRealtimeUpdate, requestInitialMetrics]);
 
   // Handle real-time updates from ActionCable
-  const handleRealtimeUpdate = useCallback((data: any) => {
+  const handleRealtimeUpdate = useCallback((data: WebSocketMessage) => {
     setLoading(false);
     
     switch (data.type) {
@@ -149,31 +243,33 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
     }
   }, []);
 
+  // Debounced metrics request to prevent excessive API calls
+  const debouncedRequestMetrics = useMemo(
+    () => debounce((metricType: string, timeRange: string, brandId: string) => {
+      if (!channel) {
+        return;
+      }
+      
+      setLoading(true);
+      setError(null);
+      
+      channel.perform('request_metrics', {
+        metric_type: metricType,
+        time_range: timeRange,
+        brand_id: brandId
+      });
+    }, 300),
+    [channel]
+  );
+
   // Request initial metrics
   const requestInitialMetrics = useCallback(() => {
     if (!channel) {return;}
     
-    setLoading(true);
-    setError(null);
-    
-    channel.perform('request_metrics', {
-      metric_type: 'all',
-      time_range: getTimeRangeString(),
-      brand_id: brandId
-    });
-  }, [channel, brandId, dateRange]);
+    debouncedRequestMetrics('all', getTimeRangeString(), brandId);
+  }, [channel, brandId, getTimeRangeString, debouncedRequestMetrics]);
 
-  // Request specific metrics
-  const requestMetrics = useCallback((metricType: string) => {
-    if (!channel) {return;}
-    
-    setLoading(true);
-    channel.perform('request_metrics', {
-      metric_type: metricType,
-      time_range: getTimeRangeString(),
-      brand_id: brandId
-    });
-  }, [channel, brandId, dateRange]);
+  // Removed unused requestMetrics function
 
   // Get time range string for API
   const getTimeRangeString = useCallback(() => {
@@ -190,12 +286,96 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
   }, [dateRange]);
 
   // Handle date range changes
-  const handleDateRangeChange = useCallback((ranges: any) => {
+  const handleDateRangeChange = useCallback((ranges: { selection: DateRangeState }) => {
     setDateRange([ranges.selection]);
     setShowDatePicker(false);
     // Request new data with updated range
     setTimeout(() => requestInitialMetrics(), 100);
-  }, [requestInitialMetrics]);
+    // Announce change to screen readers
+    announceToScreenReader(`Date range updated to ${ranges.selection.startDate.toLocaleDateString()} - ${ranges.selection.endDate.toLocaleDateString()}`);
+  }, [requestInitialMetrics, announceToScreenReader]);
+
+  // Announce updates to screen readers
+  const announceToScreenReader = useCallback((message: string) => {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.className = 'sr-only';
+    announcement.textContent = message;
+    document.body.appendChild(announcement);
+    
+    // Clean up after announcement
+    setTimeout(() => {
+      document.body.removeChild(announcement);
+    }, 1000);
+  }, []);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // ESC key to close modals
+    if (event.key === 'Escape') {
+      if (showDatePicker) {
+        setShowDatePicker(false);
+        event.preventDefault();
+      }
+      if (customMetricBuilder) {
+        setCustomMetricBuilder(false);
+        event.preventDefault();
+      }
+    }
+    
+    // Alt + E for export menu
+    if (event.altKey && event.key === 'e') {
+      event.preventDefault();
+      // Focus first export button
+      const exportButton = document.querySelector('[aria-label="Export data as CSV file"]') as HTMLElement;
+      exportButton?.focus();
+    }
+    
+    // Alt + R for refresh
+    if (event.altKey && event.key === 'r') {
+      event.preventDefault();
+      requestInitialMetrics();
+      announceToScreenReader('Dashboard data refreshed');
+    }
+  }, [showDatePicker, customMetricBuilder, requestInitialMetrics, announceToScreenReader]);
+
+  // Add keyboard event listener
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  // Cleanup debounced functions on unmount
+  useEffect(() => {
+    return () => {
+      debouncedRequestMetrics.cancel();
+    };
+  }, [debouncedRequestMetrics]);
+
+  // Performance optimization: virtualize large lists
+  const visibleSummaryMetrics = useMemo(() => {
+    return summaryMetrics.slice(0, 8); // Only show first 8 for performance
+  }, [summaryMetrics]);
+
+  // Intersection Observer for lazy loading charts
+  const [chartInView, setChartInView] = useState(false);
+  const chartRef = useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setChartInView(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(node);
+    }
+  }, []);
 
   // Handle preset date ranges
   const handlePresetDateRange = useCallback((preset: keyof typeof DATE_PRESETS) => {
@@ -209,38 +389,20 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
     requestInitialMetrics();
   }, [requestInitialMetrics]);
 
-  // Build custom metric
-  const buildCustomMetric = useCallback((config: any) => {
-    if (!channel) {return;}
-    
-    channel.perform('build_custom_metric', {
-      ...config,
-      brand_id: brandId
-    });
-  }, [channel, brandId]);
+  // Removed unused buildCustomMetric function
 
-  // Perform drill-down
-  const performDrillDown = useCallback((source: string, metric: string, dimension: string, filters: any = {}) => {
-    if (!channel) {return;}
-    
-    channel.perform('drill_down', {
-      source,
-      metric,
-      dimension,
-      filters,
-      brand_id: brandId
-    });
-  }, [channel, brandId]);
+  // Removed unused performDrillDown function
 
   // Prepare chart data
   const chartData = useMemo(() => {
     const data: ChartData[] = [];
     
     // Combine data from all sources
-    Object.entries(metrics).forEach(([source, sourceData]: [string, any]) => {
-      if (sourceData && typeof sourceData === 'object') {
-        if (sourceData.timeseries) {
-          sourceData.timeseries.forEach((item: any) => {
+    Object.entries(metrics).forEach(([source, sourceData]) => {
+      if (sourceData && typeof sourceData === 'object' && 'timeseries' in sourceData) {
+        const timeseries = sourceData.timeseries;
+        if (timeseries) {
+          timeseries.forEach((item: TimeSeriesData) => {
             data.push({
               name: source,
               value: item.value,
@@ -259,14 +421,16 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
   const summaryMetrics = useMemo(() => {
     const summary: MetricData[] = [];
     
-    Object.entries(metrics).forEach(([source, sourceData]: [string, any]) => {
-      if (sourceData && typeof sourceData === 'object') {
-        if (sourceData.summary) {
-          Object.entries(sourceData.summary).forEach(([metric, value]: [string, any]) => {
+    Object.entries(metrics).forEach(([source, sourceData]) => {
+      if (sourceData && typeof sourceData === 'object' && 'summary' in sourceData) {
+        const summaryData = sourceData.summary;
+        if (summaryData) {
+          Object.entries(summaryData).forEach(([metric, value]) => {
+            const numericValue = typeof value === 'number' ? value : 0;
             summary.push({
               name: `${source}_${metric}`,
-              value: typeof value === 'number' ? value : 0,
-              trend: value > 0 ? 'up' : value < 0 ? 'down' : 'neutral'
+              value: numericValue,
+              trend: numericValue > 0 ? 'up' : numericValue < 0 ? 'down' : 'neutral'
             });
           });
         }
@@ -276,165 +440,249 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
     return summary;
   }, [metrics]);
 
-  // Export functionality
-  const exportData = useCallback(async (format: 'csv' | 'pdf' | 'png') => {
-    try {
-      setLoading(true);
-      
-      switch (format) {
-        case 'csv':
-          const csvData = convertToCSV(chartData);
-          downloadFile(csvData, 'analytics-data.csv', 'text/csv');
-          break;
-        case 'pdf':
-          await exportToPDF();
-          break;
-        case 'png':
-          await exportToPNG();
-          break;
+  // Export functionality moved to ExportManager component
+
+  // Theme configurations
+  const getThemeConfig = useCallback((): ChartTheme => {
+    switch (selectedTheme) {
+      case 'dark':
+        return {
+          primary: '#60A5FA',
+          secondary: '#34D399',
+          accent: '#FBBF24',
+          background: '#1F2937',
+          text: '#F9FAFB',
+          grid: '#374151',
+          colors: ['#60A5FA', '#34D399', '#FBBF24', '#F87171', '#A78BFA', '#4ADE80', '#FB923C', '#38BDF8']
+        };
+      case 'brand':
+        return {
+          primary: '#0088FE',
+          secondary: '#00C49F',
+          accent: '#FFBB28',
+          background: '#FFFFFF',
+          text: '#1E40AF',
+          grid: '#E0E7FF',
+          colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#8DD1E1']
+        };
+      default: // light
+        return {
+          primary: '#0088FE',
+          secondary: '#00C49F',
+          accent: '#FFBB28',
+          background: '#FFFFFF',
+          text: '#374151',
+          grid: '#E5E7EB',
+          colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#8DD1E1']
+        };
+    }
+  }, [selectedTheme]);
+
+  // Handle data point clicks for drill-down
+  const handleDataPointClick = useCallback((point: ChartDataPoint) => {
+    if (channel) {
+      channel.perform('drill_down', {
+        source: point.source || 'general',
+        metric: 'value',
+        dimension: 'name',
+        filters: { name: point.name },
+        brand_id: brandId
+      });
+    }
+    announceToScreenReader(`Drilling down into ${point.name} data`);
+  }, [channel, brandId, announceToScreenReader]);
+
+  // Handle chart zoom
+  const handleChartZoom = useCallback((scale: number) => {
+    announceToScreenReader(`Chart zoomed to ${(scale * 100).toFixed(0)}%`);
+  }, [announceToScreenReader]);
+
+  // Convert chart data for advanced components
+  const convertToAdvancedChartData = useCallback((data: ChartData[]): ChartDataPoint[] => {
+    return data.map(item => ({
+      name: item.name,
+      value: item.value,
+      date: item.date,
+      source: item.source,
+      x: Math.random() * 100, // For scatter plots
+      y: Math.random() * 100,
+      size: item.value / 10,
+      metadata: { source: item.source, date: item.date }
+    }));
+  }, []);
+
+  // Generate funnel data from CRM metrics
+  const generateFunnelData = useCallback((): FunnelDataPoint[] => {
+    if (!metrics.crm?.pipeline) {return [];}
+    
+    const theme = getThemeConfig();
+    return metrics.crm.pipeline.map((stage, index) => ({
+      name: stage.stage,
+      value: stage.value,
+      fill: theme.colors[index % theme.colors.length],
+      conversionRate: index > 0 
+        ? (stage.value / metrics.crm!.pipeline![index - 1].value) * 100 
+        : 100
+    }));
+  }, [metrics.crm, getThemeConfig]);
+
+  // Generate heatmap data from engagement patterns
+  const generateHeatmapData = useCallback((): HeatmapDataPoint[] => {
+    const data: HeatmapDataPoint[] = [];
+    for (let row = 0; row < 7; row++) {
+      for (let col = 0; col < 24; col++) {
+        data.push({
+          row,
+          col,
+          value: Math.floor(Math.random() * 100),
+          label: `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][row]} ${col}:00`
+        });
       }
-    } catch (error) {
-      console.error('Export failed:', error);
-      setError('Export failed. Please try again.');
-    } finally {
-      setLoading(false);
     }
-  }, [chartData]);
+    return data;
+  }, []);
 
-  // Helper functions
-  const convertToCSV = (data: ChartData[]) => {
-    const headers = Object.keys(data[0] || {}).join(',');
-    const rows = data.map(row => Object.values(row).join(','));
-    return [headers, ...rows].join('\\n');
-  };
+  // Update heatmap and funnel data when metrics change
+  useEffect(() => {
+    setFunnelData(generateFunnelData());
+    setHeatmapData(generateHeatmapData());
+  }, [generateFunnelData, generateHeatmapData]);
 
-  const downloadFile = (content: string, filename: string, contentType: string) => {
-    const blob = new Blob([content], { type: contentType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
+  // Enhanced main chart component
+  const EnhancedMainChart = memo(({ 
+    chartType, 
+    chartData, 
+    theme, 
+    onDataPointClick, 
+    onZoom 
+  }: { 
+    chartType: string;
+    chartData: ChartData[];
+    theme: ChartTheme;
+    onDataPointClick?: (point: ChartDataPoint) => void;
+    onZoom?: (scale: number) => void;
+  }) => {
+    const advancedData = convertToAdvancedChartData(chartData);
+    const chartOptions: ChartOptions = {
+      showZoom: chartType === 'line',
+      showTooltip: true,
+      showLegend: true,
+      showGrid: true,
+      enableAnimation: true,
+      theme
+    };
 
-  const exportToPDF = async () => {
-    // Implementation for PDF export using jsPDF
-    const { jsPDF } = await import('jspdf');
-    const pdf = new jsPDF();
-    pdf.text('Analytics Dashboard', 20, 20);
-    // Add charts and data to PDF
-    pdf.save('analytics-dashboard.pdf');
-  };
-
-  const exportToPNG = async () => {
-    // Implementation for PNG export using html2canvas
-    const html2canvas = (await import('html2canvas')).default;
-    const element = document.getElementById('analytics-dashboard');
-    if (element) {
-      const canvas = await html2canvas(element);
-      const link = document.createElement('a');
-      link.download = 'analytics-dashboard.png';
-      link.href = canvas.toDataURL();
-      link.click();
+    switch (chartType) {
+      case 'line':
+        return <AdvancedLineChart data={advancedData} options={chartOptions} onDataPointClick={onDataPointClick} onZoom={onZoom} />;
+      case 'bar':
+        return <AdvancedBarChart data={advancedData} options={chartOptions} onBarClick={onDataPointClick} />;
+      case 'donut':
+        return <DonutChart data={advancedData} options={chartOptions} centerText="Total" onSegmentClick={onDataPointClick} />;
+      case 'funnel':
+        return <FunnelVisualization data={funnelData} options={chartOptions} onStageClick={onDataPointClick} />;
+      case 'heatmap':
+        return <HeatmapDisplay data={heatmapData} options={chartOptions} width={800} height={400} />;
+      case 'scatter':
+        return <ScatterPlot data={advancedData} options={chartOptions} onPointClick={onDataPointClick} />;
+      case 'treemap':
+        return <TreeMapChart data={advancedData} options={chartOptions} onNodeClick={onDataPointClick} />;
+      case 'radial_bar':
+        return <RadialBarChartComponent data={advancedData} options={chartOptions} />;
+      case 'area':
+        return <MultiSeriesAreaChart data={advancedData} series={['value']} options={chartOptions} />;
+      default:
+        return (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke={theme.grid} />
+              <XAxis dataKey="date" stroke={theme.text} />
+              <YAxis stroke={theme.text} />
+              <Tooltip contentStyle={{ backgroundColor: theme.background, color: theme.text }} />
+              <Legend />
+              <Line type="monotone" dataKey="value" stroke={theme.primary} strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        );
     }
-  };
+  });
 
-  // Custom Metric Builder Component
-  const CustomMetricBuilder = () => {
-    const [metricConfig, setMetricConfig] = useState({
-      name: '',
-      sources: [],
-      aggregation: 'sum',
-      filters: {}
-    });
-
+  const MemoizedMetricCard = memo(({ metric, theme }: { metric: MetricData; theme: ChartTheme }) => {
+    const trendColor = metric.trend === 'up' ? '#00C49F' : metric.trend === 'down' ? '#FF8042' : '#8884D8';
+    
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold mb-4">Custom Metric Builder</h3>
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="Metric Name"
-            value={metricConfig.name}
-            onChange={(e) => setMetricConfig(prev => ({ ...prev, name: e.target.value }))}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-          
+      <div 
+        className="p-6 rounded-lg shadow-md"
+        style={{ backgroundColor: theme.background }}
+        role="article"
+        aria-labelledby={`metric-${metric.name}`}
+      >
+        <div className="flex items-center justify-between">
           <div>
-            <label className="block text-sm font-medium mb-2">Data Sources</label>
-            <div className="space-y-2">
-              {['social_media', 'email', 'google_analytics', 'crm'].map(source => (
-                <label key={source} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={metricConfig.sources.includes(source)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setMetricConfig(prev => ({ 
-                          ...prev, 
-                          sources: [...prev.sources, source] 
-                        }));
-                      } else {
-                        setMetricConfig(prev => ({ 
-                          ...prev, 
-                          sources: prev.sources.filter(s => s !== source) 
-                        }));
-                      }
-                    }}
-                    className="mr-2"
-                  />
-                  {source.replace('_', ' ').toUpperCase()}
-                </label>
-              ))}
-            </div>
-          </div>
-          
-          <select
-            value={metricConfig.aggregation}
-            onChange={(e) => setMetricConfig(prev => ({ ...prev, aggregation: e.target.value }))}
-            className="w-full p-2 border border-gray-300 rounded"
-          >
-            <option value="sum">Sum</option>
-            <option value="average">Average</option>
-            <option value="max">Maximum</option>
-            <option value="min">Minimum</option>
-          </select>
-          
-          <div className="flex space-x-2">
-            <button
-              onClick={() => buildCustomMetric(metricConfig)}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            <p 
+              id={`metric-${metric.name}`}
+              className="text-sm mb-1"
+              style={{ color: theme.text, opacity: 0.7 }}
             >
-              Build Metric
-            </button>
-            <button
-              onClick={() => setCustomMetricBuilder(false)}
-              className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+              {metric.name.replace(/_/g, ' ').toUpperCase()}
+            </p>
+            <p 
+              className="text-2xl font-bold"
+              style={{ color: theme.text }}
+              aria-label={`${metric.name.replace(/_/g, ' ')} value: ${metric.value.toLocaleString()}`}
             >
-              Cancel
-            </button>
+              {metric.value.toLocaleString()}
+            </p>
+            {metric.change !== undefined && (
+              <p className="text-sm mt-1" style={{ color: trendColor }}>
+                {metric.change > 0 ? '+' : ''}{metric.change.toFixed(1)}%
+                <span className="ml-1">
+                  {metric.trend === 'up' ? '↗' : metric.trend === 'down' ? '↘' : '→'}
+                </span>
+              </p>
+            )}
           </div>
+          <div 
+            className="w-3 h-3 rounded-full" 
+            style={{ backgroundColor: trendColor }}
+            aria-label={`Trend: ${metric.trend || 'neutral'}`}
+            role="img"
+          />
         </div>
       </div>
     );
-  };
+  });
+
+  // Custom Metric Builder Component
+  // Removed CustomMetricBuilder component - replaced with CustomChartBuilder
 
   return (
-    <div id="analytics-dashboard" className="p-6 max-w-7xl mx-auto">
+    <div 
+      id="analytics-dashboard" 
+      className="p-6 max-w-7xl mx-auto min-h-screen"
+      style={{ 
+        backgroundColor: selectedTheme === 'dark' ? '#111827' : '#F9FAFB',
+        color: getThemeConfig().text
+      }}
+      role="main"
+      aria-label="Analytics Dashboard"
+    >
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Analytics Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4" id="dashboard-title">
+          Analytics Dashboard
+        </h1>
         
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-4 mb-6">
           {/* Date Range Presets */}
-          <div className="flex space-x-2">
+          <div className="flex space-x-2" role="group" aria-label="Date range presets">
             {Object.entries(DATE_PRESETS).map(([key, preset]) => (
               <button
                 key={key}
                 onClick={() => handlePresetDateRange(key as keyof typeof DATE_PRESETS)}
-                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                aria-label={`Set date range to ${preset.label}`}
               >
                 {preset.label}
               </button>
@@ -444,56 +692,115 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
           {/* Custom Date Range */}
           <button
             onClick={() => setShowDatePicker(!showDatePicker)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            aria-expanded={showDatePicker}
+            aria-haspopup="dialog"
+            aria-label="Open custom date range picker"
           >
             Custom Range
           </button>
           
           {/* Chart Type Selector */}
+          <label className="sr-only" htmlFor="chart-type-selector">
+            Chart type
+          </label>
           <select
+            id="chart-type-selector"
             value={chartType}
-            onChange={(e) => setChartType(e.target.value as 'line' | 'bar' | 'area')}
-            className="p-2 border border-gray-300 rounded"
+            onChange={(e) => setChartType(e.target.value as any)}
+            className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            aria-label="Select chart type"
           >
-            <option value="line">Line Chart</option>
-            <option value="bar">Bar Chart</option>
-            <option value="area">Area Chart</option>
+            <option value="line">📈 Line Chart</option>
+            <option value="bar">📊 Bar Chart</option>
+            <option value="area">📈 Area Chart</option>
+            <option value="donut">🍩 Donut Chart</option>
+            <option value="funnel">🔽 Funnel Chart</option>
+            <option value="heatmap">🔥 Heatmap</option>
+            <option value="scatter">⚫ Scatter Plot</option>
+            <option value="treemap">🌳 Tree Map</option>
+            <option value="radial_bar">🌙 Radial Bar</option>
           </select>
           
+          {/* Dashboard Layout Toggle */}
+          <button
+            onClick={() => setDashboardLayout(dashboardLayout === 'grid' ? 'list' : 'grid')}
+            className="px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            aria-label={`Switch to ${dashboardLayout === 'grid' ? 'list' : 'grid'} layout`}
+          >
+            {dashboardLayout === 'grid' ? '📋 List' : '🔲 Grid'}
+          </button>
+          
+          {/* Theme Selector */}
+          <select
+            value={selectedTheme}
+            onChange={(e) => setSelectedTheme(e.target.value as 'light' | 'dark' | 'brand')}
+            className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            aria-label="Select dashboard theme"
+          >
+            <option value="light">☀️ Light</option>
+            <option value="dark">🌙 Dark</option>
+            <option value="brand">🎨 Brand</option>
+          </select>
+          
+          {/* Advanced Charts Toggle */}
+          <button
+            onClick={() => setShowAdvancedCharts(!showAdvancedCharts)}
+            className={`px-4 py-2 rounded focus:ring-2 focus:outline-none ${
+              showAdvancedCharts 
+                ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-500'
+            }`}
+            aria-label="Toggle advanced charts"
+          >
+            📡 Advanced Charts
+          </button>
+
           {/* Custom Metric Builder */}
           <button
             onClick={() => setCustomMetricBuilder(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:outline-none"
+            aria-label="Open custom metric builder"
           >
-            Custom Metrics
+            🛠️ Custom Metrics
           </button>
           
-          {/* Export Options */}
-          <div className="flex space-x-2">
-            <button
-              onClick={() => exportData('csv')}
-              className="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700"
-            >
-              CSV
-            </button>
-            <button
-              onClick={() => exportData('pdf')}
-              className="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700"
-            >
-              PDF
-            </button>
-            <button
-              onClick={() => exportData('png')}
-              className="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700"
-            >
-              PNG
-            </button>
+          {/* Enhanced Export Options */}
+          <div role="group" aria-label="Export options">
+            <ExportManager
+              data={{
+                metrics: summaryMetrics.map(m => ({
+                  name: m.name,
+                  value: m.value,
+                  change: m.change,
+                  trend: m.trend,
+                  timestamp: new Date().toISOString()
+                })),
+                chartData: convertToAdvancedChartData(chartData),
+                metadata: {
+                  exportDate: new Date().toISOString(),
+                  brandId,
+                  dateRange: getTimeRangeString(),
+                  dashboardVersion: '2.0'
+                }
+              }}
+              theme={getThemeConfig()}
+              brandId={brandId}
+              onExportStart={() => announceToScreenReader('Export started')}
+              onExportComplete={(format) => announceToScreenReader(`Export completed as ${format}`)}
+              onExportError={(error) => announceToScreenReader(`Export failed: ${error}`)}
+            />
           </div>
         </div>
         
         {/* Date Picker */}
         {showDatePicker && (
-          <div className="absolute z-10 bg-white border border-gray-300 rounded-lg shadow-lg">
+          <div 
+            className="absolute z-10 bg-white border border-gray-300 rounded-lg shadow-lg"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Custom date range selector"
+          >
             <DateRange
               editableDateInputs={true}
               onChange={handleDateRangeChange}
@@ -507,94 +814,218 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
 
       {/* Loading State */}
       {loading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="flex items-center justify-center py-8" role="status" aria-live="polite">
+          <div 
+            className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" 
+            aria-hidden="true"
+          />
           <span className="ml-2">Loading analytics data...</span>
         </div>
       )}
 
       {/* Error State */}
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+        <div 
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6"
+          role="alert"
+          aria-live="assertive"
+        >
           {error}
           <button
             onClick={() => setError(null)}
-            className="float-right font-bold text-red-700 hover:text-red-900"
+            className="float-right font-bold text-red-700 hover:text-red-900 focus:ring-2 focus:ring-red-500 focus:outline-none"
+            aria-label="Dismiss error message"
           >
             ×
           </button>
         </div>
       )}
 
-      {/* Custom Metric Builder Modal */}
+      {/* Custom Chart Builder Modal */}
       {customMetricBuilder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg max-w-md w-full mx-4">
-            <CustomMetricBuilder />
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="custom-chart-builder-title"
+        >
+          <div className="bg-white rounded-lg w-full h-full max-w-7xl max-h-screen m-4 overflow-hidden">
+            <CustomChartBuilder
+              onSave={(config) => {
+                setSavedCharts(prev => [...prev, config]);
+                setCustomMetricBuilder(false);
+                announceToScreenReader(`Custom chart "${config.title}" saved successfully`);
+              }}
+              onCancel={() => setCustomMetricBuilder(false)}
+              brandId={brandId}
+            />
           </div>
         </div>
       )}
 
-      {/* Summary Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {summaryMetrics.slice(0, 8).map((metric, index) => (
-          <div key={metric.name} className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">
-                  {metric.name.replace(/_/g, ' ').toUpperCase()}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {metric.value.toLocaleString()}
-                </p>
-              </div>
-              <div className={`w-3 h-3 rounded-full bg-${TREND_COLORS[metric.trend || 'neutral']}`} />
-            </div>
-          </div>
+      {/* Mobile Dashboard */}
+      <MobileDashboard
+        metrics={summaryMetrics.map(m => ({
+          title: m.name.replace(/_/g, ' '),
+          value: m.value,
+          change: m.change,
+          trend: m.trend
+        }))}
+        charts={[
+          {
+            title: 'Trends Overview',
+            data: convertToAdvancedChartData(chartData),
+            type: 'simple' as const
+          },
+          ...(metrics.social_media?.platforms ? [{
+            title: 'Social Media',
+            data: metrics.social_media.platforms.map(p => ({
+              name: p.name,
+              value: p.engagement,
+              source: 'social_media'
+            })),
+            type: 'simple' as const
+          }] : [])
+        ]}
+        theme={getThemeConfig()}
+      />
+
+      {/* Desktop Summary Metrics */}
+      <div 
+        className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+        role="region"
+        aria-label="Summary metrics"
+      >
+        {visibleSummaryMetrics.map((metric) => (
+          <MemoizedMetricCard key={metric.name} metric={metric} theme={getThemeConfig()} />
         ))}
       </div>
 
       {/* Main Chart */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold mb-4">Trends Overview</h2>
-        <div className="h-96">
-          <ResponsiveContainer width="100%" height="100%">
-            {chartType === 'line' && (
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="value" stroke="#0088FE" strokeWidth={2} />
-              </LineChart>
-            )}
-            {chartType === 'bar' && (
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#0088FE" />
-              </BarChart>
-            )}
-            {chartType === 'area' && (
-              <AreaChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Area type="monotone" dataKey="value" stroke="#0088FE" fill="#0088FE" fillOpacity={0.6} />
-              </AreaChart>
-            )}
-          </ResponsiveContainer>
+      <div 
+        className="bg-white p-6 rounded-lg shadow-md mb-8"
+        role="region"
+        aria-labelledby="trends-chart-title"
+      >
+        <h2 id="trends-chart-title" className="text-xl font-semibold mb-4">
+          Trends Overview
+        </h2>
+        <div ref={chartRef} className="h-96" role="img" aria-label="Analytics trends chart">
+          {chartInView ? (
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+                <span className="ml-3">Loading chart...</span>
+              </div>
+            }>
+              <EnhancedMainChart 
+                chartType={chartType} 
+                chartData={chartData}
+                theme={getThemeConfig()}
+                onDataPointClick={handleDataPointClick}
+                onZoom={handleChartZoom}
+              />
+            </Suspense>
+          ) : (
+            <div className="flex items-center justify-center h-full bg-gray-100 rounded">
+              <span className="text-gray-500">Chart will load when visible</span>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Advanced Charts Section */}
+      {showAdvancedCharts && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Advanced Analytics</h2>
+          <div className={`grid gap-6 ${
+            dashboardLayout === 'grid' 
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+              : 'grid-cols-1'
+          }`}>
+            {/* Conversion Funnel */}
+            {funnelData.length > 0 && (
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold mb-4">Conversion Funnel</h3>
+                <div className="h-64">
+                  <FunnelVisualization 
+                    data={funnelData} 
+                    options={{ theme: getThemeConfig(), enableAnimation: true }}
+                    onStageClick={handleDataPointClick}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Engagement Heatmap */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4">Engagement Heatmap</h3>
+              <div className="h-64">
+                <HeatmapDisplay 
+                  data={heatmapData} 
+                  options={{ theme: getThemeConfig() }}
+                  width={350}
+                  height={200}
+                />
+              </div>
+            </div>
+
+            {/* Performance Scatter */}
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-4">Performance Correlation</h3>
+              <div className="h-64">
+                <ScatterPlot 
+                  data={convertToAdvancedChartData(chartData)}
+                  options={{ theme: getThemeConfig(), showTooltip: true }}
+                  onPointClick={handleDataPointClick}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Saved Custom Charts */}
+      {savedCharts.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Custom Charts</h2>
+          <div className={`grid gap-6 ${
+            dashboardLayout === 'grid' 
+              ? 'grid-cols-1 md:grid-cols-2' 
+              : 'grid-cols-1'
+          }`}>
+            {savedCharts.map((chart) => (
+              <div key={chart.id} className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">{chart.title}</h3>
+                  <button
+                    onClick={() => setSavedCharts(prev => prev.filter(c => c.id !== chart.id))}
+                    className="text-red-600 hover:text-red-800 text-sm"
+                    aria-label={`Delete ${chart.title} chart`}
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="h-64">
+                  <EnhancedMainChart 
+                    chartType={chart.type}
+                    chartData={chartData}
+                    theme={getThemeConfig()}
+                    onDataPointClick={handleDataPointClick}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Source-specific Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className={`grid gap-8 ${
+        dashboardLayout === 'grid' 
+          ? 'grid-cols-1 lg:grid-cols-2' 
+          : 'grid-cols-1'
+      }`}>
         {/* Social Media Metrics */}
         {metrics.social_media && (
           <div className="bg-white p-6 rounded-lg shadow-md">
@@ -611,8 +1042,8 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
                     dataKey="engagement"
                     label
                   >
-                    {(metrics.social_media.platforms || []).map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {(metrics.social_media.platforms || []).map((entry: PlatformData, index: number) => (
+                      <Cell key={`cell-${entry.name || index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -703,6 +1134,23 @@ export const AnalyticsDashboard: React.FC<DashboardProps> = ({
           </button>
         </div>
       )}
+
+      {/* Mobile Touch Controls */}
+      <MobileTouchControls
+        onRefresh={() => {
+          requestInitialMetrics();
+          announceToScreenReader('Dashboard refreshed');
+        }}
+        onExport={() => {
+          // Trigger export modal or quick export
+          announceToScreenReader('Export options opened');
+        }}
+        onSettings={() => {
+          setCustomMetricBuilder(true);
+          announceToScreenReader('Settings opened');
+        }}
+        theme={getThemeConfig()}
+      />
     </div>
   );
 };

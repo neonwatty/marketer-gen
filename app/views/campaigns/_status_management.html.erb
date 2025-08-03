@@ -1,0 +1,286 @@
+<div class="status-management-container" 
+     data-controller="status-management"
+     data-status-management-current-status-value="<%= @campaign.status %>"
+     data-status-management-campaign-id-value="<%= @campaign.id %>"
+     data-status-management-update-url-value="<%= campaign_path(@campaign) %>">
+
+  <!-- Status Overview Header -->
+  <div class="bg-white rounded-lg border mb-6 overflow-hidden">
+    <div class="px-6 py-4 border-b bg-gray-50">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-medium text-gray-900">Campaign Status</h3>
+        <div class="flex items-center space-x-3">
+          <!-- Status History Button -->
+          <button type="button" 
+                  class="btn btn-outline btn-sm inline-flex items-center"
+                  data-action="click->status-management#showHistory"
+                  aria-label="View status history">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            History
+          </button>
+          
+          <!-- Workflow View Button -->
+          <button type="button" 
+                  class="btn btn-outline btn-sm inline-flex items-center"
+                  data-action="click->status-management#showWorkflow"
+                  aria-label="View workflow">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Workflow
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Status Display -->
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <!-- Status Badge -->
+        <div class="flex items-center">
+          <div class="status-indicator mr-4" data-status-management-target="statusIndicator">
+            <div class="flex items-center">
+              <div class="w-4 h-4 rounded-full mr-3 <%= status_dot_color(@campaign.status) %>"></div>
+              <span class="text-2xl font-bold <%= status_text_color(@campaign.status) %>" data-status-management-target="statusText">
+                <%= @campaign.status.humanize %>
+              </span>
+            </div>
+          </div>
+          
+          <!-- Status Description -->
+          <div class="ml-4" data-status-management-target="statusDescription">
+            <p class="text-sm text-gray-600">
+              <%= status_description(@campaign.status) %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="status-actions" data-status-management-target="quickActions">
+          <%= render 'status_quick_actions', campaign: @campaign %>
+        </div>
+      </div>
+
+      <!-- Progress Timeline -->
+      <div class="status-timeline mb-6" data-status-management-target="timeline">
+        <div class="flex items-center justify-between relative">
+          <!-- Timeline Steps -->
+          <% ['draft', 'active', 'paused', 'completed', 'archived'].each_with_index do |status, index| %>
+            <div class="flex flex-col items-center flex-1 <%= 'mr-4' unless index == 4 %>">
+              <!-- Step Circle -->
+              <div class="timeline-step relative z-10 w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                         <%= timeline_step_classes(@campaign.status, status) %>"
+                   data-status="<%= status %>"
+                   data-status-management-target="timelineStep">
+                
+                <% if status_reached?(@campaign.status, status) %>
+                  <!-- Completed/Current Icon -->
+                  <% if @campaign.status == status %>
+                    <div class="w-3 h-3 rounded-full bg-current animate-pulse"></div>
+                  <% else %>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                  <% end %>
+                <% else %>
+                  <!-- Future step number -->
+                  <span class="text-xs font-medium"><%= index + 1 %></span>
+                <% end %>
+              </div>
+              
+              <!-- Step Label -->
+              <div class="mt-2 text-center">
+                <div class="text-xs font-medium <%= status_reached?(@campaign.status, status) ? 'text-gray-900' : 'text-gray-500' %>">
+                  <%= status.humanize %>
+                </div>
+                <% if @campaign.status == status %>
+                  <div class="text-xs text-gray-500 mt-1">Current</div>
+                <% elsif status_timestamp = get_status_timestamp(@campaign, status) %>
+                  <div class="text-xs text-gray-500 mt-1">
+                    <%= time_ago_in_words(status_timestamp) %> ago
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            
+            <!-- Connector Line -->
+            <% unless index == 4 %>
+              <div class="flex-1 h-0.5 mx-2 -mt-5 relative z-0 
+                         <%= status_reached?(@campaign.status, status) && status_reached?(@campaign.status, ['draft', 'active', 'paused', 'completed', 'archived'][index + 1]) ? 'bg-green-500' : 'bg-gray-300' %>"></div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Status Metadata -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="font-medium text-gray-900 mb-1">Last Updated</div>
+          <div class="text-gray-600">
+            <%= @campaign.updated_at.strftime('%B %d, %Y at %I:%M %p') %>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="font-medium text-gray-900 mb-1">Duration</div>
+          <div class="text-gray-600">
+            <% if @campaign.started_at %>
+              <%= @campaign.duration_days %> days
+              <% if @campaign.ended_at %>
+                (Completed)
+              <% else %>
+                (Active)
+              <% end %>
+            <% else %>
+              Not started
+            <% end %>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="font-medium text-gray-900 mb-1">Next Milestone</div>
+          <div class="text-gray-600">
+            <%= get_next_milestone(@campaign) || 'No milestones set' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Change Form -->
+  <div class="bg-white rounded-lg border p-6 mb-6">
+    <h4 class="text-lg font-medium text-gray-900 mb-4">Change Status</h4>
+    
+    <%= form_with model: @campaign, 
+                  url: campaign_path(@campaign), 
+                  method: :patch, 
+                  local: false,
+                  class: "status-change-form",
+                  data: { 
+                    "status-management-target": "changeForm",
+                    "action": "submit->status-management#handleStatusChange"
+                  } do |form| %>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <!-- New Status -->
+        <div>
+          <%= form.label :status, "New Status", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :status, 
+                          options_for_select(status_transition_options(@campaign.status), @campaign.status),
+                          {},
+                          { 
+                            class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                            data: { 
+                              "status-management-target": "statusSelect",
+                              "action": "change->status-management#validateTransition"
+                            }
+                          } %>
+        </div>
+        
+        <!-- Reason/Notes -->
+        <div>
+          <%= form.label :status_change_reason, "Reason (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :status_change_reason, 
+                              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                              placeholder: "Brief reason for status change" %>
+        </div>
+        
+        <!-- Submit Button -->
+        <div>
+          <%= form.submit "Update Status", 
+                          class: "w-full btn btn-primary",
+                          data: { "status-management-target": "submitButton" } %>
+        </div>
+      </div>
+      
+      <!-- Status Change Warnings -->
+      <div class="mt-4 hidden" data-status-management-target="warnings" role="alert" aria-live="polite">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-yellow-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <div class="flex-1">
+              <h5 class="text-sm font-medium text-yellow-800 mb-1">Status Change Warning</h5>
+              <p class="text-sm text-yellow-700" data-status-management-target="warningText"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Approval Workflow (if applicable) -->
+  <% if requires_approval?(@campaign) %>
+    <div class="bg-white rounded-lg border p-6 mb-6">
+      <h4 class="text-lg font-medium text-gray-900 mb-4">Approval Workflow</h4>
+      <%= render 'approval_workflow', campaign: @campaign %>
+    </div>
+  <% end %>
+
+  <!-- Automated Rules -->
+  <div class="bg-white rounded-lg border p-6">
+    <h4 class="text-lg font-medium text-gray-900 mb-4">Automated Status Rules</h4>
+    <%= render 'automated_rules', campaign: @campaign %>
+  </div>
+
+  <!-- Status History Modal -->
+  <div class="fixed inset-0 z-50 hidden" 
+       data-status-management-target="historyModal" 
+       role="dialog" 
+       aria-labelledby="history-modal-title" 
+       aria-hidden="true">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" 
+           data-action="click->status-management#hideHistory"></div>
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 relative max-h-96 overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 id="history-modal-title" class="text-lg font-bold text-gray-900">Status Change History</h3>
+          <button type="button" 
+                  class="text-gray-400 hover:text-gray-600"
+                  data-action="click->status-management#hideHistory"
+                  aria-label="Close history modal">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div data-status-management-target="historyContent">
+          <!-- History content will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workflow Visualization Modal -->
+  <div class="fixed inset-0 z-50 hidden" 
+       data-status-management-target="workflowModal" 
+       role="dialog" 
+       aria-labelledby="workflow-modal-title" 
+       aria-hidden="true">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" 
+           data-action="click->status-management#hideWorkflow"></div>
+      <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6 relative max-h-96 overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 id="workflow-modal-title" class="text-lg font-bold text-gray-900">Campaign Workflow</h3>
+          <button type="button" 
+                  class="text-gray-400 hover:text-gray-600"
+                  data-action="click->status-management#hideWorkflow"
+                  aria-label="Close workflow modal">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div data-status-management-target="workflowContent">
+          <!-- Workflow visualization will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

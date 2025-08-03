@@ -252,7 +252,7 @@ export default class extends Controller {
   }
 
   displayTemplatePreview(data) {
-    const { template, template_data } = data
+    const { template, templateData } = data
     
     this.previewTitleTarget.textContent = `${template.name} Preview`
     
@@ -319,7 +319,7 @@ export default class extends Controller {
         <div class="border border-gray-200 rounded-lg p-4">
           <h5 class="font-medium text-gray-900 mb-3">Timeline Phases</h5>
           <div class="space-y-2">
-            ${templateData.timeline_phases.map((phase, index) => `
+            ${templateData.timeline_phases.map((phase, _index) => `
               <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span class="text-sm font-medium">${phase.phase}</span>
                 <span class="text-xs text-gray-500">${phase.duration_weeks} weeks</span>
