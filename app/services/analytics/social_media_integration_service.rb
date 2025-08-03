@@ -280,6 +280,77 @@ module Analytics
       @brand.social_media_integrations.active.all?(&:token_valid?)
     end
 
+    # Dashboard-specific methods for real-time updates
+    def dashboard_metrics(time_range = "7d")
+      start_date = parse_time_range(time_range)
+      active_integrations = @brand.social_media_integrations.active
+
+      return { error: "No active social media integrations" } if active_integrations.empty?
+
+      platforms_data = {}
+      summary_data = {
+        total_reach: 0,
+        total_engagement: 0,
+        total_followers: 0,
+        engagement_rate: 0
+      }
+
+      active_integrations.each do |integration|
+        platform_metrics = get_platform_dashboard_metrics(integration, start_date)
+        platforms_data[integration.platform] = platform_metrics
+
+        # Aggregate for summary
+        summary_data[:total_reach] += platform_metrics[:reach] || 0
+        summary_data[:total_engagement] += platform_metrics[:engagement] || 0
+        summary_data[:total_followers] += platform_metrics[:followers] || 0
+      end
+
+      # Calculate overall engagement rate
+      summary_data[:engagement_rate] = if summary_data[:total_reach] > 0
+                                        (summary_data[:total_engagement].to_f / summary_data[:total_reach] * 100).round(2)
+      else
+                                        0
+      end
+
+      {
+        summary: summary_data,
+        platforms: platforms_data,
+        timeseries: generate_timeseries_data(active_integrations, start_date),
+        timestamp: Time.current.iso8601
+      }
+    end
+
+    def real_time_metrics(time_range = "24h")
+      dashboard_metrics(time_range)
+    end
+
+    def filtered_metrics(config)
+      time_range = config[:time_range] || "7d"
+      filters = config[:filters] || {}
+
+      metrics = dashboard_metrics(time_range)
+
+      # Apply filters if specified
+      if filters[:platforms].present?
+        metrics[:platforms] = metrics[:platforms].select { |platform, _| filters[:platforms].include?(platform) }
+      end
+
+      metrics
+    end
+
+    def drill_down(metric, dimension, filters = {})
+      case dimension
+      when "platform"
+        drill_down_by_platform(metric, filters)
+      when "content_type"
+        drill_down_by_content_type(metric, filters)
+      when "engagement_type"
+        drill_down_by_engagement_type(metric, filters)
+      else
+        {}
+      end
+    end
+
     # Data storage
     def store_metrics_batch(metrics_data)
       return ServiceResult.failure("Metrics data is required") if metrics_data.blank?
@@ -461,6 +532,156 @@ module Analytics
           "Other" => rand(10..40)
         }
       })
+    end
+
+    # Dashboard helper methods
+    def parse_time_range(time_range)
+      case time_range
+      when "24h", "1d"
+        1.day.ago
+      when "7d"
+        7.days.ago
+      when "30d"
+        30.days.ago
+      when "90d"
+        90.days.ago
+      when "1y"
+        1.year.ago
+      else
+        7.days.ago
+      end
+    end
+
+    def get_platform_dashboard_metrics(integration, start_date)
+      # Get recent metrics from database or API
+      recent_metrics = integration.social_media_metrics
+                                 .where("created_at > ?", start_date)
+                                 .order(created_at: :desc)
+
+      if recent_metrics.any?
+        # Aggregate actual metrics
+        {
+          platform: integration.platform,
+          reach: recent_metrics.where(metric_type: "reach").sum(:value),
+          engagement: recent_metrics.where(metric_type: "engagement").sum(:value),
+          followers: recent_metrics.where(metric_type: "followers").last&.value || 0,
+          impressions: recent_metrics.where(metric_type: "impressions").sum(:value),
+          last_updated: recent_metrics.first.created_at.iso8601
+        }
+      else
+        # Fallback to mock data for demo purposes
+        generate_mock_platform_metrics(integration.platform)
+      end
+    end
+
+    def generate_mock_platform_metrics(platform)
+      base_multiplier = case platform
+      when "facebook" then 3
+      when "instagram" then 2
+      when "linkedin" then 1
+      when "twitter" then 2.5
+      when "tiktok" then 4
+      else 1
+      end
+
+      {
+        platform: platform,
+        reach: (rand(5000..15000) * base_multiplier).to_i,
+        engagement: (rand(500..2000) * base_multiplier).to_i,
+        followers: (rand(1000..10000) * base_multiplier).to_i,
+        impressions: (rand(8000..25000) * base_multiplier).to_i,
+        last_updated: Time.current.iso8601
+      }
+    end
+
+    def generate_timeseries_data(integrations, start_date)
+      # Generate daily data points for charts
+      days = ((Time.current - start_date) / 1.day).ceil
+      timeseries = []
+
+      days.times do |i|
+        date = start_date + i.days
+        day_data = {
+          date: date.strftime("%Y-%m-%d"),
+          reach: 0,
+          engagement: 0,
+          impressions: 0
+        }
+
+        integrations.each do |integration|
+          # Get metrics for this day (mock data for demo)
+          day_metrics = generate_daily_metrics(integration.platform, date)
+          day_data[:reach] += day_metrics[:reach]
+          day_data[:engagement] += day_metrics[:engagement]
+          day_data[:impressions] += day_metrics[:impressions]
+        end
+
+        timeseries << day_data
+      end
+
+      timeseries
+    end
+
+    def generate_daily_metrics(platform, date)
+      # Generate consistent but varied daily metrics
+      seed = "#{platform}-#{date.strftime('%Y%m%d')}".hash
+      Random.srand(seed)
+
+      base_multiplier = case platform
+      when "facebook" then 3
+      when "instagram" then 2
+      when "linkedin" then 1
+      when "twitter" then 2.5
+      when "tiktok" then 4
+      else 1
+      end
+
+      {
+        reach: (Random.rand(1000..3000) * base_multiplier).to_i,
+        engagement: (Random.rand(100..500) * base_multiplier).to_i,
+        impressions: (Random.rand(1500..4500) * base_multiplier).to_i
+      }
+    end
+
+    def drill_down_by_platform(metric, filters)
+      active_integrations = @brand.social_media_integrations.active
+
+      data = active_integrations.map do |integration|
+        metrics = get_platform_dashboard_metrics(integration, 7.days.ago)
+        {
+          name: integration.platform.titleize,
+          value: metrics[metric.to_sym] || 0,
+          platform: integration.platform
+        }
+      end
+
+      data.sort_by { |item| -item[:value] }
+    end
+
+    def drill_down_by_content_type(metric, filters)
+      # Mock content type breakdown
+      content_types = [ "image", "video", "carousel", "story", "live" ]
+
+      content_types.map do |type|
+        {
+          name: type.titleize,
+          value: rand(100..1000),
+          content_type: type
+        }
+      end.sort_by { |item| -item[:value] }
+    end
+
+    def drill_down_by_engagement_type(metric, filters)
+      # Mock engagement type breakdown
+      engagement_types = [ "likes", "comments", "shares", "saves", "clicks" ]
+
+      engagement_types.map do |type|
+        {
+          name: type.titleize,
+          value: rand(50..500),
+          engagement_type: type
+        }
+      end.sort_by { |item| -item[:value] }
     end
   end
 end

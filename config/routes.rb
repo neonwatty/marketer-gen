@@ -251,6 +251,13 @@ Rails.application.routes.draw do
         post :complete
       end
       
+      # Analytics Dashboard API
+      namespace :analytics do
+        get :dashboard, controller: :analytics
+        post 'dashboard/data', action: :dashboard_data, controller: :analytics
+        post :performance, controller: :analytics
+      end
+
       # Google Analytics Integration API
       namespace :google_analytics, path: 'google-analytics' do
         # Google OAuth Routes
@@ -474,6 +481,9 @@ Rails.application.routes.draw do
   get '/500', to: 'errors#internal_server_error'
   post '/error_report', to: 'errors#report_error'
   
+  # Analytics Dashboard
+  get '/analytics/dashboard', to: 'analytics#dashboard', as: :analytics_dashboard
+
   # Social Media OAuth Callbacks
   get '/social_media/oauth_callback/:platform', to: 'social_media_integrations#oauth_callback', 
       as: :social_media_oauth_callback

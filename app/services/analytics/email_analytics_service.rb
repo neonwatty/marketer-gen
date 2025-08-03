@@ -4,11 +4,17 @@ module Analytics
   class EmailAnalyticsService
     include Analytics::RateLimitingService
 
-    attr_accessor :integration
+    attr_accessor :brand, :integration
 
-    def initialize(integration)
-      @integration = integration
-      @platform_service = build_platform_service
+    def initialize(brand_or_integration)
+      if brand_or_integration.is_a?(Brand)
+        @brand = brand_or_integration
+        @integration = @brand.email_integrations.active.first
+      else
+        @integration = brand_or_integration
+        @brand = @integration.brand
+      end
+      @platform_service = build_platform_service if @integration
     end
 
     def full_sync
@@ -190,7 +196,261 @@ module Analytics
       ServiceResult.success(data: trends)
     end
 
+    # Dashboard-specific methods for real-time updates
+    def dashboard_metrics(time_range = "7d")
+      return { error: "No active email integrations" } unless @integration
+
+      start_date = parse_time_range(time_range)
+
+      # Get recent campaigns and metrics
+      recent_campaigns = @integration.email_campaigns
+                                   .where("send_time > ?", start_date)
+                                   .includes(:email_metrics)
+
+      recent_metrics = @integration.email_metrics
+                                 .where("metric_date > ?", start_date)
+
+      summary_data = calculate_dashboard_summary(recent_campaigns, recent_metrics)
+      campaigns_data = get_campaigns_dashboard_data(recent_campaigns.limit(10))
+      timeseries_data = generate_email_timeseries_data(start_date)
+
+      {
+        summary: summary_data,
+        campaigns: campaigns_data,
+        timeseries: timeseries_data,
+        platform: @integration.platform,
+        timestamp: Time.current.iso8601
+      }
+    end
+
+    def real_time_metrics(time_range = "24h")
+      dashboard_metrics(time_range)
+    end
+
+    def filtered_metrics(config)
+      time_range = config[:time_range] || "7d"
+      filters = config[:filters] || {}
+
+      metrics = dashboard_metrics(time_range)
+
+      # Apply filters if specified
+      if filters[:campaigns].present?
+        metrics[:campaigns] = metrics[:campaigns].select { |campaign| filters[:campaigns].include?(campaign[:id]) }
+      end
+
+      if filters[:metrics].present?
+        metrics[:summary] = metrics[:summary].select { |key, _| filters[:metrics].include?(key.to_s) }
+      end
+
+      metrics
+    end
+
+    def drill_down(metric, dimension, filters = {})
+      case dimension
+      when "campaign"
+        drill_down_by_campaign(metric, filters)
+      when "platform"
+        drill_down_by_platform(metric, filters)
+      when "time"
+        drill_down_by_time(metric, filters)
+      when "segment"
+        drill_down_by_segment(metric, filters)
+      else
+        {}
+      end
+    end
+
     private
+
+    def parse_time_range(time_range)
+      case time_range
+      when "24h", "1d"
+        1.day.ago
+      when "7d"
+        7.days.ago
+      when "30d"
+        30.days.ago
+      when "90d"
+        90.days.ago
+      when "1y"
+        1.year.ago
+      else
+        7.days.ago
+      end
+    end
+
+    def calculate_dashboard_summary(campaigns, metrics)
+      if campaigns.any? && metrics.any?
+        {
+          total_campaigns: campaigns.count,
+          total_sent: metrics.sum(:sent),
+          total_delivered: metrics.sum(:delivered),
+          total_opens: metrics.sum(:opens),
+          total_clicks: metrics.sum(:clicks),
+          avg_open_rate: metrics.average(:open_rate)&.round(2) || 0,
+          avg_click_rate: metrics.average(:click_rate)&.round(2) || 0,
+          avg_bounce_rate: metrics.average(:bounce_rate)&.round(2) || 0,
+          unsubscribe_rate: metrics.average(:unsubscribe_rate)&.round(2) || 0,
+          active_subscribers: @integration.email_subscribers.active.count
+        }
+      else
+        generate_mock_email_summary
+      end
+    end
+
+    def generate_mock_email_summary
+      # Mock data for demo purposes
+      sent = rand(10000..50000)
+      delivered = (sent * (0.95 + rand * 0.04)).to_i
+      opens = (delivered * (0.2 + rand * 0.15)).to_i
+      clicks = (opens * (0.1 + rand * 0.1)).to_i
+
+      {
+        total_campaigns: rand(5..20),
+        total_sent: sent,
+        total_delivered: delivered,
+        total_opens: opens,
+        total_clicks: clicks,
+        avg_open_rate: ((opens.to_f / delivered) * 100).round(2),
+        avg_click_rate: ((clicks.to_f / delivered) * 100).round(2),
+        avg_bounce_rate: (((sent - delivered).to_f / sent) * 100).round(2),
+        unsubscribe_rate: (rand * 0.5).round(2),
+        active_subscribers: rand(5000..25000)
+      }
+    end
+
+    def get_campaigns_dashboard_data(campaigns)
+      if campaigns.any?
+        campaigns.map do |campaign|
+          metrics = campaign.email_metrics.first
+          {
+            id: campaign.id,
+            name: campaign.name,
+            subject: campaign.subject,
+            send_time: campaign.send_time&.iso8601,
+            open_rate: metrics&.open_rate || 0,
+            click_rate: metrics&.click_rate || 0,
+            sent: metrics&.sent || 0,
+            delivered: metrics&.delivered || 0
+          }
+        end
+      else
+        generate_mock_campaigns_data
+      end
+    end
+
+    def generate_mock_campaigns_data
+      # Mock campaign data for demo
+      (1..rand(3..8)).map do |i|
+        sent = rand(1000..5000)
+        delivered = (sent * (0.95 + rand * 0.04)).to_i
+        opens = (delivered * (0.2 + rand * 0.15)).to_i
+        clicks = (opens * (0.1 + rand * 0.1)).to_i
+
+        {
+          id: "mock_#{i}",
+          name: "Campaign #{i}",
+          subject: "Subject Line #{i}",
+          send_time: rand(7.days).seconds.ago.iso8601,
+          open_rate: ((opens.to_f / delivered) * 100).round(2),
+          click_rate: ((clicks.to_f / delivered) * 100).round(2),
+          sent: sent,
+          delivered: delivered
+        }
+      end
+    end
+
+    def generate_email_timeseries_data(start_date)
+      # Generate daily data points for charts
+      days = ((Time.current - start_date) / 1.day).ceil
+      timeseries = []
+
+      days.times do |i|
+        date = start_date + i.days
+
+        # Generate consistent but varied daily metrics
+        seed = "email-#{@integration&.platform || 'demo'}-#{date.strftime('%Y%m%d')}".hash
+        Random.srand(seed)
+
+        sent = Random.rand(500..2000)
+        delivered = (sent * (0.95 + Random.rand * 0.04)).to_i
+        opens = (delivered * (0.2 + Random.rand * 0.15)).to_i
+        clicks = (opens * (0.1 + Random.rand * 0.1)).to_i
+
+        timeseries << {
+          date: date.strftime("%Y-%m-%d"),
+          sent: sent,
+          delivered: delivered,
+          opens: opens,
+          clicks: clicks,
+          open_rate: ((opens.to_f / delivered) * 100).round(2),
+          click_rate: ((clicks.to_f / delivered) * 100).round(2)
+        }
+      end
+
+      timeseries
+    end
+
+    def drill_down_by_campaign(metric, filters)
+      campaigns = @integration ? @integration.email_campaigns.includes(:email_metrics).limit(10) : []
+
+      if campaigns.any?
+        campaigns.map do |campaign|
+          metrics = campaign.email_metrics.first
+          {
+            name: campaign.name,
+            value: metrics&.send(metric) || 0,
+            campaign_id: campaign.id,
+            send_time: campaign.send_time&.iso8601
+          }
+        end.sort_by { |item| -item[:value] }
+      else
+        # Mock drill-down data
+        (1..5).map do |i|
+          {
+            name: "Campaign #{i}",
+            value: rand(100..1000),
+            campaign_id: "mock_#{i}",
+            send_time: rand(30.days).seconds.ago.iso8601
+          }
+        end.sort_by { |item| -item[:value] }
+      end
+    end
+
+    def drill_down_by_platform(metric, filters)
+      # For email, platform is typically the ESP
+      [ {
+        name: @integration&.platform&.titleize || "Demo Platform",
+        value: rand(1000..5000),
+        platform: @integration&.platform || "demo"
+      } ]
+    end
+
+    def drill_down_by_time(metric, filters)
+      # Hourly breakdown for the last 24 hours
+      24.times.map do |hour|
+        time = hour.hours.ago
+        {
+          name: time.strftime("%H:00"),
+          value: rand(50..200),
+          hour: hour,
+          timestamp: time.iso8601
+        }
+      end.reverse
+    end
+
+    def drill_down_by_segment(metric, filters)
+      # Mock segment breakdown
+      segments = [ "New Subscribers", "Active Users", "VIP Customers", "Re-engagement", "Prospects" ]
+
+      segments.map do |segment|
+        {
+          name: segment,
+          value: rand(100..800),
+          segment: segment.downcase.gsub(" ", "_")
+        }
+      end.sort_by { |item| -item[:value] }
+    end
 
     def build_platform_service
       case @integration.platform

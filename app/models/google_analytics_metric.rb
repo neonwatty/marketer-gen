@@ -10,20 +10,20 @@ class GoogleAnalyticsMetric < ApplicationRecord
 
   scope :recent, -> { order(date: :desc) }
   scope :for_date_range, ->(start_date, end_date) { where(date: start_date..end_date) }
-  scope :with_sessions, -> { where('sessions > 0') }
-  scope :with_revenue, -> { where('transaction_revenue > 0') }
+  scope :with_sessions, -> { where("sessions > 0") }
+  scope :with_revenue, -> { where("transaction_revenue > 0") }
 
   # Aggregate metrics for reporting
   def self.daily_summary(date)
     where(date: date).select(
-      'SUM(sessions) as total_sessions',
-      'SUM(users) as total_users',
-      'SUM(new_users) as total_new_users',
-      'SUM(page_views) as total_page_views',
-      'AVG(bounce_rate) as avg_bounce_rate',
-      'AVG(avg_session_duration) as avg_session_duration',
-      'SUM(goal_completions) as total_conversions',
-      'SUM(transaction_revenue) as total_revenue'
+      "SUM(sessions) as total_sessions",
+      "SUM(users) as total_users",
+      "SUM(new_users) as total_new_users",
+      "SUM(page_views) as total_page_views",
+      "AVG(bounce_rate) as avg_bounce_rate",
+      "AVG(avg_session_duration) as avg_session_duration",
+      "SUM(goal_completions) as total_conversions",
+      "SUM(transaction_revenue) as total_revenue"
     ).first
   end
 
@@ -57,11 +57,11 @@ class GoogleAnalyticsMetric < ApplicationRecord
       .group(:date)
       .order(:date)
       .select(
-        'date',
-        'SUM(sessions) as sessions',
-        'SUM(users) as users',
-        'SUM(transaction_revenue) as revenue',
-        'SUM(goal_completions) as conversions'
+        "date",
+        "SUM(sessions) as sessions",
+        "SUM(users) as users",
+        "SUM(transaction_revenue) as revenue",
+        "SUM(goal_completions) as conversions"
       )
   end
 
@@ -80,11 +80,11 @@ class GoogleAnalyticsMetric < ApplicationRecord
     ).count
 
     # Calculate consistency (e.g., users should not exceed sessions)
-    consistent_records = metrics.where('users <= sessions OR sessions = 0').count
+    consistent_records = metrics.where("users <= sessions OR sessions = 0").count
 
     # Calculate freshness (data processed within expected timeframe)
     fresh_records = metrics.where(
-      'processed_at <= created_at + INTERVAL 1 HOUR'
+      "processed_at <= created_at + INTERVAL 1 HOUR"
     ).count
 
     {
@@ -148,7 +148,7 @@ class GoogleAnalyticsMetric < ApplicationRecord
     return 0.0 if total == 0
 
     weights = { completeness: 0.4, consistency: 0.4, freshness: 0.2 }
-    
+
     completeness_score = complete.to_f / total
     consistency_score = consistent.to_f / total
     freshness_score = fresh.to_f / total

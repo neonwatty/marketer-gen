@@ -257,6 +257,171 @@ class AnalyticsController < ApplicationController
     end
   end
 
+  # GET /analytics/dashboard
+  def dashboard
+    @brand = current_user.brands.find_by(id: params[:brand_id])
+    @initial_metrics = fetch_initial_dashboard_data(@brand) if @brand
+  end
+
+  # POST /analytics/dashboard/data
+  def dashboard_data
+    brand = current_user.brands.find_by(id: params[:brand_id])
+    
+    unless brand
+      return render json: { error: "Brand not found" }, status: :not_found
+    end
+
+    time_range = params[:time_range] || '30d'
+    
+    # Fetch data from all integrated sources
+    dashboard_metrics = {
+      social_media: fetch_social_media_metrics(brand, time_range),
+      email: fetch_email_metrics(brand, time_range),
+      google_analytics: fetch_google_analytics_metrics(brand, time_range),
+      crm: fetch_crm_metrics(brand, time_range),
+      summary: fetch_summary_metrics(brand, time_range),
+      timestamp: Time.current.iso8601
+    }
+
+    render json: dashboard_metrics
+  rescue StandardError => e
+    Rails.logger.error "Dashboard data fetch failed: #{e.message}"
+    render json: { error: "Failed to fetch dashboard data" }, status: :internal_server_error
+  end
+
+  # POST /analytics/performance
+  def performance
+    # Log performance metrics for monitoring
+    performance_data = {
+      component: params[:component],
+      duration: params[:duration],
+      user_id: params[:user_id],
+      brand_id: params[:brand_id],
+      timestamp: params[:timestamp],
+      user_agent: request.user_agent,
+      ip_address: request.remote_ip
+    }
+
+    Rails.logger.info "Performance metric: #{performance_data.to_json}"
+    
+    # Store in database if needed for analysis
+    # PerformanceMetric.create!(performance_data)
+    
+    render json: { success: true }
+  end
+
+  private
+
+  def fetch_initial_dashboard_data(brand)
+    return {} unless brand
+
+    {
+      social_media: fetch_social_media_metrics(brand, '7d'),
+      email: fetch_email_metrics(brand, '7d'),
+      google_analytics: fetch_google_analytics_metrics(brand, '7d'),
+      crm: fetch_crm_metrics(brand, '7d'),
+      summary: fetch_summary_metrics(brand, '7d')
+    }
+  rescue StandardError => e
+    Rails.logger.error "Initial dashboard data fetch failed: #{e.message}"
+    {}
+  end
+
+  def fetch_social_media_metrics(brand, time_range)
+    service = Analytics::SocialMediaIntegrationService.new(brand)
+    service.dashboard_metrics(time_range)
+  rescue StandardError => e
+    Rails.logger.error "Social media metrics fetch failed: #{e.message}"
+    { error: e.message }
+  end
+
+  def fetch_email_metrics(brand, time_range)
+    service = Analytics::EmailAnalyticsService.new(brand)
+    service.dashboard_metrics(time_range)
+  rescue StandardError => e
+    Rails.logger.error "Email metrics fetch failed: #{e.message}"
+    { error: e.message }
+  end
+
+  def fetch_google_analytics_metrics(brand, time_range)
+    # Check if Google Analytics is connected for this brand
+    return { error: "Google Analytics not connected" } unless brand.respond_to?(:google_analytics_connected?) && brand.google_analytics_connected?
+
+    service = Analytics::GoogleAnalyticsService.new(
+      user_id: current_user.id,
+      property_id: brand.respond_to?(:google_analytics_property_id) ? brand.google_analytics_property_id : nil
+    )
+    service.dashboard_metrics(time_range) if service.respond_to?(:dashboard_metrics)
+  rescue StandardError => e
+    Rails.logger.error "Google Analytics metrics fetch failed: #{e.message}"
+    { error: e.message }
+  end
+
+  def fetch_crm_metrics(brand, time_range)
+    service = Analytics::CrmAnalyticsService.new(brand)
+    service.dashboard_metrics(time_range)
+  rescue StandardError => e
+    Rails.logger.error "CRM metrics fetch failed: #{e.message}"
+    { error: e.message }
+  end
+
+  def fetch_summary_metrics(brand, time_range)
+    {
+      total_leads: brand.respond_to?(:crm_leads) ? brand.crm_leads.where("created_at > ?", parse_time_range(time_range)).count : 0,
+      total_campaigns: brand.campaigns.where("created_at > ?", parse_time_range(time_range)).count,
+      total_revenue: calculate_total_revenue(brand, time_range),
+      conversion_rate: calculate_conversion_rate(brand, time_range)
+    }
+  rescue StandardError => e
+    Rails.logger.error "Summary metrics fetch failed: #{e.message}"
+    {}
+  end
+
+  def parse_time_range(time_range)
+    case time_range
+    when '24h', '1d'
+      1.day.ago
+    when '7d'
+      7.days.ago
+    when '30d'
+      30.days.ago
+    when '90d'
+      90.days.ago
+    when '1y'
+      1.year.ago
+    else
+      30.days.ago
+    end
+  end
+
+  def calculate_total_revenue(brand, time_range)
+    # Calculate revenue from CRM opportunities
+    start_date = parse_time_range(time_range)
+    if brand.respond_to?(:crm_opportunities)
+      brand.crm_opportunities
+           .where("created_at > ? AND status = ?", start_date, "won")
+           .sum(:value) || 0
+    else
+      0
+    end
+  end
+
+  def calculate_conversion_rate(brand, time_range)
+    start_date = parse_time_range(time_range)
+    total_leads = brand.respond_to?(:crm_leads) ? brand.crm_leads.where("created_at > ?", start_date).count : 0
+    converted_leads = if brand.respond_to?(:crm_opportunities)
+                       brand.crm_opportunities
+                            .where("created_at > ? AND status = ?", start_date, "won")
+                            .count
+                     else
+                       0
+                     end
+    
+    return 0 if total_leads.zero?
+    
+    (converted_leads.to_f / total_leads * 100).round(2)
+  end
+
   def authenticate_user!
     # This assumes you have a current_user method from your authentication system
     return if current_user

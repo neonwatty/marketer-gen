@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-require 'dry-types'
-require 'dry-validation'
+require "dry-types"
+require "dry-validation"
 
 module Etl
   # Base ETL service providing common functionality for all ETL pipelines
   class BaseEtlService
-
     class EtlError < StandardError; end
     class ValidationError < EtlError; end
     class TransformationError < EtlError; end
@@ -24,7 +23,7 @@ module Etl
     # Main ETL pipeline execution
     def execute
       Rails.logger.info("[ETL] Starting pipeline #{pipeline_id} for #{source}")
-      
+
       begin
         with_monitoring do
           extracted_data = extract
@@ -32,7 +31,7 @@ module Etl
           transformed_data = transform(validated_data)
           load(transformed_data)
         end
-        
+
         record_success
         notify_completion
       rescue => error
@@ -52,14 +51,14 @@ module Etl
     # Validate extracted data
     def validate(data)
       Rails.logger.info("[ETL] Validating #{data.size} records")
-      
+
       validation_schema = build_validation_schema
       validated_data = []
       errors = []
 
       data.each_with_index do |record, index|
         result = validation_schema.call(record)
-        
+
         if result.success?
           validated_data << result.to_h
         else
@@ -70,7 +69,7 @@ module Etl
       end
 
       update_metrics(:validation_errors, errors.size)
-      
+
       if errors.size > (data.size * 0.1) # Fail if more than 10% invalid
         raise ValidationError, "Too many validation errors: #{errors.first(5).join(', ')}"
       end
@@ -81,7 +80,7 @@ module Etl
     # Transform phase - to be implemented by subclasses
     def transform(data)
       Rails.logger.info("[ETL] Transforming #{data.size} records")
-      
+
       begin
         transformed_data = apply_transformations(data)
         update_metrics(:records_transformed, transformed_data.size)
@@ -94,7 +93,7 @@ module Etl
     # Load phase - save to database with batching
     def load(data)
       Rails.logger.info("[ETL] Loading #{data.size} records")
-      
+
       begin
         batch_size = EtlPipeline::Config::BATCH_SIZES[:medium]
         loaded_count = 0
@@ -128,7 +127,7 @@ module Etl
         record.merge(
           normalized_at: Time.current,
           pipeline_id: pipeline_id,
-          etl_version: '1.0'
+          etl_version: "1.0"
         )
       end
     end
@@ -148,7 +147,7 @@ module Etl
     def compress_if_needed(data)
       data_size = data.to_json.bytesize
       threshold = EtlPipeline::Config::COMPRESSION_CONFIG[:threshold_size]
-      
+
       if data_size > threshold
         Rails.logger.info("[ETL] Compressing #{data_size} bytes of data")
         compressed_data = compress_data(data)
@@ -158,7 +157,7 @@ module Etl
 
     # Data compression using Zlib
     def compress_data(data)
-      require 'zlib'
+      require "zlib"
       Zlib::Deflate.deflate(data.to_json)
     end
 
@@ -183,13 +182,13 @@ module Etl
     # Monitoring wrapper
     def with_monitoring
       start_time = Time.current
-      
+
       yield
-      
+
       duration = Time.current - start_time
       update_metrics(:duration, duration)
       update_metrics(:success_rate, 1.0)
-      
+
       Rails.logger.info("[ETL] Pipeline #{pipeline_id} completed in #{duration.round(2)}s")
     end
 
@@ -219,7 +218,7 @@ module Etl
       EtlPipelineRun.create!(
         pipeline_id: pipeline_id,
         source: source,
-        status: 'completed',
+        status: "completed",
         started_at: started_at,
         completed_at: Time.current,
         metrics: metrics,
@@ -232,7 +231,7 @@ module Etl
       EtlPipelineRun.create!(
         pipeline_id: pipeline_id,
         source: source,
-        status: 'failed',
+        status: "failed",
         started_at: started_at,
         completed_at: Time.current,
         error_message: error.message,
@@ -244,7 +243,7 @@ module Etl
     # Error handling with retry logic
     def handle_error(error)
       Rails.logger.error("[ETL] Pipeline #{pipeline_id} failed: #{error.message}")
-      
+
       case error
       when ValidationError
         notify_validation_error(error)

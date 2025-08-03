@@ -7,15 +7,15 @@ module ApiPagination
   private
 
   def paginate_collection(collection)
-    page = [params[:page].to_i, 1].max
-    per_page = [[params[:per_page].to_i, DEFAULT_PAGE_SIZE].max, MAX_PAGE_SIZE].min
-    
+    page = [ params[:page].to_i, 1 ].max
+    per_page = [ [ params[:per_page].to_i, DEFAULT_PAGE_SIZE ].max, MAX_PAGE_SIZE ].min
+
     offset = (page - 1) * per_page
     total_count = collection.count
     total_pages = (total_count.to_f / per_page).ceil
-    
+
     paginated_collection = collection.limit(per_page).offset(offset)
-    
+
     {
       collection: paginated_collection,
       meta: {
@@ -33,13 +33,13 @@ module ApiPagination
 
   def paginate_and_render(collection, serializer: nil, **options)
     result = paginate_collection(collection)
-    
+
     data = if serializer
       result[:collection].map { |item| serializer.call(item) }
     else
       result[:collection]
     end
-    
+
     render_success(
       data: data,
       meta: result[:meta],

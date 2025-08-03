@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_02_232910) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_02_235252) do
   create_table "ab_test_configurations", force: :cascade do |t|
     t.integer "ab_test_id", null: false
     t.string "configuration_type"
@@ -186,6 +186,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_232910) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_admin_audit_logs_on_user_id"
+  end
+
+  create_table "alert_instances", force: :cascade do |t|
+    t.integer "performance_alert_id", null: false
+    t.string "status", default: "active", null: false
+    t.string "severity", null: false
+    t.decimal "triggered_value", precision: 15, scale: 6
+    t.decimal "threshold_value", precision: 15, scale: 6
+    t.json "trigger_context"
+    t.json "metric_data"
+    t.datetime "triggered_at", null: false
+    t.datetime "acknowledged_at"
+    t.datetime "resolved_at"
+    t.datetime "snoozed_until"
+    t.integer "acknowledged_by_id"
+    t.integer "resolved_by_id"
+    t.text "acknowledgment_note"
+    t.text "resolution_note"
+    t.json "notifications_sent"
+    t.json "notification_failures"
+    t.boolean "escalated", default: false
+    t.datetime "escalation_sent_at"
+    t.decimal "anomaly_score", precision: 5, scale: 4
+    t.json "ml_prediction_data"
+    t.boolean "false_positive", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["acknowledged_by_id"], name: "index_alert_instances_on_acknowledged_by_id"
+    t.index ["escalated", "severity"], name: "index_alert_instances_on_escalated_and_severity"
+    t.index ["performance_alert_id"], name: "index_alert_instances_on_performance_alert_id"
+    t.index ["resolved_by_id"], name: "index_alert_instances_on_resolved_by_id"
+    t.index ["snoozed_until", "status"], name: "index_alert_instances_on_snoozed_until_and_status"
+    t.index ["status", "severity"], name: "index_alert_instances_on_status_and_severity"
+    t.index ["triggered_at"], name: "index_alert_instances_on_triggered_at"
   end
 
   create_table "brand_analyses", force: :cascade do |t|
@@ -1126,6 +1160,126 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_232910) do
     t.index ["brand_id"], name: "index_messaging_frameworks_on_brand_id"
   end
 
+  create_table "notification_queues", force: :cascade do |t|
+    t.integer "alert_instance_id", null: false
+    t.integer "user_id", null: false
+    t.string "channel", null: false
+    t.string "status", default: "pending", null: false
+    t.string "priority", default: "medium", null: false
+    t.string "subject", null: false
+    t.text "message", null: false
+    t.json "template_data"
+    t.string "template_name"
+    t.string "recipient_address"
+    t.json "channel_config"
+    t.datetime "scheduled_for", null: false
+    t.datetime "sent_at"
+    t.integer "retry_count", default: 0
+    t.integer "max_retries", default: 3
+    t.datetime "next_retry_at"
+    t.json "retry_schedule"
+    t.string "external_id"
+    t.json "delivery_status"
+    t.text "failure_reason"
+    t.json "delivery_metadata"
+    t.string "batch_id"
+    t.boolean "can_batch", default: true
+    t.integer "batch_window_minutes", default: 5
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["alert_instance_id"], name: "index_notification_queues_on_alert_instance_id"
+    t.index ["batch_id"], name: "index_notification_queues_on_batch_id"
+    t.index ["channel", "status"], name: "index_notification_queues_on_channel_and_status"
+    t.index ["external_id"], name: "index_notification_queues_on_external_id"
+    t.index ["next_retry_at", "status"], name: "index_notification_queues_on_next_retry_at_and_status"
+    t.index ["priority", "scheduled_for"], name: "index_notification_queues_on_priority_and_scheduled_for"
+    t.index ["status", "scheduled_for"], name: "index_notification_queues_on_status_and_scheduled_for"
+    t.index ["user_id"], name: "index_notification_queues_on_user_id"
+  end
+
+  create_table "performance_alerts", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "metric_type", null: false
+    t.string "metric_source", null: false
+    t.string "alert_type", null: false
+    t.string "severity", default: "medium", null: false
+    t.string "status", default: "active", null: false
+    t.decimal "threshold_value", precision: 15, scale: 6
+    t.string "threshold_operator"
+    t.integer "threshold_duration_minutes", default: 5
+    t.boolean "use_ml_thresholds", default: false
+    t.json "ml_model_config"
+    t.decimal "anomaly_sensitivity", precision: 3, scale: 2, default: "0.95"
+    t.integer "baseline_period_days", default: 30
+    t.json "conditions"
+    t.json "filters"
+    t.json "notification_channels"
+    t.json "notification_settings"
+    t.integer "cooldown_minutes", default: 60
+    t.integer "max_alerts_per_hour", default: 5
+    t.integer "user_id", null: false
+    t.integer "campaign_id"
+    t.integer "journey_id"
+    t.json "user_roles"
+    t.json "metadata"
+    t.datetime "last_triggered_at"
+    t.datetime "last_checked_at"
+    t.integer "trigger_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_performance_alerts_on_campaign_id"
+    t.index ["journey_id"], name: "index_performance_alerts_on_journey_id"
+    t.index ["metric_type", "metric_source"], name: "index_performance_alerts_on_metric_type_and_metric_source"
+    t.index ["severity"], name: "index_performance_alerts_on_severity"
+    t.index ["status", "last_checked_at"], name: "index_performance_alerts_on_status_and_last_checked_at"
+    t.index ["user_id"], name: "index_performance_alerts_on_user_id"
+  end
+
+  create_table "performance_thresholds", force: :cascade do |t|
+    t.string "metric_type", null: false
+    t.string "metric_source", null: false
+    t.string "context_filters", null: false
+    t.decimal "baseline_mean", precision: 15, scale: 6
+    t.decimal "baseline_std_dev", precision: 15, scale: 6
+    t.decimal "upper_threshold", precision: 15, scale: 6
+    t.decimal "lower_threshold", precision: 15, scale: 6
+    t.decimal "anomaly_threshold", precision: 15, scale: 6
+    t.integer "sample_size"
+    t.decimal "confidence_level", precision: 5, scale: 4, default: "0.95"
+    t.datetime "baseline_start_date"
+    t.datetime "baseline_end_date"
+    t.datetime "last_recalculated_at"
+    t.decimal "accuracy_score", precision: 5, scale: 4
+    t.decimal "precision_score", precision: 5, scale: 4
+    t.decimal "recall_score", precision: 5, scale: 4
+    t.decimal "f1_score", precision: 5, scale: 4
+    t.integer "true_positives", default: 0
+    t.integer "false_positives", default: 0
+    t.integer "true_negatives", default: 0
+    t.integer "false_negatives", default: 0
+    t.boolean "auto_adjust", default: true
+    t.integer "recalculation_frequency_hours", default: 24
+    t.decimal "learning_rate", precision: 5, scale: 4, default: "0.1"
+    t.json "model_parameters"
+    t.integer "campaign_id"
+    t.integer "journey_id"
+    t.string "audience_segment"
+    t.string "time_of_day_segment"
+    t.string "day_of_week_segment"
+    t.string "seasonality_segment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["accuracy_score", "metric_type"], name: "index_performance_thresholds_on_accuracy_score_and_metric_type"
+    t.index ["campaign_id"], name: "index_performance_thresholds_on_campaign_id"
+    t.index ["context_filters"], name: "index_performance_thresholds_on_context_filters"
+    t.index ["journey_id"], name: "index_performance_thresholds_on_journey_id"
+    t.index ["last_recalculated_at", "auto_adjust"], name: "idx_on_last_recalculated_at_auto_adjust_7ccd367fa2"
+    t.index ["metric_type", "metric_source"], name: "index_performance_thresholds_on_metric_type_and_metric_source"
+    t.check_constraint "confidence_level >= 0.5 AND confidence_level <= 1.0", name: "confidence_level_range"
+    t.check_constraint "learning_rate >= 0.001 AND learning_rate <= 1.0", name: "learning_rate_range"
+  end
+
   create_table "personas", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -1360,6 +1514,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_232910) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "admin_audit_logs", "users"
+  add_foreign_key "alert_instances", "performance_alerts"
+  add_foreign_key "alert_instances", "users", column: "acknowledged_by_id"
+  add_foreign_key "alert_instances", "users", column: "resolved_by_id"
   add_foreign_key "brand_analyses", "brands"
   add_foreign_key "brand_assets", "brands"
   add_foreign_key "brand_guidelines", "brands"
@@ -1386,6 +1543,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_02_232910) do
   add_foreign_key "email_metrics", "email_campaigns"
   add_foreign_key "email_metrics", "email_integrations"
   add_foreign_key "email_subscribers", "email_integrations"
+  add_foreign_key "notification_queues", "alert_instances"
+  add_foreign_key "notification_queues", "users"
+  add_foreign_key "performance_alerts", "campaigns"
+  add_foreign_key "performance_alerts", "journeys"
+  add_foreign_key "performance_alerts", "users"
+  add_foreign_key "performance_thresholds", "campaigns"
+  add_foreign_key "performance_thresholds", "journeys"
   add_foreign_key "social_media_integrations", "brands"
   add_foreign_key "social_media_metrics", "social_media_integrations"
 end

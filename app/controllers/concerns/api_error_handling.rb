@@ -14,18 +14,18 @@ module ApiErrorHandling
 
   def handle_not_found(exception)
     render_error(
-      message: 'Resource not found',
+      message: "Resource not found",
       status: :not_found,
-      code: 'RESOURCE_NOT_FOUND'
+      code: "RESOURCE_NOT_FOUND"
     )
   end
 
   def handle_validation_error(exception)
     render_error(
-      message: 'Validation failed',
+      message: "Validation failed",
       errors: exception.record.errors.as_json,
       status: :unprocessable_entity,
-      code: 'VALIDATION_ERROR'
+      code: "VALIDATION_ERROR"
     )
   end
 
@@ -33,15 +33,15 @@ module ApiErrorHandling
     render_error(
       message: "Required parameter missing: #{exception.param}",
       status: :bad_request,
-      code: 'PARAMETER_MISSING'
+      code: "PARAMETER_MISSING"
     )
   end
 
   def handle_unauthorized(exception)
     render_error(
-      message: 'Access denied',
+      message: "Access denied",
       status: :forbidden,
-      code: 'ACCESS_DENIED'
+      code: "ACCESS_DENIED"
     )
   end
 
@@ -51,12 +51,12 @@ module ApiErrorHandling
     Rails.logger.error exception.backtrace.join("\n") if Rails.env.development?
 
     # Don't expose internal error details in production
-    message = Rails.env.production? ? 'Internal server error' : exception.message
-    
+    message = Rails.env.production? ? "Internal server error" : exception.message
+
     render_error(
       message: message,
       status: :internal_server_error,
-      code: 'INTERNAL_ERROR'
+      code: "INTERNAL_ERROR"
     )
   end
 end
