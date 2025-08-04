@@ -385,4 +385,4 @@ class BrandSystemPerformanceTest < ActionDispatch::IntegrationTest
     # In a real implementation, you'd use proper query logging
     ActiveRecord::Base.connection.query_cache.size
   end
-end"
+end

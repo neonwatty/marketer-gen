@@ -250,7 +250,7 @@ export default class extends Controller {
   }
 
   // Restore selections when navigating back to page
-  turbo:load() {
+  turboLoad() {
     this.restoreSelections()
   }
 

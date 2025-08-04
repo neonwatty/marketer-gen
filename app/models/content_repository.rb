@@ -12,9 +12,7 @@ class ContentRepository < ApplicationRecord
   validates :format, presence: true
   validates :storage_path, presence: true
   validates :file_hash, presence: true
-  
-  # Virtual attributes for form handling
-  attr_accessor :body
+  validates :body, presence: true
 
   enum :status, {
     draft: 0,
