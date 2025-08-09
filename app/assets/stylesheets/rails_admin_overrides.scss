@@ -1,8 +1,0 @@
-// Override problematic media queries from Rails Admin
-// This fixes the CSS compilation error in tests
-
-// The Rails Admin gem uses invalid CSS syntax: @media (width >= 40rem)
-// We override it with valid syntax
-@media (min-width: 40rem) {
-  // Add any necessary overrides here
-}

@@ -1,8 +1,0 @@
-<%= form.select field.method_name, 
-  options_for_select(
-    ActiveSupport::TimeZone.all.map { |tz| [tz.to_s, tz.name] },
-    form.object.send(field.method_name)
-  ),
-  { include_blank: true },
-  class: "form-control", 
-  data: { "live-search": true } %>
