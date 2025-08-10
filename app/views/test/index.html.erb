@@ -1,0 +1,67 @@
+<div class="p-8 bg-gray-100 min-h-screen">
+  <h1 class="text-4xl font-bold text-gray-900 mb-8">Rails 8 + Stimulus + Tailwind Test</h1>
+  
+  <div class="space-y-6">
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-2xl font-semibold mb-4">Stimulus Controller Test</h2>
+      <div data-controller="hello" class="p-4 bg-blue-50 border border-blue-200 rounded">
+        <!-- This will be replaced by the hello controller -->
+      </div>
+    </div>
+    
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-2xl font-semibold mb-4">Tailwind CSS Test</h2>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="bg-red-100 p-4 rounded text-center">Red</div>
+        <div class="bg-green-100 p-4 rounded text-center">Green</div>
+        <div class="bg-blue-100 p-4 rounded text-center">Blue</div>
+      </div>
+    </div>
+    
+    <div class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-2xl font-semibold mb-4">JavaScript Test</h2>
+      <button onclick="alert('JavaScript is working!')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+        Test JavaScript
+      </button>
+    </div>
+    
+    <div class="bg-white p-6 rounded-lg shadow" data-controller="campaign" data-campaign-clicks-value="0">
+      <h2 class="text-2xl font-semibold mb-4">Marketing Campaign Controller Test</h2>
+      <div class="space-y-4">
+        <div class="flex items-center space-x-4">
+          <label class="font-medium">Campaign Name:</label>
+          <input 
+            data-action="input->campaign#updateTitle" 
+            type="text" 
+            placeholder="Enter campaign name"
+            class="border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 data-campaign-target="title" class="text-xl font-bold">Marketing Campaign</h3>
+            <span data-campaign-target="status" class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+              Draft Campaign
+            </span>
+          </div>
+          
+          <div class="text-center">
+            <div class="text-3xl font-bold text-blue-600" data-campaign-target="counter">0</div>
+            <div class="text-sm text-gray-500">Clicks</div>
+            <button 
+              data-action="click->campaign#increment" 
+              class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            >
+              Click to Activate
+            </button>
+          </div>
+        </div>
+        
+        <p class="text-sm text-gray-600">
+          💡 Try typing a campaign name and clicking the button 5 times to see the campaign activate!
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

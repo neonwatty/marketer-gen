@@ -1,0 +1,196 @@
+<div class="min-h-screen bg-gray-50 py-8" data-controller="campaign-dashboard">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Marketing Campaign Dashboard</h1>
+      <p class="text-gray-600">Manage and track your marketing campaigns across all channels</p>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-500">Total Campaigns</h3>
+            <p class="text-2xl font-semibold text-gray-900" data-campaign-dashboard-target="totalCount"><%= @campaigns.count %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-500">Active</h3>
+            <p class="text-2xl font-semibold text-gray-900"><%= @campaigns.select(&:active?).count %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-500">Draft</h3>
+            <p class="text-2xl font-semibold text-gray-900"><%= @campaigns.select(&:draft?).count %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-500">Completed</h3>
+            <p class="text-2xl font-semibold text-gray-900"><%= @campaigns.count { |c| c.status == 'completed' } %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="bg-white rounded-lg shadow mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Filter Campaigns</h3>
+      </div>
+      <div class="p-6">
+        <div class="flex flex-wrap gap-4">
+          <button data-action="click->campaign-dashboard#filterBy" data-status="all" 
+                  class="px-4 py-2 text-sm font-medium rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
+            All Campaigns
+          </button>
+          <button data-action="click->campaign-dashboard#filterBy" data-status="active" 
+                  class="px-4 py-2 text-sm font-medium rounded-md bg-white text-gray-700 border hover:bg-gray-50 transition-colors">
+            Active Only
+          </button>
+          <button data-action="click->campaign-dashboard#filterBy" data-status="draft" 
+                  class="px-4 py-2 text-sm font-medium rounded-md bg-white text-gray-700 border hover:bg-gray-50 transition-colors">
+            Drafts Only
+          </button>
+          <button data-action="click->campaign-dashboard#filterBy" data-status="completed" 
+                  class="px-4 py-2 text-sm font-medium rounded-md bg-white text-gray-700 border hover:bg-gray-50 transition-colors">
+            Completed Only
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaigns List -->
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Campaign List</h3>
+      </div>
+      
+      <div class="divide-y divide-gray-200" data-campaign-dashboard-target="campaignList">
+        <% @campaigns.each do |campaign| %>
+          <div class="px-6 py-4 campaign-item" data-status="<%= campaign.status %>">
+            <div class="flex items-center justify-between">
+              <div class="flex-1">
+                <div class="flex items-center space-x-4">
+                  <h4 class="text-lg font-semibold text-gray-900"><%= campaign.name %></h4>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= campaign.status_color %>">
+                    <%= campaign.status.capitalize %>
+                  </span>
+                </div>
+                <p class="mt-2 text-sm text-gray-600"><%= campaign.purpose %></p>
+                <div class="mt-2 flex items-center text-xs text-gray-500">
+                  <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                  </svg>
+                  Created <%= time_ago_in_words(campaign.created_at) %> ago
+                </div>
+              </div>
+              
+              <div class="flex items-center space-x-2">
+                <button class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                  View Details
+                </button>
+                <button class="text-gray-400 hover:text-gray-600">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      
+      <% if @campaigns.empty? %>
+        <div class="px-6 py-12 text-center">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No campaigns</h3>
+          <p class="mt-1 text-sm text-gray-500">Get started by creating your first marketing campaign.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Technology Stack Verification -->
+    <div class="mt-8 bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">🎉 Full Stack Integration Verified</h3>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+              <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-900">Rails 8 + esbuild</h4>
+            <p class="text-sm text-gray-600">Backend MVC with fast JS bundling</p>
+          </div>
+          
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+              <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-900">Tailwind CSS</h4>
+            <p class="text-sm text-gray-600">Responsive utility-first styling</p>
+          </div>
+          
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+              <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-900">Stimulus</h4>
+            <p class="text-sm text-gray-600">Interactive campaign filtering</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
