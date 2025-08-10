@@ -1,5 +1,13 @@
-// Database configuration and utilities will go here
-// Example:
-// export { db } from './connection'
-// export { queries } from './queries'
-// export { migrations } from './migrations'
+import { PrismaClient } from '@prisma/client'
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: ['query'],
+  })
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma

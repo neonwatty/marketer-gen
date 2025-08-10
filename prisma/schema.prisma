@@ -1,0 +1,314 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model - placeholder structure for future auth integration
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  brands Brand[]
+
+  @@map("users")
+}
+
+// Brand model - guidelines, assets, and messaging
+model Brand {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Brand guidelines and assets
+  logoUrl           String?
+  primaryColor      String?
+  secondaryColor    String?
+  fontFamily        String?
+  brandGuidelines   String? // JSON string for detailed guidelines
+  voiceAndTone      String? // JSON string for messaging guidelines
+  targetAudience    String? // JSON string for audience definitions
+  brandAssets       String? // JSON string for asset URLs and metadata
+
+  // Relationships
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaigns Campaign[]
+
+  @@map("brands")
+}
+
+// Campaign model - goals, status, and metadata
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Campaign configuration
+  status      CampaignStatus @default(DRAFT)
+  goals       String?        // JSON string for campaign objectives
+  targetKPIs  String?        // JSON string for key performance indicators
+  timeline    String?        // JSON string for campaign timeline
+  budget      Float?         // Campaign budget if applicable
+  metadata    String?        // JSON string for additional campaign data
+
+  // Relationships
+  brandId   String
+  brand     Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  journeys  Journey[]
+  analytics Analytics[]
+
+  @@map("campaigns")
+}
+
+// Campaign status enum
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+// Template model - for journey and content templates
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Template configuration
+  type        TemplateType
+  category    String?      // Template category (email, social, blog, etc.)
+  structure   String       // JSON string defining template structure
+  variables   String?      // JSON string for template variables/placeholders
+  styling     String?      // JSON string for styling configuration
+  metadata    String?      // JSON string for additional template data
+  isActive    Boolean      @default(true)
+
+  // Relationships
+  journeys Journey[]
+  contents Content[]
+
+  @@map("templates")
+}
+
+// Template type enum
+enum TemplateType {
+  JOURNEY
+  CONTENT
+}
+
+// Journey model - marketing campaign workflows
+model Journey {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Journey configuration
+  status      JourneyStatus @default(DRAFT)
+  stages      String        // JSON string defining journey stages
+  triggers    String?       // JSON string for journey triggers
+  conditions  String?       // JSON string for stage conditions
+  settings    String?       // JSON string for journey settings
+  metadata    String?       // JSON string for additional journey data
+
+  // Relationships
+  campaignId String
+  campaign   Campaign    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  templateId String?
+  template   Template?   @relation(fields: [templateId], references: [id])
+  contents   Content[]
+  analytics  Analytics[]
+
+  @@map("journeys")
+}
+
+// Journey status enum
+enum JourneyStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+// Content model - generated marketing assets
+model Content {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Content configuration
+  type         ContentType    @default(TEXT)
+  status       ContentStatus  @default(DRAFT)
+  content      String         // The actual content/copy
+  version      Int            @default(1)
+  language     String         @default("en")
+  format       String?        // File format for assets (jpg, png, mp4, etc.)
+  fileSize     Int?           // File size in bytes for assets
+  fileUrl      String?        // URL for uploaded/generated assets
+  thumbnailUrl String?        // Thumbnail URL for media content
+  metadata     String?        // JSON string for additional content data
+  
+  // AI generation tracking
+  prompt          String?  // Original AI prompt used
+  generatedBy     String?  // AI model/service used
+  generationCost  Float?   // Cost of generation if applicable
+  
+  // Approval workflow
+  approvalStatus  ApprovalStatus @default(PENDING)
+  approvedBy      String?        // User ID who approved
+  approvedAt      DateTime?      // Approval timestamp
+  rejectionReason String?        // Reason for rejection
+
+  // Relationships
+  journeyId  String?
+  journey    Journey?    @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  templateId String?
+  template   Template?   @relation(fields: [templateId], references: [id])
+  analytics  Analytics[]
+
+  @@map("contents")
+}
+
+// Content type enum
+enum ContentType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  EMAIL
+  SOCIAL_POST
+  BLOG_POST
+  AD_COPY
+  LANDING_PAGE
+}
+
+// Content status enum
+enum ContentStatus {
+  DRAFT
+  GENERATING
+  GENERATED
+  REVIEWING
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+// Approval status enum
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_REVISION
+}
+
+// Analytics model - performance tracking and metrics
+model Analytics {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Tracking configuration
+  eventType   AnalyticsEventType
+  eventName   String             // Specific event name (e.g., "email_open", "click_cta")
+  timestamp   DateTime           @default(now())
+  
+  // Engagement metrics
+  views         Int      @default(0)
+  clicks        Int      @default(0)
+  conversions   Int      @default(0)
+  shares        Int      @default(0)
+  likes         Int      @default(0)
+  comments      Int      @default(0)
+  downloads     Int      @default(0)
+  
+  // Performance metrics
+  engagementRate    Float?  // Percentage engagement rate
+  conversionRate    Float?  // Percentage conversion rate
+  clickThroughRate  Float?  // CTR percentage
+  reachCount        Int     @default(0)
+  impressionCount   Int     @default(0)
+  
+  // Revenue and cost tracking
+  revenue           Float   @default(0.0)
+  cost              Float   @default(0.0)
+  returnOnInvestment Float? // ROI percentage
+  
+  // User behavior data
+  userAgent      String?  // Browser/device information
+  ipAddress      String?  // User IP (anonymized for privacy)
+  referrerUrl    String?  // Where user came from
+  sessionId      String?  // Session tracking
+  userId         String?  // Associated user if available
+  
+  // Geographic and demographic data
+  country        String?
+  region         String?
+  city           String?
+  deviceType     String?  // mobile, desktop, tablet
+  browserType    String?  // chrome, firefox, safari, etc.
+  
+  // Additional metadata
+  metadata       String?  // JSON string for custom tracking data
+  
+  // Relationships - polymorphic tracking
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  journeyId  String?
+  journey    Journey?  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  contentId  String?
+  content    Content?  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  
+  // Indexing for performance
+  @@index([eventType, timestamp])
+  @@index([campaignId, timestamp])
+  @@index([journeyId, timestamp])
+  @@index([contentId, timestamp])
+  @@index([timestamp])
+  @@map("analytics")
+}
+
+// Analytics event types
+enum AnalyticsEventType {
+  VIEW
+  CLICK
+  CONVERSION
+  SHARE
+  LIKE
+  COMMENT
+  DOWNLOAD
+  EMAIL_OPEN
+  EMAIL_CLICK
+  FORM_SUBMIT
+  PAGE_VIEW
+  CAMPAIGN_START
+  CAMPAIGN_END
+  JOURNEY_ENTER
+  JOURNEY_EXIT
+  CONTENT_GENERATE
+  CONTENT_APPROVE
+  CONTENT_PUBLISH
+  CUSTOM
+}
