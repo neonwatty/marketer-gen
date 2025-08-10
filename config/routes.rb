@@ -3,8 +3,17 @@ Rails.application.routes.draw do
   get "test/index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
+  # Campaigns Management with Journey Builder
+  resources :campaigns do
+    resource :customer_journey, only: [:show, :create, :update, :destroy] do
+      member do
+        get :builder
+      end
+    end
+  end
+
   # Brand Assets Management
-  resources :brand_assets, except: [:show] do
+  resources :brand_assets, except: [ :show ] do
     collection do
       post :upload_multiple
     end

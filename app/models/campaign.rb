@@ -6,13 +6,13 @@ class Campaign < ApplicationRecord
   has_many :customer_journeys, dependent: :destroy
   has_many :content_assets, as: :assetable, dependent: :destroy
   has_many :brand_assets, as: :assetable, dependent: :destroy
-  
+
   # Through associations for easier access
-  has_many :campaign_templates, -> { where(template_type: 'campaign') }, class_name: 'Template'
+  has_many :campaign_templates, -> { where(template_type: "campaign") }, class_name: "Template"
   has_many :journey_stages, through: :customer_journeys, source: :stages
-  has_many :email_content, -> { where(channel: 'email') }, class_name: 'ContentAsset', as: :assetable
-  has_many :social_content, -> { where(channel: 'social_media') }, class_name: 'ContentAsset', as: :assetable
-  has_many :web_content, -> { where(channel: 'web') }, class_name: 'ContentAsset', as: :assetable
+  has_many :email_content, -> { where(channel: "email") }, class_name: "ContentAsset", as: :assetable
+  has_many :social_content, -> { where(channel: "social_media") }, class_name: "ContentAsset", as: :assetable
+  has_many :web_content, -> { where(channel: "web") }, class_name: "ContentAsset", as: :assetable
 
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
@@ -22,13 +22,13 @@ class Campaign < ApplicationRecord
   validate :end_date_after_start_date, if: :dates_present?
 
   # Scopes
-  scope :active, -> { where(status: 'active') }
-  scope :draft, -> { where(status: 'draft') }
+  scope :active, -> { where(status: "active") }
+  scope :draft, -> { where(status: "draft") }
   scope :by_status, ->(status) { where(status: status) }
   scope :with_budget, -> { where.not(budget_cents: nil) }
-  scope :current, -> { where('start_date <= ? AND (end_date >= ? OR end_date IS NULL)', Date.current, Date.current) }
-  scope :upcoming, -> { where('start_date > ?', Date.current) }
-  scope :past, -> { where('end_date < ?', Date.current) }
+  scope :current, -> { where("start_date <= ? AND (end_date >= ? OR end_date IS NULL)", Date.current, Date.current) }
+  scope :upcoming, -> { where("start_date > ?", Date.current) }
+  scope :past, -> { where("end_date < ?", Date.current) }
 
   # AASM State Machine for campaign status
   aasm column: :status, whiny_transitions: false do
@@ -39,7 +39,7 @@ class Campaign < ApplicationRecord
     state :archived
 
     event :activate do
-      transitions from: [:draft, :paused], to: :active
+      transitions from: [ :draft, :paused ], to: :active
       before do
         self.start_date ||= Date.current
       end
@@ -50,14 +50,14 @@ class Campaign < ApplicationRecord
     end
 
     event :complete do
-      transitions from: [:active, :paused], to: :completed
+      transitions from: [ :active, :paused ], to: :completed
       before do
         self.end_date ||= Date.current
       end
     end
 
     event :archive do
-      transitions from: [:draft, :completed, :paused], to: :archived
+      transitions from: [ :draft, :completed, :paused ], to: :archived
     end
 
     event :reopen do
@@ -68,14 +68,14 @@ class Campaign < ApplicationRecord
   # Instance methods
   def budget
     return nil unless budget_cents
-    Money.new(budget_cents, 'USD') if defined?(Money)
+    Money.new(budget_cents, "USD") if defined?(Money)
     budget_cents / 100.0
   end
 
   def budget=(amount)
     if amount.is_a?(String)
       # Remove currency symbols and convert to cents
-      clean_amount = amount.gsub(/[$,]/, '').to_f
+      clean_amount = amount.gsub(/[$,]/, "").to_f
       self.budget_cents = (clean_amount * 100).to_i
     elsif amount.respond_to?(:cents)
       self.budget_cents = amount.cents
@@ -93,13 +93,13 @@ class Campaign < ApplicationRecord
 
   def days_remaining
     return nil unless end_date && active?
-    [(end_date - Date.current).to_i, 0].max
+    [ (end_date - Date.current).to_i, 0 ].max
   end
 
   def progress_percentage
     return 0 unless start_date && end_date && start_date <= Date.current
     return 100 if completed? || Date.current >= end_date
-    
+
     total_days = (end_date - start_date).to_f
     elapsed_days = (Date.current - start_date).to_f
     ((elapsed_days / total_days) * 100).round(1)
@@ -107,12 +107,12 @@ class Campaign < ApplicationRecord
 
   def status_color
     case status
-    when 'active' then 'bg-green-100 text-green-800'
-    when 'draft' then 'bg-gray-100 text-gray-600'
-    when 'paused' then 'bg-yellow-100 text-yellow-800'
-    when 'completed' then 'bg-blue-100 text-blue-800'
-    when 'archived' then 'bg-red-100 text-red-600'
-    else 'bg-gray-100 text-gray-600'
+    when "active" then "bg-green-100 text-green-800"
+    when "draft" then "bg-gray-100 text-gray-600"
+    when "paused" then "bg-yellow-100 text-yellow-800"
+    when "completed" then "bg-blue-100 text-blue-800"
+    when "archived" then "bg-red-100 text-red-600"
+    else "bg-gray-100 text-gray-600"
     end
   end
 
@@ -136,6 +136,6 @@ class Campaign < ApplicationRecord
 
   def end_date_after_start_date
     return unless start_date && end_date
-    errors.add(:end_date, 'must be after start date') if end_date < start_date
+    errors.add(:end_date, "must be after start date") if end_date < start_date
   end
 end

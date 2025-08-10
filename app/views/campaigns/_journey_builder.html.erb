@@ -1,0 +1,306 @@
+<div class="journey-builder bg-white rounded-lg shadow-lg" 
+     data-controller="journey-builder" 
+     data-journey-builder-campaign-id-value="<%= campaign.id if defined?(campaign) %>"
+     data-journey-builder-existing-stages-value="<%= (campaign&.customer_journey&.stages || []).to_json %>">
+  
+  <!-- Journey Builder Header -->
+  <div class="flex items-center justify-between p-6 border-b border-gray-200">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">Journey Builder</h2>
+      <p class="text-sm text-gray-600 mt-1">Design your customer journey with drag-and-drop stages</p>
+    </div>
+    
+    <!-- Journey Actions -->
+    <div class="flex items-center space-x-3">
+      <button type="button" 
+              class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              data-action="click->journey-builder#resetJourney">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Reset
+      </button>
+      
+      <button type="button" 
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              data-action="click->journey-builder#saveJourney">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        Save Journey
+      </button>
+    </div>
+  </div>
+
+  <div class="flex h-screen max-h-[800px]">
+    <!-- Stage Library Sidebar -->
+    <div class="w-80 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Journey Stages</h3>
+      
+      <!-- Stage Templates -->
+      <div class="space-y-3" data-journey-builder-target="stageLibrary">
+        <!-- Awareness Stage -->
+        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-blue-300 cursor-move hover:border-blue-400 hover:shadow-md transition-all"
+             data-stage-type="awareness"
+             data-journey-builder-target="stageTemplate"
+             draggable="true">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-medium text-gray-900">Awareness</h4>
+              <p class="text-xs text-gray-500">Initial brand discovery</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consideration Stage -->
+        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-yellow-300 cursor-move hover:border-yellow-400 hover:shadow-md transition-all"
+             data-stage-type="consideration"
+             data-journey-builder-target="stageTemplate"
+             draggable="true">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-medium text-gray-900">Consideration</h4>
+              <p class="text-xs text-gray-500">Evaluating options</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversion Stage -->
+        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-green-300 cursor-move hover:border-green-400 hover:shadow-md transition-all"
+             data-stage-type="conversion"
+             data-journey-builder-target="stageTemplate"
+             draggable="true">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-medium text-gray-900">Conversion</h4>
+              <p class="text-xs text-gray-500">Making the purchase</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Retention Stage -->
+        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-purple-300 cursor-move hover:border-purple-400 hover:shadow-md transition-all"
+             data-stage-type="retention"
+             data-journey-builder-target="stageTemplate"
+             draggable="true">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-medium text-gray-900">Retention</h4>
+              <p class="text-xs text-gray-500">Building loyalty</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advocacy Stage -->
+        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-indigo-300 cursor-move hover:border-indigo-400 hover:shadow-md transition-all"
+             data-stage-type="advocacy"
+             data-journey-builder-target="stageTemplate"
+             draggable="true">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-medium text-gray-900">Advocacy</h4>
+              <p class="text-xs text-gray-500">Becoming promoters</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Predefined Templates -->
+      <div class="mt-8">
+        <h4 class="text-md font-semibold text-gray-900 mb-3">Quick Templates</h4>
+        <div class="space-y-2">
+          <button type="button" 
+                  class="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all text-sm"
+                  data-action="click->journey-builder#loadTemplate"
+                  data-template="product-launch">
+            <div class="font-medium text-gray-900">Product Launch</div>
+            <div class="text-xs text-gray-500">Awareness → Consideration → Conversion</div>
+          </button>
+          
+          <button type="button" 
+                  class="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all text-sm"
+                  data-action="click->journey-builder#loadTemplate"
+                  data-template="lead-generation">
+            <div class="font-medium text-gray-900">Lead Generation</div>
+            <div class="text-xs text-gray-500">Awareness → Consideration → Conversion → Retention</div>
+          </button>
+          
+          <button type="button" 
+                  class="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all text-sm"
+                  data-action="click->journey-builder#loadTemplate"
+                  data-template="full-funnel">
+            <div class="font-medium text-gray-900">Full Customer Lifecycle</div>
+            <div class="text-xs text-gray-500">All stages: Awareness → Retention → Advocacy</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Journey Canvas -->
+    <div class="flex-1 bg-gray-100 relative overflow-auto">
+      <div class="journey-canvas h-full min-h-[600px] p-8" 
+           data-journey-builder-target="canvas"
+           data-action="dragover->journey-builder#handleCanvasDragOver drop->journey-builder#handleCanvasDrop">
+        
+        <!-- Canvas Instructions (shown when empty) -->
+        <div class="canvas-instructions flex flex-col items-center justify-center h-full text-center"
+             data-journey-builder-target="canvasInstructions">
+          <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Design Your Customer Journey</h3>
+          <p class="text-gray-500 mb-4 max-w-md">Drag stages from the sidebar to build your customer journey. Connect stages to create a flow that guides customers from awareness to advocacy.</p>
+          <div class="flex items-center text-sm text-gray-400">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+            </svg>
+            Tip: Start with a template or drag individual stages
+          </div>
+        </div>
+
+        <!-- Journey Stages Container -->
+        <div class="journey-stages flex flex-wrap gap-6 items-start min-h-full"
+             data-journey-builder-target="stagesContainer" 
+             style="display: none;">
+          <!-- Dynamically populated with stage cards -->
+        </div>
+
+        <!-- Connection Lines SVG Overlay -->
+        <svg class="connection-lines absolute inset-0 w-full h-full pointer-events-none" 
+             data-journey-builder-target="connectionLines"
+             style="z-index: 1;">
+          <!-- Connection lines will be drawn here -->
+        </svg>
+      </div>
+    </div>
+
+    <!-- Stage Configuration Panel -->
+    <div class="stage-config-panel w-80 bg-white border-l border-gray-200 p-6 overflow-y-auto"
+         data-journey-builder-target="configPanel"
+         style="display: none;">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Stage Configuration</h3>
+        <button type="button" 
+                class="text-gray-400 hover:text-gray-600"
+                data-action="click->journey-builder#closeConfigPanel">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Configuration Form -->
+      <form data-journey-builder-target="configForm">
+        <div class="space-y-4">
+          <!-- Stage Name -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Stage Name</label>
+            <input type="text" 
+                   name="name"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                   data-journey-builder-target="stageNameInput">
+          </div>
+
+          <!-- Stage Description -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea name="description" 
+                      rows="3"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      data-journey-builder-target="stageDescriptionInput"></textarea>
+          </div>
+
+          <!-- Duration -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Duration (days)</label>
+            <input type="number" 
+                   name="duration_days"
+                   min="1"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                   data-journey-builder-target="stageDurationInput">
+          </div>
+
+          <!-- Stage Actions -->
+          <div class="pt-4 border-t border-gray-200">
+            <div class="flex space-x-3">
+              <button type="button" 
+                      class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      data-action="click->journey-builder#saveStageConfig">
+                Save Changes
+              </button>
+              
+              <button type="button" 
+                      class="inline-flex justify-center items-center px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                      data-action="click->journey-builder#deleteStage">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Journey Statistics Footer -->
+  <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+    <div class="flex items-center justify-between text-sm text-gray-600">
+      <div class="flex items-center space-x-6">
+        <span>Total Stages: <span class="font-medium" data-journey-builder-target="stageCount">0</span></span>
+        <span>Average Duration: <span class="font-medium" data-journey-builder-target="averageDuration">0 days</span></span>
+      </div>
+      <div class="flex items-center space-x-2 text-xs">
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+          <span>Awareness</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+          <span>Consideration</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+          <span>Conversion</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-purple-400 rounded-full"></div>
+          <span>Retention</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 bg-indigo-400 rounded-full"></div>
+          <span>Advocacy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

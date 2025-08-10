@@ -1,21 +1,21 @@
 class Template < ApplicationRecord
   # Associations
-  belongs_to :parent_template, class_name: 'Template', optional: true, counter_cache: :child_templates_count
-  has_many :child_templates, class_name: 'Template', foreign_key: 'parent_template_id', dependent: :destroy, counter_cache: true
+  belongs_to :parent_template, class_name: "Template", optional: true, counter_cache: :child_templates_count
+  has_many :child_templates, class_name: "Template", foreign_key: "parent_template_id", dependent: :destroy, counter_cache: true
   has_many :content_assets, as: :assetable, dependent: :destroy
-  
+
   # Through associations for template relationships
   has_many :grandchild_templates, through: :child_templates, source: :child_templates
   has_many :sibling_templates, through: :parent_template, source: :child_templates
 
   # Enums
   enum :template_type, {
-    journey: 'journey',
-    content: 'content',
-    campaign: 'campaign',
-    email: 'email',
-    social_post: 'social_post',
-    landing_page: 'landing_page'
+    journey: "journey",
+    content: "content",
+    campaign: "campaign",
+    email: "email",
+    social_post: "social_post",
+    landing_page: "landing_page"
   }, prefix: :template
 
   # Validations
@@ -59,7 +59,7 @@ class Template < ApplicationRecord
       is_active: false,
       version: 1
     )
-    
+
     new_template.save
     new_template
   end
@@ -77,12 +77,12 @@ class Template < ApplicationRecord
       is_active: attributes[:is_active] || false,
       version: 1
     )
-    
+
     # Apply customizations
     if attributes[:template_data]
       child.template_data = child.template_data.deep_merge(attributes[:template_data])
     end
-    
+
     child.save
     child
   end
@@ -101,7 +101,7 @@ class Template < ApplicationRecord
       version: version + 1,
       is_active: false
     )
-    
+
     # Apply updates
     new_version.assign_attributes(attributes) if attributes.present?
     new_version.save
@@ -116,29 +116,29 @@ class Template < ApplicationRecord
   def add_variable(variable_name, default_value = nil, description = nil)
     updated_variables = variables.dup
     variable_info = {
-      'name' => variable_name.to_s,
-      'default' => default_value,
-      'description' => description
+      "name" => variable_name.to_s,
+      "default" => default_value,
+      "description" => description
     }.compact
-    
+
     # Check if variable already exists
-    existing_index = updated_variables.find_index { |v| v['name'] == variable_name.to_s }
+    existing_index = updated_variables.find_index { |v| v["name"] == variable_name.to_s }
     if existing_index
       updated_variables[existing_index] = variable_info
     else
       updated_variables << variable_info
     end
-    
+
     update(variables: updated_variables)
   end
 
   def remove_variable(variable_name)
-    updated_variables = variables.reject { |v| v['name'] == variable_name.to_s }
+    updated_variables = variables.reject { |v| v["name"] == variable_name.to_s }
     update(variables: updated_variables)
   end
 
   def get_variable_info(variable_name)
-    variables.find { |v| v['name'] == variable_name.to_s }
+    variables.find { |v| v["name"] == variable_name.to_s }
   end
 
   def has_variable?(variable_name)
@@ -148,13 +148,13 @@ class Template < ApplicationRecord
   # Template Instantiation and Rendering
   def instantiate(variable_values = {})
     rendered_data = render_template_with_variables(template_data, variable_values)
-    
+
     case template_type
-    when 'journey'
+    when "journey"
       instantiate_journey(rendered_data)
-    when 'content'
+    when "content"
       instantiate_content(rendered_data)
-    when 'campaign'
+    when "campaign"
       instantiate_campaign(rendered_data)
     else
       rendered_data
@@ -167,14 +167,14 @@ class Template < ApplicationRecord
 
   def validate_variables(variable_values)
     errors = []
-    required_variables = variable_names.select { |v| get_variable_info(v)&.dig('required') }
-    
+    required_variables = variable_names.select { |v| get_variable_info(v)&.dig("required") }
+
     required_variables.each do |var_name|
       if variable_values[var_name].blank? && variable_values[var_name.to_sym].blank?
         errors << "Variable '#{var_name}' is required"
       end
     end
-    
+
     errors
   end
 
@@ -218,12 +218,12 @@ class Template < ApplicationRecord
   # Template Categories and Tags
   def tag_list
     return [] if tags.blank?
-    tags.split(',').map(&:strip)
+    tags.split(",").map(&:strip)
   end
 
   def tag_list=(new_tags)
     if new_tags.is_a?(Array)
-      self.tags = new_tags.join(', ')
+      self.tags = new_tags.join(", ")
     else
       self.tags = new_tags.to_s
     end
@@ -246,7 +246,7 @@ class Template < ApplicationRecord
   # Search and Discovery
   def self.search(query)
     return none if query.blank?
-    
+
     where("LOWER(name) LIKE ? OR LOWER(description) LIKE ? OR LOWER(category) LIKE ? OR LOWER(tags) LIKE ?",
           "%#{query.downcase}%", "%#{query.downcase}%", "%#{query.downcase}%", "%#{query.downcase}%")
   end
@@ -268,7 +268,7 @@ class Template < ApplicationRecord
 
   def merge_metadata(new_metadata)
     return false unless new_metadata.is_a?(Hash)
-    
+
     updated_metadata = metadata.merge(new_metadata.stringify_keys)
     update(metadata: updated_metadata)
   end
@@ -277,18 +277,18 @@ class Template < ApplicationRecord
 
   def extract_variables_from_template_data
     return if template_data.blank?
-    
+
     found_variables = extract_template_variables
-    
+
     # Update variables array with found variables (keep existing info)
     updated_variables = variables.dup
-    
+
     found_variables.each do |var_name|
-      unless updated_variables.any? { |v| v['name'] == var_name }
-        updated_variables << { 'name' => var_name, 'type' => 'string' }
+      unless updated_variables.any? { |v| v["name"] == var_name }
+        updated_variables << { "name" => var_name, "type" => "string" }
       end
     end
-    
+
     self.variables = updated_variables
   end
 
@@ -317,22 +317,22 @@ class Template < ApplicationRecord
       data.map { |item| render_template_with_variables(item, variable_values) }
     when String
       rendered_string = data.dup
-      
+
       # Replace {{variable}} and {variable} patterns
       variable_values.each do |key, value|
         key_str = key.to_s
         rendered_string.gsub!(/\{\{#{key_str}\}\}/, value.to_s)
         rendered_string.gsub!(/\{#{key_str}\}/, value.to_s)
       end
-      
+
       # Replace with defaults for remaining variables
       variables.each do |var_info|
-        var_name = var_info['name']
-        default_value = var_info['default'] || ''
+        var_name = var_info["name"]
+        default_value = var_info["default"] || ""
         rendered_string.gsub!(/\{\{#{var_name}\}\}/, default_value.to_s)
         rendered_string.gsub!(/\{#{var_name}\}/, default_value.to_s)
       end
-      
+
       rendered_string
     else
       data
@@ -384,7 +384,7 @@ class Template < ApplicationRecord
 
   def template_data_structure_valid
     return if template_data.blank?
-    
+
     unless template_data.is_a?(Hash)
       errors.add(:template_data, "must be a valid JSON object")
     end
@@ -392,14 +392,14 @@ class Template < ApplicationRecord
 
   def variables_structure_valid
     return if variables.blank?
-    
+
     unless variables.is_a?(Array)
       errors.add(:variables, "must be an array")
       return
     end
-    
+
     variables.each_with_index do |var, index|
-      unless var.is_a?(Hash) && var['name'].present?
+      unless var.is_a?(Hash) && var["name"].present?
         errors.add(:variables, "Variable at position #{index} must have a name")
         break
       end
@@ -408,7 +408,7 @@ class Template < ApplicationRecord
 
   def parent_template_compatibility
     return unless parent_template
-    
+
     unless parent_template.template_type == template_type
       errors.add(:parent_template, "must have the same template type")
     end
@@ -416,16 +416,16 @@ class Template < ApplicationRecord
 
   def circular_dependency_check
     return unless parent_template_id
-    
+
     current_template = self
     visited_ids = Set.new
-    
+
     while current_template.parent_template_id
       if visited_ids.include?(current_template.parent_template_id)
         errors.add(:parent_template, "creates a circular dependency")
         break
       end
-      
+
       visited_ids.add(current_template.parent_template_id)
       current_template = Template.find_by(id: current_template.parent_template_id)
       break unless current_template

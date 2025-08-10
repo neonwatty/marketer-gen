@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_10_132538) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_10_135533) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -58,10 +58,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_10_132538) do
     t.datetime "updated_at", null: false
     t.datetime "text_extracted_at"
     t.text "text_extraction_error"
+    t.integer "version_number", default: 1
+    t.integer "parent_asset_id"
+    t.boolean "is_current_version", default: true
+    t.text "version_notes"
     t.index ["active"], name: "index_brand_assets_on_active"
     t.index ["assetable_type", "assetable_id", "file_type"], name: "idx_on_assetable_type_assetable_id_file_type_768c8523e2"
     t.index ["assetable_type", "assetable_id"], name: "index_brand_assets_on_assetable"
     t.index ["file_type"], name: "index_brand_assets_on_file_type"
+    t.index ["parent_asset_id", "is_current_version"], name: "index_brand_assets_on_parent_asset_id_and_is_current_version"
+    t.index ["parent_asset_id", "version_number"], name: "index_brand_assets_on_parent_asset_id_and_version_number", unique: true
+    t.index ["parent_asset_id"], name: "index_brand_assets_on_parent_asset_id"
     t.index ["scan_status"], name: "index_brand_assets_on_scan_status"
   end
 
@@ -192,6 +199,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_10_132538) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "brand_assets", "brand_assets", column: "parent_asset_id"
   add_foreign_key "campaigns", "brand_identities"
   add_foreign_key "customer_journeys", "campaigns"
   add_foreign_key "templates", "templates", column: "parent_template_id"

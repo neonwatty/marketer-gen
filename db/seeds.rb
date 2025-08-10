@@ -26,16 +26,16 @@ acme_corp = BrandIdentity.create!(
     primary: "#2563EB",
     secondary: "#64748B",
     accent: "#F59E0B",
-    additional: ["#10B981", "#EF4444", "#8B5CF6"]
+    additional: [ "#10B981", "#EF4444", "#8B5CF6" ]
   },
   typography: {
     primary_font: {
       family: "Inter, sans-serif",
-      weights: [400, 500, 600, 700]
+      weights: [ 400, 500, 600, 700 ]
     },
     secondary_font: {
       family: "Merriweather, serif",
-      weights: [400, 700]
+      weights: [ 400, 700 ]
     },
     font_sizes: {
       small: "14px",
@@ -60,14 +60,14 @@ acme_corp = BrandIdentity.create!(
   messaging_frameworks: {
     voice: {
       tone: "Professional yet approachable",
-      personality: ["Confident", "Innovative", "Trustworthy"]
+      personality: [ "Confident", "Innovative", "Trustworthy" ]
     },
     key_messages: [
       "Innovation drives everything we do",
       "Your success is our priority",
       "Excellence in every solution"
     ],
-    values: ["Innovation", "Integrity", "Excellence", "Collaboration"]
+    values: [ "Innovation", "Integrity", "Excellence", "Collaboration" ]
   },
   published_at: 1.month.ago
 )
@@ -85,7 +85,7 @@ tech_startup = BrandIdentity.create!(
   typography: {
     primary_font: {
       family: "Poppins, sans-serif",
-      weights: [300, 400, 600, 700]
+      weights: [ 300, 400, 600, 700 ]
     }
   },
   guidelines: {
@@ -98,8 +98,8 @@ tech_startup = BrandIdentity.create!(
     voice: {
       tone: "Modern and energetic"
     },
-    key_messages: ["Technology simplified", "Future-ready solutions"],
-    values: ["Innovation", "Speed", "Reliability"]
+    key_messages: [ "Technology simplified", "Future-ready solutions" ],
+    values: [ "Innovation", "Speed", "Reliability" ]
   }
 )
 
@@ -130,7 +130,7 @@ creative_agency = BrandIdentity.create!(
     voice: {
       tone: "Creative and inspiring"
     },
-    key_messages: ["Creativity meets strategy", "Your vision, our expertise"]
+    key_messages: [ "Creativity meets strategy", "Your vision, our expertise" ]
   },
   published_at: 2.weeks.ago
 )
@@ -147,9 +147,9 @@ summer_launch = Campaign.create!(
     demographics: {
       age_range: "25-40",
       income: "$50k-$100k",
-      interests: ["lifestyle", "technology", "sustainability"]
+      interests: [ "lifestyle", "technology", "sustainability" ]
     },
-    personas: ["tech-savvy professional", "eco-conscious consumer"]
+    personas: [ "tech-savvy professional", "eco-conscious consumer" ]
   }.to_json,
   budget_cents: 5000000, # $50,000
   start_date: 1.week.from_now,
@@ -165,7 +165,7 @@ holiday_campaign = Campaign.create!(
     demographics: {
       age_range: "30-55",
       income: "$75k+",
-      interests: ["luxury", "family", "experiences"]
+      interests: [ "luxury", "family", "experiences" ]
     }
   }.to_json,
   budget_cents: 7500000, # $75,000
@@ -181,7 +181,7 @@ startup_awareness = Campaign.create!(
   target_audience: {
     demographics: {
       age_range: "28-45",
-      job_roles: ["CTO", "Engineering Manager", "Tech Lead"],
+      job_roles: [ "CTO", "Engineering Manager", "Tech Lead" ],
       company_size: "50-500 employees"
     }
   }.to_json,
@@ -266,11 +266,11 @@ awareness_journey = CustomerJourney.create!(
       }
     ]
   },
-  content_types: ["social_media", "email", "blog_post", "landing_page"],
+  content_types: [ "social_media", "email", "blog_post", "landing_page" ],
   metrics: {
     conversion_rate: 12.5,
     avg_journey_duration: 21,
-    drop_off_points: ["stage-2"],
+    drop_off_points: [ "stage-2" ],
     last_updated: "2024-08-10T12:00:00Z"
   }
 )
@@ -332,7 +332,7 @@ b2b_journey = CustomerJourney.create!(
       }
     ]
   },
-  content_types: ["webinar", "email", "whitepaper", "case_study"],
+  content_types: [ "webinar", "email", "whitepaper", "case_study" ],
   metrics: {
     lead_score_avg: 75,
     qualified_rate: 8.5,

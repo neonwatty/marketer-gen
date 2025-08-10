@@ -22,13 +22,13 @@ class CreateContentAssets < ActiveRecord::Migration[8.0]
     end
 
     # Add indexes for performance
-    add_index :content_assets, [:assetable_type, :assetable_id]
+    add_index :content_assets, [ :assetable_type, :assetable_id ]
     add_index :content_assets, :content_type
     add_index :content_assets, :channel
     add_index :content_assets, :status
     add_index :content_assets, :stage
     add_index :content_assets, :published_at
     add_index :content_assets, :position
-    add_index :content_assets, [:assetable_type, :assetable_id, :channel], name: 'index_content_assets_on_assetable_and_channel'
+    add_index :content_assets, [ :assetable_type, :assetable_id, :channel ], name: 'index_content_assets_on_assetable_and_channel'
   end
 end

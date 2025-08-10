@@ -37,6 +37,6 @@ Rails.application.config.active_storage.analyzers = [
 # Configure previewers
 Rails.application.config.active_storage.previewers = [
   ActiveStorage::Previewer::PopplerPDFPreviewer,
-  ActiveStorage::Previewer::MuPDFPreviewer, 
+  ActiveStorage::Previewer::MuPDFPreviewer,
   ActiveStorage::Previewer::VideoPreviewer
 ]

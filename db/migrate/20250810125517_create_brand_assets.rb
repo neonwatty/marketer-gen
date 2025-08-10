@@ -17,8 +17,8 @@ class CreateBrandAssets < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
-    add_index :brand_assets, [:assetable_type, :assetable_id, :file_type]
+
+    add_index :brand_assets, [ :assetable_type, :assetable_id, :file_type ]
     add_index :brand_assets, :scan_status
     add_index :brand_assets, :file_type
     add_index :brand_assets, :active

@@ -27,7 +27,7 @@ class CreateTemplates < ActiveRecord::Migration[8.0]
     add_index :templates, :usage_count
     add_index :templates, :version
     add_index :templates, :published_at
-    add_index :templates, [:template_type, :category]
-    add_index :templates, [:is_active, :template_type]
+    add_index :templates, [ :template_type, :category ]
+    add_index :templates, [ :is_active, :template_type ]
   end
 end

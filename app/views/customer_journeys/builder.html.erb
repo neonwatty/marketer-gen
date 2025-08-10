@@ -1,0 +1,135 @@
+<% content_for :title, "Journey Builder - #{@campaign.name}" %>
+
+<div class="min-h-screen bg-gray-100">
+  <!-- Navigation Header -->
+  <div class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <h1 class="text-xl font-bold text-gray-900">Journey Builder</h1>
+          </div>
+          <div class="ml-6 flex items-center">
+            <div class="text-sm text-gray-500">
+              <span class="font-medium text-gray-900"><%= @campaign.name %></span>
+              <span class="mx-2">•</span>
+              <span>Campaign Journey Design</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <%= link_to campaigns_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Campaigns
+          <% end %>
+          
+          <div class="text-sm text-gray-500">
+            Status: 
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @campaign.status_color %>">
+              <%= @campaign.status.capitalize %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey Builder Component -->
+  <div class="p-6">
+    <%= render 'campaigns/journey_builder', campaign: @campaign %>
+  </div>
+
+  <!-- Help Panel (Collapsible) -->
+  <div class="fixed bottom-6 right-6 z-50">
+    <div class="bg-white rounded-lg shadow-lg border border-gray-200 max-w-sm" 
+         data-controller="help-panel" 
+         data-help-panel-expanded-value="false">
+      <!-- Help Toggle Button -->
+      <button type="button" 
+              class="w-full flex items-center justify-between p-4 text-left"
+              data-action="click->help-panel#toggle">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <span class="text-sm font-medium text-gray-900">Quick Help</span>
+        </div>
+        <svg class="w-4 h-4 text-gray-400 transform transition-transform" 
+             data-help-panel-target="chevron">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      <!-- Help Content -->
+      <div class="hidden p-4 pt-0 border-t border-gray-100" data-help-panel-target="content">
+        <div class="space-y-3 text-sm text-gray-600">
+          <div class="flex items-start space-x-2">
+            <div class="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="text-xs font-bold text-blue-600">1</span>
+            </div>
+            <div>
+              <strong class="text-gray-900">Drag Stages:</strong> Drag stages from the left sidebar onto the canvas to build your journey.
+            </div>
+          </div>
+          
+          <div class="flex items-start space-x-2">
+            <div class="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="text-xs font-bold text-blue-600">2</span>
+            </div>
+            <div>
+              <strong class="text-gray-900">Configure:</strong> Click the settings icon on any stage to edit its details.
+            </div>
+          </div>
+          
+          <div class="flex items-start space-x-2">
+            <div class="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="text-xs font-bold text-blue-600">3</span>
+            </div>
+            <div>
+              <strong class="text-gray-900">Templates:</strong> Use quick templates to get started with common journey patterns.
+            </div>
+          </div>
+          
+          <div class="flex items-start space-x-2">
+            <div class="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="text-xs font-bold text-blue-600">4</span>
+            </div>
+            <div>
+              <strong class="text-gray-900">Save:</strong> Click "Save Journey" to persist your changes to the campaign.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Simple help panel controller inline (could be moved to Stimulus)
+document.addEventListener('DOMContentLoaded', function() {
+  const helpPanel = document.querySelector('[data-controller="help-panel"]')
+  if (helpPanel) {
+    const button = helpPanel.querySelector('button')
+    const content = helpPanel.querySelector('[data-help-panel-target="content"]')
+    const chevron = helpPanel.querySelector('[data-help-panel-target="chevron"]')
+    let expanded = false
+    
+    button.addEventListener('click', function() {
+      expanded = !expanded
+      
+      if (expanded) {
+        content.classList.remove('hidden')
+        chevron.classList.add('rotate-180')
+      } else {
+        content.classList.add('hidden')
+        chevron.classList.remove('rotate-180')
+      }
+    })
+  }
+})
+</script>

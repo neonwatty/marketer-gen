@@ -48,7 +48,7 @@ class CampaignTest < ActiveSupport::TestCase
 
     @campaign.budget_cents = 0
     assert @campaign.valid?
-    
+
     @campaign.budget_cents = 10000
     assert @campaign.valid?
   end
@@ -80,26 +80,26 @@ class CampaignTest < ActiveSupport::TestCase
 
   test "should allow valid status transitions" do
     campaign = Campaign.create!(
-      name: "Test Campaign", 
+      name: "Test Campaign",
       purpose: "Test campaign purpose for testing",
       start_date: Date.current,
       end_date: 1.month.from_now.to_date
     )
-    
+
     # Check initial state
     assert_equal "draft", campaign.status
     assert campaign.may_activate?
-    
+
     # Activate campaign
     result = campaign.activate!
     assert result, "Activation should succeed"
     assert_equal "active", campaign.status
-    
+
     # Pause campaign
     assert campaign.may_pause?
     campaign.pause!
     assert_equal "paused", campaign.status
-    
+
     # Reactivate and complete
     campaign.activate!
     assert_equal "active", campaign.status
@@ -112,7 +112,7 @@ class CampaignTest < ActiveSupport::TestCase
   test "should optionally belong to brand identity" do
     campaign = Campaign.new(name: "Test Campaign", purpose: "Test campaign purpose for testing")
     assert campaign.valid? # should be valid without brand_identity
-    
+
     campaign.brand_identity = @brand_identity
     assert_equal @brand_identity, campaign.brand_identity
   end
@@ -131,8 +131,8 @@ class CampaignTest < ActiveSupport::TestCase
   test "should destroy associated customer journeys when campaign is deleted" do
     campaign = campaigns(:summer_launch)
     journey_count = campaign.customer_journeys.count
-    
-    assert_difference 'CustomerJourney.count', -journey_count do
+
+    assert_difference "CustomerJourney.count", -journey_count do
       campaign.destroy!
     end
   end
@@ -219,32 +219,32 @@ class CampaignTest < ActiveSupport::TestCase
   test "should update customer_journeys_count when journeys are added" do
     campaign = campaigns(:paused_campaign)
     initial_count = campaign.customer_journeys.count
-    
+
     journey = campaign.customer_journeys.create!(
       name: "Test Journey",
       description: "Test journey for counter cache",
       stages: [],
       touchpoints: {},
-      content_types: ["email"],
+      content_types: [ "email" ],
       metrics: {}
     )
-    
+
     assert_equal initial_count + 1, campaign.customer_journeys.count
   end
 
   # Status Method Tests
   test "should provide status color helper" do
     @campaign.status = "active"
-    assert_equal 'bg-green-100 text-green-800', @campaign.status_color
-    
+    assert_equal "bg-green-100 text-green-800", @campaign.status_color
+
     @campaign.status = "draft"
-    assert_equal 'bg-gray-100 text-gray-600', @campaign.status_color
+    assert_equal "bg-gray-100 text-gray-600", @campaign.status_color
   end
 
   test "can_be_activated? should check dates and status" do
     campaign = Campaign.new(status: "draft")
     assert_not campaign.can_be_activated?
-    
+
     campaign.start_date = Date.current
     campaign.end_date = 1.month.from_now.to_date
     assert campaign.can_be_activated?
@@ -253,7 +253,7 @@ class CampaignTest < ActiveSupport::TestCase
   test "overdue? should check if active campaign past end date" do
     campaign = Campaign.new(status: "active", end_date: 1.day.ago.to_date)
     assert campaign.overdue?
-    
+
     campaign.end_date = 1.day.from_now.to_date
     assert_not campaign.overdue?
   end
