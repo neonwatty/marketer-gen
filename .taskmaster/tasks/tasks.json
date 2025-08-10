@@ -1,0 +1,1058 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Initialize Rails 8 Application with Required Technology Stack",
+        "description": "Create a new Rails 8 application with Vite for JavaScript packaging, Tailwind CSS for styling, and Stimulus for JavaScript interactions",
+        "details": "Run 'rails new . --force --css tailwind --javascript vite' to initialize the Rails application. Configure Vite for asset processing, set up Stimulus controllers, and ensure Tailwind CSS is properly integrated. Create initial directory structure for the marketing campaign platform including app/models, app/controllers, app/views directories specific to campaign management.",
+        "testStrategy": "Verify Rails application starts successfully, Vite compiles assets, Tailwind CSS styles are applied, and Stimulus controllers are functional. Test with a simple controller and view to ensure the full stack is working.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Design and Implement Core Database Schema",
+        "description": "Create database models for campaigns, customer journeys, brand identities, content assets, and templates",
+        "details": "Design database schema with models: Campaign (name, purpose, status, created_at), CustomerJourney (campaign_id, stages, content_types), BrandIdentity (guidelines, messaging_frameworks, assets), ContentAsset (type, content, stage, channel), Template (name, type, journey_template). Create Rails migrations and ActiveRecord models with appropriate associations and validations. Include polymorphic associations for flexible content management.",
+        "testStrategy": "Write model tests for validations, associations, and business logic. Test database migrations run successfully. Verify model relationships work correctly with sample data.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design ERD and Database Schema Documentation",
+            "description": "Create comprehensive Entity Relationship Diagram and database schema documentation with proper relationships, constraints, and indexing strategies",
+            "dependencies": [],
+            "details": "Design complete ERD showing all tables, relationships, and cardinalities. Document each table's purpose, columns, data types, constraints, and indexes. Define naming conventions for tables, columns, and foreign keys. Plan for polymorphic associations between ContentAsset and other models. Document database performance considerations and query optimization strategies.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Create Campaign Model with Migrations and State Machine",
+            "description": "Implement Campaign model with Rails migrations, validations, and state machine for campaign lifecycle management",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "Generate Campaign model with fields: name (string, required), purpose (text), status (enum: draft, active, paused, completed, archived), budget (decimal), start_date, end_date, metadata (jsonb). Implement AASM state machine for status transitions. Add validations for required fields, date constraints, and budget limits. Create indexes on status, dates, and frequently queried fields.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement CustomerJourney Model with Stage Management",
+            "description": "Build CustomerJourney model with dynamic stage management and polymorphic associations for flexible content mapping",
+            "dependencies": [
+              "2.1",
+              "2.2"
+            ],
+            "details": "Create CustomerJourney model with campaign_id (foreign key), stages (jsonb array for flexible stage definition), content_types (array), touchpoints (jsonb), metrics (jsonb). Implement stage management methods: add_stage, remove_stage, reorder_stages. Add validations for stage structure and required fields. Create journey progression tracking with timestamps for each stage.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Build BrandIdentity Model with File Attachments",
+            "description": "Create BrandIdentity model with Active Storage integration for brand assets and JSON configuration for guidelines",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "Generate BrandIdentity model with name, description, guidelines (jsonb for brand rules), messaging_frameworks (jsonb), color_palette (jsonb), typography (jsonb). Set up Active Storage associations for logo variants, brand assets, and style guides. Implement methods for accessing brand configuration and validating brand compliance. Add version tracking for brand guideline updates.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Create ContentAsset Model with Polymorphic Associations",
+            "description": "Implement ContentAsset model with polymorphic associations and Active Storage for flexible content management",
+            "dependencies": [
+              "2.1",
+              "2.4"
+            ],
+            "details": "Create ContentAsset model with assetable (polymorphic reference), content_type (enum: text, image, video, document), content (text for inline content), stage (string), channel (enum: email, social, web, print), metadata (jsonb). Set up Active Storage for file attachments. Implement content versioning and approval workflow. Add full-text search capabilities for content discovery.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement Template Model for Journey and Content Templates",
+            "description": "Build Template model system for reusable journey templates and content templates with inheritance support",
+            "dependencies": [
+              "2.1",
+              "2.3",
+              "2.5"
+            ],
+            "details": "Generate Template model with name, template_type (enum: journey, content, campaign), category, template_data (jsonb), is_active (boolean), usage_count (integer). Implement template inheritance and customization. Create template versioning system. Add methods for template instantiation and variable substitution. Build template validation and preview functionality.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Set Up Model Associations and Database Constraints",
+            "description": "Configure all model associations, foreign keys, database constraints, and cascade rules for referential integrity",
+            "dependencies": [
+              "2.2",
+              "2.3",
+              "2.4",
+              "2.5",
+              "2.6"
+            ],
+            "details": "Define has_many, belongs_to, and has_and_belongs_to_many associations between all models. Set up foreign key constraints with appropriate cascade rules. Implement database-level constraints for data integrity. Add composite indexes for association queries. Configure counter caches where appropriate. Set up soft deletes with paranoia gem for critical models.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Write Model Tests, Factories, and Seed Data",
+            "description": "Create comprehensive test suite with RSpec, FactoryBot factories, and realistic seed data for development",
+            "dependencies": [
+              "2.7"
+            ],
+            "details": "Write RSpec model tests for all validations, associations, and custom methods. Create FactoryBot factories with traits for different scenarios. Implement shared examples for common model behaviors. Generate comprehensive seed data script with realistic campaigns, journeys, and content. Add database cleaner configuration for test isolation. Create performance benchmarks for critical queries.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Build File Upload System for Brand Materials",
+        "description": "Implement secure file upload functionality for brand guidelines, compliance documents, and creative assets",
+        "details": "Implement Active Storage for file uploads with support for PDFs, images, and documents. Create BrandAsset model with file validation (type, size limits). Build upload interface with drag-and-drop functionality using Stimulus controllers. Implement file processing to extract text content from PDFs for AI analysis. Add virus scanning and content validation.",
+        "testStrategy": "Test file upload with various formats (PDF, JPG, PNG, DOC). Verify file size limits and type restrictions. Test file processing and text extraction. Ensure uploaded files are securely stored and accessible.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configure Active Storage with AWS S3 or Google Cloud Storage",
+            "description": "Set up Active Storage with a cloud storage provider for secure, scalable file storage",
+            "dependencies": [],
+            "details": "Install and configure Active Storage in Rails application. Set up AWS S3 bucket or Google Cloud Storage bucket with appropriate IAM permissions and CORS configuration. Configure storage service in storage.yml with production credentials. Set up direct uploads for improved performance. Configure CDN integration for faster file delivery.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Create BrandAsset model with validations and associations",
+            "description": "Build the core BrandAsset model with file type/size validations and polymorphic associations to brands",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Generate BrandAsset model with attributes: file_type, file_size, original_filename, metadata (JSON), extracted_text, scan_status. Implement polymorphic association to Brand and Campaign models. Add validations for file types (PDF, JPG, PNG, DOC, DOCX), size limits (10MB for documents, 5MB for images). Create scopes for asset types and status filtering. Add callbacks for metadata extraction.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Build drag-and-drop upload UI with Stimulus and progress indicators",
+            "description": "Create an intuitive file upload interface with drag-and-drop functionality and real-time progress feedback",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "Create Stimulus controller for drag-and-drop file handling with visual feedback. Implement ActiveStorage DirectUpload for client-side uploads with progress bars. Build upload queue management for multiple files. Add file type validation on client-side before upload. Create upload status indicators and error handling UI. Style with Tailwind CSS for responsive design.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement PDF text extraction service using pdf-reader",
+            "description": "Build service to extract and process text content from PDF files for AI analysis",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "Add pdf-reader gem to Gemfile and configure. Create PdfTextExtractor service class to extract text from uploaded PDFs. Implement background job using Sidekiq for async processing. Store extracted text in BrandAsset model for searchability. Handle various PDF formats and encoding issues. Add OCR capability for scanned PDFs using Tesseract or cloud service.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Add virus scanning integration with ClamAV or cloud service",
+            "description": "Implement virus and malware scanning for uploaded files to ensure security",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "Integrate ClamAV for on-premise scanning or use cloud service like VirusTotal API. Create VirusScannerService to scan files before storage. Implement background job for async scanning of larger files. Add scan_status and scan_results to BrandAsset model. Configure quarantine process for infected files. Set up alerts for security team on detection.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Create file management interface with preview and metadata editing",
+            "description": "Build comprehensive file management UI with preview capabilities and metadata editing",
+            "dependencies": [
+              "3.3",
+              "3.4",
+              "3.5"
+            ],
+            "details": "Create file gallery view with grid/list toggle and filtering options. Implement file preview for images, PDFs (using PDF.js), and documents. Build metadata editing form for tags, descriptions, and categorization. Add file versioning support with version history. Create bulk actions for delete, download, and categorization. Implement search functionality using extracted text and metadata.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Create Campaign Journey Builder Interface",
+        "description": "Build visual customer journey builder with pre-built templates and drag-and-drop functionality",
+        "details": "Create responsive journey builder interface using Tailwind CSS components. Implement Stimulus controllers for drag-and-drop journey stage management. Build template system with pre-defined journeys (Product Launch, Lead Gen, Re-Engagement). Create journey visualization with stages: Awareness, Consideration, Conversion, Retention. Add form inputs for campaign purpose, goals, timing, and audience definition.",
+        "testStrategy": "Test drag-and-drop functionality across different browsers and devices. Verify journey templates load correctly and can be customized. Test form validation and data persistence. Ensure responsive design works on mobile devices.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design journey builder UI wireframes and components",
+            "description": "Create comprehensive wireframes and UI components for the visual journey builder interface using Figma or similar design tools",
+            "dependencies": [],
+            "details": "Design the main journey canvas area with grid layout for stage placement. Create component library including journey stage cards, connection lines, toolbar with stage types, and sidebar panels for configuration. Design responsive layouts for desktop, tablet, and mobile views. Include visual states for drag-and-drop interactions, hover effects, and active selections. Create design system with consistent colors, typography, and spacing aligned with Tailwind CSS utilities.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Create journey stage models and database schema",
+            "description": "Implement Rails models and database schema for storing journey stages, templates, and configurations",
+            "dependencies": [],
+            "details": "Create Journey model with attributes for name, template_type, purpose, goals, timing, and audience. Build JourneyStage model with position, stage_type (Awareness, Consideration, Conversion, Retention), content, and configuration fields. Implement JourneyTemplate model for pre-built templates. Add associations between Campaign and Journey models. Create migrations with proper indexes for performance. Include JSON columns for flexible stage configuration storage.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement drag-and-drop functionality with sortable.js",
+            "description": "Build Stimulus controllers integrating sortable.js for drag-and-drop journey stage management",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Install and configure sortable.js library. Create JourneyBuilderController Stimulus controller to manage drag-and-drop interactions. Implement stage dragging from toolbar to canvas with ghost element preview. Add reordering functionality for existing stages within the journey flow. Create connection line updates when stages are moved. Handle drop zone validation and collision detection. Implement undo/redo functionality for stage movements.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Build journey template system with predefined workflows",
+            "description": "Create template management system with pre-built journey templates for common marketing campaigns",
+            "dependencies": [
+              "4.2"
+            ],
+            "details": "Build template library with Product Launch, Lead Generation, and Re-Engagement journey templates. Create template selection interface with preview cards showing journey flow. Implement template customization allowing users to modify predefined stages. Build template versioning system for updates without affecting existing journeys. Add template categories and search functionality. Create admin interface for managing and creating new templates.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Create stage configuration forms with dynamic fields",
+            "description": "Implement dynamic form system for configuring individual journey stages with stage-specific fields",
+            "dependencies": [
+              "4.1",
+              "4.2"
+            ],
+            "details": "Build StageConfigController Stimulus controller for managing stage configuration forms. Create dynamic form fields based on stage type (email, social, content, etc.). Implement form validation with inline error messages. Add rich text editor for content fields using Trix or similar. Create audience targeting fields with segmentation options. Build timing configuration with date/time pickers and relative scheduling. Include goal setting fields with metric selection.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement journey visualization components with interactive flow diagrams",
+            "description": "Build visual representation system showing journey flow with interactive elements and stage connections",
+            "dependencies": [
+              "4.3",
+              "4.5"
+            ],
+            "details": "Create JourneyVisualizerController for rendering journey flow diagrams. Implement SVG-based connection lines between stages with animated flow indicators. Build zoom and pan functionality for large journeys. Add mini-map navigation for complex journeys. Create stage status indicators (active, completed, scheduled). Implement click-to-edit functionality for quick stage modifications. Add visual feedback for validation errors and warnings.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Add journey validation and business rules engine",
+            "description": "Implement validation system ensuring journey integrity and enforcing business rules",
+            "dependencies": [
+              "4.5",
+              "4.6"
+            ],
+            "details": "Create JourneyValidator service to check journey completeness and logical flow. Implement required field validation for each stage type. Add dependency checking between stages (prerequisites, timing conflicts). Build business rules for minimum/maximum stages, timing constraints, and audience overlap. Create warning system for potential issues without blocking saves. Implement validation feedback UI with clear error messages and suggestions.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Build journey persistence and loading with optimistic updates",
+            "description": "Implement auto-save functionality and optimistic UI updates for smooth user experience",
+            "dependencies": [
+              "4.7"
+            ],
+            "details": "Create auto-save mechanism triggering after user actions with debouncing. Implement optimistic updates showing changes immediately while saving in background. Build version history system tracking journey changes over time. Add conflict resolution for concurrent edits by multiple users. Create journey duplication functionality for creating variations. Implement export/import functionality for journey sharing. Add recovery mechanism for failed saves with retry logic.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Create responsive mobile interface optimized for touch",
+            "description": "Build mobile-optimized version of journey builder with touch-friendly interactions",
+            "dependencies": [
+              "4.6",
+              "4.8"
+            ],
+            "details": "Adapt journey builder UI for mobile screens with collapsible panels and simplified toolbar. Implement touch gestures for stage manipulation (tap to select, long-press for options). Create mobile-specific stage configuration with full-screen forms. Build responsive grid system adapting to screen size. Optimize performance for mobile devices with lazy loading and virtualization. Add mobile-specific features like stage quick actions and swipe navigation. Test on various mobile devices and browsers.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Implement LLM Integration Architecture",
+        "description": "Set up AI service integration for content generation and campaign planning using Context7 MCP server",
+        "details": "Create AIService class to handle LLM API calls. Implement content generation endpoints for different content types (social media, ads, email, landing pages). Build prompt templates for campaign planning, brand analysis, and content creation. Integrate Context7 MCP server for technical documentation lookup. Add error handling, rate limiting, and response caching. Create background job system for long-running AI tasks.",
+        "testStrategy": "Test AI service with sample prompts and verify content generation quality. Test error handling for API failures and rate limits. Verify Context7 integration works for documentation queries. Test background job processing for AI tasks.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design AI Service Architecture with Context7 Integration",
+            "description": "Create architectural design for AI service layer including Context7 MCP server integration points and service interfaces",
+            "dependencies": [],
+            "details": "Define AIService interface and abstract classes. Design modular architecture supporting multiple LLM providers (OpenAI, Anthropic, etc.). Plan Context7 MCP server integration architecture for documentation lookups. Define service boundaries and communication patterns. Document API contracts and data flow between services.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement Base AIService Class with Error Handling",
+            "description": "Build core AIService class with comprehensive error handling, timeout management, and provider abstraction",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Create app/services/ai_service.rb with base methods for LLM communication. Implement error handling for API failures, timeouts, and invalid responses. Add circuit breaker pattern for provider failures. Create custom exception classes for AI-specific errors. Implement provider adapter pattern for multiple LLM support.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Create Prompt Template System",
+            "description": "Build flexible prompt template system for different content types and campaign planning scenarios",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Create PromptTemplate model and database migrations. Build template variables and interpolation system. Implement templates for social media, ads, emails, landing pages. Create campaign planning and brand analysis prompt templates. Add template versioning and A/B testing support.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Build Content Generation Endpoints",
+            "description": "Implement API endpoints for generating various content types using AI services",
+            "dependencies": [
+              "5.2",
+              "5.3"
+            ],
+            "details": "Create ContentGenerationController with endpoints for each content type. Implement /api/v1/generate/social_media, /api/v1/generate/ad_copy, /api/v1/generate/email, /api/v1/generate/landing_page endpoints. Add request validation and parameter sanitization. Build response formatting for generated content. Implement content variation generation.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Integrate Context7 MCP Server for Documentation Lookup",
+            "description": "Set up and integrate Context7 MCP server for technical documentation and knowledge base queries",
+            "dependencies": [
+              "5.2"
+            ],
+            "details": "Configure Context7 MCP server connection in Rails. Create Context7Service wrapper class for documentation queries. Implement documentation search and retrieval methods. Build caching layer for frequently accessed documentation. Add fallback mechanisms for Context7 unavailability.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement Rate Limiting and Response Caching",
+            "description": "Add rate limiting for API calls and implement intelligent caching for AI responses",
+            "dependencies": [
+              "5.4"
+            ],
+            "details": "Implement Redis-based rate limiting with configurable limits per provider. Create intelligent caching strategy using Redis for AI responses. Build cache key generation based on prompt hash and parameters. Implement cache invalidation strategies. Add rate limit headers to API responses.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Set Up Background Job Processing with Sidekiq",
+            "description": "Configure Sidekiq for processing long-running AI tasks asynchronously",
+            "dependencies": [
+              "5.4"
+            ],
+            "details": "Install and configure Sidekiq with Redis. Create AIGenerationJob for async content generation. Implement job status tracking and progress updates. Build webhook system for job completion notifications. Add job retry configuration with exponential backoff.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Create AI Response Parsing and Validation",
+            "description": "Build robust parsing and validation system for AI-generated responses",
+            "dependencies": [
+              "5.4"
+            ],
+            "details": "Implement response parser for different AI provider formats. Create content validators for quality and appropriateness checks. Build structured data extraction from AI responses. Add content moderation and filtering. Implement response transformation for consistent output format.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Build Retry Logic and Fallback Mechanisms",
+            "description": "Implement sophisticated retry strategies and fallback options for AI service failures",
+            "dependencies": [
+              "5.2",
+              "5.7"
+            ],
+            "details": "Create retry logic with exponential backoff and jitter. Implement provider fallback chain (primary to secondary providers). Build degraded mode for partial AI service failures. Add manual override capabilities for critical failures. Create alert system for repeated failures.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 10,
+            "title": "Add Monitoring and Logging for AI Operations",
+            "description": "Implement comprehensive monitoring, logging, and metrics collection for AI service operations",
+            "dependencies": [
+              "5.4",
+              "5.6",
+              "5.7"
+            ],
+            "details": "Set up structured logging for all AI operations. Implement metrics collection for response times, error rates, and costs. Create monitoring dashboard for AI service health. Add cost tracking per provider and content type. Build alerting rules for performance degradation and failures.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Build Content Management and Generation System",
+        "description": "Create system for generating, managing, and versioning marketing content across different channels and formats",
+        "details": "Implement ContentGenerator service that creates channel-specific content (social posts, ad copy, email sequences, landing page copy, video scripts). Build content versioning system with approval workflows. Create content preview interface with editing capabilities. Implement A/B testing variant generation. Add content formatting for different channels and export options (CSV, PDF, calendar formats).",
+        "testStrategy": "Test content generation for each channel type with sample brand inputs. Verify content versioning and approval workflows. Test A/B variant generation and content editing interface. Validate export functionality produces correct formats.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design ContentGenerator service architecture with channel adapter pattern",
+            "description": "Create the core ContentGenerator service architecture using an adapter pattern to support multiple content channels (social, email, ads, landing pages, video scripts)",
+            "dependencies": [],
+            "details": "Design base ContentGenerator class with abstract methods for content creation. Implement adapter interface for channel-specific generators. Create service registry for managing channel adapters. Define content request/response models with metadata for each channel type. Set up dependency injection for flexible adapter configuration.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement channel-specific content generators for social, email, and ads",
+            "description": "Build concrete implementations of content generators for social media posts, email sequences, and ad copy with channel-specific formatting and constraints",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "Create SocialMediaGenerator for Twitter, LinkedIn, Facebook, Instagram with character limits and hashtag optimization. Build EmailSequenceGenerator for welcome series, nurture campaigns, and promotional emails. Implement AdCopyGenerator for Google Ads, Facebook Ads with headline/description variations. Add channel-specific validation rules and formatting requirements.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Build Git-like content versioning system with branching and merging",
+            "description": "Create a versioning system that tracks content changes over time with branch management, commit history, and merge capabilities",
+            "dependencies": [],
+            "details": "Implement ContentVersion model with parent references and change tracking. Create branching system for parallel content development. Build merge functionality with conflict resolution for collaborative editing. Add commit messages and author tracking. Implement rollback and diff viewing capabilities.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Create approval workflow engine with role-based permissions",
+            "description": "Develop a flexible workflow engine that manages content approval processes with customizable stages and role-based access control",
+            "dependencies": [
+              "6.3"
+            ],
+            "details": "Design WorkflowEngine with configurable approval stages (Draft, Review, Approved, Published). Implement role-based permissions (Creator, Reviewer, Approver, Publisher). Create workflow templates for different content types. Add notification system for workflow transitions. Build audit trail for tracking approval history.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Develop content preview and rich text editing interface",
+            "description": "Build an interactive preview system with in-line editing capabilities using a rich text editor for content refinement",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "Integrate TipTap or similar rich text editor with formatting toolbar. Create channel-specific preview templates showing how content appears on each platform. Implement real-time preview updates as content is edited. Add markdown support and content formatting options. Build responsive preview layouts for mobile and desktop views.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement A/B variant generation with AI-powered suggestions",
+            "description": "Create system for generating content variants for A/B testing with automatic suggestions based on performance patterns",
+            "dependencies": [
+              "6.2",
+              "6.5"
+            ],
+            "details": "Build VariantGenerator service that creates multiple versions of content. Implement AI-powered variant suggestions based on best practices and historical performance. Create variant comparison interface showing differences highlighted. Add performance prediction scoring for each variant. Build variant management system with naming and tagging.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Build content formatting services for platform-specific requirements",
+            "description": "Develop formatting services that adapt content to meet specific platform requirements and constraints",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "Create FormattingService with platform-specific rules (character limits, image specs, hashtag limits). Implement automatic content truncation and expansion strategies. Build link shortening and UTM parameter management. Add emoji and special character handling for different platforms. Create content validation against platform policies.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Create multi-format export functionality (CSV, PDF, calendar)",
+            "description": "Implement export system that generates content in various formats for distribution and scheduling",
+            "dependencies": [
+              "6.7"
+            ],
+            "details": "Build CSVExporter for bulk content export with metadata columns. Implement PDFGenerator using Prawn or similar for formatted content decks. Create ICS calendar export for content scheduling. Add batch export functionality with filtering options. Implement template-based export formatting with custom branding.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Add content scheduling with calendar views and timeline visualization",
+            "description": "Build scheduling interface with calendar and timeline views for content planning and publication management",
+            "dependencies": [
+              "6.8"
+            ],
+            "details": "Implement FullCalendar or similar for monthly/weekly/daily content views. Create timeline visualization showing content distribution across channels. Build drag-and-drop scheduling interface for content placement. Add publishing queue management with automatic posting capabilities. Implement conflict detection for overlapping content schedules.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Develop Brand Identity Processing System",
+        "description": "Build system to analyze uploaded brand materials and ensure content adherence to brand guidelines",
+        "details": "Create BrandProcessor service to extract key information from uploaded brand guidelines, compliance documents, and messaging playbooks. Implement text analysis to identify tone, voice, restrictions, and brand rules. Build brand compliance checker that validates generated content against brand guidelines. Create messaging framework interface for defining brand pillars, tone ladders, and product positioning.",
+        "testStrategy": "Test brand document processing with various file formats. Verify brand compliance checking works with sample content. Test messaging framework creation and validation. Ensure brand analysis accuracy with known brand examples.",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create BrandProcessor service architecture with document parsing",
+            "description": "Design and implement the core BrandProcessor service class with methods for handling different document types and establishing the processing pipeline",
+            "dependencies": [],
+            "details": "Set up BrandProcessor Rails service with ActiveJob integration for async processing. Create document intake methods supporting PDF, DOCX, TXT, and image formats. Implement file validation and sanitization. Set up document storage using Active Storage. Create processing queue management with status tracking. Design database schema for brand_documents and brand_rules tables.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement document text extraction with support for multiple formats",
+            "description": "Build robust text extraction system that handles various file formats commonly used for brand guidelines",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Integrate PDF parsing gems (pdf-reader or similar) for PDF extraction. Implement DOCX parsing using docx gem for Word documents. Add OCR capabilities using Tesseract for image-based guidelines. Create text preprocessing pipeline to clean and normalize extracted content. Handle multi-page documents with proper text flow preservation. Add error handling for corrupted or unsupported files.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Build brand guideline parser with NLP for rules extraction",
+            "description": "Develop natural language processing system to extract brand rules, tone guidelines, and restrictions from unstructured text",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "Implement NLP pipeline using Ruby NLP libraries or API integration. Create pattern matching for common brand guideline structures (do's/don'ts, approved language, restricted terms). Extract color codes, typography rules, and visual guidelines. Build entity recognition for brand values, mission statements, and key messaging. Parse tone and voice descriptors with semantic analysis. Create structured JSON output of extracted brand rules.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Create brand compliance validation engine with scoring",
+            "description": "Build system to check generated content against extracted brand rules and provide compliance scores",
+            "dependencies": [
+              "7.3"
+            ],
+            "details": "Implement BrandComplianceChecker service with rule-based validation logic. Create scoring algorithm weighing different compliance factors (tone match, terminology, visual guidelines). Build real-time content validation API endpoints. Implement compliance report generation with specific violation details. Add configurable thresholds for pass/fail criteria. Create feedback mechanism for improving rule accuracy.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Develop messaging framework builder UI with drag-and-drop",
+            "description": "Create interactive interface for defining brand messaging hierarchies, pillars, and positioning statements",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Build Stimulus controllers for drag-and-drop messaging components. Create UI for defining brand pillars with supporting proof points. Implement tone ladder builder with intensity levels. Add product positioning matrix interface. Create value proposition canvas with editable sections. Design responsive layouts using Tailwind CSS components. Implement auto-save functionality for framework changes.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement tone and voice analysis using NLP libraries",
+            "description": "Build sophisticated tone analysis system to evaluate and categorize brand voice characteristics",
+            "dependencies": [
+              "7.3"
+            ],
+            "details": "Integrate sentiment analysis for emotional tone detection. Implement formality scoring (casual to professional spectrum). Create personality trait extraction (friendly, authoritative, innovative, etc.). Build vocabulary complexity analyzer. Implement sentence structure analysis for style patterns. Create tone consistency checker across multiple content pieces. Generate tone profile reports with visualization charts.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Build brand rule configuration interface with visual editor",
+            "description": "Create admin interface for manually configuring and overriding extracted brand rules with visual feedback",
+            "dependencies": [
+              "7.4",
+              "7.5"
+            ],
+            "details": "Design rule management dashboard with CRUD operations. Implement visual rule builder with condition/action patterns. Create rule priority and conflict resolution system. Add rule testing interface with sample content validation. Build rule versioning with change history tracking. Implement rule import/export functionality. Create visual feedback showing rule application on content examples.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Create Dashboard and Campaign Management Interface",
+        "description": "Build intuitive dashboard for campaign management with analytics and collaboration features",
+        "details": "Design responsive dashboard using Tailwind CSS with campaign overview, progress tracking, and content management sections. Implement campaign summary plan generation showing content strategy and rationale. Build collaboration interface for team sharing and approval workflows. Create export functionality for decks, one-pagers, and calendar views. Add search and filtering capabilities for campaigns and content.",
+        "testStrategy": "Test dashboard responsiveness across devices. Verify campaign summary generation and export functionality. Test collaboration features with multiple user scenarios. Validate search and filtering works with large datasets.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design dashboard layout and navigation with responsive grid system",
+            "description": "Create the overall dashboard structure with responsive grid layout using Tailwind CSS, including sidebar navigation, header with user controls, and main content area with flexible grid system for widget placement",
+            "dependencies": [],
+            "details": "Design wireframes for dashboard layout with mobile-first approach. Implement responsive grid system using Tailwind's grid utilities. Create sidebar navigation with collapsible menu items for campaigns, content library, analytics, and settings. Build header component with user profile, notifications, and quick actions. Set up main content area with flexible widget placement system. Implement responsive breakpoints for tablet and mobile views.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Build campaign overview components with status indicators and metrics cards",
+            "description": "Develop reusable campaign card components displaying key metrics, status indicators, progress bars, and quick action buttons for campaign management",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "Create CampaignCard component with campaign name, status badge (Draft, Active, Completed), and launch date. Build MetricsCard components for displaying KPIs like reach, engagement, conversions. Implement progress indicators showing campaign completion percentage. Add quick action buttons for edit, duplicate, archive operations. Create campaign list view with sorting and pagination. Build campaign detail modal with expanded information.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Create progress tracking visualizations with interactive charts",
+            "description": "Implement data visualization components using Chart.js or similar library to display campaign progress, content performance, and timeline views",
+            "dependencies": [
+              "8.2"
+            ],
+            "details": "Integrate Chart.js or D3.js for data visualization. Create line charts for campaign performance over time. Build bar charts for content type performance comparison. Implement donut charts for channel distribution visualization. Create Gantt-style timeline view for campaign scheduling. Add interactive tooltips and drill-down capabilities. Implement real-time data updates using ActionCable.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement collaboration features with real-time notifications",
+            "description": "Build team collaboration functionality including comments, approvals, task assignments, and real-time notifications using ActionCable",
+            "dependencies": [
+              "8.1",
+              "8.2"
+            ],
+            "details": "Create comment system for campaigns and content pieces with threaded discussions. Implement approval workflow with status tracking (Pending Review, Approved, Rejected). Build task assignment system with due dates and reminders. Set up ActionCable for real-time notifications and presence indicators. Create activity feed showing team actions and updates. Implement @mentions functionality for team communication.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Build export functionality for PDF decks, presentations, and calendars",
+            "description": "Develop export system to generate various output formats including PDF campaign decks, PowerPoint presentations, and calendar files",
+            "dependencies": [
+              "8.2",
+              "8.3"
+            ],
+            "details": "Implement PDF generation using Prawn or WickedPDF for campaign decks and one-pagers. Create PowerPoint export using ruby-pptx or similar gem. Build calendar export functionality supporting iCal and CSV formats. Design professional templates for exported documents with brand consistency. Add customization options for export content selection. Implement background job processing for large exports using Sidekiq.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Create search and filtering system with faceted navigation",
+            "description": "Implement comprehensive search functionality with filters for campaigns, content types, dates, and tags using elasticsearch or PostgreSQL full-text search",
+            "dependencies": [
+              "8.1",
+              "8.2"
+            ],
+            "details": "Set up full-text search using PostgreSQL's pg_search or Elasticsearch. Create search interface with autocomplete suggestions using Stimulus. Build faceted filtering for campaign status, content type, date ranges, and tags. Implement saved search functionality for frequently used filters. Add bulk actions for filtered results. Create search results view with highlighting and relevance scoring.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Develop campaign summary generator with AI insights",
+            "description": "Build AI-powered campaign summary generation that creates executive summaries, strategy rationale, and content recommendations based on campaign data",
+            "dependencies": [
+              "8.2"
+            ],
+            "details": "Create prompt templates for campaign summary generation including objectives, target audience, and strategy. Integrate with AIService to generate natural language summaries. Build interface for reviewing and editing AI-generated summaries. Implement content strategy recommendations based on journey stages. Add rationale generation explaining content choices and timing. Create summary preview and export functionality.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Implement responsive design patterns optimized for mobile and desktop",
+            "description": "Ensure all dashboard components are fully responsive with optimized layouts for mobile, tablet, and desktop viewports using Tailwind CSS utilities",
+            "dependencies": [
+              "8.1",
+              "8.2",
+              "8.3",
+              "8.4",
+              "8.5",
+              "8.6",
+              "8.7"
+            ],
+            "details": "Apply mobile-first responsive design to all components. Create touch-optimized interfaces for mobile devices with larger tap targets. Implement responsive tables that transform to card layouts on mobile. Optimize chart visualizations for smaller screens. Build responsive navigation with hamburger menu for mobile. Test and optimize performance on various devices and screen sizes.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Implement Marketing Platform Integrations",
+        "description": "Build integration framework for social media, email marketing, and advertising platforms",
+        "details": "Create Integration base class and specific integrations for Meta, LinkedIn, Twitter, Google Ads, Mailchimp, and HubSpot APIs. Implement OAuth authentication flows for each platform. Build content publishing and performance tracking capabilities. Create webhook handlers for real-time data updates. Add integration management interface for connecting and configuring platforms.",
+        "testStrategy": "Test OAuth flows for each integration platform. Verify content publishing works correctly. Test webhook handling and data synchronization. Validate integration management interface allows proper configuration.",
+        "priority": "low",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design integration framework architecture",
+            "description": "Create the foundational architecture for the integration system including base classes, interfaces, and design patterns",
+            "dependencies": [],
+            "details": "Design Integration base class with common methods for authentication, request handling, and response parsing. Define interfaces for OAuth providers, webhook handlers, and data synchronizers. Create abstract classes for social media, email, and advertising platform integrations. Document the architecture with UML diagrams and technical specifications.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Implement OAuth2 authentication system",
+            "description": "Build a robust OAuth2 authentication framework supporting multiple providers and token management",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "Implement OAuth2 client with support for authorization code flow, token refresh, and secure storage. Create OAuthProvider model to store client credentials and tokens. Build token encryption and secure storage using Rails credentials. Implement token refresh background jobs and expiration handling.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Build Meta API integration",
+            "description": "Implement complete integration with Meta's Graph API for Facebook and Instagram",
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
+            "details": "Create MetaIntegration class extending base integration. Implement Facebook Pages API for content publishing and Instagram Graph API for posts and stories. Build audience insights retrieval and ad performance tracking. Handle Meta-specific webhook events and real-time updates.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Create LinkedIn API integration",
+            "description": "Develop LinkedIn integration for company pages and advertising platform",
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
+            "details": "Build LinkedInIntegration class with support for organization pages and member profiles. Implement content sharing API for posts, articles, and native videos. Create LinkedIn Ads API integration for campaign management. Handle LinkedIn webhook notifications for engagement metrics.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement Google Ads integration",
+            "description": "Build comprehensive Google Ads API integration for campaign management and reporting",
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
+            "details": "Create GoogleAdsIntegration class using Google Ads API client library. Implement campaign creation, ad group management, and keyword targeting. Build reporting API integration for performance metrics and conversion tracking. Handle Google Ads API versioning and migration strategies.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Build email platform integrations",
+            "description": "Implement integrations for Mailchimp and HubSpot email marketing platforms",
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
+            "details": "Create MailchimpIntegration and HubSpotIntegration classes. Implement list management, campaign creation, and template handling for both platforms. Build email automation workflow triggers and contact synchronization. Handle bounce management and unsubscribe webhook events.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Create webhook handling system",
+            "description": "Build robust webhook receiver and processor for real-time platform updates",
+            "dependencies": [
+              "9.3",
+              "9.4",
+              "9.5",
+              "9.6"
+            ],
+            "details": "Implement webhook controller with signature verification for each platform. Create webhook event queue using ActiveJob for asynchronous processing. Build webhook retry mechanism with exponential backoff. Implement webhook event logging and debugging interface.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Implement API rate limiting",
+            "description": "Build intelligent rate limiting system to handle API quotas across all platforms",
+            "dependencies": [
+              "9.3",
+              "9.4",
+              "9.5",
+              "9.6"
+            ],
+            "details": "Create RateLimiter service with platform-specific quota tracking. Implement request queuing and throttling mechanisms. Build adaptive rate limiting based on API response headers. Create dashboard for monitoring API usage and quota consumption.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Build integration configuration UI",
+            "description": "Create user interface for managing platform connections and settings",
+            "dependencies": [
+              "9.2",
+              "9.3",
+              "9.4",
+              "9.5",
+              "9.6"
+            ],
+            "details": "Build integration settings page with OAuth connection flows for each platform. Create configuration forms for API credentials and webhook URLs. Implement connection status indicators and test functionality. Add platform-specific settings for content preferences and targeting options.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 10,
+            "title": "Create data synchronization services",
+            "description": "Implement bi-directional data sync between application and external platforms",
+            "dependencies": [
+              "9.3",
+              "9.4",
+              "9.5",
+              "9.6",
+              "9.7"
+            ],
+            "details": "Build DataSyncService for periodic synchronization of campaigns, audiences, and metrics. Implement conflict resolution strategies for concurrent updates. Create sync scheduling system with customizable intervals. Build data mapping and transformation layer for platform-specific formats.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 11,
+            "title": "Add error recovery mechanisms",
+            "description": "Implement comprehensive error handling and recovery systems for integration failures",
+            "dependencies": [
+              "9.7",
+              "9.8",
+              "9.10"
+            ],
+            "details": "Create error tracking and alerting system for API failures. Implement automatic retry logic with circuit breaker pattern. Build fallback mechanisms for critical operations. Create error recovery dashboard with manual intervention options.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 12,
+            "title": "Implement integration testing framework",
+            "description": "Build comprehensive testing suite for all platform integrations",
+            "dependencies": [
+              "9.3",
+              "9.4",
+              "9.5",
+              "9.6",
+              "9.7",
+              "9.8",
+              "9.9",
+              "9.10",
+              "9.11"
+            ],
+            "details": "Create integration test suite with VCR for API response recording. Build mock services for webhook testing and OAuth flows. Implement performance testing for rate limiting and data sync. Create end-to-end tests for complete integration workflows.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Build Performance Analytics and Optimization System",
+        "description": "Create comprehensive analytics dashboard with AI-driven optimization recommendations",
+        "details": "Implement AnalyticsService to collect and process campaign performance data from integrated platforms. Build metrics dashboard showing impressions, CTR, engagement, and conversions. Create AI optimization engine that provides improvement suggestions based on performance data. Implement A/B testing analysis and content retirement recommendations. Add performance reporting with exportable insights and trend analysis.",
+        "testStrategy": "Test analytics data collection from integration platforms. Verify metrics dashboard displays accurate data with proper visualizations. Test AI optimization recommendations with sample performance data. Validate reporting exports and trend analysis accuracy.",
+        "priority": "medium",
+        "dependencies": [
+          8,
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design analytics data architecture with time-series database",
+            "description": "Define data models and schema for storing time-series performance metrics, choose appropriate database solution (PostgreSQL with TimescaleDB or InfluxDB), and design efficient data partitioning strategy",
+            "dependencies": [],
+            "details": "Create database schema for metrics storage including campaigns, impressions, clicks, conversions, and engagement data. Design tables for time-series data with proper indexing and partitioning. Implement data retention policies and aggregation strategies for different time granularities (hourly, daily, weekly, monthly).",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Build data collection pipeline from marketing platforms",
+            "description": "Implement background jobs and services to collect performance data from integrated marketing platforms (Facebook, Google, LinkedIn, Twitter) via their APIs",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "Create AnalyticsCollector service with platform-specific adapters. Implement Sidekiq jobs for periodic data fetching. Build error handling and retry mechanisms. Create data normalization layer to standardize metrics across platforms. Implement webhook receivers for real-time data updates where available.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Create metrics calculation engine with KPIs",
+            "description": "Build service to calculate key performance indicators including CTR, CPA, ROI, ROAS, engagement rates, and custom metrics based on campaign goals",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "Implement MetricsCalculator service with methods for standard KPIs. Create configurable metric definitions for custom calculations. Build aggregation functions for different time periods and segments. Implement statistical functions for variance, standard deviation, and confidence intervals. Add support for weighted averages and composite metrics.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Implement data visualization components with Chart.js",
+            "description": "Create reusable Stimulus controllers and ViewComponents for rendering interactive charts, graphs, and data visualizations using Chart.js",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "Build Stimulus controllers for line charts, bar charts, pie charts, and heatmaps. Create ViewComponents for metric cards, trend indicators, and comparison widgets. Implement responsive chart sizing and mobile-optimized views. Add interactive features like zoom, pan, and data point tooltips. Create chart configuration presets for common visualizations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Build AI optimization recommendation system",
+            "description": "Develop machine learning service that analyzes performance data and generates actionable optimization recommendations using OpenAI or custom ML models",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "Create OptimizationEngine service integrating with OpenAI API for insights. Build pattern recognition for identifying underperforming segments. Implement recommendation algorithms for budget reallocation, audience targeting, and content improvements. Create confidence scoring for recommendations. Build feedback loop to improve recommendations based on applied optimizations.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Create A/B testing analysis tools",
+            "description": "Implement statistical analysis tools for A/B test results including significance testing, confidence intervals, and winner determination algorithms",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "Build ABTestAnalyzer service with statistical significance calculations. Implement Bayesian and frequentist testing methods. Create sample size calculators and test duration estimators. Build variant performance comparison views. Implement early stopping rules and sequential testing algorithms. Add support for multivariate testing analysis.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Develop performance trend analysis with forecasting",
+            "description": "Build time-series analysis and forecasting capabilities to predict future performance based on historical data and identify trends",
+            "dependencies": [
+              "10.3",
+              "10.5"
+            ],
+            "details": "Implement TrendAnalyzer service with moving averages and exponential smoothing. Build ARIMA models for forecasting. Create seasonality detection and adjustment algorithms. Implement anomaly detection for identifying unusual performance patterns. Build trend visualization components with confidence bands. Add comparative analysis against industry benchmarks.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Build reporting and export system (PDF, CSV)",
+            "description": "Create comprehensive reporting system with customizable templates and export functionality for PDF reports and CSV data exports",
+            "dependencies": [
+              "10.4",
+              "10.7"
+            ],
+            "details": "Implement ReportGenerator service using Prawn for PDF generation. Create customizable report templates with branding options. Build scheduled report generation with email delivery. Implement CSV export with configurable columns and filters. Create executive summary templates with key insights. Add support for PowerPoint export using python-pptx integration.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Implement real-time dashboard updates with ActionCable",
+            "description": "Build WebSocket-based real-time updates for dashboard metrics using Rails ActionCable to show live performance data",
+            "dependencies": [
+              "10.4"
+            ],
+            "details": "Create ActionCable channels for dashboard updates. Implement broadcast triggers on data collection events. Build Stimulus controllers for handling WebSocket connections and DOM updates. Create efficient data diffing to minimize payload size. Implement connection state management and reconnection logic. Add real-time notifications for significant metric changes.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 10,
+            "title": "Create performance alerting system with thresholds",
+            "description": "Develop alerting system that monitors metrics against configured thresholds and sends notifications via email, Slack, or in-app alerts",
+            "dependencies": [
+              "10.3",
+              "10.9"
+            ],
+            "details": "Build AlertManager service with configurable alert rules. Implement threshold monitoring for absolute values, percentage changes, and trend deviations. Create notification delivery system with multiple channels (email, Slack, SMS). Build alert escalation and suppression logic. Implement alert dashboard with history and acknowledgment tracking. Add smart alerting to reduce noise using ML-based anomaly detection.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-09T22:22:11.811Z",
+      "updated": "2025-08-09T22:22:11.811Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
