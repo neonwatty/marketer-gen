@@ -73,6 +73,10 @@ module.exports = {
           DEFAULT: 'hsl(var(--muted))',
           foreground: 'hsl(var(--muted-foreground))',
         },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
           foreground: 'hsl(var(--popover-foreground))',
@@ -81,6 +85,23 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // Status colors
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(var(--warning-foreground))',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          foreground: 'hsl(var(--info-foreground))',
+        },
+        // Brand colors from CSS variables
+        'brand-primary': 'hsl(var(--brand-primary))',
+        'brand-secondary': 'hsl(var(--brand-secondary))',
+        'brand-accent': 'hsl(var(--brand-accent))',
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar))',
           foreground: 'hsl(var(--sidebar-foreground))',
@@ -151,6 +172,29 @@ module.exports = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        // Additional radius tokens
+        'radius-sm': 'var(--radius-sm)',
+        'radius-md': 'var(--radius-md)',
+        'radius-lg': 'var(--radius-lg)',
+        'radius-xl': 'var(--radius-xl)',
+        'radius-2xl': 'var(--radius-2xl)',
+        'radius-full': 'var(--radius-full)',
+      },
+      transitionDuration: {
+        '75': 'var(--duration-75)',
+        '100': 'var(--duration-100)',
+        '150': 'var(--duration-150)',
+        '200': 'var(--duration-200)',
+        '300': 'var(--duration-300)',
+        '500': 'var(--duration-500)',
+        '700': 'var(--duration-700)',
+        '1000': 'var(--duration-1000)',
+      },
+      transitionTimingFunction: {
+        'ease-in': 'var(--ease-in)',
+        'ease-out': 'var(--ease-out)',
+        'ease-in-out': 'var(--ease-in-out)',
+        'ease-linear': 'var(--ease-linear)',
       },
     },
   },

@@ -91,3 +91,30 @@ export { Textarea } from "./textarea"
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./tooltip"
 export { FileUpload, type FileWithPreview } from "./file-upload"
 export { BrandAssetUpload } from "./brand-asset-upload"
+export { ContentCard, type ContentCardProps } from "./content-card"
+export { ProgressBar, type ProgressBarProps } from "./progress-bar"
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs"
+export { Badge, badgeVariants } from "./badge"
+export {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+} from "./breadcrumb"
+export { StepperNavigation, type StepperStep } from "./stepper-navigation"
+export { EnhancedTabs, type EnhancedTabItem } from "./enhanced-tabs"
+export {
+  StepValidation,
+  ValidationSummary,
+  useStepValidation,
+  type ValidationRule,
+  type StepValidationResult
+} from "./step-validation"
+export {
+  NavigationGuidance,
+  StepGuidance,
+  type NavigationAction
+} from "./navigation-guidance"
