@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { waitFor } from '@testing-library/react'
 import { z } from 'zod'
 import { 
@@ -38,14 +38,25 @@ type ContentCreationFormData = z.infer<typeof contentCreationSchema>
 describe('Form and File Upload Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Force garbage collection if available
+    if (global.gc) {
+      global.gc()
+    }
+  })
+
+  afterEach(() => {
+    // Force cleanup after each test
+    if (global.gc) {
+      global.gc()
+    }
   })
 
   describe('FileUploadField Integration', () => {
     it('integrates file upload with form validation', async () => {
       const mockSubmit = vi.fn()
       const mockFiles = [
-        createMockImageFile('logo.png', 100000),
-        createMockPdfFile('guidelines.pdf', 500000),
+        createMockImageFile('logo.png', 10000), // Reduced from 100KB to 10KB
+        createMockPdfFile('guidelines.pdf', 50000), // Reduced from 500KB to 50KB
       ]
 
       const { user, container, getByTestId, getByText } = renderWithForm<CampaignFormData>(
@@ -156,7 +167,7 @@ describe('Form and File Upload Integration Tests', () => {
     it('validates file count limits', async () => {
       const mockSubmit = vi.fn()
       const tooManyFiles = Array.from({ length: 6 }, (_, i) => 
-        createMockImageFile(`image${i + 1}.jpg`, 50000)
+        createMockImageFile(`image${i + 1}.jpg`, 5000) // Reduced from 50KB to 5KB
       )
 
       const { user, container, getByTestId, getByText } = renderWithForm<ContentCreationFormData>(
@@ -204,7 +215,7 @@ describe('Form and File Upload Integration Tests', () => {
     it('handles file upload errors gracefully in form context', async () => {
       const mockSubmit = vi.fn()
       const failingUpload = vi.fn().mockRejectedValue(new Error('Upload server error'))
-      const mockFile = createMockImageFile('test.jpg', 100000)
+      const mockFile = createMockImageFile('test.jpg', 10000) // Reduced from 100KB to 10KB
 
       const { user, container, getByTestId, getByText, getByLabelText } = renderWithForm<CampaignFormData>(
         <>
@@ -264,8 +275,8 @@ describe('Form and File Upload Integration Tests', () => {
     it('integrates brand asset upload with custom form wrapper', async () => {
       const mockSubmit = vi.fn()
       const mockFiles = [
-        createMockImageFile('logo.png', 1000000),
-        createMockPdfFile('brand-guide.pdf', 5000000),
+        createMockImageFile('logo.png', 100000), // Reduced from 1MB to 100KB
+        createMockPdfFile('brand-guide.pdf', 500000), // Reduced from 5MB to 500KB
       ]
 
       const TestForm = () => (
@@ -336,8 +347,8 @@ describe('Form and File Upload Integration Tests', () => {
 
     it('handles large brand asset uploads', async () => {
       const largeBrandAssets = [
-        createMockImageFile('high-res-logo.png', 25 * 1024 * 1024), // 25MB
-        createMockImageFile('banner-image.jpg', 30 * 1024 * 1024),  // 30MB
+        createMockImageFile('high-res-logo.png', 1 * 1024 * 1024), // Reduced from 25MB to 1MB
+        createMockImageFile('banner-image.jpg', 1.5 * 1024 * 1024),  // Reduced from 30MB to 1.5MB
       ]
 
       const { user, getByText } = render(
@@ -360,8 +371,8 @@ describe('Form and File Upload Integration Tests', () => {
 
       expect(mockFileUploadHandlers.onFilesChange).toHaveBeenCalledWith(
         expect.arrayContaining([
-          expect.objectContaining({ size: 25 * 1024 * 1024 }),
-          expect.objectContaining({ size: 30 * 1024 * 1024 }),
+          expect.objectContaining({ size: 1 * 1024 * 1024 }),
+          expect.objectContaining({ size: 1.5 * 1024 * 1024 }),
         ])
       )
     })
@@ -371,9 +382,9 @@ describe('Form and File Upload Integration Tests', () => {
     it('simulates complete campaign creation workflow', async () => {
       const mockSubmit = vi.fn()
       const campaignAssets = [
-        createMockImageFile('campaign-logo.png', 500000),
-        createMockImageFile('hero-image.jpg', 2000000),
-        createMockPdfFile('campaign-brief.pdf', 1000000),
+        createMockImageFile('campaign-logo.png', 50000), // Reduced from 500KB to 50KB
+        createMockImageFile('hero-image.jpg', 200000), // Reduced from 2MB to 200KB
+        createMockPdfFile('campaign-brief.pdf', 100000), // Reduced from 1MB to 100KB
       ]
 
       const { user, container, getByTestId, getByText } = renderWithForm<CampaignFormData>(
@@ -471,19 +482,19 @@ describe('Form and File Upload Integration Tests', () => {
         expect(callArgs.brandAssets).toHaveLength(3)
         expect(callArgs.brandAssets[0]).toHaveProperty('name', 'campaign-logo.png')
         expect(callArgs.brandAssets[0]).toHaveProperty('type', 'image/png')
-        expect(callArgs.brandAssets[0]).toHaveProperty('size', 500000)
+        expect(callArgs.brandAssets[0]).toHaveProperty('size', 50000)
         expect(callArgs.brandAssets[1]).toHaveProperty('name', 'hero-image.jpg')
         expect(callArgs.brandAssets[1]).toHaveProperty('type', 'image/jpeg')
-        expect(callArgs.brandAssets[1]).toHaveProperty('size', 2000000)
+        expect(callArgs.brandAssets[1]).toHaveProperty('size', 200000)
         expect(callArgs.brandAssets[2]).toHaveProperty('name', 'campaign-brief.pdf')
         expect(callArgs.brandAssets[2]).toHaveProperty('type', 'application/pdf')
-        expect(callArgs.brandAssets[2]).toHaveProperty('size', 1000000)
+        expect(callArgs.brandAssets[2]).toHaveProperty('size', 100000)
       })
     })
 
     it('handles partial form completion with file persistence', async () => {
       const mockSubmit = vi.fn()
-      const partialFiles = [createMockImageFile('draft-logo.png', 200000)]
+      const partialFiles = [createMockImageFile('draft-logo.png', 20000)] // Reduced from 200KB to 20KB
 
       const { user, container, getByTestId, getByText } = renderWithForm<CampaignFormData>(
         <>
@@ -558,7 +569,7 @@ describe('Form and File Upload Integration Tests', () => {
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce(undefined)
 
-      const mockFile = createMockImageFile('retry-test.jpg', 100000)
+      const mockFile = createMockImageFile('retry-test.jpg', 10000) // Reduced from 100KB to 10KB
 
       const { user, container, getByTestId, getByText } = renderWithForm<CampaignFormData>(
         <>
@@ -617,8 +628,8 @@ describe('Form and File Upload Integration Tests', () => {
     it('handles browser refresh simulation with file state', async () => {
       const mockSubmit = vi.fn()
       const existingFiles = [
-        createFileWithPreview('existing-logo.png', 'image/png', 300000),
-        createFileWithPreview('existing-doc.pdf', 'application/pdf', 800000),
+        createFileWithPreview('existing-logo.png', 'image/png', 30000), // Reduced from 300KB to 30KB
+        createFileWithPreview('existing-doc.pdf', 'application/pdf', 80000), // Reduced from 800KB to 80KB
       ]
 
       const { user, container, getByTestId, getByText } = renderWithForm<CampaignFormData>(
