@@ -1,0 +1,228 @@
+# Content Asset fixtures for testing
+
+welcome_email:
+  assetable: summer_launch (Campaign)
+  content_type: "text"
+  content: |
+    Welcome to our summer collection! 
+    
+    Dear {{customer_name}},
+    
+    We're thrilled to introduce you to our exciting new summer collection. With innovative designs and sustainable materials, we're bringing you the perfect blend of style and consciousness.
+    
+    Special Launch Offer: Use code SUMMER2024 for 20% off your first purchase.
+    
+    Best regards,
+    The Acme Team
+  stage: "awareness"
+  channel: "email"
+  metadata: |
+    {
+      "template_variables": ["customer_name"],
+      "send_time": "morning",
+      "personalization_level": "high"
+    }
+  status: "approved"
+  title: "Summer Collection Welcome Email"
+  description: "Personalized welcome email for summer campaign launch"
+  version: 2
+  position: 1
+  published_at: <%= 1.week.ago %>
+
+social_media_post:
+  assetable: summer_launch (Campaign)
+  content_type: "text"
+  content: "🌞 Summer vibes are here! Check out our new eco-friendly collection that's perfect for your sustainable lifestyle. #SustainableFashion #SummerStyle #EcoFriendly"
+  stage: "awareness"
+  channel: "social_media"
+  metadata: |
+    {
+      "hashtags": ["#SustainableFashion", "#SummerStyle", "#EcoFriendly"],
+      "platform": "instagram",
+      "post_type": "image_with_text",
+      "optimal_post_time": "6pm"
+    }
+  status: "published"
+  title: "Instagram Summer Collection Announcement"
+  description: "Social media post announcing the summer collection launch"
+  version: 1
+  position: 2
+  published_at: <%= 5.days.ago %>
+
+landing_page_copy:
+  assetable: summer_launch (Campaign)
+  content_type: "text"
+  content: |
+    # Summer Collection 2024
+    
+    ## Sustainable Style Meets Summer Vibes
+    
+    Discover our revolutionary summer collection crafted from 100% recycled materials. Each piece tells a story of innovation, sustainability, and uncompromising style.
+    
+    ### Why Choose Our Summer Collection?
+    - 🌱 100% sustainable materials
+    - 🎨 Cutting-edge designs
+    - 💚 Carbon-neutral shipping
+    - ⭐ Award-winning quality
+    
+    **Limited Time: 20% off with code SUMMER2024**
+    
+    [Shop Now](#cta-button)
+  stage: "consideration"
+  channel: "web"
+  metadata: |
+    {
+      "page_type": "product_landing",
+      "cta_buttons": ["Shop Now", "Learn More"],
+      "conversion_goal": "product_purchase",
+      "seo_optimized": true
+    }
+  status: "approved"
+  title: "Summer Collection Landing Page"
+  description: "Main landing page copy for summer collection campaign"
+  version: 3
+  position: 0
+  published_at: <%= 1.week.ago %>
+
+b2b_whitepaper:
+  assetable: startup_awareness (Campaign)
+  content_type: "document"
+  content: ""
+  stage: "interest"
+  channel: "web"
+  metadata: |
+    {
+      "document_type": "whitepaper",
+      "pages": 12,
+      "download_gate": true,
+      "lead_scoring_value": 25
+    }
+  status: "published"
+  title: "The Future of Tech Infrastructure: A Comprehensive Guide"
+  description: "Technical whitepaper for lead generation"
+  version: 1
+  position: 1
+  file_size: 2048576
+  mime_type: "application/pdf"
+  published_at: <%= 4.months.ago %>
+
+webinar_registration:
+  assetable: startup_awareness (Campaign)
+  content_type: "text"
+  content: |
+    # Join Our Expert Webinar
+    
+    ## "Scaling Tech Infrastructure in 2024"
+    
+    Learn from industry experts about the latest trends and best practices in tech infrastructure scaling.
+    
+    **When:** Thursday, 2:00 PM PST
+    **Duration:** 60 minutes + Q&A
+    **Cost:** Free
+    
+    ### What You'll Learn:
+    - Modern infrastructure patterns
+    - Cost optimization strategies  
+    - Security best practices
+    - Real-world case studies
+    
+    [Register Now](#register-button)
+  stage: "interest"
+  channel: "web"
+  metadata: |
+    {
+      "webinar_date": "2024-06-15T14:00:00Z",
+      "max_attendees": 500,
+      "registration_required": true
+    }
+  status: "archived"
+  title: "Tech Infrastructure Webinar Registration Page"
+  description: "Registration page for technical webinar"
+  version: 1
+  position: 2
+
+holiday_ad_copy:
+  assetable: holiday_campaign (Campaign)
+  content_type: "text"
+  content: "Make this holiday unforgettable with gifts that matter. Handcrafted with love, delivered with care. ✨ Shop our holiday collection now!"
+  stage: "awareness"
+  channel: "social_media"
+  metadata: |
+    {
+      "ad_format": "carousel",
+      "target_audience": "holiday_shoppers",
+      "budget_allocation": 5000
+    }
+  status: "pending_review"
+  title: "Holiday Campaign Social Ad"
+  description: "Social media advertisement for holiday campaign"
+  version: 1
+  position: 1
+
+brand_video_script:
+  assetable: creative_agency (BrandIdentity)
+  content_type: "text"
+  content: |
+    [SCENE 1: CREATIVE OFFICE]
+    
+    NARRATOR (V.O.): "At Creative Minds Agency, we don't just create campaigns..."
+    
+    [Quick cuts of team brainstorming]
+    
+    NARRATOR (V.O.): "We create connections."
+    
+    [SCENE 2: CLIENT SUCCESS STORIES]
+    
+    CLIENT 1: "They transformed our brand completely."
+    
+    [Show before/after brand transformations]
+    
+    NARRATOR (V.O.): "Your vision. Our expertise. Extraordinary results."
+    
+    [END SCREEN: Creative Minds Agency logo]
+  stage: "awareness"
+  channel: "video_platform"
+  metadata: |
+    {
+      "video_length": "30_seconds",
+      "production_budget": 15000,
+      "target_platforms": ["youtube", "linkedin"]
+    }
+  status: "draft"
+  title: "Agency Brand Video Script"
+  description: "30-second brand video script for Creative Minds Agency"
+  version: 1
+  position: 1
+
+email_nurture_sequence:
+  assetable: awareness_to_purchase (CustomerJourney)
+  content_type: "text"
+  content: |
+    **Email 1: Welcome & Introduction**
+    Subject: Welcome to the journey, {{first_name}}!
+    
+    **Email 2: Educational Content**
+    Subject: Here's what you need to know about {{product_category}}
+    
+    **Email 3: Social Proof**  
+    Subject: See what others are saying about {{product_name}}
+    
+    **Email 4: Limited Time Offer**
+    Subject: Exclusive offer ending soon, {{first_name}}
+    
+    **Email 5: Final Reminder**
+    Subject: Last chance - don't miss out!
+  stage: "nurturing"
+  channel: "email"
+  metadata: |
+    {
+      "sequence_length": 5,
+      "send_intervals": [0, 3, 7, 14, 21],
+      "personalization_fields": ["first_name", "product_category", "product_name"]
+    }
+  status: "approved"
+  title: "5-Part Email Nurture Sequence"
+  description: "Automated email sequence for customer journey nurturing"
+  version: 1
+  position: 3
+  published_at: <%= 2.weeks.ago %>

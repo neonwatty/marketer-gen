@@ -6,20 +6,38 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# AWS S3 Configuration
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
-# amazon:
-#   service: S3
-#   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
-#   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
-#   region: us-east-1
-#   bucket: your_own_bucket-<%= Rails.env %>
+amazon:
+  service: S3
+  access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+  secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+  region: <%= Rails.application.credentials.dig(:aws, :region) || 'us-east-1' %>
+  bucket: <%= Rails.application.credentials.dig(:aws, :bucket) || "marketer-gen-#{Rails.env}" %>
+  public: false
+  upload:
+    server_side_encryption: AES256
+  # CORS configuration for direct uploads
+  cors:
+    - allowed_origins: 
+        - "*"
+      allowed_methods: 
+        - GET
+        - PUT
+        - POST
+        - DELETE
+      allowed_headers: 
+        - "*"
+      max_age_seconds: 3600
 
-# Remember not to checkin your GCS keyfile to a repository
-# google:
-#   service: GCS
-#   project: your_project
-#   credentials: <%= Rails.root.join("path/to/gcs.keyfile") %>
-#   bucket: your_own_bucket-<%= Rails.env %>
+# Google Cloud Storage Configuration
+# Use bin/rails credentials:edit to set the GCS credentials or use environment variable
+google:
+  service: GCS
+  project: <%= Rails.application.credentials.dig(:gcs, :project) %>
+  credentials: <%= Rails.application.credentials.dig(:gcs, :credentials) || Rails.root.join("config/gcs.keyfile") %>
+  bucket: <%= Rails.application.credentials.dig(:gcs, :bucket) || "marketer-gen-#{Rails.env}" %>
+  public: false
 
 # Use bin/rails credentials:edit to set the Azure Storage secret (as azure_storage:storage_access_key)
 # microsoft:
@@ -28,7 +46,21 @@ local:
 #   storage_access_key: <%= Rails.application.credentials.dig(:azure_storage, :storage_access_key) %>
 #   container: your_container_name-<%= Rails.env %>
 
-# mirror:
-#   service: Mirror
-#   primary: local
-#   mirrors: [ amazon, google, microsoft ]
+# Production mirror configuration for redundancy
+production_mirror:
+  service: Mirror
+  primary: amazon
+  mirrors: [ google ]
+
+# CDN configuration (example with CloudFront)
+# cdn:
+#   service: S3
+#   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+#   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+#   region: <%= Rails.application.credentials.dig(:aws, :region) || 'us-east-1' %>
+#   bucket: <%= Rails.application.credentials.dig(:aws, :bucket) || "marketer-gen-#{Rails.env}" %>
+#   public: true
+#   upload:
+#     server_side_encryption: AES256
+#   # CloudFront CDN URL
+#   # url: <%= Rails.application.credentials.dig(:aws, :cloudfront_url) %>

@@ -1,0 +1,213 @@
+# Customer Journey fixtures for testing
+
+awareness_to_purchase:
+  campaign: summer_launch
+  name: "Summer Product Discovery Journey"
+  description: "Multi-stage journey from initial awareness through purchase decision"
+  position: 0
+  stages: |
+    [
+      {
+        "id": "stage-1",
+        "name": "Awareness",
+        "description": "Customer discovers our brand through social media or search",
+        "duration_days": 7,
+        "position": 0,
+        "created_at": "2024-08-01T10:00:00Z"
+      },
+      {
+        "id": "stage-2", 
+        "name": "Interest",
+        "description": "Customer visits website and browses products",
+        "duration_days": 14,
+        "position": 1,
+        "created_at": "2024-08-01T10:00:00Z"
+      },
+      {
+        "id": "stage-3",
+        "name": "Consideration", 
+        "description": "Customer compares products and reads reviews",
+        "duration_days": 7,
+        "position": 2,
+        "created_at": "2024-08-01T10:00:00Z"
+      },
+      {
+        "id": "stage-4",
+        "name": "Purchase",
+        "description": "Customer makes a purchase decision",
+        "duration_days": 1,
+        "position": 3,
+        "created_at": "2024-08-01T10:00:00Z"
+      }
+    ]
+  touchpoints: |
+    {
+      "stage-1": [
+        {
+          "id": "tp-1",
+          "channel": "social_media",
+          "description": "Instagram product discovery ad",
+          "created_at": "2024-08-01T10:00:00Z"
+        }
+      ],
+      "stage-2": [
+        {
+          "id": "tp-2", 
+          "channel": "web",
+          "description": "Website landing page visit",
+          "created_at": "2024-08-01T10:00:00Z"
+        },
+        {
+          "id": "tp-3",
+          "channel": "email",
+          "description": "Welcome email sequence",
+          "created_at": "2024-08-01T10:00:00Z"
+        }
+      ]
+    }
+  content_types: ["social_media", "email", "blog_post", "landing_page"]
+  metrics: |
+    {
+      "conversion_rate": 12.5,
+      "avg_journey_duration": 21,
+      "drop_off_points": ["stage-2"],
+      "last_updated": "2024-08-10T12:00:00Z"
+    }
+
+b2b_lead_nurture:
+  campaign: startup_awareness
+  name: "B2B Lead Nurturing Journey"
+  description: "Journey for converting business leads into qualified prospects"
+  position: 0
+  stages: |
+    [
+      {
+        "id": "lead-capture",
+        "name": "Lead Capture",
+        "description": "Visitor downloads whitepaper or attends webinar",
+        "duration_days": 1,
+        "position": 0,
+        "created_at": "2024-06-01T09:00:00Z"
+      },
+      {
+        "id": "qualification",
+        "name": "Lead Qualification", 
+        "description": "Automated scoring and qualification process",
+        "duration_days": 3,
+        "position": 1,
+        "created_at": "2024-06-01T09:00:00Z"
+      },
+      {
+        "id": "nurturing",
+        "name": "Lead Nurturing",
+        "description": "Educational content and personalized outreach",
+        "duration_days": 30,
+        "position": 2,
+        "created_at": "2024-06-01T09:00:00Z"
+      },
+      {
+        "id": "sales-ready",
+        "name": "Sales Ready",
+        "description": "Lead is ready for sales team engagement",
+        "duration_days": 7,
+        "position": 3,
+        "created_at": "2024-06-01T09:00:00Z"
+      }
+    ]
+  touchpoints: |
+    {
+      "lead-capture": [
+        {
+          "id": "webinar-tp",
+          "channel": "webinar",
+          "description": "Technical webinar registration",
+          "created_at": "2024-06-01T09:00:00Z"
+        }
+      ],
+      "nurturing": [
+        {
+          "id": "email-sequence",
+          "channel": "email", 
+          "description": "5-part educational email series",
+          "created_at": "2024-06-01T09:00:00Z"
+        }
+      ]
+    }
+  content_types: ["webinar", "email", "whitepaper", "case_study"]
+  metrics: |
+    {
+      "lead_score_avg": 75,
+      "qualified_rate": 8.5,
+      "sales_conversion": 15.0
+    }
+
+holiday_customer_journey:
+  campaign: holiday_campaign
+  name: "Holiday Shopping Journey"
+  description: "Seasonal journey optimized for holiday shopping behavior"
+  position: 0
+  stages: |
+    [
+      {
+        "id": "early-holiday",
+        "name": "Early Holiday Planning",
+        "description": "Customer starts planning holiday purchases",
+        "duration_days": 21,
+        "position": 0,
+        "created_at": "2024-10-01T08:00:00Z"
+      },
+      {
+        "id": "active-shopping",
+        "name": "Active Shopping",
+        "description": "Customer actively comparing and purchasing gifts",
+        "duration_days": 14,
+        "position": 1,
+        "created_at": "2024-10-01T08:00:00Z"
+      },
+      {
+        "id": "last-minute",
+        "name": "Last Minute Rush",
+        "description": "Final purchases before holiday deadlines",
+        "duration_days": 3,
+        "position": 2,
+        "created_at": "2024-10-01T08:00:00Z"
+      }
+    ]
+  touchpoints: |
+    {}
+  content_types: ["advertisement", "email", "social_media", "landing_page"]
+  metrics: |
+    {
+      "projected_revenue": 125000,
+      "target_customers": 2500
+    }
+
+simple_journey:
+  campaign: paused_campaign
+  name: "Simple Two-Stage Journey"
+  description: "Basic journey for testing"
+  position: 1
+  stages: |
+    [
+      {
+        "id": "discover",
+        "name": "Discovery",
+        "description": "Customer discovers the product",
+        "duration_days": 5,
+        "position": 0,
+        "created_at": "2024-07-01T12:00:00Z"
+      },
+      {
+        "id": "convert",
+        "name": "Conversion",
+        "description": "Customer makes a purchase",
+        "duration_days": 2,
+        "position": 1,
+        "created_at": "2024-07-01T12:00:00Z"
+      }
+    ]
+  touchpoints: |
+    {}
+  content_types: ["email", "web"]
+  metrics: |
+    {}

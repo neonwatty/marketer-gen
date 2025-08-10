@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  file_type: brand_guideline
+  file_size: 1024
+  original_filename: brand_guide.pdf
+  metadata: "{}"
+  extracted_text: "Sample brand guideline text content"
+  scan_status: clean
+  assetable: one (BrandIdentity)
+  content_type: application/pdf
+  active: true
+
+two:
+  file_type: logo
+  file_size: 512
+  original_filename: logo.png
+  metadata: "{\"width\": 200, \"height\": 100}"
+  extracted_text: 
+  scan_status: clean
+  assetable: one (BrandIdentity)
+  content_type: image/png
+  active: true

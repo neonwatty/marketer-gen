@@ -1,11 +1,68 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# Campaign fixtures for testing
 
-one:
-  name: MyString
-  status: MyString
-  purpose: MyText
+summer_launch:
+  name: "Summer Product Launch 2024"
+  purpose: "Introduce our new summer collection to drive Q3 sales growth and increase brand awareness among millennials"
+  status: "active"
+  brand_identity: acme_corp
+  target_audience: |
+    {
+      "demographics": {
+        "age_range": "25-40",
+        "income": "$50k-$100k",
+        "interests": ["lifestyle", "technology", "sustainability"]
+      },
+      "personas": ["tech-savvy professional", "eco-conscious consumer"]
+    }
+  budget_cents: 5000000
+  start_date: <%= 1.week.from_now %>
+  end_date: <%= 3.months.from_now %>
+  created_at: <%= 1.week.ago %>
+  updated_at: <%= 1.day.ago %>
 
-two:
-  name: MyString
-  status: MyString
-  purpose: MyText
+holiday_campaign:
+  name: "Holiday Spectacular 2024"
+  purpose: "Drive end-of-year sales through integrated digital and traditional marketing channels"
+  status: "planning"
+  brand_identity: creative_agency
+  target_audience: |
+    {
+      "demographics": {
+        "age_range": "30-55",
+        "income": "$75k+",
+        "interests": ["luxury", "family", "experiences"]
+      }
+    }
+  budget_cents: 7500000
+  start_date: <%= 2.months.from_now %>
+  end_date: <%= 4.months.from_now %>
+  created_at: <%= 2.weeks.ago %>
+
+startup_awareness:
+  name: "TechFlow Brand Awareness Campaign"
+  purpose: "Establish brand presence in the competitive tech market and generate initial customer base"
+  status: "completed"
+  brand_identity: tech_startup
+  target_audience: |
+    {
+      "demographics": {
+        "age_range": "28-45",
+        "job_roles": ["CTO", "Engineering Manager", "Tech Lead"],
+        "company_size": "50-500 employees"
+      }
+    }
+  budget_cents: 2500000
+  start_date: <%= 6.months.ago %>
+  end_date: <%= 3.months.ago %>
+  created_at: <%= 6.months.ago %>
+  updated_at: <%= 3.months.ago %>
+
+paused_campaign:
+  name: "Paused Marketing Initiative"
+  purpose: "Testing campaign pause functionality"
+  status: "paused"
+  brand_identity: acme_corp
+  budget_cents: 1000000
+  start_date: <%= 1.month.ago %>
+  end_date: <%= 2.months.from_now %>
+  created_at: <%= 2.months.ago %>

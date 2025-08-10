@@ -1,0 +1,208 @@
+<% content_for :title, "Upload Brand Assets" %>
+
+<div class="max-w-4xl mx-auto p-6">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Upload Brand Assets</h1>
+    <p class="text-gray-600">Upload brand guidelines, logos, templates, and other marketing materials</p>
+  </div>
+
+  <!-- File Upload Component -->
+  <div class="bg-white rounded-lg shadow-lg p-8" 
+       data-controller="file-upload"
+       data-file-upload-url-value="<%= rails_direct_uploads_url %>"
+       data-file-upload-max-files-value="10"
+       data-file-upload-max-size-value="<%= 10.megabytes %>"
+       data-file-upload-allowed-types-value="<%= %w[
+         .pdf .doc .docx .ppt .pptx .txt
+         .png .jpg .jpeg .gif .svg
+         .woff .woff2 .ttf .otf
+         application/pdf
+         application/msword
+         application/vnd.openxmlformats-officedocument.wordprocessingml.document
+         application/vnd.ms-powerpoint
+         application/vnd.openxmlformats-officedocument.presentationml.presentation
+         text/plain
+         image/png
+         image/jpeg
+         image/gif
+         image/svg+xml
+         font/woff
+         font/woff2
+         font/ttf
+         font/otf
+       ].to_json %>">
+    
+    <!-- Error Messages -->
+    <div class="error-messages hidden mb-4" data-file-upload-target="errorMessages"></div>
+
+    <!-- Overall Progress Bar -->
+    <div class="mb-6 hidden" id="overall-progress">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-sm font-medium text-gray-700">Upload Progress</span>
+        <span class="text-sm text-gray-500" data-file-upload-target="progressText">0 / 0 files uploaded</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+             style="width: 0%" 
+             data-file-upload-target="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Drag and Drop Zone -->
+    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors"
+         data-file-upload-target="dropZone">
+      
+      <!-- Upload Icon -->
+      <div class="mx-auto w-16 h-16 text-gray-400 mb-4">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-full h-full">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+        </svg>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-lg font-semibold text-gray-900">Drop files here to upload</h3>
+        <p class="text-gray-500">or click to browse your computer</p>
+        <p class="text-sm text-gray-400">
+          Supports: PDFs, Images (PNG, JPG, SVG), Documents (Word, PowerPoint), Fonts, and Text files
+        </p>
+        <p class="text-xs text-gray-400">Maximum file size: 10MB</p>
+      </div>
+
+      <!-- Hidden File Input -->
+      <input type="file" 
+             multiple 
+             accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.svg,.woff,.woff2,.ttf,.otf"
+             class="hidden" 
+             data-file-upload-target="fileInput"
+             data-action="change->file-upload#fileSelected">
+
+      <!-- Browse Button -->
+      <button type="button" 
+              class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              data-action="click->file-upload#browseFiles">
+        Browse Files
+      </button>
+    </div>
+
+    <!-- Selected Files List -->
+    <div class="file-list hidden mt-6" data-file-upload-target="fileList">
+      <h4 class="text-lg font-semibold text-gray-900 mb-4">Selected Files</h4>
+      <!-- Files will be added here dynamically -->
+    </div>
+
+    <!-- Upload Form -->
+    <%= form_with model: @brand_asset, 
+                  url: upload_multiple_brand_assets_path,
+                  method: :post,
+                  local: false,
+                  data: { "file-upload-target" => "form" },
+                  class: "mt-8" do |form| %>
+      
+      <!-- File Type Selection for All Files -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Default File Type
+          </label>
+          <%= form.select :file_type, 
+                          options_for_select(@file_types.map { |type| [type.humanize, type] }, @brand_asset.file_type),
+                          { prompt: "Auto-detect from file" },
+                          { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+          <p class="text-xs text-gray-500 mt-1">This will be applied to all uploaded files unless overridden</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Purpose/Description
+          </label>
+          <%= form.text_field :purpose, 
+                              placeholder: "e.g., Q1 2024 Brand Guidelines",
+                              class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+          <p class="text-xs text-gray-500 mt-1">Optional description for all files</p>
+        </div>
+      </div>
+
+      <!-- Hidden fields for file uploads -->
+      <div id="uploaded-files-data"></div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-4">
+        <button type="button"
+                class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                data-action="click->file-upload#startUploads"
+                data-file-upload-target="uploadButton">
+          Start Upload
+        </button>
+
+        <button type="submit"
+                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                disabled
+                data-file-upload-target="submitButton">
+          Save Assets
+        </button>
+
+        <%= link_to "Cancel", brand_assets_path, 
+                    class: "px-6 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+      </div>
+    <% end %>
+
+    <!-- File Type Information -->
+    <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+      <h4 class="text-sm font-semibold text-gray-900 mb-2">Supported File Types</h4>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-600">
+        <div>
+          <strong>Documents (10MB max):</strong><br>
+          PDF, Word (.doc, .docx), PowerPoint (.ppt, .pptx), Text (.txt)
+        </div>
+        <div>
+          <strong>Images (5MB max):</strong><br>
+          PNG, JPEG, GIF, SVG
+        </div>
+        <div>
+          <strong>Fonts (2MB max):</strong><br>
+          WOFF, WOFF2, TTF, OTF
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- File Upload Completion Handler -->
+<script>
+document.addEventListener('file-upload:completed', function(event) {
+  const { detail } = event
+  const { completed, errors, totalFiles, completedCount, errorCount } = detail
+  
+  if (completedCount > 0) {
+    // Add hidden inputs for completed uploads
+    const uploadedFilesContainer = document.getElementById('uploaded-files-data')
+    
+    completed.forEach((upload, index) => {
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = `uploads[${index}][signed_id]`
+      input.value = upload.signedId
+      uploadedFilesContainer.appendChild(input)
+    })
+
+    // Show overall progress
+    document.getElementById('overall-progress').classList.remove('hidden')
+    
+    // Enable submit button
+    const submitButton = document.querySelector('[data-file-upload-target="submitButton"]')
+    if (submitButton) {
+      submitButton.disabled = false
+    }
+  }
+})
+
+// Handle browse button click
+document.addEventListener('click', function(event) {
+  if (event.target.matches('[data-action*="browseFiles"]')) {
+    const fileInput = document.querySelector('[data-file-upload-target="fileInput"]')
+    if (fileInput) {
+      fileInput.click()
+    }
+  }
+})
+</script>

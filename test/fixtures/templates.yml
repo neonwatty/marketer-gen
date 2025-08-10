@@ -1,0 +1,372 @@
+# Template fixtures for testing
+
+welcome_email_template:
+  name: "Welcome Email Template"
+  template_type: "email"
+  category: "onboarding"
+  template_data: |
+    {
+      "subject": "Welcome to {{company_name}}, {{customer_name}}!",
+      "preheader": "We're excited to have you on board",
+      "body": {
+        "header": {
+          "logo": "{{company_logo}}",
+          "background_color": "{{brand_primary_color}}"
+        },
+        "content": [
+          {
+            "type": "heading",
+            "text": "Welcome {{customer_name}}!"
+          },
+          {
+            "type": "paragraph",
+            "text": "Thank you for joining {{company_name}}. We're excited to help you achieve your goals with our innovative solutions."
+          },
+          {
+            "type": "button",
+            "text": "Get Started",
+            "url": "{{onboarding_url}}"
+          }
+        ],
+        "footer": {
+          "company": "{{company_name}}",
+          "address": "{{company_address}}",
+          "unsubscribe_url": "{{unsubscribe_url}}"
+        }
+      }
+    }
+  is_active: true
+  usage_count: 15
+  description: "Customizable welcome email template for new customers"
+  version: 2
+  variables: |
+    [
+      {"name": "customer_name", "type": "string", "required": true, "description": "Customer's first name"},
+      {"name": "company_name", "type": "string", "required": true, "description": "Company name"},
+      {"name": "company_logo", "type": "url", "description": "Company logo URL"},
+      {"name": "brand_primary_color", "type": "color", "default": "#2563EB"},
+      {"name": "onboarding_url", "type": "url", "required": true},
+      {"name": "company_address", "type": "string"},
+      {"name": "unsubscribe_url", "type": "url", "required": true}
+    ]
+  metadata: |
+    {
+      "email_client_support": ["gmail", "outlook", "apple_mail"],
+      "responsive": true,
+      "dark_mode_support": true
+    }
+  tags: "onboarding, welcome, email"
+  author: "Marketing Team"
+  published_at: <%= 2.months.ago %>
+
+b2b_journey_template:
+  name: "B2B Lead Nurturing Journey"
+  template_type: "journey"
+  category: "lead_generation"
+  template_data: |
+    {
+      "name": "{{journey_name}}",
+      "description": "Multi-touch B2B lead nurturing journey for {{product_name}}",
+      "stages": [
+        {
+          "name": "Lead Capture",
+          "duration_days": 1,
+          "touchpoints": [
+            {
+              "type": "content_download",
+              "content": "{{lead_magnet_title}}",
+              "channel": "web"
+            }
+          ],
+          "success_criteria": "Lead information captured"
+        },
+        {
+          "name": "Initial Engagement",
+          "duration_days": 3,
+          "touchpoints": [
+            {
+              "type": "email",
+              "template": "welcome_email",
+              "delay_hours": 2
+            },
+            {
+              "type": "email", 
+              "template": "educational_content",
+              "delay_hours": 48
+            }
+          ]
+        },
+        {
+          "name": "Nurturing Sequence",
+          "duration_days": 21,
+          "touchpoints": [
+            {
+              "type": "email_sequence",
+              "sequence_name": "{{nurture_sequence_name}}",
+              "frequency": "weekly"
+            },
+            {
+              "type": "content_recommendation",
+              "based_on": "engagement_score"
+            }
+          ]
+        },
+        {
+          "name": "Sales Qualified",
+          "duration_days": 7,
+          "touchpoints": [
+            {
+              "type": "sales_notification",
+              "trigger": "lead_score_threshold"
+            },
+            {
+              "type": "demo_invitation",
+              "personalized": true
+            }
+          ]
+        }
+      ],
+      "conversion_goals": {
+        "primary": "Schedule demo",
+        "secondary": ["Download additional resources", "Engage with sales"]
+      }
+    }
+  is_active: true
+  usage_count: 8
+  description: "Complete B2B lead nurturing journey with multiple touchpoints"
+  version: 1
+  variables: |
+    [
+      {"name": "journey_name", "type": "string", "required": true},
+      {"name": "product_name", "type": "string", "required": true},
+      {"name": "lead_magnet_title", "type": "string", "required": true},
+      {"name": "nurture_sequence_name", "type": "string", "default": "Standard B2B Sequence"}
+    ]
+  metadata: |
+    {
+      "industry": "B2B SaaS",
+      "avg_conversion_rate": "8.5%",
+      "avg_journey_duration": "32_days"
+    }
+  tags: "b2b, lead nurturing, sales"
+  author: "Sales & Marketing Team"
+  published_at: <%= 1.month.ago %>
+
+product_launch_campaign:
+  name: "Product Launch Campaign Template"
+  template_type: "campaign"
+  category: "product_launch"
+  template_data: |
+    {
+      "campaign_name": "{{product_name}} Launch Campaign",
+      "duration_weeks": 12,
+      "phases": [
+        {
+          "name": "Pre-Launch (Teaser)",
+          "duration_weeks": 4,
+          "activities": [
+            {
+              "type": "teaser_content",
+              "channels": ["social_media", "email", "blog"],
+              "frequency": "2x_per_week"
+            },
+            {
+              "type": "influencer_outreach",
+              "target_count": 10
+            }
+          ]
+        },
+        {
+          "name": "Launch Week",
+          "duration_weeks": 1,
+          "activities": [
+            {
+              "type": "press_release",
+              "distribution": "wide"
+            },
+            {
+              "type": "launch_event",
+              "format": "{{event_format}}"
+            },
+            {
+              "type": "social_media_blitz",
+              "frequency": "daily"
+            }
+          ]
+        },
+        {
+          "name": "Post-Launch",
+          "duration_weeks": 7,
+          "activities": [
+            {
+              "type": "customer_testimonials",
+              "collection_method": "automated"
+            },
+            {
+              "type": "performance_analysis",
+              "frequency": "weekly"
+            }
+          ]
+        }
+      ],
+      "budget_allocation": {
+        "paid_media": "{{paid_media_budget}}",
+        "content_creation": "{{content_budget}}",
+        "events": "{{events_budget}}",
+        "tools_software": "{{tools_budget}}"
+      },
+      "success_metrics": [
+        "Launch week sales",
+        "Social media reach",
+        "Press coverage mentions",
+        "Customer acquisition cost"
+      ]
+    }
+  is_active: true
+  usage_count: 3
+  description: "Comprehensive template for managing product launch campaigns"
+  version: 1
+  variables: |
+    [
+      {"name": "product_name", "type": "string", "required": true},
+      {"name": "event_format", "type": "select", "options": ["virtual", "in_person", "hybrid"], "default": "virtual"},
+      {"name": "paid_media_budget", "type": "currency", "required": true},
+      {"name": "content_budget", "type": "currency", "required": true},
+      {"name": "events_budget", "type": "currency", "required": true},
+      {"name": "tools_budget", "type": "currency", "required": true}
+    ]
+  metadata: |
+    {
+      "complexity": "high",
+      "team_size_recommended": "5-8 people",
+      "industries": ["technology", "consumer_goods", "b2b_services"]
+    }
+  tags: "product launch, campaign, multi-channel"
+  author: "Product Marketing Team"
+
+social_post_template:
+  name: "Social Media Post Template"
+  template_type: "social_post"
+  category: "social_media"
+  template_data: |
+    {
+      "platforms": {
+        "instagram": {
+          "format": "image_with_caption",
+          "caption": "{{post_message}} {{hashtags}}",
+          "image_specs": {
+            "aspect_ratio": "1:1",
+            "min_resolution": "1080x1080"
+          }
+        },
+        "linkedin": {
+          "format": "text_with_image",
+          "message": "{{post_message_professional}}",
+          "image_specs": {
+            "aspect_ratio": "1.91:1",
+            "min_resolution": "1200x628"
+          }
+        },
+        "twitter": {
+          "format": "text_with_media",
+          "message": "{{post_message_short}} {{hashtags_short}}",
+          "character_limit": 280
+        }
+      },
+      "scheduling": {
+        "optimal_times": {
+          "instagram": "{{instagram_post_time}}",
+          "linkedin": "{{linkedin_post_time}}",
+          "twitter": "{{twitter_post_time}}"
+        }
+      }
+    }
+  is_active: true
+  usage_count: 25
+  description: "Multi-platform social media post template with platform-specific formatting"
+  version: 1
+  variables: |
+    [
+      {"name": "post_message", "type": "text", "required": true, "description": "Main social media message"},
+      {"name": "post_message_professional", "type": "text", "description": "Professional version for LinkedIn"},
+      {"name": "post_message_short", "type": "text", "description": "Short version for Twitter"},
+      {"name": "hashtags", "type": "string", "description": "Instagram hashtags"},
+      {"name": "hashtags_short", "type": "string", "description": "Twitter hashtags"},
+      {"name": "instagram_post_time", "type": "time", "default": "6:00 PM"},
+      {"name": "linkedin_post_time", "type": "time", "default": "8:00 AM"},
+      {"name": "twitter_post_time", "type": "time", "default": "12:00 PM"}
+    ]
+  metadata: |
+    {
+      "platforms_supported": ["instagram", "linkedin", "twitter"],
+      "content_types": ["promotional", "educational", "behind_the_scenes"],
+      "engagement_optimization": true
+    }
+  tags: "social media, multi-platform, scheduling"
+  author: "Social Media Team"
+  published_at: <%= 3.weeks.ago %>
+
+email_template_child:
+  name: "Summer Welcome Email (Customized)"
+  template_type: "email"
+  category: "seasonal"
+  parent_template: welcome_email_template
+  template_data: |
+    {
+      "subject": "Welcome to our Summer Collection, {{customer_name}}! ☀️",
+      "preheader": "Discover sustainable summer style",
+      "body": {
+        "header": {
+          "logo": "{{company_logo}}",
+          "background_color": "#F59E0B",
+          "seasonal_graphic": "summer_banner.jpg"
+        },
+        "content": [
+          {
+            "type": "heading",
+            "text": "Welcome to Summer, {{customer_name}}!"
+          },
+          {
+            "type": "paragraph",
+            "text": "Thank you for joining our sustainable fashion journey. Discover our eco-friendly summer collection designed for the conscious consumer."
+          },
+          {
+            "type": "product_showcase",
+            "products": ["summer_dress", "eco_swimwear", "sustainable_sandals"]
+          },
+          {
+            "type": "button",
+            "text": "Shop Summer Collection",
+            "url": "{{summer_collection_url}}",
+            "color": "#F59E0B"
+          }
+        ],
+        "footer": {
+          "company": "{{company_name}}",
+          "address": "{{company_address}}",
+          "unsubscribe_url": "{{unsubscribe_url}}",
+          "social_links": true
+        }
+      }
+    }
+  is_active: false
+  usage_count: 5
+  description: "Summer-themed version of the welcome email template"
+  version: 1
+  variables: |
+    [
+      {"name": "customer_name", "type": "string", "required": true},
+      {"name": "company_name", "type": "string", "required": true},
+      {"name": "company_logo", "type": "url"},
+      {"name": "summer_collection_url", "type": "url", "required": true},
+      {"name": "company_address", "type": "string"},
+      {"name": "unsubscribe_url", "type": "url", "required": true}
+    ]
+  metadata: |
+    {
+      "seasonal": "summer",
+      "parent_template_id": "welcome_email_template",
+      "customizations": ["header_color", "seasonal_graphics", "product_showcase"]
+    }
+  tags: "summer, seasonal, welcome"
+  author: "Seasonal Marketing Team"

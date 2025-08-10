@@ -10,5 +10,8 @@ application.register("campaign", CampaignController)
 import CampaignDashboardController from "./campaign_dashboard_controller"
 application.register("campaign-dashboard", CampaignDashboardController)
 
+import FileUploadController from "./file_upload_controller"
+application.register("file-upload", FileUploadController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
