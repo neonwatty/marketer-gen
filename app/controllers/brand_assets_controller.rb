@@ -3,16 +3,20 @@ class BrandAssetsController < ApplicationController
   
   # GET /brand_assets
   def index
-    @brand_assets = BrandAsset.active
-                             .includes([file_attachment: :blob])
-                             .recent
-                             .limit(20)
-                             .offset((params[:page].to_i - 1) * 20)
+    @brand_assets = BrandAsset.active.includes([file_attachment: :blob])
 
-    # Apply filters if present
-    @brand_assets = @brand_assets.by_file_type(params[:file_type]) if params[:file_type].present?
-    @brand_assets = @brand_assets.by_scan_status(params[:scan_status]) if params[:scan_status].present?
-    @brand_assets = @brand_assets.search_content(params[:search]) if params[:search].present?
+    # Apply search and filters
+    apply_search_and_filters
+
+    # Apply sorting
+    apply_sorting
+
+    # Apply pagination
+    page = [params[:page].to_i, 1].max
+    per_page = params[:per_page]&.to_i || 20
+    offset = (page - 1) * per_page
+    
+    @brand_assets = @brand_assets.limit(per_page).offset(offset)
 
     respond_to do |format|
       format.html
@@ -65,18 +69,21 @@ class BrandAssetsController < ApplicationController
     upload_params = params.require(:uploads)
 
     upload_params.each do |upload_data|
+      # Convert Parameters to hash and permit the necessary fields
+      permitted_data = upload_data.permit(:file, :file_type, :purpose, :assetable_type, :assetable_id)
+      
       brand_asset = BrandAsset.new(
-        file: upload_data[:file],
-        file_type: upload_data[:file_type],
-        purpose: upload_data[:purpose],
-        assetable: find_or_create_assetable(upload_data)
+        file: permitted_data[:file],
+        file_type: permitted_data[:file_type],
+        purpose: permitted_data[:purpose],
+        assetable: find_or_create_assetable(permitted_data)
       )
 
       if brand_asset.save
         uploaded_assets << serialize_brand_asset(brand_asset)
       else
         failed_uploads << {
-          filename: upload_data[:file]&.original_filename,
+          filename: permitted_data[:file]&.original_filename,
           errors: brand_asset.errors.full_messages
         }
       end
@@ -118,8 +125,31 @@ class BrandAssetsController < ApplicationController
   # PATCH /brand_assets/1/update_metadata
   def update_metadata
     metadata_params = params.require(:metadata)
+    
+    # Convert ActionController::Parameters to hash for merge_metadata
+    # Handle case where metadata is not a valid Parameters object
+    begin
+      metadata_hash = metadata_params.respond_to?(:to_unsafe_h) ? metadata_params.to_unsafe_h : metadata_params
+    rescue
+      render json: {
+        success: false,
+        errors: ['Invalid metadata format'],
+        message: 'Metadata must be a valid object'
+      }, status: :unprocessable_entity
+      return
+    end
+    
+    # Ensure metadata_hash is a hash
+    unless metadata_hash.is_a?(Hash)
+      render json: {
+        success: false,
+        errors: ['Invalid metadata format'],
+        message: 'Metadata must be a valid object'
+      }, status: :unprocessable_entity
+      return
+    end
 
-    if @brand_asset.merge_metadata(metadata_params)
+    if @brand_asset.merge_metadata(metadata_hash)
       render json: {
         success: true,
         brand_asset: serialize_brand_asset(@brand_asset),
@@ -228,5 +258,85 @@ class BrandAssetsController < ApplicationController
         total_count: brand_assets.respond_to?(:total_count) ? brand_assets.total_count : brand_assets.count
       }
     }
+  end
+
+  def apply_search_and_filters
+    # Search across multiple fields
+    if params[:query].present? || params[:search].present?
+      search_term = params[:query] || params[:search]
+      @brand_assets = @brand_assets.search_content(search_term)
+    end
+
+    # File type filter
+    if params[:file_type].present?
+      @brand_assets = @brand_assets.by_file_type(params[:file_type])
+    end
+
+    # Scan status filter
+    if params[:scan_status].present?
+      @brand_assets = @brand_assets.by_scan_status(params[:scan_status])
+    end
+
+    # Size range filter
+    if params[:size_range].present?
+      case params[:size_range]
+      when 'small'
+        @brand_assets = @brand_assets.where('file_size < ?', 1.megabyte)
+      when 'medium'
+        @brand_assets = @brand_assets.where('file_size >= ? AND file_size <= ?', 1.megabyte, 5.megabytes)
+      when 'large'
+        @brand_assets = @brand_assets.where('file_size > ?', 5.megabytes)
+      end
+    end
+
+    # Purpose filter
+    if params[:purpose].present?
+      @brand_assets = @brand_assets.where('purpose LIKE ?', "%#{params[:purpose]}%")
+    end
+
+    # Date range filter
+    if params[:date_from].present?
+      @brand_assets = @brand_assets.where('created_at >= ?', params[:date_from])
+    end
+
+    if params[:date_to].present?
+      @brand_assets = @brand_assets.where('created_at <= ?', params[:date_to])
+    end
+
+    # With extracted text
+    if params[:has_text] == 'true'
+      @brand_assets = @brand_assets.with_text_extracted
+    elsif params[:has_text] == 'false'
+      @brand_assets = @brand_assets.where(extracted_text: [nil, ''])
+    end
+
+    # Metadata filters
+    if params[:tags].present?
+      tag_list = params[:tags].split(',').map(&:strip)
+      tag_list.each do |tag|
+        @brand_assets = @brand_assets.where("JSON_EXTRACT(metadata, '$.tags') LIKE ?", "%#{tag}%")
+      end
+    end
+  end
+
+  def apply_sorting
+    case params[:sort]
+    when 'oldest'
+      @brand_assets = @brand_assets.order(created_at: :asc)
+    when 'name'
+      @brand_assets = @brand_assets.order(original_filename: :asc)
+    when 'name_desc'
+      @brand_assets = @brand_assets.order(original_filename: :desc)
+    when 'size'
+      @brand_assets = @brand_assets.order(file_size: :asc)
+    when 'size_desc'
+      @brand_assets = @brand_assets.order(file_size: :desc)
+    when 'file_type'
+      @brand_assets = @brand_assets.order(file_type: :asc, created_at: :desc)
+    when 'scan_status'
+      @brand_assets = @brand_assets.order(scan_status: :asc, created_at: :desc)
+    else # 'recent' or default
+      @brand_assets = @brand_assets.recent
+    end
   end
 end
