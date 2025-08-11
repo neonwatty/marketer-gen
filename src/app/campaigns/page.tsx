@@ -1,6 +1,13 @@
+"use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { CampaignCard, type CampaignStatus } from "@/components/ui/campaign-card"
+import { CampaignCardSkeleton } from "@/components/ui/campaign-card-skeleton"
 import { CampaignStats } from "@/components/ui/campaign-stats"
+import { CampaignStatsSkeleton } from "@/components/ui/campaign-stats-skeleton"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
+import { ErrorDisplay } from "@/components/ui/error-display"
 import { Plus, Search, Filter, LayoutGrid, List } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -84,12 +91,44 @@ const campaignStats = {
 }
 
 export default function CampaignsPage() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [loadingCampaigns, setLoadingCampaigns] = useState<Set<string>>(new Set())
+  const [error, setError] = useState<Error | null>(null)
+
   const handleEdit = (id: string) => {
     console.log("Edit campaign:", id)
   }
 
-  const handleStatusChange = (id: string, newStatus: CampaignStatus) => {
+  const handleStatusChange = async (id: string, newStatus: CampaignStatus) => {
     console.log("Status change for campaign:", id, "to:", newStatus)
+    
+    setLoadingCampaigns(prev => new Set(prev).add(id))
+    
+    try {
+      // Simulate API call
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate occasional failures for demonstration
+          if (Math.random() > 0.8) {
+            reject(new Error("Network error occurred"))
+          } else {
+            resolve(undefined)
+          }
+        }, 1000)
+      })
+      
+      // Update would happen here in real implementation
+      setError(null)
+    } catch (err) {
+      setError(err as Error)
+      throw err // Re-throw to let optimistic UI handle rollback
+    } finally {
+      setLoadingCampaigns(prev => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+    }
   }
 
   const handleCopy = (id: string) => {
@@ -101,35 +140,46 @@ export default function CampaignsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Campaigns</h1>
-          <p className="text-muted-foreground">
-            Manage and organize your marketing campaigns
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center border rounded-lg p-1">
-            <Button variant="default" size="sm" className="h-7 px-2">
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-            <Link href="/campaigns/list">
-              <Button variant="ghost" size="sm" className="h-7 px-2">
-                <List className="h-4 w-4" />
-              </Button>
-            </Link>
+    <ErrorBoundary>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Campaigns</h1>
+            <p className="text-muted-foreground">
+              Manage and organize your marketing campaigns
+            </p>
           </div>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Campaign
-          </Button>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center border rounded-lg p-1">
+              <Button variant="default" size="sm" className="h-7 px-2">
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Link href="/campaigns/list">
+                <Button variant="ghost" size="sm" className="h-7 px-2">
+                  <List className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              New Campaign
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* Campaign Stats */}
-      <CampaignStats stats={campaignStats} />
+        {/* Error Display */}
+        {error && (
+          <ErrorDisplay
+            error={error}
+            title="Failed to update campaign"
+            onDismiss={() => setError(null)}
+            onRetry={() => setError(null)}
+          />
+        )}
+
+        {/* Campaign Stats */}
+        {isLoading ? <CampaignStatsSkeleton /> : <CampaignStats stats={campaignStats} />}
 
       {/* Search and Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -148,37 +198,46 @@ export default function CampaignsPage() {
         </div>
       </div>
 
-      {/* Campaigns Grid */}
-      <div className="grid gap-6">
-        {sampleCampaigns.map((campaign) => (
-          <CampaignCard
-            key={campaign.id}
-            id={campaign.id}
-            title={campaign.title}
-            description={campaign.description}
-            status={campaign.status}
-            createdAt={campaign.createdAt}
-            metrics={campaign.metrics}
-            onEdit={handleEdit}
-            onStatusChange={handleStatusChange}
-            onCopy={handleCopy}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+        {/* Campaigns Grid */}
+        <div className="grid gap-6">
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <CampaignCardSkeleton key={i} />
+            ))
+          ) : (
+            sampleCampaigns.map((campaign) => (
+              <CampaignCard
+                key={campaign.id}
+                id={campaign.id}
+                title={campaign.title}
+                description={campaign.description}
+                status={campaign.status}
+                createdAt={campaign.createdAt}
+                metrics={campaign.metrics}
+                onEdit={handleEdit}
+                onStatusChange={handleStatusChange}
+                onCopy={handleCopy}
+                onDelete={handleDelete}
+                isLoading={loadingCampaigns.has(campaign.id)}
+                loadingActions={loadingCampaigns.has(campaign.id) ? [`status-${campaign.status}`] : []}
+              />
+            ))
+          )}
+        </div>
 
-      {/* Empty State (shown when no campaigns) */}
-      {/* <div className="flex flex-col items-center justify-center py-12 text-center">
-        <Target className="h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">No campaigns yet</h3>
-        <p className="text-muted-foreground mb-6 max-w-sm">
-          Get started by creating your first marketing campaign with AI-powered content generation.
-        </p>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Your First Campaign
-        </Button>
-      </div> */}
-    </div>
+        {/* Empty State (shown when no campaigns) */}
+        {/* <div className="flex flex-col items-center justify-center py-12 text-center">
+          <Target className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No campaigns yet</h3>
+          <p className="text-muted-foreground mb-6 max-w-sm">
+            Get started by creating your first marketing campaign with AI-powered content generation.
+          </p>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Your First Campaign
+          </Button>
+        </div> */}
+      </div>
+    </ErrorBoundary>
   )
 }

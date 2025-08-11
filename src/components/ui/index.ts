@@ -118,3 +118,36 @@ export {
   StepGuidance,
   type NavigationAction
 } from "./navigation-guidance"
+export { Switch } from "./switch"
+export { Avatar, AvatarImage, AvatarFallback } from "./avatar"
+export { CampaignCard, type CampaignStatus, type CampaignMetrics, type CampaignCardProps } from "./campaign-card"
+export { CampaignStats, type CampaignStatsProps } from "./campaign-stats"
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from "./table"
+export {
+  DropdownMenu,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+} from "./dropdown-menu"
+export { DataTable, type DataTableProps } from "./data-table"
+export { CampaignDataTable, type CampaignTableData } from "./campaign-data-table"

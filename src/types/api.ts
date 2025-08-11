@@ -49,15 +49,70 @@ export interface ApiEndpoint {
 export interface CreateCampaignRequest {
   name: string
   description?: string
-  type: string
-  startDate?: string
-  endDate?: string
+  brandId: string
+  status?: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'ARCHIVED'
+  goals?: string // JSON string
+  targetKPIs?: string // JSON string
+  timeline?: string // JSON string
   budget?: number
-  tags?: string[]
+  metadata?: string // JSON string
 }
 
-export interface UpdateCampaignRequest extends Partial<CreateCampaignRequest> {
-  status?: string
+export interface UpdateCampaignRequest {
+  name?: string
+  description?: string
+  status?: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'ARCHIVED'
+  goals?: string // JSON string
+  targetKPIs?: string // JSON string
+  timeline?: string // JSON string
+  budget?: number
+  metadata?: string // JSON string
+}
+
+export interface CampaignResponse {
+  id: string
+  name: string
+  description?: string
+  createdAt: string
+  updatedAt: string
+  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'ARCHIVED'
+  goals?: string
+  targetKPIs?: string
+  timeline?: string
+  budget?: number
+  metadata?: string
+  brandId: string
+  brand?: {
+    id: string
+    name: string
+    description?: string
+    primaryColor?: string
+    secondaryColor?: string
+  }
+  journeys?: Array<{
+    id: string
+    name: string
+    description?: string
+    status: string
+    createdAt: string
+    updatedAt: string
+  }>
+  analytics?: Array<{
+    id: string
+    eventType: string
+    views: number
+    clicks: number
+    conversions: number
+    engagementRate?: number
+    conversionRate?: number
+    revenue: number
+    cost: number
+    timestamp: string
+  }>
+  _count?: {
+    journeys: number
+    analytics: number
+  }
 }
 
 // Content Generation API

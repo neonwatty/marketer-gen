@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -31,6 +31,7 @@ export interface StepperNavigationProps {
   orientation?: "horizontal" | "vertical"
   className?: string
   children?: React.ReactNode
+  isLoading?: boolean
 }
 
 function StepperNavigation({
@@ -47,6 +48,7 @@ function StepperNavigation({
   orientation = "horizontal",
   className,
   children,
+  isLoading = false,
 }: StepperNavigationProps) {
   const progressPercentage = ((currentStep) / (steps.length - 1)) * 100
 
@@ -195,7 +197,7 @@ function StepperNavigation({
           type="button"
           variant="outline"
           onClick={handlePrevious}
-          disabled={isFirstStep || !canGoPrevious}
+          disabled={isFirstStep || !canGoPrevious || isLoading}
           className="flex items-center gap-2"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -213,11 +215,20 @@ function StepperNavigation({
           <Button
             type="button"
             onClick={handleNext}
-            disabled={!canGoNext}
+            disabled={!canGoNext || isLoading}
             className="flex items-center gap-2"
           >
-            {isLastStep ? "Complete" : "Next"}
-            {!isLastStep && <ChevronRight className="w-4 h-4" />}
+            {isLoading && isLastStep ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              <>
+                {isLastStep ? "Complete" : "Next"}
+                {!isLastStep && <ChevronRight className="w-4 h-4" />}
+              </>
+            )}
           </Button>
         </div>
       </div>
