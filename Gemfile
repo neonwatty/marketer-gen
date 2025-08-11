@@ -49,6 +49,9 @@ gem "image_processing", "~> 1.2"
 # PDF text extraction [https://github.com/yob/pdf-reader]
 gem "pdf-reader"
 
+# Redis for advanced caching and rate limiting [https://github.com/redis/redis-rb]
+gem "redis", "~> 5.0"
+
 # Cloud storage providers for Active Storage
 gem "aws-sdk-s3", require: false
 gem "google-cloud-storage", require: false

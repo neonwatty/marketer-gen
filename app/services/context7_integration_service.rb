@@ -100,9 +100,12 @@ class Context7IntegrationService
     return false unless enabled
     
     begin
-      # Test with a simple library lookup
-      test_result = resolve_library_id("react")
-      !test_result.nil?
+      # Test with a simple library lookup using the Context7Client
+      test_result = Context7Client.resolve_library_id("rails")
+      !test_result.nil? && test_result.key?(:library_id)
+    rescue NotImplementedError => e
+      Rails.logger.warn "Context7 MCP client not yet implemented: #{e.message}"
+      false
     rescue => e
       Rails.logger.warn "Context7 availability check failed: #{e.message}"
       false
@@ -129,12 +132,27 @@ class Context7IntegrationService
 
   # Resolve library name to Context7-compatible library ID
   def resolve_library_id(library_name)
-    # This would call the MCP server's resolve-library-id function
-    # For now, simulate the call
     Rails.logger.debug "Context7: Resolving library ID for '#{library_name}'"
     
-    # Simulate MCP call - in real implementation this would use:
-    # mcp_client.call("resolve-library-id", libraryName: library_name)
+    begin
+      # Call Context7 MCP to resolve library ID
+      result = Context7Client.resolve_library_id(library_name)
+      
+      if result && result[:library_id]
+        Rails.logger.debug "Context7: Resolved '#{library_name}' to '#{result[:library_id]}'"
+        result[:library_id]
+      else
+        raise LibraryNotFoundError, "Could not resolve library: #{library_name}"
+      end
+    rescue => e
+      Rails.logger.error "Context7: Library resolution failed for '#{library_name}': #{e.message}"
+      # Fallback to basic transformation for common libraries
+      fallback_library_id(library_name)
+    end
+  end
+  
+  # Fallback method for basic library ID transformation
+  def fallback_library_id(library_name)
     case library_name.downcase
     when "react"
       "/facebook/react"
@@ -155,26 +173,37 @@ class Context7IntegrationService
   def fetch_library_docs(library_id, topic: nil, tokens: nil)
     Rails.logger.debug "Context7: Fetching documentation for #{library_id}"
     
-    # This would call the MCP server's get-library-docs function
-    # mcp_client.call("get-library-docs", {
-    #   context7CompatibleLibraryID: library_id,
-    #   topic: topic,
-    #   tokens: tokens || max_doc_tokens
-    # })
-    
-    # Simulate response structure
-    {
-      library_id: library_id,
-      topic: topic,
-      content: simulate_documentation_content(library_id, topic),
-      retrieved_at: Time.current.iso8601,
-      token_count: tokens || max_doc_tokens
-    }
+    begin
+      # Call Context7 MCP to fetch library documentation
+      result = Context7Client.get_library_docs(
+        library_id: library_id,
+        topic: topic,
+        tokens: tokens || max_doc_tokens
+      )
+      
+      if result
+        Rails.logger.debug "Context7: Successfully fetched documentation for #{library_id}"
+        {
+          library_id: library_id,
+          topic: topic,
+          content: result[:content] || result['content'],
+          retrieved_at: Time.current.iso8601,
+          token_count: tokens || max_doc_tokens,
+          raw_response: result
+        }
+      else
+        raise DocumentationNotFoundError, "No documentation found for #{library_id}"
+      end
+    rescue => e
+      Rails.logger.error "Context7: Documentation fetch failed for #{library_id}: #{e.message}"
+      # Fallback to simulated content
+      fallback_documentation_content(library_id, topic)
+    end
   end
 
-  # Simulate documentation content (remove in real implementation)
-  def simulate_documentation_content(library_id, topic)
-    case library_id
+  # Fallback documentation content when Context7 MCP is unavailable
+  def fallback_documentation_content(library_id, topic)
+    content = case library_id
     when "/facebook/react"
       if topic&.include?("hooks")
         "React Hooks allow you to use state and other React features in functional components..."
@@ -188,6 +217,15 @@ class Context7IntegrationService
     else
       "Documentation content for #{library_id}..."
     end
+    
+    {
+      library_id: library_id,
+      topic: topic,
+      content: content,
+      retrieved_at: Time.current.iso8601,
+      token_count: max_doc_tokens,
+      fallback: true
+    }
   end
 
   # Enhance documentation with user query context

@@ -1,0 +1,274 @@
+# Prompt Template Test Fixtures
+
+social_media_template:
+  name: "Social Media Test Template"
+  prompt_type: "social_media"
+  system_prompt: "You are a social media content creator. Create engaging content for social media platforms."
+  user_prompt: "Create {{content_type}} content for {{platform}}. Brand: {{brand_context}}. Campaign: {{campaign_name}}. Goal: {{campaign_goal}}."
+  variables: 
+    - name: "content_type"
+      type: "string"
+      required: false
+    - name: "platform"
+      type: "string"
+      required: true
+    - name: "brand_context"
+      type: "string"
+      required: true
+    - name: "campaign_name"
+      type: "string"
+      required: false
+    - name: "campaign_goal"
+      type: "string"
+      required: false
+  default_values:
+    content_type: "social media post"
+    campaign_goal: "engagement"
+  description: "Template for generating social media content"
+  category: "content"
+  version: 1
+  is_active: true
+  usage_count: 5
+  metadata: {}
+  tags: "social,content,engagement"
+  temperature: 0.8
+  max_tokens: 500
+
+email_template:
+  name: "Email Marketing Template"
+  prompt_type: "email_marketing"
+  system_prompt: "You are an email marketing specialist. Create compelling email content that drives engagement and conversions."
+  user_prompt: "Create {{email_type}} email for {{campaign_context}}. Subject focus: {{subject_focus}}. Goal: {{primary_goal}}."
+  variables: 
+    - name: "email_type"
+      type: "string"
+      required: true
+    - name: "campaign_context"
+      type: "string"
+      required: false
+    - name: "subject_focus"
+      type: "string"
+      required: false
+    - name: "primary_goal"
+      type: "string"
+      required: true
+  default_values:
+    primary_goal: "conversion"
+  description: "Template for email marketing campaigns"
+  category: "email"
+  version: 1
+  is_active: true
+  usage_count: 12
+  metadata: {}
+  tags: "email,marketing,conversion"
+  temperature: 0.6
+  max_tokens: 1200
+
+campaign_planning_template:
+  name: "Campaign Planning Template"
+  prompt_type: "campaign_planning"
+  system_prompt: "You are a marketing strategist. Create comprehensive campaign plans with actionable strategies."
+  user_prompt: "Create campaign plan for {{campaign_name}}. Purpose: {{campaign_purpose}}. Budget: {{budget}}. Audience: {{target_audience}}."
+  variables: 
+    - name: "campaign_name"
+      type: "string"
+      required: true
+    - name: "campaign_purpose"
+      type: "string"
+      required: true
+    - name: "budget"
+      type: "string"
+      required: false
+    - name: "target_audience"
+      type: "string"
+      required: false
+  default_values: {}
+  description: "Template for strategic campaign planning"
+  category: "strategy"
+  version: 1
+  is_active: true
+  usage_count: 8
+  metadata: {}
+  tags: "strategy,planning,campaign"
+  temperature: 0.3
+  max_tokens: 3000
+
+inactive_template:
+  name: "Inactive Template"
+  prompt_type: "ad_copy"
+  system_prompt: "Create ad copy."
+  user_prompt: "Generate ad for {{product}}."
+  variables: 
+    - name: "product"
+      type: "string"
+      required: true
+  default_values: {}
+  description: "Inactive template for testing"
+  category: "advertising"
+  version: 1
+  is_active: false
+  usage_count: 0
+  metadata: {}
+  tags: "advertising"
+  temperature: 0.7
+  max_tokens: 800
+
+ad_copy_template:
+  name: "Ad Copy Template"
+  prompt_type: "ad_copy"
+  system_prompt: "Create compelling ad copy that converts."
+  user_prompt: "Create ad copy for {{offering}} targeting {{target_audience}}."
+  variables: 
+    - name: "offering"
+      type: "string"
+      required: true
+    - name: "target_audience"
+      type: "string"
+      required: true
+  default_values: {}
+  description: "Template for ad copy generation"
+  category: "advertising"
+  version: 1
+  is_active: true
+  usage_count: 0
+  metadata: {}
+  tags: "advertising,conversion"
+  temperature: 0.7
+  max_tokens: 800
+
+parent_template:
+  name: "Parent Template"
+  prompt_type: "social_media"
+  system_prompt: "Base template for social media."
+  user_prompt: "Create {{content_type}} for {{platform}}."
+  variables: 
+    - name: "content_type"
+      type: "string"
+      required: false
+    - name: "platform"
+      type: "string"
+      required: true
+  default_values:
+    content_type: "social media post"
+  description: "Parent template for testing inheritance"
+  category: "content"
+  version: 1
+  is_active: true
+  usage_count: 3
+  metadata: {}
+  tags: "social"
+  temperature: 0.7
+  max_tokens: 400
+
+child_template:
+  name: "Child Template"
+  prompt_type: "social_media"
+  system_prompt: "Specialized template for social media."
+  user_prompt: "Create specialized {{content_type}} for {{platform}} with {{tone}} tone."
+  variables: 
+    - name: "content_type"
+      type: "string"
+      required: false
+    - name: "platform"
+      type: "string"
+      required: true
+    - name: "tone"
+      type: "string"
+      required: false
+  default_values:
+    content_type: "social media post"
+    tone: "casual"
+  description: "Child template for testing inheritance"
+  category: "content"
+  version: 1
+  is_active: true
+  usage_count: 1
+  parent_template: parent_template
+  metadata: {}
+  tags: "social"
+  temperature: 0.8
+  max_tokens: 400
+
+variant_template:
+  name: "Social Media Test Template - Variant"
+  prompt_type: "social_media"
+  system_prompt: "You are a social media content creator. Create casual, conversational content."
+  user_prompt: "Create {{content_type}} content for {{platform}}. Brand: {{brand_context}}. Campaign: {{campaign_name}}. Goal: {{campaign_goal}}."
+  variables: 
+    - name: "content_type"
+      type: "string"
+      required: false
+    - name: "platform"
+      type: "string"
+      required: true
+    - name: "brand_context"
+      type: "string"
+      required: true
+    - name: "campaign_name"
+      type: "string"
+      required: false
+    - name: "campaign_goal"
+      type: "string"
+      required: false
+  default_values:
+    content_type: "social media post"
+    campaign_goal: "engagement"
+  description: "Variant template for A/B testing"
+  category: "content"
+  version: 1
+  is_active: false
+  usage_count: 0
+  metadata:
+    variant_of: 1
+    variant_name: "Casual"
+    created_for_testing: true
+  tags: "social,content,engagement"
+  temperature: 0.9
+  max_tokens: 500
+
+landing_page_template:
+  name: "Landing Page Template"
+  prompt_type: "landing_page"
+  system_prompt: "Create high-converting landing page content."
+  user_prompt: "Create landing page for {{page_purpose}} offering {{offering}}."
+  variables: 
+    - name: "page_purpose"
+      type: "string"
+      required: true
+    - name: "offering"
+      type: "string"
+      required: true
+  default_values: {}
+  description: "Template for landing page generation"
+  category: "conversion"
+  version: 1
+  is_active: true
+  usage_count: 0
+  metadata: {}
+  tags: "landing,conversion"
+  temperature: 0.7
+  max_tokens: 1500
+
+brand_analysis_template:
+  name: "Brand Analysis Template"
+  prompt_type: "brand_analysis"
+  system_prompt: "Analyze brand assets and provide insights."
+  user_prompt: "Analyze {{brand_assets}} focusing on {{focus_areas}}."
+  variables: 
+    - name: "brand_assets"
+      type: "string"
+      required: true
+    - name: "focus_areas"
+      type: "string"
+      required: false
+  default_values:
+    focus_areas: "brand voice, messaging, target audience, compliance"
+  description: "Template for brand analysis"
+  category: "analysis"
+  version: 1
+  is_active: true
+  usage_count: 0
+  metadata: {}
+  tags: "brand,analysis"
+  temperature: 0.5
+  max_tokens: 2000

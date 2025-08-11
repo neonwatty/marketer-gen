@@ -23,6 +23,34 @@ Rails.application.routes.draw do
     end
   end
 
+  # Content Generation API
+  namespace :api do
+    namespace :v1 do
+      namespace :generate do
+        post :social_media
+        post :ad_copy
+        post :email
+        post :landing_page
+        post :campaign_plan
+        post :brand_analysis
+      end
+    end
+  end
+
+  # AI Services API
+  resources :ai_services, only: [] do
+    collection do
+      get :status
+      get :rate_limit_status
+      get :cache_statistics
+      post :documentation_lookup
+      post :batch_documentation_lookup
+      post :suggest_libraries
+      delete :clear_cache
+      delete :clear_ai_cache
+    end
+  end
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

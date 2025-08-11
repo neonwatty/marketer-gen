@@ -1,6 +1,6 @@
 # Factory for creating AI service instances based on provider configuration
 # Supports multiple providers: OpenAI, Anthropic, etc.
-class AIServiceFactory
+class AiServiceFactory
   include Singleton
 
   # Provider configuration

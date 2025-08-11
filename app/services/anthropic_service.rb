@@ -1,6 +1,6 @@
 # Anthropic Claude AI service implementation
 # Handles content generation using Claude models via Anthropic API
-class AnthropicService < AIServiceBase
+class AnthropicService < AiServiceBase
   require "net/http"
   require "json"
 
@@ -60,7 +60,20 @@ class AnthropicService < AIServiceBase
 
     request_payload[:system] = system_message if system_message.present?
 
-    make_request_with_retries(-> { send_anthropic_request("/messages", request_payload) })
+    # Include cache options for rate limiting and caching
+    cache_options = {
+      prompt: sanitized_prompt,
+      estimated_tokens: estimate_token_count(sanitized_prompt),
+      system_prompt: system_message,
+      temperature: temperature,
+      max_tokens: max_tokens,
+      cache_ttl: options[:cache_ttl]
+    }
+
+    make_request_with_retries(
+      -> { send_anthropic_request("/messages", request_payload) },
+      cache_options
+    )
   end
 
   # Generate comprehensive campaign plan

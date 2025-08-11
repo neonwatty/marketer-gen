@@ -104,19 +104,19 @@ class BrandAssetsControllerTest < ActionDispatch::IntegrationTest
 
   # Create Action Tests
   test "should create brand asset" do
-    skip "File upload testing needs multipart form handling - skip for now"
-
     file = fixture_file_upload("test_logo.png", "image/png")
 
-    post brand_assets_url, params: {
-      brand_asset: {
-        file: file,
-        file_type: "logo",
-        purpose: "Test logo",
-        assetable_id: @brand_identity.id,
-        assetable_type: "BrandIdentity"
+    assert_difference("BrandAsset.count", 1) do
+      post brand_assets_url, params: {
+        brand_asset: {
+          file: file,
+          file_type: "logo",
+          purpose: "Test logo",
+          assetable_id: @brand_identity.id,
+          assetable_type: "BrandIdentity"
+        }
       }
-    }, as: :json
+    end
 
     assert_response :created
     json_response = JSON.parse(response.body)
@@ -142,34 +142,31 @@ class BrandAssetsControllerTest < ActionDispatch::IntegrationTest
 
   # Upload Multiple Action Tests
   test "should upload multiple files" do
-    skip "Multiple file upload testing requires complex multipart form handling - skip for now"
-
     file1 = fixture_file_upload("test_logo1.png", "image/png")
     file2 = fixture_file_upload("test_logo2.png", "image/png")
 
     initial_count = BrandAsset.count
 
-    post upload_multiple_brand_assets_url, params: {
-      uploads: [
-        {
-          file: file1,
-          file_type: "logo",
-          purpose: "Logo 1",
-          assetable_type: "BrandIdentity",
-          assetable_id: @brand_identity.id
-        },
-        {
-          file: file2,
-          file_type: "logo",
-          purpose: "Logo 2",
-          assetable_type: "BrandIdentity",
-          assetable_id: @brand_identity.id
-        }
-      ]
-    }, as: :json
-
-    final_count = BrandAsset.count
-    assert_equal initial_count + 2, final_count, "Expected 2 new assets to be created"
+    assert_difference("BrandAsset.count", 2) do
+      post upload_multiple_brand_assets_url, params: {
+        uploads: [
+          {
+            file: file1,
+            file_type: "logo",
+            purpose: "Logo 1",
+            assetable_type: "BrandIdentity",
+            assetable_id: @brand_identity.id
+          },
+          {
+            file: file2,
+            file_type: "logo",
+            purpose: "Logo 2",
+            assetable_type: "BrandIdentity",
+            assetable_id: @brand_identity.id
+          }
+        ]
+      }
+    end
 
     assert_response :created
     json_response = JSON.parse(response.body)
@@ -178,8 +175,6 @@ class BrandAssetsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should handle partial upload failure" do
-    skip "Multiple file upload testing needs complex multipart form handling - skip for now"
-
     valid_file = fixture_file_upload("test_logo.png", "image/png")
     invalid_file = fixture_file_upload("test_invalid.exe", "application/x-msdownload")
 
@@ -188,7 +183,7 @@ class BrandAssetsControllerTest < ActionDispatch::IntegrationTest
         { file: valid_file, file_type: "logo", purpose: "Valid logo", assetable_id: @brand_identity.id, assetable_type: "BrandIdentity" },
         { file: invalid_file, file_type: "logo", purpose: "Invalid file", assetable_id: @brand_identity.id, assetable_type: "BrandIdentity" }
       ]
-    }, as: :json
+    }
 
     assert_response :unprocessable_content
     json_response = JSON.parse(response.body)

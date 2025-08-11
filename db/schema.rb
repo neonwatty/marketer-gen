@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_10_135533) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_10_211036) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -165,6 +165,38 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_10_135533) do
     t.index ["position"], name: "index_customer_journeys_on_position"
   end
 
+  create_table "prompt_templates", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "prompt_type", null: false
+    t.text "system_prompt", null: false
+    t.text "user_prompt", null: false
+    t.json "variables", default: [], null: false
+    t.json "default_values", default: {}, null: false
+    t.text "description"
+    t.string "category"
+    t.integer "version", default: 1, null: false
+    t.boolean "is_active", default: true, null: false
+    t.integer "usage_count", default: 0, null: false
+    t.integer "parent_template_id"
+    t.json "metadata", default: {}, null: false
+    t.string "tags"
+    t.float "temperature", default: 0.7
+    t.integer "max_tokens", default: 2000
+    t.string "model_preferences"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "child_templates_count", default: 0, null: false
+    t.index ["category"], name: "index_prompt_templates_on_category"
+    t.index ["is_active", "prompt_type"], name: "index_prompt_templates_on_is_active_and_prompt_type"
+    t.index ["is_active"], name: "index_prompt_templates_on_is_active"
+    t.index ["name"], name: "index_prompt_templates_on_name"
+    t.index ["parent_template_id"], name: "index_prompt_templates_on_parent_template_id"
+    t.index ["prompt_type", "category"], name: "index_prompt_templates_on_prompt_type_and_category"
+    t.index ["prompt_type"], name: "index_prompt_templates_on_prompt_type"
+    t.index ["usage_count"], name: "index_prompt_templates_on_usage_count"
+    t.index ["version"], name: "index_prompt_templates_on_version"
+  end
+
   create_table "templates", force: :cascade do |t|
     t.string "name", null: false
     t.string "template_type", null: false
@@ -202,5 +234,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_10_135533) do
   add_foreign_key "brand_assets", "brand_assets", column: "parent_asset_id"
   add_foreign_key "campaigns", "brand_identities"
   add_foreign_key "customer_journeys", "campaigns"
+  add_foreign_key "prompt_templates", "prompt_templates", column: "parent_template_id"
   add_foreign_key "templates", "templates", column: "parent_template_id"
 end

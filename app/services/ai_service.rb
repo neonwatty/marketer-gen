@@ -1,6 +1,6 @@
 # Main AI Service orchestrator
 # Coordinates between different AI providers, Context7 documentation, and application needs
-class AIService
+class AiService
   include ActiveModel::Model
   include ActiveModel::Attributes
 
@@ -172,7 +172,7 @@ class AIService
   def setup_services
     begin
       # Initialize AI provider
-      @ai_provider = AIServiceFactory.create(
+      @ai_provider = AiServiceFactory.create(
         provider: provider, 
         model: model,
         timeout_seconds: 60,

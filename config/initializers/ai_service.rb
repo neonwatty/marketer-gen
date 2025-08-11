@@ -31,7 +31,18 @@ Rails.application.configure do
   config.ai_service.debug_mode = Rails.env.development? && ENV.fetch("AI_DEBUG", "false") == "true"
   config.ai_service.log_requests = ENV.fetch("AI_LOG_REQUESTS", "true") == "true"
   
-  # Rate limiting (requests per minute)
+  # Advanced rate limiting configuration
+  config.ai_service.rate_limiting_enabled = ENV.fetch("AI_RATE_LIMITING_ENABLED", "true") == "true"
+  config.ai_service.rate_limit_requests_per_minute = ENV.fetch("AI_RATE_LIMIT_RPM", "60").to_i
+  config.ai_service.rate_limit_requests_per_hour = ENV.fetch("AI_RATE_LIMIT_RPH", "1000").to_i
+  config.ai_service.rate_limit_requests_per_day = ENV.fetch("AI_RATE_LIMIT_RPD", "10000").to_i
+  config.ai_service.rate_limit_tokens_per_minute = ENV.fetch("AI_RATE_LIMIT_TPM", "150000").to_i
+  
+  # Advanced response caching configuration
+  config.ai_service.cache_similar_prompts = ENV.fetch("AI_CACHE_SIMILAR_PROMPTS", "false") == "true"
+  config.ai_service.cache_similarity_threshold = ENV.fetch("AI_CACHE_SIMILARITY_THRESHOLD", "0.85").to_f
+  
+  # Legacy rate limit setting (for backward compatibility)
   config.ai_service.rate_limit = ENV.fetch("AI_RATE_LIMIT", "100").to_i
 end
 
