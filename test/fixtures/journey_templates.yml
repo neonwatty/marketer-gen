@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: "B2B Lead Nurturing"
+  template_type: "lead_nurturing"
+  category: "b2b"
+  description: "Standard lead nurturing template"
+  author: "Marketing Team"
+  version: 1
+  usage_count: 0
+  is_active: true
+  template_data: '{}'
+  variables: '[]'
+  metadata: '{}'
+
+two:
+  name: "Customer Retention"
+  template_type: "customer_retention"
+  category: "saas"
+  description: "Keep customers engaged"
+  author: "Customer Success Team"
+  version: 1
+  usage_count: 5
+  is_active: true
+  template_data: '{}'
+  variables: '[]'
+  metadata: '{}'

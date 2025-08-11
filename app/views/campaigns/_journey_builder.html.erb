@@ -1,7 +1,7 @@
 <div class="journey-builder bg-white rounded-lg shadow-lg" 
      data-controller="journey-builder" 
      data-journey-builder-campaign-id-value="<%= campaign.id if defined?(campaign) %>"
-     data-journey-builder-existing-stages-value="<%= (campaign&.customer_journey&.stages || []).to_json %>">
+     data-journey-builder-existing-stages-value="<%= [].to_json %>">
   
   <!-- Journey Builder Header -->
   <div class="flex items-center justify-between p-6 border-b border-gray-200">
@@ -40,7 +40,7 @@
       <!-- Stage Templates -->
       <div class="space-y-3" data-journey-builder-target="stageLibrary">
         <!-- Awareness Stage -->
-        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-blue-300 cursor-move hover:border-blue-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-blue-300 cursor-move hover:border-blue-400 hover:shadow-md transition-all"
              data-stage-type="awareness"
              data-journey-builder-target="stageTemplate"
              draggable="true">
@@ -59,7 +59,7 @@
         </div>
 
         <!-- Consideration Stage -->
-        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-yellow-300 cursor-move hover:border-yellow-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-yellow-300 cursor-move hover:border-yellow-400 hover:shadow-md transition-all"
              data-stage-type="consideration"
              data-journey-builder-target="stageTemplate"
              draggable="true">
@@ -77,7 +77,7 @@
         </div>
 
         <!-- Conversion Stage -->
-        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-green-300 cursor-move hover:border-green-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-green-300 cursor-move hover:border-green-400 hover:shadow-md transition-all"
              data-stage-type="conversion"
              data-journey-builder-target="stageTemplate"
              draggable="true">
@@ -95,7 +95,7 @@
         </div>
 
         <!-- Retention Stage -->
-        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-purple-300 cursor-move hover:border-purple-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-purple-300 cursor-move hover:border-purple-400 hover:shadow-md transition-all"
              data-stage-type="retention"
              data-journey-builder-target="stageTemplate"
              draggable="true">
@@ -113,7 +113,7 @@
         </div>
 
         <!-- Advocacy Stage -->
-        <div class="stage-template bg-white p-4 rounded-lg border-2 border-dashed border-indigo-300 cursor-move hover:border-indigo-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-indigo-300 cursor-move hover:border-indigo-400 hover:shadow-md transition-all"
              data-stage-type="advocacy"
              data-journey-builder-target="stageTemplate"
              draggable="true">

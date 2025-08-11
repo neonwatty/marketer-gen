@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  campaign: one
+  name: "Lead Nurturing Journey"
+  template_type: "lead_nurturing"
+  purpose: "Generate qualified leads"
+  goals: "Increase conversion rate by 20%"
+  timing: "30-day sequence"
+  audience: "Prospects interested in our product"
+  position: 0
+
+two:
+  campaign: two
+  name: "Customer Retention Journey"
+  template_type: "customer_retention"
+  purpose: "Keep customers engaged"
+  goals: "Reduce churn by 15%"
+  timing: "Ongoing quarterly engagement"
+  audience: "Existing customers"
+  position: 1

@@ -502,6 +502,7 @@ DEPENDENCIES
   capybara
   cssbundling-rails
   debug
+  faraday (~> 2.0)
   google-cloud-storage
   image_processing (~> 1.2)
   jbuilder

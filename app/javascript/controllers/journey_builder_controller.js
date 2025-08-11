@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import Sortable from 'sortablejs'
 
 // Journey Builder Controller for drag-and-drop stage management
 export default class extends Controller {
@@ -20,6 +21,12 @@ export default class extends Controller {
     this.draggedElement = null
     this.selectedStage = null
     this.stageCounter = 0
+    this.sortableInstances = []
+    
+    // Undo/Redo functionality
+    this.history = []
+    this.historyIndex = -1
+    this.maxHistorySize = 50
     
     // Load existing stages if available
     if (this.existingStagesValue && this.existingStagesValue.length > 0) {
@@ -27,7 +34,8 @@ export default class extends Controller {
     }
 
     this.updateStatistics()
-    this.setupDragAndDrop()
+    this.setupSortableJS()
+    this.setupKeyboardShortcuts()
   }
 
   disconnect() {
@@ -42,16 +50,183 @@ export default class extends Controller {
     this.showStagesContainer()
   }
 
-  // Setup drag and drop event listeners
-  setupDragAndDrop() {
-    // Setup drag start for stage templates
-    this.stageTemplateTargets.forEach(template => {
-      template.addEventListener('dragstart', this.handleTemplateDragStart.bind(this))
-    })
+  // Setup sortable.js for enhanced drag-and-drop
+  setupSortableJS() {
+    // Setup sortable for stage library (for dragging templates to canvas)
+    if (this.stageLibraryTarget) {
+      const librarySort = Sortable.create(this.stageLibraryTarget, {
+        group: {
+          name: 'stages',
+          pull: 'clone',
+          put: false
+        },
+        sort: false,
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        dragClass: 'sortable-drag',
+        onStart: (evt) => {
+          this.addStateToHistory()
+        },
+        onEnd: (evt) => {
+          // Handle dropping template to canvas
+          if (evt.to === this.stagesContainerTarget) {
+            const stageType = evt.item.dataset.stageType
+            this.createStageFromTemplate(evt.item, evt.newIndex * 250 + 50, 100)
+            evt.item.remove() // Remove the cloned template
+          }
+        }
+      })
+      this.sortableInstances.push(librarySort)
+    }
 
-    // Prevent default drag behaviors
-    this.canvasTarget.addEventListener('dragenter', this.preventDefault)
-    this.canvasTarget.addEventListener('dragleave', this.preventDefault)
+    // Setup sortable for stages container (for reordering existing stages)
+    if (this.stagesContainerTarget) {
+      const stagesSort = Sortable.create(this.stagesContainerTarget, {
+        group: 'stages',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        dragClass: 'sortable-drag',
+        dropClass: 'sortable-drop',
+        onStart: (evt) => {
+          this.addStateToHistory()
+          evt.item.style.zIndex = '1000'
+        },
+        onEnd: (evt) => {
+          evt.item.style.zIndex = '10'
+          this.updateStagePositions()
+          this.drawConnections()
+        },
+        onMove: (evt) => {
+          return this.validateDrop(evt)
+        }
+      })
+      this.sortableInstances.push(stagesSort)
+    }
+
+    // Setup canvas drop zone for templates
+    this.setupCanvasDropZone()
+  }
+
+  // Setup canvas as a drop zone for templates
+  setupCanvasDropZone() {
+    this.canvasTarget.addEventListener('dragover', this.handleCanvasDragOver.bind(this))
+    this.canvasTarget.addEventListener('drop', this.handleCanvasDrop.bind(this))
+  }
+
+  // Setup keyboard shortcuts for undo/redo
+  setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault()
+        this.undo()
+      } else if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+        event.preventDefault()
+        this.redo()
+      }
+    })
+  }
+
+  // Add current state to history for undo/redo
+  addStateToHistory() {
+    const currentState = {
+      stages: JSON.parse(JSON.stringify(this.stages)),
+      timestamp: Date.now()
+    }
+    
+    // Remove any history after current index (when adding new state after undo)
+    this.history = this.history.slice(0, this.historyIndex + 1)
+    
+    // Add new state
+    this.history.push(currentState)
+    this.historyIndex = this.history.length - 1
+    
+    // Limit history size
+    if (this.history.length > this.maxHistorySize) {
+      this.history.shift()
+      this.historyIndex--
+    }
+  }
+  
+  // Undo last action
+  undo() {
+    if (this.historyIndex > 0) {
+      this.historyIndex--
+      this.restoreState(this.history[this.historyIndex])
+      this.showNotification('Undid last action', 'info')
+    }
+  }
+  
+  // Redo last undone action
+  redo() {
+    if (this.historyIndex < this.history.length - 1) {
+      this.historyIndex++
+      this.restoreState(this.history[this.historyIndex])
+      this.showNotification('Redid last action', 'info')
+    }
+  }
+  
+  // Restore state from history
+  restoreState(state) {
+    this.stages = JSON.parse(JSON.stringify(state.stages))
+    this.stageCounter = Math.max(...this.stages.map(s => parseInt(s.id.split('-')[1]) || 0), 0)
+    this.renderStages()
+    this.updateStatistics()
+    this.drawConnections()
+    
+    if (this.stages.length > 0) {
+      this.showStagesContainer()
+    } else {
+      this.canvasInstructionsTarget.style.display = 'flex'
+      this.stagesContainerTarget.style.display = 'none'
+    }
+  }
+  
+  // Update stage positions after reordering
+  updateStagePositions() {
+    const stageElements = Array.from(this.stagesContainerTarget.children)
+    stageElements.forEach((element, index) => {
+      const stageId = element.dataset.stageId
+      const stage = this.stages.find(s => s.id === stageId)
+      if (stage) {
+        stage.position.x = index * 250 + 50
+        element.style.left = `${stage.position.x}px`
+      }
+    })
+  }
+  
+  // Validate drop operation (collision detection)
+  validateDrop(evt) {
+    const rect = evt.related.getBoundingClientRect()
+    const dragRect = evt.dragged.getBoundingClientRect()
+    
+    // Check for collision with existing stages
+    const collision = this.checkCollision(dragRect, evt.related)
+    
+    // Allow drop if no collision or if dropping in safe zone
+    return !collision
+  }
+  
+  // Check for collision between dragged element and existing stages
+  checkCollision(dragRect, target) {
+    const stages = this.stagesContainerTarget.children
+    
+    for (let stage of stages) {
+      if (stage === target) continue
+      
+      const stageRect = stage.getBoundingClientRect()
+      
+      // Check if rectangles overlap
+      if (!(dragRect.right < stageRect.left || 
+            dragRect.left > stageRect.right || 
+            dragRect.bottom < stageRect.top || 
+            dragRect.top > stageRect.bottom)) {
+        return true // Collision detected
+      }
+    }
+    
+    return false // No collision
   }
 
   // Handle template drag start
@@ -89,9 +264,21 @@ export default class extends Controller {
   }
 
   // Create stage from template
-  createStageFromTemplate(template, x, y) {
-    const stageType = template.dataset.stageType
+  createStageFromTemplate(template, x = null, y = null) {
+    this.addStateToHistory()
+    
+    const stageType = template.dataset.stageType || template.type
     const stageConfig = this.getStageTypeConfig(stageType)
+    
+    // Calculate position - if x,y not provided, use next available position
+    let posX, posY
+    if (x !== null && y !== null) {
+      posX = Math.max(0, x - 100)
+      posY = Math.max(0, y - 50)
+    } else {
+      posX = this.stages.length * 250 + 50
+      posY = 100
+    }
     
     const newStage = {
       id: `stage-${++this.stageCounter}`,
@@ -99,7 +286,7 @@ export default class extends Controller {
       type: stageType,
       description: stageConfig.description,
       duration_days: stageConfig.defaultDuration,
-      position: { x: Math.max(0, x - 100), y: Math.max(0, y - 50) },
+      position: { x: posX, y: posY },
       color: stageConfig.color
     }
 
@@ -108,6 +295,9 @@ export default class extends Controller {
     this.showStagesContainer()
     this.updateStatistics()
     this.drawConnections()
+    
+    // Re-initialize sortable after adding new stage
+    this.refreshSortable()
   }
 
   // Get stage type configuration
@@ -301,6 +491,8 @@ export default class extends Controller {
     const stage = this.stages.find(s => s.id === this.selectedStage)
     if (!stage) return
     
+    this.addStateToHistory()
+    
     // Update stage with form data
     stage.name = this.stageNameInputTarget.value
     stage.description = this.stageDescriptionInputTarget.value
@@ -311,6 +503,7 @@ export default class extends Controller {
     this.updateStatistics()
     this.closeConfigPanel()
     this.drawConnections()
+    this.refreshSortable()
   }
 
   // Delete stage
@@ -320,11 +513,14 @@ export default class extends Controller {
     if (!this.selectedStage) return
     
     if (confirm('Are you sure you want to delete this stage?')) {
+      this.addStateToHistory()
+      
       this.stages = this.stages.filter(s => s.id !== this.selectedStage)
       this.renderStages()
       this.updateStatistics()
       this.closeConfigPanel()
       this.drawConnections()
+      this.refreshSortable()
       
       // Show instructions if no stages left
       if (this.stages.length === 0) {
@@ -344,12 +540,15 @@ export default class extends Controller {
       }
     }
     
+    this.addStateToHistory()
+    
     this.stages = this.getTemplateStages(templateType)
     this.stageCounter = this.stages.length
     this.renderStages()
     this.showStagesContainer()
     this.updateStatistics()
     this.drawConnections()
+    this.refreshSortable()
   }
 
   // Get template stage configurations
@@ -448,6 +647,8 @@ export default class extends Controller {
   resetJourney() {
     if (this.stages.length > 0) {
       if (confirm('This will delete all stages. Are you sure?')) {
+        this.addStateToHistory()
+        
         this.stages = []
         this.stageCounter = 0
         this.renderStages()
@@ -456,6 +657,7 @@ export default class extends Controller {
         this.canvasInstructionsTarget.style.display = 'flex'
         this.stagesContainerTarget.style.display = 'none'
         this.connectionLinesTarget.innerHTML = ''
+        this.refreshSortable()
       }
     }
   }
@@ -537,10 +739,33 @@ export default class extends Controller {
     event.preventDefault()
   }
 
+  // Refresh sortable instances after DOM changes
+  refreshSortable() {
+    // Find the stages sortable instance and refresh it
+    const stagesSortable = this.sortableInstances.find(instance => 
+      instance.el === this.stagesContainerTarget
+    )
+    if (stagesSortable) {
+      // Sortable automatically handles new elements, no refresh needed
+    }
+  }
+
   cleanup() {
-    // Remove event listeners and clean up
-    this.stageTemplateTargets.forEach(template => {
-      template.removeEventListener('dragstart', this.handleTemplateDragStart)
+    // Destroy all sortable instances
+    this.sortableInstances.forEach(instance => {
+      if (instance && instance.destroy) {
+        instance.destroy()
+      }
     })
+    this.sortableInstances = []
+    
+    // Remove event listeners
+    if (this.canvasTarget) {
+      this.canvasTarget.removeEventListener('dragover', this.handleCanvasDragOver)
+      this.canvasTarget.removeEventListener('drop', this.handleCanvasDrop)
+    }
+    
+    // Remove keyboard shortcuts (note: this might affect other controllers)
+    // document.removeEventListener('keydown', this.keydownHandler)
   }
 }

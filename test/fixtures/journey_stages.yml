@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  journey: one
+  name: "Awareness Stage"
+  stage_type: "Awareness"
+  position: 0
+  description: "First stage of the journey"
+  status: "draft"
+
+two:
+  journey: one
+  name: "Consideration Stage" 
+  stage_type: "Consideration"
+  position: 1
+  description: "Second stage of the journey"
+  status: "draft"

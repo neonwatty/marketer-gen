@@ -4,12 +4,15 @@ class Campaign < ApplicationRecord
   # Associations
   belongs_to :brand_identity, optional: true, counter_cache: true
   has_many :customer_journeys, dependent: :destroy
+  has_one :customer_journey, -> { order(:created_at) }, dependent: :destroy
+  has_many :journeys, -> { order(:position) }, dependent: :destroy
   has_many :content_assets, as: :assetable, dependent: :destroy
   has_many :brand_assets, as: :assetable, dependent: :destroy
 
   # Through associations for easier access
   has_many :campaign_templates, -> { where(template_type: "campaign") }, class_name: "Template"
   has_many :journey_stages, through: :customer_journeys, source: :stages
+  has_many :structured_journey_stages, through: :journeys, source: :journey_stages
   has_many :email_content, -> { where(channel: "email") }, class_name: "ContentAsset", as: :assetable
   has_many :social_content, -> { where(channel: "social_media") }, class_name: "ContentAsset", as: :assetable
   has_many :web_content, -> { where(channel: "web") }, class_name: "ContentAsset", as: :assetable

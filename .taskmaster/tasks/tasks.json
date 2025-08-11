@@ -272,8 +272,8 @@
             "title": "Create journey stage models and database schema",
             "description": "Implement Rails models and database schema for storing journey stages, templates, and configurations",
             "dependencies": [],
-            "details": "Create Journey model with attributes for name, template_type, purpose, goals, timing, and audience. Build JourneyStage model with position, stage_type (Awareness, Consideration, Conversion, Retention), content, and configuration fields. Implement JourneyTemplate model for pre-built templates. Add associations between Campaign and Journey models. Create migrations with proper indexes for performance. Include JSON columns for flexible stage configuration storage.",
-            "status": "pending",
+            "details": "Create Journey model with attributes for name, template_type, purpose, goals, timing, and audience. Build JourneyStage model with position, stage_type (Awareness, Consideration, Conversion, Retention), content, and configuration fields. Implement JourneyTemplate model for pre-built templates. Add associations between Campaign and Journey models. Create migrations with proper indexes for performance. Include JSON columns for flexible stage configuration storage.\n<info added on 2025-08-11T21:32:35.158Z>\n**COMPLETION REPORT:**\n\nModels and database schema successfully implemented and tested. All three core models (Journey, JourneyStage, JourneyTemplate) created with comprehensive functionality including stage management, analytics, configuration handling, and template instantiation. Database migrations executed with proper indexing and foreign key constraints. Campaign model updated with journey associations. Three seed templates created and validated. All model methods tested and working correctly. Foundation ready for UI implementation in next subtask.\n</info added on 2025-08-11T21:32:35.158Z>",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -284,7 +284,7 @@
               "4.1"
             ],
             "details": "Install and configure sortable.js library. Create JourneyBuilderController Stimulus controller to manage drag-and-drop interactions. Implement stage dragging from toolbar to canvas with ghost element preview. Add reordering functionality for existing stages within the journey flow. Create connection line updates when stages are moved. Handle drop zone validation and collision detection. Implement undo/redo functionality for stage movements.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -444,7 +444,7 @@
               "5.4"
             ],
             "details": "Install and configure Sidekiq with Redis. Create AIGenerationJob for async content generation. Implement job status tracking and progress updates. Build webhook system for job completion notifications. Add job retry configuration with exponential backoff.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -455,7 +455,7 @@
               "5.4"
             ],
             "details": "Implement response parser for different AI provider formats. Create content validators for quality and appropriateness checks. Build structured data extraction from AI responses. Add content moderation and filtering. Implement response transformation for consistent output format.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -1097,7 +1097,7 @@
     ],
     "metadata": {
       "created": "2025-08-09T22:22:11.811Z",
-      "updated": "2025-08-11T19:57:41.100Z",
+      "updated": "2025-08-11T21:47:39.810Z",
       "description": "Tasks for master context"
     }
   }

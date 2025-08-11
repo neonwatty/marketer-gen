@@ -52,6 +52,9 @@ gem "pdf-reader"
 # Redis for advanced caching and rate limiting [https://github.com/redis/redis-rb]
 gem "redis", "~> 5.0"
 
+# HTTP client library for webhook notifications [https://github.com/lostisland/faraday]
+gem "faraday", "~> 2.0"
+
 # Cloud storage providers for Active Storage
 gem "aws-sdk-s3", require: false
 gem "google-cloud-storage", require: false
