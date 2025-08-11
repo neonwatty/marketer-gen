@@ -9,6 +9,11 @@ class CampaignsController < ApplicationController
       create_sample_campaigns
       @campaigns = Campaign.all.order(created_at: :desc)
     end
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @campaigns.select(:id, :name, :status, :purpose) }
+    end
   end
 
   def show

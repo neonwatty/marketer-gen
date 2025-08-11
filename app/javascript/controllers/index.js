@@ -21,3 +21,9 @@ application.register("hello", HelloController)
 
 import JourneyBuilderController from "./journey_builder_controller"
 application.register("journey-builder", JourneyBuilderController)
+
+import JourneyTemplatesController from "./journey_templates_controller"
+application.register("journey-templates", JourneyTemplatesController)
+
+import StageConfigController from "./stage_config_controller"
+application.register("stage-config", StageConfigController)

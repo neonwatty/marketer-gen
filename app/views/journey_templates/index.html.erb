@@ -1,0 +1,257 @@
+<div class="journey-templates-library bg-gray-50 min-h-screen" 
+     data-controller="journey-templates" 
+     data-journey-templates-templates-url-value="<%= journey_templates_path(format: :json) %>"
+     data-journey-templates-categories-url-value="<%= categories_journey_templates_path %>"
+     data-journey-templates-search-url-value="<%= search_journey_templates_path %>">
+
+  <!-- Header Section -->
+  <div class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900">Journey Templates</h1>
+            <p class="mt-2 text-gray-600">Pre-built customer journey templates to accelerate your marketing campaigns</p>
+          </div>
+          
+          <!-- Quick Actions -->
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 text-sm text-gray-500">
+              <span data-journey-templates-target="totalCount">Loading...</span>
+              <span>templates available</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="py-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          
+          <!-- Search Bar -->
+          <div class="flex-1 max-w-lg">
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <input type="text" 
+                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                     placeholder="Search templates by name, description, or tags..."
+                     data-journey-templates-target="searchInput"
+                     data-action="input->journey-templates#handleSearchInput">
+            </div>
+          </div>
+
+          <!-- Filter Controls -->
+          <div class="flex flex-wrap items-center gap-4">
+            <!-- Category Filter -->
+            <div class="flex items-center space-x-2">
+              <label class="text-sm font-medium text-gray-700">Category:</label>
+              <select class="border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
+                      data-journey-templates-target="categoryFilter"
+                      data-action="change->journey-templates#handleFilterChange">
+                <option value="">All Categories</option>
+                <% @categories.each do |category| %>
+                  <option value="<%= category %>"><%= category&.humanize || 'General' %></option>
+                <% end %>
+              </select>
+            </div>
+
+            <!-- Template Type Filter -->
+            <div class="flex items-center space-x-2">
+              <label class="text-sm font-medium text-gray-700">Type:</label>
+              <select class="border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
+                      data-journey-templates-target="typeFilter"
+                      data-action="change->journey-templates#handleFilterChange">
+                <option value="">All Types</option>
+                <% @template_types.each do |type| %>
+                  <option value="<%= type %>"><%= type.humanize %></option>
+                <% end %>
+              </select>
+            </div>
+
+            <!-- Sort Options -->
+            <div class="flex items-center space-x-2">
+              <label class="text-sm font-medium text-gray-700">Sort:</label>
+              <select class="border-gray-300 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500"
+                      data-journey-templates-target="sortFilter"
+                      data-action="change->journey-templates#handleFilterChange">
+                <option value="recent">Most Recent</option>
+                <option value="popular">Most Popular</option>
+                <option value="name">Name A-Z</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates Grid -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Loading State -->
+    <div class="text-center py-12" data-journey-templates-target="loadingState">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <p class="mt-2 text-gray-600">Loading templates...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="text-center py-12 hidden" data-journey-templates-target="emptyState">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No templates found</h3>
+      <p class="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+    </div>
+
+    <!-- Templates Grid Container -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+         data-journey-templates-target="templatesGrid"
+         style="display: none;">
+      <!-- Template cards will be populated here -->
+    </div>
+
+    <!-- Load More Button -->
+    <div class="text-center mt-8 hidden" data-journey-templates-target="loadMoreContainer">
+      <button type="button" 
+              class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              data-journey-templates-target="loadMoreButton"
+              data-action="click->journey-templates#loadMore">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        Load More Templates
+      </button>
+    </div>
+  </div>
+
+  <!-- Template Preview Modal -->
+  <div class="fixed inset-0 z-50 hidden" data-journey-templates-target="previewModal">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <!-- Backdrop -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+           data-action="click->journey-templates#closePreviewModal"></div>
+      
+      <!-- Modal -->
+      <div class="relative bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-hidden shadow-xl">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900" data-journey-templates-target="previewTitle">
+              Template Preview
+            </h2>
+            <p class="text-sm text-gray-600 mt-1" data-journey-templates-target="previewSubtitle">
+              Preview template details and stages
+            </p>
+          </div>
+          <button type="button" 
+                  class="text-gray-400 hover:text-gray-600"
+                  data-action="click->journey-templates#closePreviewModal">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="overflow-y-auto max-h-96" data-journey-templates-target="previewContent">
+          <!-- Content will be populated dynamically -->
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
+          <button type="button" 
+                  class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  data-action="click->journey-templates#closePreviewModal">
+            Close
+          </button>
+          <button type="button" 
+                  class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  data-journey-templates-target="applyTemplateButton"
+                  data-action="click->journey-templates#showApplyModal">
+            Apply to Campaign
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apply Template Modal -->
+  <div class="fixed inset-0 z-50 hidden" data-journey-templates-target="applyModal">
+    <div class="flex items-center justify-center min-h-screen px-4">
+      <!-- Backdrop -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+           data-action="click->journey-templates#closeApplyModal"></div>
+      
+      <!-- Modal -->
+      <div class="relative bg-white rounded-lg max-w-lg w-full shadow-xl">
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Apply Template to Campaign</h3>
+          <p class="text-sm text-gray-600 mt-1">Select a campaign to apply this template to.</p>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="p-6">
+          <form data-journey-templates-target="applyForm" data-action="submit->journey-templates#applyTemplate">
+            <div class="space-y-4">
+              <!-- Campaign Selection -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Select Campaign
+                </label>
+                <select name="campaign_id" 
+                        required
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        data-journey-templates-target="campaignSelect">
+                  <option value="">Choose a campaign...</option>
+                  <!-- Options will be populated dynamically -->
+                </select>
+              </div>
+
+              <!-- Journey Name -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Journey Name
+                </label>
+                <input type="text" 
+                       name="name"
+                       class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                       data-journey-templates-target="journeyNameInput"
+                       placeholder="Enter journey name...">
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="flex justify-end space-x-3 p-6 border-t border-gray-200">
+          <button type="button" 
+                  class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  data-action="click->journey-templates#closeApplyModal">
+            Cancel
+          </button>
+          <button type="submit" 
+                  form="apply-template-form"
+                  class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  data-action="click->journey-templates#applyTemplate"
+                  data-journey-templates-target="applyButton">
+            Apply Template
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Area -->
+  <div class="fixed top-4 right-4 z-50 space-y-2" data-journey-templates-target="notificationArea">
+    <!-- Notifications will be added here dynamically -->
+  </div>
+</div>

@@ -7,7 +7,9 @@ export default class extends Controller {
     "canvas", "stagesContainer", "configPanel", "configForm", "connectionLines",
     "stageTemplate", "stageLibrary", "canvasInstructions",
     "stageNameInput", "stageDescriptionInput", "stageDurationInput",
-    "stageCount", "averageDuration"
+    "stageCount", "averageDuration",
+    "quickTemplates", "templateSearchInput", "templateSearchResults",
+    "configSubtitle", "stageTypeIndicator", "stageTypeLabel"
   ]
 
   static values = {
@@ -28,6 +30,10 @@ export default class extends Controller {
     this.historyIndex = -1
     this.maxHistorySize = 50
     
+    // Template system
+    this.templates = []
+    this.templateSearchTimeout = null
+    
     // Load existing stages if available
     if (this.existingStagesValue && this.existingStagesValue.length > 0) {
       this.loadExistingStages()
@@ -36,6 +42,7 @@ export default class extends Controller {
     this.updateStatistics()
     this.setupSortableJS()
     this.setupKeyboardShortcuts()
+    this.loadQuickTemplates()
   }
 
   disconnect() {
@@ -458,17 +465,97 @@ export default class extends Controller {
     }
   }
 
-  // Open configuration panel
+  // Open configuration panel with enhanced stage config
   openConfigPanel(stage) {
     this.selectedStage = stage.id
     
-    // Populate form
+    // Update stage type indicator and label
+    this.updateStageTypeIndicator(stage)
+    
+    // Populate basic form fields
     this.stageNameInputTarget.value = stage.name
     this.stageDescriptionInputTarget.value = stage.description || ''
     this.stageDurationInputTarget.value = stage.duration_days || ''
     
+    // Update subtitle
+    if (this.hasConfigSubtitleTarget) {
+      this.configSubtitleTarget.textContent = `Configure ${stage.name} settings and behavior`
+    }
+    
+    // Pass stage data to the stage config controller
+    this.updateStageConfigController(stage)
+    
     // Show panel
     this.configPanelTarget.style.display = 'block'
+  }
+
+  // Update stage type indicator
+  updateStageTypeIndicator(stage) {
+    if (this.hasStageTypeLabelTarget) {
+      this.stageTypeLabelTarget.textContent = `${stage.type.charAt(0).toUpperCase() + stage.type.slice(1)} Stage`
+    }
+    
+    if (this.hasStageTypeIndicatorTarget) {
+      // Update indicator color based on stage type
+      const colors = {
+        awareness: 'bg-blue-500',
+        consideration: 'bg-yellow-500',
+        conversion: 'bg-green-500',
+        retention: 'bg-purple-500',
+        advocacy: 'bg-indigo-500'
+      }
+      
+      // Remove existing color classes
+      this.stageTypeIndicatorTarget.className = this.stageTypeIndicatorTarget.className.replace(/bg-\w+-500/g, '')
+      
+      // Add new color class
+      const colorClass = colors[stage.type] || 'bg-gray-500'
+      this.stageTypeIndicatorTarget.classList.add(colorClass)
+    }
+  }
+
+  // Update stage config controller with stage data
+  updateStageConfigController(stage) {
+    const stageConfigElement = this.element.querySelector('[data-controller*="stage-config"]')
+    if (stageConfigElement) {
+      // Get the stage config controller instance
+      const stageConfigController = this.application.getControllerForElementAndIdentifier(stageConfigElement, 'stage-config')
+      if (stageConfigController) {
+        stageConfigController.updateStageData(stage)
+      } else {
+        // If controller not yet connected, store data for when it connects
+        stageConfigElement.dataset.stageConfigStageDataValue = JSON.stringify(stage)
+      }
+    }
+  }
+
+  // Handle stage config saved event
+  handleStageConfigSaved(event) {
+    const { stage, formData } = event.detail
+    
+    // Update the stage in our stages array
+    const stageIndex = this.stages.findIndex(s => s.id === stage.id)
+    if (stageIndex !== -1) {
+      this.stages[stageIndex] = { ...stage }
+      
+      // Re-render stages to reflect changes
+      this.renderStages()
+      this.updateStatistics()
+      this.drawConnections()
+      this.refreshSortable()
+      
+      // Show success notification
+      this.showNotification('Stage configuration saved successfully!', 'success')
+    }
+    
+    // Close config panel
+    this.closeConfigPanel()
+  }
+
+  // Handle notifications from stage config controller
+  handleNotification(event) {
+    const { message, type } = event.detail
+    this.showNotification(message, type)
   }
 
   // Close configuration panel
@@ -575,6 +662,225 @@ export default class extends Controller {
     }
     
     return templates[templateType] || []
+  }
+
+  // Load quick templates from the database
+  async loadQuickTemplates() {
+    try {
+      const response = await fetch('/journey_templates.json?sort=popular&limit=5')
+      if (!response.ok) {
+        console.warn('Could not load templates')
+        this.renderQuickTemplatesError()
+        return
+      }
+      
+      const data = await response.json()
+      this.templates = data.templates
+      this.renderQuickTemplates()
+      
+    } catch (error) {
+      console.warn('Error loading templates:', error)
+      this.renderQuickTemplatesError()
+    }
+  }
+
+  // Render quick templates in sidebar
+  renderQuickTemplates() {
+    if (!this.hasQuickTemplatesTarget) return
+
+    if (this.templates.length === 0) {
+      this.quickTemplatesTarget.innerHTML = `
+        <div class="text-center py-4">
+          <p class="text-xs text-gray-500">No templates available</p>
+        </div>
+      `
+      return
+    }
+
+    const templatesHTML = this.templates.map(template => `
+      <button type="button" 
+              class="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all text-sm"
+              data-action="click->journey-builder#loadDatabaseTemplate"
+              data-template-id="${template.id}">
+        <div class="flex items-center justify-between mb-1">
+          <div class="font-medium text-gray-900 truncate">${template.name}</div>
+          <span class="text-xs text-gray-500">${template.stage_count} stages</span>
+        </div>
+        <div class="text-xs text-gray-500 truncate">${template.description || template.template_type_humanized}</div>
+        <div class="flex items-center justify-between mt-2">
+          <span class="text-xs text-blue-600">${template.category_humanized}</span>
+          <span class="text-xs text-gray-400">${template.estimated_duration_days} days</span>
+        </div>
+      </button>
+    `).join('')
+
+    this.quickTemplatesTarget.innerHTML = templatesHTML
+  }
+
+  // Render quick templates error state
+  renderQuickTemplatesError() {
+    if (!this.hasQuickTemplatesTarget) return
+    
+    this.quickTemplatesTarget.innerHTML = `
+      <div class="text-center py-4">
+        <p class="text-xs text-gray-500 mb-2">Could not load templates</p>
+        <button type="button" 
+                class="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                data-action="click->journey-builder#loadQuickTemplates">
+          Try Again
+        </button>
+      </div>
+    `
+  }
+
+  // Load template from database
+  async loadDatabaseTemplate(event) {
+    const templateId = event.currentTarget.dataset.templateId
+    
+    if (this.stages.length > 0) {
+      if (!confirm('This will replace your current journey. Continue?')) {
+        return
+      }
+    }
+
+    try {
+      const response = await fetch(`/journey_templates/${templateId}/preview`)
+      if (!response.ok) throw new Error('Failed to load template')
+      
+      const data = await response.json()
+      this.applyTemplateToBuilder(data)
+      
+    } catch (error) {
+      console.error('Error loading template:', error)
+      this.showNotification('Failed to load template. Please try again.', 'error')
+    }
+  }
+
+  // Apply template data to builder
+  applyTemplateToBuilder(templateData) {
+    this.addStateToHistory()
+    
+    const { template, stages } = templateData
+    
+    // Clear existing stages
+    this.stages = []
+    this.stageCounter = 0
+    
+    // Convert template stages to builder stages
+    stages.forEach((stage, index) => {
+      const newStage = {
+        id: `stage-${++this.stageCounter}`,
+        name: stage.name,
+        type: stage.stage_type.toLowerCase(),
+        description: stage.description,
+        duration_days: stage.duration_days || 7,
+        position: { x: index * 250 + 50, y: 100 },
+        color: this.getStageColor(stage.stage_type.toLowerCase())
+      }
+      this.stages.push(newStage)
+    })
+    
+    this.renderStages()
+    this.showStagesContainer()
+    this.updateStatistics()
+    this.drawConnections()
+    this.refreshSortable()
+    
+    this.showNotification(`Applied template: ${template.name}`, 'success')
+  }
+
+  // Handle template search input
+  handleTemplateSearch(event) {
+    const query = event.target.value.trim()
+    
+    clearTimeout(this.templateSearchTimeout)
+    this.templateSearchTimeout = setTimeout(() => {
+      if (query.length >= 2) {
+        this.searchTemplates(query)
+      } else {
+        this.clearTemplateSearchResults()
+      }
+    }, 300)
+  }
+
+  // Search templates via API
+  async searchTemplates(query) {
+    if (!this.hasTemplateSearchResultsTarget) return
+
+    try {
+      this.templateSearchResultsTarget.innerHTML = `
+        <div class="text-center py-2">
+          <div class="inline-block animate-spin rounded-full h-3 w-3 border-b border-blue-600"></div>
+          <span class="text-xs text-gray-500 ml-2">Searching...</span>
+        </div>
+      `
+      
+      const response = await fetch(`/journey_templates/search?q=${encodeURIComponent(query)}`)
+      if (!response.ok) throw new Error('Search failed')
+      
+      const data = await response.json()
+      this.renderTemplateSearchResults(data.templates)
+      
+    } catch (error) {
+      console.error('Template search error:', error)
+      this.templateSearchResultsTarget.innerHTML = `
+        <div class="text-center py-2">
+          <p class="text-xs text-red-600">Search failed</p>
+        </div>
+      `
+    }
+  }
+
+  // Render template search results
+  renderTemplateSearchResults(templates) {
+    if (!this.hasTemplateSearchResultsTarget) return
+
+    if (templates.length === 0) {
+      this.templateSearchResultsTarget.innerHTML = `
+        <div class="text-center py-2">
+          <p class="text-xs text-gray-500">No templates found</p>
+        </div>
+      `
+      return
+    }
+
+    const resultsHTML = templates.map(template => `
+      <button type="button" 
+              class="w-full text-left p-2 bg-white rounded border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all text-xs"
+              data-action="click->journey-builder#loadDatabaseTemplate"
+              data-template-id="${template.id}">
+        <div class="flex items-center justify-between">
+          <div class="font-medium text-gray-900 truncate">${template.name}</div>
+          <span class="text-gray-500">${template.stage_count} stages</span>
+        </div>
+        <div class="text-gray-500 truncate mt-1">${template.description}</div>
+        <div class="flex items-center justify-between mt-1">
+          <span class="text-blue-600">${template.category}</span>
+          <span class="text-gray-400">${template.duration} days</span>
+        </div>
+      </button>
+    `).join('')
+
+    this.templateSearchResultsTarget.innerHTML = resultsHTML
+  }
+
+  // Clear template search results
+  clearTemplateSearchResults() {
+    if (this.hasTemplateSearchResultsTarget) {
+      this.templateSearchResultsTarget.innerHTML = ''
+    }
+  }
+
+  // Get stage color helper
+  getStageColor(stageType) {
+    const colors = {
+      awareness: 'blue',
+      consideration: 'yellow', 
+      conversion: 'green',
+      retention: 'purple',
+      advocacy: 'indigo'
+    }
+    return colors[stageType] || 'blue'
   }
 
   // Draw connection lines between stages

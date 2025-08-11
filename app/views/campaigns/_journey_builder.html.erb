@@ -131,33 +131,49 @@
         </div>
       </div>
 
-      <!-- Predefined Templates -->
+      <!-- Template Library -->
       <div class="mt-8">
-        <h4 class="text-md font-semibold text-gray-900 mb-3">Quick Templates</h4>
-        <div class="space-y-2">
-          <button type="button" 
-                  class="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all text-sm"
-                  data-action="click->journey-builder#loadTemplate"
-                  data-template="product-launch">
-            <div class="font-medium text-gray-900">Product Launch</div>
-            <div class="text-xs text-gray-500">Awareness → Consideration → Conversion</div>
-          </button>
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="text-md font-semibold text-gray-900">Templates</h4>
+          <%= link_to journey_templates_path, 
+                      class: "text-sm text-blue-600 hover:text-blue-800 font-medium",
+                      target: "_blank" do %>
+            Browse All
+            <svg class="w-3 h-3 inline ml-1" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+              <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+            </svg>
+          <% end %>
+        </div>
+
+        <!-- Quick Templates -->
+        <div class="space-y-2 mb-4" data-journey-builder-target="quickTemplates">
+          <!-- Templates will be populated here -->
+          <div class="text-center py-4">
+            <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <p class="text-xs text-gray-500 mt-1">Loading templates...</p>
+          </div>
+        </div>
+
+        <!-- Template Search -->
+        <div class="border-t pt-4">
+          <div class="relative mb-3">
+            <input type="text" 
+                   placeholder="Search templates..."
+                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                   data-journey-builder-target="templateSearchInput"
+                   data-action="input->journey-builder#handleTemplateSearch">
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+          </div>
           
-          <button type="button" 
-                  class="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all text-sm"
-                  data-action="click->journey-builder#loadTemplate"
-                  data-template="lead-generation">
-            <div class="font-medium text-gray-900">Lead Generation</div>
-            <div class="text-xs text-gray-500">Awareness → Consideration → Conversion → Retention</div>
-          </button>
-          
-          <button type="button" 
-                  class="w-full text-left p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all text-sm"
-                  data-action="click->journey-builder#loadTemplate"
-                  data-template="full-funnel">
-            <div class="font-medium text-gray-900">Full Customer Lifecycle</div>
-            <div class="text-xs text-gray-500">All stages: Awareness → Retention → Advocacy</div>
-          </button>
+          <!-- Search Results -->
+          <div class="max-h-48 overflow-y-auto space-y-1" data-journey-builder-target="templateSearchResults">
+            <!-- Search results will appear here -->
+          </div>
         </div>
       </div>
     </div>
@@ -202,14 +218,21 @@
       </div>
     </div>
 
-    <!-- Stage Configuration Panel -->
-    <div class="stage-config-panel w-80 bg-white border-l border-gray-200 p-6 overflow-y-auto"
+    <!-- Enhanced Stage Configuration Panel -->
+    <div class="stage-config-panel w-96 bg-white border-l border-gray-200 overflow-hidden"
          data-journey-builder-target="configPanel"
          style="display: none;">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900">Stage Configuration</h3>
+      
+      <!-- Configuration Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Stage Configuration</h3>
+          <p class="text-sm text-gray-600 mt-1" data-journey-builder-target="configSubtitle">
+            Configure stage settings and behavior
+          </p>
+        </div>
         <button type="button" 
-                class="text-gray-400 hover:text-gray-600"
+                class="text-gray-400 hover:text-gray-600 p-1"
                 data-action="click->journey-builder#closeConfigPanel">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -217,44 +240,88 @@
         </button>
       </div>
 
-      <!-- Configuration Form -->
-      <form data-journey-builder-target="configForm">
-        <div class="space-y-4">
+      <!-- Stage Type Indicator -->
+      <div class="px-6 py-3 bg-blue-50 border-b border-blue-100">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-full bg-blue-500" data-journey-builder-target="stageTypeIndicator"></div>
+          <span class="text-sm font-medium text-blue-900" data-journey-builder-target="stageTypeLabel">
+            Stage Type
+          </span>
+        </div>
+      </div>
+
+      <!-- Configuration Form Container -->
+      <div class="flex-1 overflow-y-auto max-h-[calc(100vh-200px)]"
+           data-controller="stage-config"
+           data-stage-config-stage-data-value="{}"
+           data-action="stage-config:stageConfigSaved->journey-builder#handleStageConfigSaved stage-config:configCancelled->journey-builder#closeConfigPanel stage-config:notification->journey-builder#handleNotification">
+        
+        <!-- Basic Stage Information -->
+        <div class="p-6 border-b border-gray-200">
+          <h4 class="text-base font-medium text-gray-900 mb-4">Basic Information</h4>
+          
           <!-- Stage Name -->
-          <div>
+          <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Stage Name</label>
             <input type="text" 
                    name="name"
                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                   data-journey-builder-target="stageNameInput">
+                   data-journey-builder-target="stageNameInput"
+                   data-stage-config-target="stageNameInput">
           </div>
 
           <!-- Stage Description -->
-          <div>
+          <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea name="description" 
                       rows="3"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      data-journey-builder-target="stageDescriptionInput"></textarea>
+                      data-journey-builder-target="stageDescriptionInput"
+                      data-stage-config-target="stageDescriptionInput"
+                      placeholder="Describe what happens in this stage..."></textarea>
           </div>
 
           <!-- Duration -->
-          <div>
+          <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Duration (days)</label>
             <input type="number" 
                    name="duration_days"
                    min="1"
                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                   data-journey-builder-target="stageDurationInput">
+                   data-journey-builder-target="stageDurationInput"
+                   data-stage-config-target="stageDurationInput">
+          </div>
+        </div>
+
+        <!-- Dynamic Configuration Form -->
+        <form data-journey-builder-target="configForm" 
+              data-stage-config-target="form"
+              data-action="submit->stage-config#handleFormSubmit">
+          
+          <!-- Error Container -->
+          <div class="px-6 pt-4" data-stage-config-target="errorContainer"></div>
+          
+          <!-- Dynamic Fields Container -->
+          <div class="px-6 pb-6" data-stage-config-target="dynamicFieldsContainer">
+            <!-- Dynamic fields will be populated here based on stage type -->
+            <div class="text-center py-8 text-gray-500">
+              <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"/>
+              </svg>
+              <p class="text-sm">Select or configure a stage to see advanced options</p>
+            </div>
           </div>
 
-          <!-- Stage Actions -->
-          <div class="pt-4 border-t border-gray-200">
+          <!-- Form Actions -->
+          <div class="border-t border-gray-200 p-6 bg-gray-50">
             <div class="flex space-x-3">
-              <button type="button" 
+              <button type="submit"
                       class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      data-action="click->journey-builder#saveStageConfig">
-                Save Changes
+                      data-stage-config-target="saveButton">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Save Configuration
               </button>
               
               <button type="button" 
@@ -267,8 +334,8 @@
               </button>
             </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 

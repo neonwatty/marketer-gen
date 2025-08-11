@@ -3,6 +3,21 @@ Rails.application.routes.draw do
   get "test/index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
+  # Journey Templates Management
+  resources :journey_templates, only: [:index, :show] do
+    member do
+      get :preview
+      post :apply_to_campaign
+      post :duplicate
+      patch :publish
+      patch :unpublish
+    end
+    collection do
+      get :categories
+      get :search
+    end
+  end
+
   # Campaigns Management with Journey Builder
   resources :campaigns do
     resource :customer_journey, only: [:show, :create, :update, :destroy] do
