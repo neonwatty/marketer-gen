@@ -45,15 +45,52 @@ export const tagSchema = z
 export const contentGenerationSchema = z.object({
   title: contentTitleSchema,
   description: contentDescriptionSchema,
-  contentType: z.enum(['blog-post', 'social-media', 'email', 'landing-page', 'ad-copy'], {
+  contentType: z.enum([
+    'social-post', 
+    'ad-copy', 
+    'email', 
+    'landing-page', 
+    'video-script', 
+    'blog-post',
+    'product-description',
+    'press-release'
+  ], {
     message: "Please select a content type",
   }),
-  tone: z.enum(['professional', 'casual', 'friendly', 'persuasive', 'informative'], {
+  tone: z.enum([
+    'professional', 
+    'casual', 
+    'friendly', 
+    'persuasive', 
+    'informative',
+    'urgent',
+    'humorous',
+    'authoritative',
+    'empathetic'
+  ], {
     message: "Please select a tone",
   }),
   targetAudience: z.string().min(1, "Target audience is required"),
   keywords: z.string().optional(),
   additionalInstructions: z.string().optional(),
+  brandContext: z.string().optional(),
+  contentLength: z.enum(['short', 'medium', 'long'], {
+    message: "Please select content length",
+  }).optional(),
+  channel: z.enum([
+    'facebook',
+    'instagram', 
+    'twitter',
+    'linkedin',
+    'tiktok',
+    'youtube',
+    'email',
+    'website',
+    'blog',
+    'print'
+  ]).optional(),
+  callToAction: z.string().optional(),
+  urgencyLevel: z.enum(['low', 'medium', 'high']).optional(),
 })
 
 export type ContentGenerationFormData = z.infer<typeof contentGenerationSchema>

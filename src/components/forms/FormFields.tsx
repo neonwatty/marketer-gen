@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { RichTextEditor } from "./RichTextEditor"
 import { Eye, EyeOff } from "lucide-react"
 
 interface BaseFormFieldProps {
@@ -46,6 +47,11 @@ interface TextareaFieldProps extends BaseFormFieldProps {
 interface SelectFieldProps extends BaseFormFieldProps {
   options: Array<{ value: string; label: string; disabled?: boolean }>
   placeholder?: string
+}
+
+interface RichTextEditorFieldProps extends BaseFormFieldProps {
+  maxCharacters?: number
+  minHeight?: string
 }
 
 export function TextField({ 
@@ -232,6 +238,46 @@ export function SelectField({
               ))}
             </SelectContent>
           </Select>
+          {description && <FormDescription>{description}</FormDescription>}
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )
+}
+
+export function RichTextEditorField({ 
+  name, 
+  label, 
+  description, 
+  placeholder,
+  maxCharacters = 10000,
+  disabled = false,
+  required = false,
+}: RichTextEditorFieldProps) {
+  const { control } = useFormContext()
+
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          {label && (
+            <FormLabel>
+              {label}
+              {required && <span className="text-destructive ml-1">*</span>}
+            </FormLabel>
+          )}
+          <FormControl>
+            <RichTextEditor
+              content={field.value || ""}
+              onChange={field.onChange}
+              placeholder={placeholder}
+              maxCharacters={maxCharacters}
+              editable={!disabled}
+            />
+          </FormControl>
           {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>
