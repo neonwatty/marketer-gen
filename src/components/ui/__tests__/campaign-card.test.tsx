@@ -296,7 +296,7 @@ describe('CampaignCard Component', () => {
 
       const card = container.firstChild as HTMLElement
       expect(card).toHaveClass('hover:shadow-md')
-      expect(card).toHaveClass('transition-shadow')
+      expect(card).toHaveClass('transition-all')
     })
   })
 

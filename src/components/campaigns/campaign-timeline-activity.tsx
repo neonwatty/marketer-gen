@@ -187,12 +187,13 @@ const getEventColor = (type: TimelineEvent['type']) => {
 const formatTimestamp = (timestamp: string) => {
   const date = new Date(timestamp)
   const now = new Date()
-  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-  const diffInDays = Math.floor(diffInHours / 24)
+  const diffInMs = now.getTime() - date.getTime()
+  const diffInHours = Math.round(diffInMs / (1000 * 60 * 60))
+  const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24))
 
   if (diffInHours < 1) {
     return "Just now"
-  } else if (diffInHours < 24) {
+  } else if (diffInDays < 1) {
     return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`
   } else if (diffInDays < 7) {
     return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`
@@ -215,9 +216,11 @@ export function CampaignTimelineActivity({ campaignId }: CampaignTimelineActivit
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Activity className="h-5 w-5" />
-          Recent Activity
+        <CardTitle className="flex items-center gap-2" asChild>
+          <h3>
+            <Activity className="h-5 w-5" />
+            Recent Activity
+          </h3>
         </CardTitle>
         <CardDescription>
           Latest updates and milestones for this campaign
@@ -229,7 +232,9 @@ export function CampaignTimelineActivity({ campaignId }: CampaignTimelineActivit
           <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border"></div>
           
           <div className="space-y-4">
-            {mockTimelineEvents.map((event, index) => (
+            {mockTimelineEvents
+              .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+              .map((event, index) => (
               <div key={event.id} className="relative flex items-start gap-4">
                 {/* Timeline dot */}
                 <div className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 bg-background ${getEventColor(event.type)}`}>

@@ -98,7 +98,7 @@ describe('CampaignTimelineActivity Component', () => {
       expect(screen.getByText('High engagement detected')).toBeInTheDocument()
       expect(screen.getByText('New content created')).toBeInTheDocument()
       expect(screen.getByText('Conversion milestone reached')).toBeInTheDocument()
-      expect(screen.getByText('Content published')).toBeInTheDocument()
+      expect(screen.getAllByText('Content published')).toHaveLength(2) // Content published appears twice in timeline
       expect(screen.getByText('Campaign resumed')).toBeInTheDocument()
       expect(screen.getByText('Campaign paused')).toBeInTheDocument()
     })
@@ -148,14 +148,14 @@ describe('CampaignTimelineActivity Component', () => {
     it('displays user information when available', () => {
       render(<CampaignTimelineActivity campaignId="test-campaign" />)
 
-      expect(screen.getByText('Sarah Johnson')).toBeInTheDocument()
+      expect(screen.getAllByText('Sarah Johnson')).toHaveLength(3) // Sarah Johnson appears in 3 timeline events
       expect(screen.getByText('Mike Chen')).toBeInTheDocument()
     })
 
     it('displays user initials in avatars', () => {
       render(<CampaignTimelineActivity campaignId="test-campaign" />)
 
-      expect(screen.getByText('SJ')).toBeInTheDocument()
+      expect(screen.getAllByText('SJ')).toHaveLength(3) // SJ initials appear 3 times
       expect(screen.getByText('MC')).toBeInTheDocument()
     })
 
@@ -285,7 +285,7 @@ describe('CampaignTimelineActivity Component', () => {
       expect(eventTitles[0]).toBe('High engagement detected')
       
       // Last visible event should be older
-      expect(eventTitles[eventTitles.length - 1]).toBe('Campaign paused')
+      expect(eventTitles[eventTitles.length - 1]).toBe('Impressions milestone')
     })
 
     it('displays timestamps in descending order', () => {
