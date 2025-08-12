@@ -101,6 +101,17 @@ module AiRateLimiter
     
     if current_usage >= limit
       retry_after = window_start + ttl_seconds - current_time.to_i
+      
+      # Send rate limit alert
+      AiAlertingService.send_alert(:rate_limit_exceeded, {
+        provider: provider_name,
+        model: attributes['model_name'],
+        period: period,
+        limit: limit,
+        current_usage: current_usage,
+        retry_after: retry_after
+      })
+      
       raise RateLimitExceededError.new(
         "Rate limit exceeded: #{current_usage}/#{limit} requests per #{period}",
         retry_after: retry_after,
@@ -121,6 +132,18 @@ module AiRateLimiter
     if current_usage + estimated_tokens > limit
       retry_after = window_start + ttl_seconds - current_time.to_i
       remaining_tokens = [limit - current_usage, 0].max
+      
+      # Send token rate limit alert
+      AiAlertingService.send_alert(:rate_limit_exceeded, {
+        provider: provider_name,
+        model: attributes['model_name'],
+        period: period,
+        limit: limit,
+        current_usage: current_usage,
+        estimated_tokens: estimated_tokens,
+        limit_type: "tokens",
+        retry_after: retry_after
+      })
       
       raise RateLimitExceededError.new(
         "Token rate limit exceeded: #{current_usage + estimated_tokens}/#{limit} tokens per #{period}",

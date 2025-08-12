@@ -36,44 +36,66 @@ class AnthropicService < AiServiceBase
 
   # Generate content using Claude
   def generate_content(prompt, options = {})
-    sanitized_prompt = sanitize_prompt(prompt)
-    temperature = options[:temperature] || self.temperature
-    max_tokens = options[:max_tokens] || max_tokens_output
-
-    messages = [
-      {
-        role: "user",
-        content: sanitized_prompt
-      }
-    ]
-
-    # Add system message if provided
-    system_message = options[:system_message] || build_default_system_message
+    operation_type = options[:operation_type] || 'content_generation'
     
-    request_payload = {
-      model: model_name,
-      max_tokens: max_tokens,
-      temperature: temperature,
-      top_p: top_p,
-      messages: messages
-    }
+    AiMonitoringService.track_request(operation_type, provider_name, model_name) do
+      sanitized_prompt = sanitize_prompt(prompt)
+      temperature = options[:temperature] || self.temperature
+      max_tokens = options[:max_tokens] || max_tokens_output
 
-    request_payload[:system] = system_message if system_message.present?
+      messages = [
+        {
+          role: "user",
+          content: sanitized_prompt
+        }
+      ]
 
-    # Include cache options for rate limiting and caching
-    cache_options = {
-      prompt: sanitized_prompt,
-      estimated_tokens: estimate_token_count(sanitized_prompt),
-      system_prompt: system_message,
-      temperature: temperature,
-      max_tokens: max_tokens,
-      cache_ttl: options[:cache_ttl]
-    }
+      # Add system message if provided
+      system_message = options[:system_message] || build_default_system_message
+      
+      request_payload = {
+        model: model_name,
+        max_tokens: max_tokens,
+        temperature: temperature,
+        top_p: top_p,
+        messages: messages
+      }
 
-    make_request_with_retries(
-      -> { send_anthropic_request("/messages", request_payload) },
-      cache_options
-    )
+      request_payload[:system] = system_message if system_message.present?
+
+      # Include cache options for rate limiting and caching
+      cache_options = {
+        prompt: sanitized_prompt,
+        estimated_tokens: estimate_token_count(sanitized_prompt),
+        system_prompt: system_message,
+        temperature: temperature,
+        max_tokens: max_tokens,
+        cache_ttl: options[:cache_ttl]
+      }
+
+      result = make_enhanced_request_with_fallbacks(
+        -> { send_anthropic_request("/messages", request_payload) },
+        cache_options
+      )
+
+      # Track cost if monitoring is enabled
+      if result && result.is_a?(Hash) && result['usage']
+        usage_data = {
+          input_tokens: result['usage']['input_tokens'] || 0,
+          output_tokens: result['usage']['output_tokens'] || 0,
+          total_tokens: result['usage']['total_tokens'] || 0
+        }
+
+        AiCostTracker.track_cost(provider_name, model_name, usage_data, {
+          operation_type: operation_type,
+          operation_id: @operation_id,
+          user_id: extract_user_id,
+          session_id: extract_session_id
+        })
+      end
+
+      result
+    end
   end
 
   # Generate comprehensive campaign plan
@@ -85,6 +107,7 @@ class AnthropicService < AiServiceBase
       system_message: system_message,
       temperature: 0.3, # Lower temperature for more structured output
       max_tokens: 3000,
+      operation_type: 'campaign_planning',
       **options
     })
 
@@ -100,6 +123,7 @@ class AnthropicService < AiServiceBase
       system_message: system_message,
       temperature: 0.4,
       max_tokens: 2000,
+      operation_type: 'brand_analysis',
       **options
     })
 

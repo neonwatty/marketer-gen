@@ -1,0 +1,315 @@
+<div class="ai-monitoring-dashboard">
+  <!-- Header with Quick Stats -->
+  <div class="bg-white shadow rounded-lg mb-6">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h1 class="text-2xl font-bold text-gray-900">AI Service Monitor</h1>
+      <p class="mt-1 text-sm text-gray-600">
+        Real-time monitoring and analytics for AI operations
+      </p>
+    </div>
+    
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-6">
+      <div class="bg-blue-50 rounded-lg p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <div class="text-sm font-medium text-gray-500">Requests/Hour</div>
+            <div class="text-2xl font-bold text-gray-900" id="requests-per-hour">
+              <%= number_with_delimiter(@quick_stats[:requests_last_hour]) %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-green-50 rounded-lg p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <div class="text-sm font-medium text-gray-500">Avg Response Time</div>
+            <div class="text-2xl font-bold text-gray-900" id="avg-response-time">
+              <%= number_with_precision(@quick_stats[:average_response_time], precision: 2) %>s
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-red-50 rounded-lg p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <div class="text-sm font-medium text-gray-500">Error Rate</div>
+            <div class="text-2xl font-bold text-gray-900" id="error-rate">
+              <%= number_with_precision(@quick_stats[:error_rate], precision: 1) %>%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-yellow-50 rounded-lg p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="ml-4">
+            <div class="text-sm font-medium text-gray-500">Hourly Cost</div>
+            <div class="text-2xl font-bold text-gray-900" id="hourly-cost">
+              $<%= number_with_precision(@quick_stats[:hourly_cost], precision: 4) %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- System Health Status -->
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-900">System Health</h2>
+      </div>
+      <div class="p-6">
+        <!-- Overall Status -->
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0">
+            <% case @health_status[:overall] %>
+            <% when :healthy %>
+              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+            <% when :degraded %>
+              <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <% when :critical %>
+              <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+            <% end %>
+          </div>
+          <div class="ml-3">
+            <div class="text-sm font-medium text-gray-900">
+              Overall Status: <%= @health_status[:overall].to_s.titleize %>
+            </div>
+            <div class="text-xs text-gray-500">
+              Last updated: <%= time_ago_in_words(@health_status[:timestamp]) %> ago
+            </div>
+          </div>
+        </div>
+
+        <!-- Provider Status -->
+        <div class="space-y-3">
+          <% @health_status[:providers].each do |provider, status| %>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <% case status[:status] %>
+                  <% when :healthy %>
+                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <% when :degraded %>
+                    <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                  <% when :unhealthy %>
+                    <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                  <% end %>
+                </div>
+                <div class="ml-2 text-sm text-gray-900"><%= provider.titleize %></div>
+              </div>
+              <div class="text-xs text-gray-500"><%= status[:reason] %></div>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Active Alerts -->
+        <% if @health_status[:alerts].any? %>
+          <div class="mt-4 pt-4 border-t border-gray-200">
+            <h3 class="text-sm font-medium text-gray-900 mb-2">Active Alerts</h3>
+            <div class="space-y-2">
+              <% @health_status[:alerts].each do |alert| %>
+                <div class="text-sm text-red-600 bg-red-50 rounded p-2">
+                  <%= alert %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Real-time Costs -->
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-900">Cost Overview</h2>
+      </div>
+      <div class="p-6">
+        <!-- Cost Rate -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-sm text-gray-500">Cost per minute</div>
+          <div class="text-sm font-medium text-gray-900">
+            $<%= number_with_precision(@real_time_costs[:cost_rate_per_minute], precision: 6) %>
+          </div>
+        </div>
+
+        <!-- Top Cost Operations -->
+        <div class="mb-4">
+          <h3 class="text-sm font-medium text-gray-900 mb-2">Top Cost Operations</h3>
+          <div class="space-y-1">
+            <% @real_time_costs[:top_cost_operations].first(3).each do |operation, cost| %>
+              <div class="flex items-center justify-between text-sm">
+                <div class="text-gray-600"><%= operation.humanize %></div>
+                <div class="font-medium">$<%= number_with_precision(cost, precision: 4) %></div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Provider Breakdown -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-900 mb-2">Cost by Provider</h3>
+          <div class="space-y-1">
+            <% @real_time_costs[:cost_by_provider].each do |provider, cost| %>
+              <div class="flex items-center justify-between text-sm">
+                <div class="text-gray-600"><%= provider.titleize %></div>
+                <div class="font-medium">$<%= number_with_precision(cost, precision: 4) %></div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+        <%= link_to "Overview", ai_monitoring_index_path, 
+            class: "border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Metrics", metrics_ai_monitoring_path, 
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Costs", costs_ai_monitoring_path, 
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Performance", performance_ai_monitoring_path, 
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Alerts", alerts_ai_monitoring_path, 
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" %>
+      </nav>
+    </div>
+
+    <!-- Time Range Selector -->
+    <div class="p-4 bg-gray-50 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <label class="text-sm font-medium text-gray-700">Time Range:</label>
+          <select id="time-range-selector" class="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+            <option value="1h" <%= 'selected' if params[:period] == '1h' %>>Last Hour</option>
+            <option value="6h" <%= 'selected' if params[:period] == '6h' %>>Last 6 Hours</option>
+            <option value="24h" <%= 'selected' if params[:period] == '24h' || params[:period].blank? %>>Last 24 Hours</option>
+            <option value="7d" <%= 'selected' if params[:period] == '7d' %>>Last 7 Days</option>
+            <option value="30d" <%= 'selected' if params[:period] == '30d' %>>Last 30 Days</option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button id="auto-refresh-toggle" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+            </svg>
+            Auto Refresh
+          </button>
+          
+          <%= link_to export_ai_monitoring_path(format: 'csv', data_type: 'metrics'), 
+              class: "inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+            Export
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auto-refresh functionality
+let autoRefreshInterval;
+let autoRefreshEnabled = false;
+
+document.getElementById('auto-refresh-toggle').addEventListener('click', function() {
+  autoRefreshEnabled = !autoRefreshEnabled;
+  
+  if (autoRefreshEnabled) {
+    this.classList.add('bg-blue-100', 'text-blue-700');
+    autoRefreshInterval = setInterval(refreshDashboard, 30000); // Refresh every 30 seconds
+  } else {
+    this.classList.remove('bg-blue-100', 'text-blue-700');
+    clearInterval(autoRefreshInterval);
+  }
+});
+
+// Time range selector
+document.getElementById('time-range-selector').addEventListener('change', function() {
+  const period = this.value;
+  const url = new URL(window.location.href);
+  url.searchParams.set('period', period);
+  window.location.href = url.toString();
+});
+
+// Refresh dashboard data
+function refreshDashboard() {
+  const period = document.getElementById('time-range-selector').value;
+  
+  fetch(`<%= ai_monitoring_index_path(format: :json) %>?period=${period}`)
+    .then(response => response.json())
+    .then(data => {
+      // Update quick stats
+      document.getElementById('requests-per-hour').textContent = 
+        (data.health.metrics.requests_per_minute * 60).toLocaleString();
+      document.getElementById('avg-response-time').textContent = 
+        data.health.metrics.average_response_time.toFixed(2) + 's';
+      document.getElementById('error-rate').textContent = 
+        data.health.metrics.error_rate.toFixed(1) + '%';
+      document.getElementById('hourly-cost').textContent = 
+        '$' + data.costs.current_hour_cost.toFixed(4);
+    })
+    .catch(error => {
+      console.error('Error refreshing dashboard:', error);
+    });
+}
+
+// Initialize with current time
+setInterval(function() {
+  document.querySelectorAll('[data-timestamp]').forEach(function(element) {
+    const timestamp = element.getAttribute('data-timestamp');
+    const date = new Date(timestamp);
+    element.textContent = timeAgo(date);
+  });
+}, 60000); // Update every minute
+
+function timeAgo(date) {
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+  
+  if (seconds < 60) return seconds + ' seconds ago';
+  if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ago';
+  if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+  return Math.floor(seconds / 86400) + ' days ago';
+}
+</script>

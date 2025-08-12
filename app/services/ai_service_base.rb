@@ -5,6 +5,8 @@ class AiServiceBase
   include ActiveModel::Attributes
   include AiRateLimiter
   include AiResponseCache
+  include AiRetryStrategies
+  include AiStructuredLogging
 
   # Common error classes for AI operations
   class AIServiceError < StandardError; end
@@ -305,9 +307,25 @@ class AiServiceBase
     if @circuit_breaker_state == :closed && @failure_count >= circuit_breaker_failure_threshold
       @circuit_breaker_state = :open
       Rails.logger.error "Circuit breaker opened for #{provider_name} after #{@failure_count} failures"
+      
+      # Send alert for circuit breaker opening
+      AiAlertingService.send_alert(:circuit_breaker_open, {
+        provider: provider_name,
+        model: attributes['model_name'],
+        failure_count: @failure_count,
+        threshold: circuit_breaker_failure_threshold
+      })
     elsif @circuit_breaker_state == :half_open
       @circuit_breaker_state = :open
       Rails.logger.error "Circuit breaker reopened for #{provider_name} - failure in half-open state"
+      
+      # Send alert for circuit breaker reopening
+      AiAlertingService.send_alert(:circuit_breaker_open, {
+        provider: provider_name,
+        model: attributes['model_name'],
+        failure_count: @failure_count,
+        state_change: "half_open_to_open"
+      })
     end
   end
 
@@ -318,6 +336,13 @@ class AiServiceBase
         @circuit_breaker_state = :closed
         @failure_count = 0
         Rails.logger.info "Circuit breaker closed for #{provider_name} after #{@success_count} successful requests"
+        
+        # Send recovery alert
+        AiAlertingService.send_recovery_alert(provider_name, {
+          model: attributes['model_name'],
+          success_count: @success_count,
+          recovery_method: "circuit_breaker_closed"
+        })
       end
     elsif @circuit_breaker_state == :closed
       # Reset failure count on successful request

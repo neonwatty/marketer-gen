@@ -18,6 +18,19 @@ Rails.application.routes.draw do
     end
   end
 
+  # Journeys Management with Validation and Persistence
+  resources :journeys do
+    member do
+      post :validate
+      post :duplicate
+      get :versions
+      post :restore_version
+      get :export
+      post :import
+      post :auto_save
+    end
+  end
+
   # Campaigns Management with Journey Builder
   resources :campaigns do
     resource :customer_journey, only: [:show, :create, :update, :destroy] do
@@ -25,6 +38,9 @@ Rails.application.routes.draw do
         get :builder
       end
     end
+    
+    # Nested journeys under campaigns
+    resources :journeys, except: [:index]
   end
 
   # Brand Assets Management
@@ -63,6 +79,19 @@ Rails.application.routes.draw do
       post :suggest_libraries
       delete :clear_cache
       delete :clear_ai_cache
+    end
+  end
+
+  # AI Monitoring Dashboard
+  resources :ai_monitoring, only: [:index] do
+    collection do
+      get :metrics
+      get :costs
+      get :performance
+      get :alerts
+      get :health_check
+      get :export
+      get :stream
     end
   end
 
