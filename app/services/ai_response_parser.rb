@@ -65,6 +65,9 @@ class AiResponseParser
       original_format: detect_original_format(raw_response)
     }
   rescue => error
+    # Re-raise validation errors when in strict mode
+    raise error if error.is_a?(StructureValidationError) && strict_validation
+    
     Rails.logger.error "AI response parsing failed: #{error.message}"
     Rails.logger.error error.backtrace.join("\n") if error.respond_to?(:backtrace)
     
@@ -87,7 +90,10 @@ class AiResponseParser
   def parse_batch(responses, options = {})
     responses.map.with_index do |response, index|
       begin
-        parse(response, options.merge(batch_index: index))
+        result = parse(response, options.merge(batch_index: index))
+        result[:success] = result[:response_type] != 'error'
+        result[:batch_index] = index
+        result
       rescue => error
         Rails.logger.error "Batch parsing failed for item #{index}: #{error.message}"
         {
@@ -96,6 +102,7 @@ class AiResponseParser
           content: nil,
           error: { type: error.class.name, message: error.message },
           batch_index: index,
+          success: false,
           parsed_at: Time.current
         }
       end
@@ -262,13 +269,16 @@ class AiResponseParser
     json_match = content.to_s.match(/```(?:json)?\s*(\{.*?\}|\[.*?\])\s*```/m) ||
                  content.to_s.match(/(\{.*?\}|\[.*?\])/m)
     
-    return content unless json_match
+    # If no JSON-like content found, raise error for JSON response type
+    unless json_match
+      raise StructureValidationError, "No JSON content found in response when JSON type expected"
+    end
     
     begin
       JSON.parse(json_match[1])
-    rescue JSON::ParserError
+    rescue JSON::ParserError => e
       Rails.logger.warn "Failed to parse JSON from content: #{json_match[1][0..100]}..."
-      content
+      raise StructureValidationError, "Invalid JSON format: #{e.message}"
     end
   end
 
@@ -357,10 +367,10 @@ class AiResponseParser
   # Helper methods for content extraction
 
   def extract_field(content, field_names)
-    text = content.to_s.downcase
+    text = content.to_s
     
     field_names.each do |field|
-      # Look for field followed by colon and value
+      # Look for field followed by colon and value (case insensitive)
       match = text.match(/#{Regexp.escape(field)}[:\-\s]*([^\n\r]+)/i)
       return match[1].strip if match
       
@@ -379,11 +389,12 @@ class AiResponseParser
     
     field_names.each do |field|
       # Look for bulleted or numbered lists after field name
-      pattern = /#{Regexp.escape(field)}[:\-\s]*\n?((?:\s*[-*•]\s*.+\n?)+)/i
+      pattern = /#{Regexp.escape(field)}[:\-\s]*\n?((?:\s*[-*•]\s*.+(?:\n|$))+)/mi
       match = text.match(pattern)
       
       if match
-        items = match[1].scan(/^\s*[-*•]\s*(.+)$/m).flatten.map(&:strip)
+        # Extract individual list items, handling multiline
+        items = match[1].scan(/[-*•]\s*(.+?)(?=\n\s*[-*•]|\n\n|\n\s*$|$)/m).flatten.map(&:strip)
         return items if items.any?
       end
     end
@@ -561,17 +572,21 @@ class AiResponseParser
   # Metadata extraction
   
   def extract_metadata(parsed_response)
-    metadata = {}
+    # Start with existing metadata from provider parsing
+    metadata = parsed_response[:metadata] || parsed_response['metadata'] || {}
     
-    # Common metadata fields across providers
-    metadata[:usage] = parsed_response[:usage] || parsed_response['usage']
-    metadata[:model] = parsed_response[:model] || parsed_response['model']
+    # Add common metadata fields across providers
+    metadata[:usage] = parsed_response[:usage] || parsed_response['usage'] if parsed_response[:usage] || parsed_response['usage']
+    metadata[:model] = parsed_response[:model] || parsed_response['model'] if parsed_response[:model] || parsed_response['model']
     metadata[:finish_reason] = parsed_response[:finish_reason] || 
                                parsed_response[:stop_reason] ||
                                parsed_response['finish_reason'] ||
-                               parsed_response['stop_reason']
+                               parsed_response['stop_reason'] if parsed_response[:finish_reason] || 
+                                                                parsed_response[:stop_reason] ||
+                                                                parsed_response['finish_reason'] ||
+                                                                parsed_response['stop_reason']
     
-    # Provider-specific metadata
+    # Add provider-specific metadata
     metadata[:safety_ratings] = parsed_response[:safety_ratings] if parsed_response[:safety_ratings]
     metadata[:function_call] = parsed_response[:function_call] if parsed_response[:function_call]
     metadata[:tool_calls] = parsed_response[:tool_calls] if parsed_response[:tool_calls]

@@ -1,7 +1,7 @@
 # Customer Journey fixtures for testing
 
 awareness_to_purchase:
-  campaign: summer_launch
+  campaign_id: 1
   name: "Summer Product Discovery Journey"
   description: "Multi-stage journey from initial awareness through purchase decision"
   position: 0
@@ -75,7 +75,7 @@ awareness_to_purchase:
     }
 
 b2b_lead_nurture:
-  campaign: startup_awareness
+  campaign_id: 3
   name: "B2B Lead Nurturing Journey"
   description: "Journey for converting business leads into qualified prospects"
   position: 0
@@ -142,7 +142,7 @@ b2b_lead_nurture:
     }
 
 holiday_customer_journey:
-  campaign: holiday_campaign
+  campaign_id: 2
   name: "Holiday Shopping Journey"
   description: "Seasonal journey optimized for holiday shopping behavior"
   position: 0
@@ -183,7 +183,7 @@ holiday_customer_journey:
     }
 
 simple_journey:
-  campaign: paused_campaign
+  campaign_id: 4
   name: "Simple Two-Stage Journey"
   description: "Basic journey for testing"
   position: 1

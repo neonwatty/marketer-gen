@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_11_211850) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_12_211919) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -170,6 +170,152 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_211850) do
     t.index ["published_at"], name: "index_content_assets_on_published_at"
     t.index ["stage"], name: "index_content_assets_on_stage"
     t.index ["status"], name: "index_content_assets_on_status"
+  end
+
+  create_table "content_branches", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "content_item_type", null: false
+    t.integer "content_item_id", null: false
+    t.integer "source_version_id"
+    t.integer "head_version_id"
+    t.integer "author_id"
+    t.integer "status", default: 0, null: false
+    t.integer "branch_type", default: 0, null: false
+    t.text "description"
+    t.text "metadata"
+    t.datetime "merged_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_type"], name: "index_content_branches_on_branch_type"
+    t.index ["content_item_type", "content_item_id", "name"], name: "index_content_branches_on_content_item_and_name", unique: true
+    t.index ["content_item_type", "content_item_id"], name: "index_content_branches_on_content_item"
+    t.index ["deleted_at"], name: "index_content_branches_on_deleted_at"
+    t.index ["head_version_id"], name: "index_content_branches_on_head_version_id"
+    t.index ["source_version_id"], name: "index_content_branches_on_source_version_id"
+    t.index ["status"], name: "index_content_branches_on_status"
+  end
+
+  create_table "content_merges", force: :cascade do |t|
+    t.integer "source_version_id", null: false
+    t.integer "target_version_id", null: false
+    t.integer "source_branch_id"
+    t.integer "target_branch_id"
+    t.integer "author_id"
+    t.integer "merge_strategy", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "conflict_count", default: 0
+    t.text "conflicts_data"
+    t.text "resolution_data"
+    t.text "merge_metadata"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["completed_at"], name: "index_content_merges_on_completed_at"
+    t.index ["merge_strategy"], name: "index_content_merges_on_merge_strategy"
+    t.index ["source_branch_id"], name: "index_content_merges_on_source_branch_id"
+    t.index ["source_version_id", "target_version_id"], name: "index_content_merges_on_versions"
+    t.index ["source_version_id"], name: "index_content_merges_on_source_version_id"
+    t.index ["status"], name: "index_content_merges_on_status"
+    t.index ["target_branch_id"], name: "index_content_merges_on_target_branch_id"
+    t.index ["target_version_id"], name: "index_content_merges_on_target_version_id"
+  end
+
+  create_table "content_requests", force: :cascade do |t|
+    t.string "campaign_name"
+    t.string "content_type"
+    t.string "platform"
+    t.text "brand_context"
+    t.string "campaign_goal"
+    t.text "target_audience"
+    t.string "tone"
+    t.string "content_length"
+    t.text "required_elements"
+    t.text "restrictions"
+    t.text "additional_context"
+    t.text "request_metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "content_responses", force: :cascade do |t|
+    t.integer "content_request_id", null: false
+    t.text "generated_content"
+    t.string "generation_status"
+    t.text "response_metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_request_id"], name: "index_content_responses_on_content_request_id"
+  end
+
+  create_table "content_variants", force: :cascade do |t|
+    t.integer "content_request_id", null: false
+    t.string "name", null: false
+    t.text "content", null: false
+    t.string "strategy_type", null: false
+    t.integer "variant_number", null: false
+    t.decimal "performance_score", precision: 5, scale: 4, default: "0.0"
+    t.string "status", default: "draft"
+    t.text "metadata"
+    t.text "differences_analysis"
+    t.text "performance_data"
+    t.text "tags"
+    t.datetime "testing_started_at"
+    t.datetime "testing_completed_at"
+    t.datetime "archived_at"
+    t.string "optimization_goal"
+    t.string "target_audience"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_request_id", "variant_number"], name: "idx_on_content_request_id_variant_number_faba7a7a62", unique: true
+    t.index ["content_request_id"], name: "index_content_variants_on_content_request_id"
+    t.index ["performance_score"], name: "index_content_variants_on_performance_score"
+    t.index ["status"], name: "index_content_variants_on_status"
+    t.index ["strategy_type"], name: "index_content_variants_on_strategy_type"
+  end
+
+  create_table "content_versions", force: :cascade do |t|
+    t.string "content_item_type", null: false
+    t.integer "content_item_id", null: false
+    t.integer "parent_id"
+    t.text "content_data", null: false
+    t.string "content_type", null: false
+    t.text "commit_message", null: false
+    t.integer "version_number", null: false
+    t.string "version_hash", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "committed_at"
+    t.text "metadata"
+    t.integer "author_id"
+    t.integer "branch_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id", "committed_at"], name: "index_content_versions_on_branch_id_and_committed_at"
+    t.index ["branch_id"], name: "index_content_versions_on_branch_id"
+    t.index ["content_item_type", "content_item_id", "version_number"], name: "index_content_versions_on_content_item_and_version"
+    t.index ["content_item_type", "content_item_id"], name: "index_content_versions_on_content_item"
+    t.index ["parent_id"], name: "index_content_versions_on_parent_id"
+    t.index ["status"], name: "index_content_versions_on_status"
+    t.index ["version_hash"], name: "index_content_versions_on_version_hash", unique: true
+  end
+
+  create_table "content_workflows", force: :cascade do |t|
+    t.string "content_item_type", null: false
+    t.integer "content_item_id", null: false
+    t.string "current_stage"
+    t.string "previous_stage"
+    t.string "template_name"
+    t.string "template_version"
+    t.integer "status"
+    t.integer "priority"
+    t.integer "created_by_id"
+    t.integer "updated_by_id"
+    t.text "metadata"
+    t.text "settings"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_item_type", "content_item_id"], name: "index_content_workflows_on_content_item"
   end
 
   create_table "customer_journeys", force: :cascade do |t|
@@ -436,12 +582,77 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_211850) do
     t.index ["version"], name: "index_templates_on_version"
   end
 
+  create_table "workflow_assignments", force: :cascade do |t|
+    t.integer "content_workflow_id", null: false
+    t.integer "user_id"
+    t.string "role"
+    t.string "stage"
+    t.integer "status"
+    t.integer "assignment_type"
+    t.datetime "assigned_at"
+    t.integer "assigned_by_id"
+    t.datetime "unassigned_at"
+    t.integer "unassigned_by_id"
+    t.datetime "expires_at"
+    t.datetime "activated_at"
+    t.integer "activated_by_id"
+    t.datetime "suspended_at"
+    t.integer "suspended_by_id"
+    t.datetime "extended_at"
+    t.integer "extended_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_workflow_id"], name: "index_workflow_assignments_on_content_workflow_id"
+  end
+
+  create_table "workflow_audit_entries", force: :cascade do |t|
+    t.integer "content_workflow_id", null: false
+    t.string "action"
+    t.string "from_stage"
+    t.string "to_stage"
+    t.integer "performed_by_id"
+    t.text "comment"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_workflow_id"], name: "index_workflow_audit_entries_on_content_workflow_id"
+  end
+
+  create_table "workflow_notifications", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "workflow_id", null: false
+    t.string "notification_type"
+    t.string "title"
+    t.text "message"
+    t.integer "priority"
+    t.integer "status"
+    t.datetime "read_at"
+    t.datetime "clicked_at"
+    t.integer "click_count"
+    t.datetime "dismissed_at"
+    t.datetime "archived_at"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workflow_id"], name: "index_workflow_notifications_on_workflow_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_generation_requests", "campaigns"
-  add_foreign_key "ai_job_statuses", "ai_generation_requests", column: "generation_request_id"
+  add_foreign_key "ai_job_statuses", "generation_requests"
   add_foreign_key "brand_assets", "brand_assets", column: "parent_asset_id"
   add_foreign_key "campaigns", "brand_identities"
+  add_foreign_key "content_branches", "content_versions", column: "head_version_id"
+  add_foreign_key "content_branches", "content_versions", column: "source_version_id"
+  add_foreign_key "content_merges", "content_branches", column: "source_branch_id"
+  add_foreign_key "content_merges", "content_branches", column: "target_branch_id"
+  add_foreign_key "content_merges", "content_versions", column: "source_version_id"
+  add_foreign_key "content_merges", "content_versions", column: "target_version_id"
+  add_foreign_key "content_responses", "content_requests"
+  add_foreign_key "content_variants", "content_requests"
+  add_foreign_key "content_versions", "content_branches", column: "branch_id"
+  add_foreign_key "content_versions", "content_versions", column: "parent_id"
   add_foreign_key "customer_journeys", "campaigns"
   add_foreign_key "journey_stages", "journeys"
   add_foreign_key "journey_templates", "journey_templates", column: "parent_template_id"
@@ -454,4 +665,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_211850) do
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "templates", "templates", column: "parent_template_id"
+  add_foreign_key "workflow_assignments", "content_workflows"
+  add_foreign_key "workflow_audit_entries", "content_workflows"
+  add_foreign_key "workflow_notifications", "content_workflows", column: "workflow_id"
 end

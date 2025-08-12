@@ -1,24 +1,115 @@
 <div class="journey-builder bg-white rounded-lg shadow-lg" 
-     data-controller="journey-builder" 
+     data-controller="journey-builder journey-persistence journey-builder-mobile" 
      data-journey-builder-campaign-id-value="<%= campaign.id if defined?(campaign) %>"
-     data-journey-builder-existing-stages-value="<%= [].to_json %>">
+     data-journey-builder-existing-stages-value="<%= [].to_json %>"
+     data-journey-persistence-journey-id-value="<%= journey&.id %>"
+     data-journey-persistence-campaign-id-value="<%= campaign.id if defined?(campaign) %>"
+     data-journey-persistence-auto-save-enabled-value="true"
+     data-journey-persistence-optimistic-updates-value="true"
+     data-journey-builder-mobile-current-panel-value="canvas">
   
   <!-- Journey Builder Header -->
-  <div class="flex items-center justify-between p-6 border-b border-gray-200">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-900">Journey Builder</h2>
-      <p class="text-sm text-gray-600 mt-1">Design your customer journey with drag-and-drop stages</p>
+  <div class="journey-builder-header flex items-center justify-between p-6 border-b border-gray-200" 
+       data-journey-builder-mobile-target="mobileHeader">
+    <div class="flex-1">
+      <div class="flex items-center space-x-4">
+        <h2 class="text-2xl font-bold text-gray-900">Journey Builder</h2>
+        <!-- Save Status Indicator -->
+        <div class="flex items-center space-x-2">
+          <div class="w-2 h-2 rounded-full bg-gray-300" 
+               data-journey-persistence-target="syncIndicator"></div>
+          <span class="text-xs text-gray-500" 
+                data-journey-persistence-target="saveStatus">Ready</span>
+        </div>
+      </div>
+      <p class="text-sm text-gray-600 mt-1 desktop-block tablet-block mobile-hidden">Design your customer journey with drag-and-drop stages</p>
+      
+      <!-- Mobile Actions Row -->
+      <div class="actions-mobile hidden mt-3">
+        <button type="button" 
+                class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                data-action="click->journey-builder#validateJourney">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Validate
+        </button>
+        <button type="button" 
+                class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                data-action="click->journey-builder#saveJourney">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Save
+        </button>
+      </div>
+      
+      <!-- Recovery Banner (hidden by default) -->
+      <div class="hidden mt-2" data-journey-persistence-target="recoveryBanner">
+        <!-- Recovery content populated by controller -->
+      </div>
     </div>
     
-    <!-- Journey Actions -->
-    <div class="flex items-center space-x-3">
+    <!-- Desktop Journey Actions -->
+    <div class="actions-desktop flex items-center space-x-3">
+      <div class="relative inline-block text-left">
+        <button type="button" 
+                class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                data-action="click->journey-persistence#toggleActionMenu"
+                id="persistence-menu-button">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+          </svg>
+          Actions
+          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+             data-journey-persistence-target="actionMenu">
+          <div class="py-1">
+            <button type="button"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    data-action="click->journey-persistence#duplicateJourney">
+              Duplicate Journey
+            </button>
+            <button type="button"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    data-action="click->journey-persistence#showVersionHistory">
+              Version History
+            </button>
+            <button type="button"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    data-action="click->journey-persistence#showExportModal">
+              Export Journey
+            </button>
+            <button type="button"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    data-action="click->journey-persistence#showImportModal">
+              Import Journey
+            </button>
+            <hr class="my-1">
+            <button type="button"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    data-action="click->journey-builder#resetJourney">
+              Reset Journey
+            </button>
+          </div>
+        </div>
+      </div>
+      
       <button type="button" 
               class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              data-action="click->journey-builder#resetJourney">
+              data-controller="journey-validation"
+              data-journey-validation-journey-id-value="<%= campaign.id if defined?(campaign) %>"
+              data-journey-validation-auto-validate-value="false"
+              data-journey-validation-target="validateButton"
+              data-action="click->journey-validation#triggerValidation">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        Reset
+        Validate
       </button>
       
       <button type="button" 
@@ -32,17 +123,25 @@
     </div>
   </div>
 
-  <div class="flex h-screen max-h-[800px]">
+  <!-- Mobile Tab Navigation (hidden on desktop/tablet) -->
+  <div class="mobile-tabs hidden" data-journey-builder-mobile-target="mobileTabs">
+    <!-- Tabs populated by mobile controller -->
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content flex h-screen max-h-[800px]" data-journey-builder-mobile-target="mobileContent">
     <!-- Stage Library Sidebar -->
-    <div class="w-80 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Journey Stages</h3>
+    <div class="w-80 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto mobile-panel" 
+         data-journey-builder-mobile-target="stageLibraryPanel">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4 mobile-stage-library-header">Journey Stages</h3>
       
       <!-- Stage Templates -->
       <div class="space-y-3" data-journey-builder-target="stageLibrary">
         <!-- Awareness Stage -->
-        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-blue-300 cursor-move hover:border-blue-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item mobile-stage-template bg-white p-4 rounded-lg border-2 border-dashed border-blue-300 cursor-move hover:border-blue-400 hover:shadow-md transition-all"
              data-stage-type="awareness"
              data-journey-builder-target="stageTemplate"
+             data-journey-builder-mobile-target="mobileStageTemplate"
              draggable="true">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -59,9 +158,10 @@
         </div>
 
         <!-- Consideration Stage -->
-        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-yellow-300 cursor-move hover:border-yellow-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item mobile-stage-template bg-white p-4 rounded-lg border-2 border-dashed border-yellow-300 cursor-move hover:border-yellow-400 hover:shadow-md transition-all"
              data-stage-type="consideration"
              data-journey-builder-target="stageTemplate"
+             data-journey-builder-mobile-target="mobileStageTemplate"
              draggable="true">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -77,9 +177,10 @@
         </div>
 
         <!-- Conversion Stage -->
-        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-green-300 cursor-move hover:border-green-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item mobile-stage-template bg-white p-4 rounded-lg border-2 border-dashed border-green-300 cursor-move hover:border-green-400 hover:shadow-md transition-all"
              data-stage-type="conversion"
              data-journey-builder-target="stageTemplate"
+             data-journey-builder-mobile-target="mobileStageTemplate"
              draggable="true">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -95,9 +196,10 @@
         </div>
 
         <!-- Retention Stage -->
-        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-purple-300 cursor-move hover:border-purple-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item mobile-stage-template bg-white p-4 rounded-lg border-2 border-dashed border-purple-300 cursor-move hover:border-purple-400 hover:shadow-md transition-all"
              data-stage-type="retention"
              data-journey-builder-target="stageTemplate"
+             data-journey-builder-mobile-target="mobileStageTemplate"
              draggable="true">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -113,9 +215,10 @@
         </div>
 
         <!-- Advocacy Stage -->
-        <div class="stage-template stage-library-item bg-white p-4 rounded-lg border-2 border-dashed border-indigo-300 cursor-move hover:border-indigo-400 hover:shadow-md transition-all"
+        <div class="stage-template stage-library-item mobile-stage-template bg-white p-4 rounded-lg border-2 border-dashed border-indigo-300 cursor-move hover:border-indigo-400 hover:shadow-md transition-all"
              data-stage-type="advocacy"
              data-journey-builder-target="stageTemplate"
+             data-journey-builder-mobile-target="mobileStageTemplate"
              draggable="true">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
@@ -179,8 +282,9 @@
     </div>
 
     <!-- Journey Canvas -->
-    <div class="flex-1 bg-gray-100 relative overflow-auto">
-      <div class="journey-canvas h-full min-h-[600px] p-8" 
+    <div class="flex-1 bg-gray-100 relative overflow-auto mobile-panel canvas" 
+         data-journey-builder-mobile-target="canvasPanel">
+      <div class="journey-canvas mobile-canvas h-full min-h-[600px] p-8" 
            data-journey-builder-target="canvas"
            data-action="dragover->journey-builder#handleCanvasDragOver drop->journey-builder#handleCanvasDrop">
         
@@ -219,8 +323,9 @@
     </div>
 
     <!-- Enhanced Stage Configuration Panel -->
-    <div class="stage-config-panel w-96 bg-white border-l border-gray-200 overflow-hidden"
+    <div class="stage-config-panel w-96 bg-white border-l border-gray-200 overflow-hidden mobile-panel"
          data-journey-builder-target="configPanel"
+         data-journey-builder-mobile-target="configPanel"
          style="display: none;">
       
       <!-- Configuration Header -->
@@ -339,6 +444,53 @@
     </div>
   </div>
 
+  <!-- Journey Validation Feedback Panel -->
+  <div class="journey-validation-panel border-t border-gray-200"
+       data-journey-validation-target="feedbackContainer"
+       style="display: none;">
+    
+    <!-- Validation Progress -->
+    <div class="px-6 py-3 bg-blue-50 border-b border-blue-200 hidden"
+         data-journey-validation-target="validationProgress">
+      <!-- Progress content populated by controller -->
+    </div>
+    
+    <!-- Validation Summary -->
+    <div class="px-6 py-4 border-b border-gray-200"
+         data-journey-validation-target="validationSummary">
+      <!-- Summary content populated by controller -->
+    </div>
+    
+    <!-- Validation Details (collapsible) -->
+    <div class="validation-details hidden"
+         data-journey-validation-target="validationDetails">
+      
+      <!-- Critical Issues & Errors -->
+      <div class="px-6 py-4 border-b border-gray-100"
+           data-journey-validation-target="errorList">
+        <!-- Error content populated by controller -->
+      </div>
+      
+      <!-- Warnings -->
+      <div class="px-6 py-4 border-b border-gray-100"
+           data-journey-validation-target="warningList">
+        <!-- Warning content populated by controller -->
+      </div>
+      
+      <!-- Recommendations -->
+      <div class="px-6 py-4 bg-blue-50"
+           data-journey-validation-target="recommendations">
+        <!-- Recommendations content populated by controller -->
+      </div>
+    </div>
+    
+    <!-- Success Message -->
+    <div class="px-6 py-4 bg-green-50 border-b border-green-200 hidden"
+         data-journey-validation-target="successMessage">
+      <!-- Success content populated by controller -->
+    </div>
+  </div>
+
   <!-- Journey Statistics Footer -->
   <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
     <div class="flex items-center justify-between text-sm text-gray-600">
@@ -368,6 +520,176 @@
           <span>Advocacy</span>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Persistence Modals -->
+  
+  <!-- Conflict Resolution Modal -->
+  <div class="hidden" data-journey-persistence-target="conflictModal">
+    <!-- Modal content populated by controller -->
+  </div>
+  
+  <!-- Version History Modal -->
+  <div class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" 
+       data-journey-persistence-target="versionHistoryModal">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Version History</h3>
+        <p class="mt-1 text-sm text-gray-500">View and restore previous versions of this journey</p>
+      </div>
+      
+      <div class="px-6 py-4 max-h-96 overflow-y-auto" data-journey-persistence-target="versionHistory">
+        <!-- Version history content populated by controller -->
+      </div>
+      
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+        <button type="button" 
+                class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                data-action="click->journey-persistence#hideVersionHistory">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Export Modal -->
+  <div class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" 
+       data-journey-persistence-target="exportModal">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Export Journey</h3>
+        <p class="mt-1 text-sm text-gray-500">Choose export format and options</p>
+      </div>
+      
+      <form data-action="submit->journey-persistence#handleExport">
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Format</label>
+            <select name="format" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+              <option value="json">JSON</option>
+              <option value="csv">CSV</option>
+              <option value="yaml">YAML</option>
+            </select>
+          </div>
+          
+          <div class="flex items-center">
+            <input type="checkbox" name="include_history" id="include_history" class="rounded border-gray-300 text-blue-600">
+            <label for="include_history" class="ml-2 text-sm text-gray-700">Include version history</label>
+          </div>
+        </div>
+        
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+          <button type="button" 
+                  class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  data-action="click->journey-persistence#hideExportModal">
+            Cancel
+          </button>
+          <button type="submit" 
+                  class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+            Export
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Import Modal -->
+  <div class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" 
+       data-journey-persistence-target="importModal">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Import Journey</h3>
+        <p class="mt-1 text-sm text-gray-500">Upload a journey file to import</p>
+      </div>
+      
+      <form data-action="submit->journey-persistence#handleImport">
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select File</label>
+            <input type="file" name="file" accept=".json,.csv,.yaml,.yml" required
+                   class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+            <p class="text-xs text-gray-500 mt-1">Supported formats: JSON, CSV, YAML</p>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Journey Name (optional)</label>
+            <input type="text" name="name" placeholder="Leave blank to use imported name"
+                   class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+          </div>
+          
+          <div class="flex items-center">
+            <input type="checkbox" name="import_history" id="import_history" class="rounded border-gray-300 text-blue-600">
+            <label for="import_history" class="ml-2 text-sm text-gray-700">Import version history</label>
+          </div>
+        </div>
+        
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+          <button type="button" 
+                  class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                  data-action="click->journey-persistence#hideImportModal">
+            Cancel
+          </button>
+          <button type="submit" 
+                  class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+            Import
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Mobile Quick Actions -->
+  <div class="mobile-quick-actions" data-journey-builder-mobile-target="quickActions">
+    <button type="button" class="mobile-quick-action" 
+            data-action="click->journey-builder#saveJourney"
+            title="Save Journey">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+    </button>
+    <button type="button" class="mobile-quick-action" 
+            data-action="click->journey-builder#validateJourney"
+            title="Validate Journey">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile Bottom Sheet -->
+  <div class="mobile-bottom-sheet" data-journey-builder-mobile-target="bottomSheet">
+    <!-- Content populated by controller -->
+  </div>
+
+  <!-- Mobile Fullscreen Modal -->
+  <div class="mobile-fullscreen-modal" data-journey-builder-mobile-target="fullscreenModal">
+    <!-- Content populated by controller -->
+  </div>
+
+  <!-- Swipe Indicators -->
+  <div class="swipe-indicator left" data-journey-builder-mobile-target="swipeIndicator">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+  </div>
+  <div class="swipe-indicator right" data-journey-builder-mobile-target="swipeIndicator">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+  </div>
+
+  <!-- Mobile Notification -->
+  <div class="mobile-notification" data-journey-builder-mobile-target="notification">
+    <!-- Content populated by controller -->
+  </div>
+
+  <!-- Save Progress Indicator -->
+  <div class="hidden fixed bottom-4 right-4 bg-white rounded-lg shadow-lg border border-gray-200 px-4 py-3 z-40"
+       data-journey-persistence-target="saveProgress">
+    <div class="flex items-center space-x-3">
+      <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+      <span class="text-sm text-gray-700">Saving changes...</span>
     </div>
   </div>
 </div>

@@ -1,0 +1,309 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">
+          <%= @content_request.campaign_name.present? ? @content_request.campaign_name : "Content ##{@content_request.id}" %>
+        </h1>
+        <div class="flex items-center space-x-4 mt-2">
+          <span class="px-3 py-1 text-sm font-medium rounded-full 
+            <%= case @content_request.content_type
+                when 'social_media' then 'bg-blue-100 text-blue-800'
+                when 'email' then 'bg-green-100 text-green-800'
+                when 'ads' then 'bg-yellow-100 text-yellow-800'
+                when 'landing_page' then 'bg-purple-100 text-purple-800'
+                else 'bg-gray-100 text-gray-800'
+                end %>">
+            <%= @content_request.content_type&.humanize || 'General' %>
+          </span>
+          
+          <% if @content_response %>
+            <% status = @content_response.generation_status || 'pending' %>
+            <span class="px-3 py-1 text-sm font-medium rounded-full
+              <%= case status
+                  when 'completed' then 'bg-green-100 text-green-800'
+                  when 'draft' then 'bg-yellow-100 text-yellow-800'
+                  when 'failed' then 'bg-red-100 text-red-800'
+                  else 'bg-gray-100 text-gray-800'
+                  end %>">
+              <%= status.humanize %>
+            </span>
+          <% end %>
+          
+          <span class="text-sm text-gray-500">
+            Created <%= time_ago_in_words(@content_request.created_at) %> ago
+          </span>
+        </div>
+      </div>
+      
+      <div class="flex space-x-3">
+        <%= link_to edit_content_management_path(@content_request), 
+            class: "bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center" do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Edit Content
+        <% end %>
+        
+        <%= link_to content_management_index_path, 
+            class: "text-gray-600 hover:text-gray-900 inline-flex items-center" do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to List
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Left Column: Content Details -->
+      <div class="lg:col-span-1 space-y-6">
+        
+        <!-- Request Details -->
+        <div class="bg-white rounded-lg shadow-sm border">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Request Details</h2>
+          </div>
+          <div class="px-6 py-4 space-y-4">
+            <% if @content_request.platform.present? %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Platform</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @content_request.platform %></dd>
+              </div>
+            <% end %>
+            
+            <% if @content_request.tone.present? %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Tone</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @content_request.tone.humanize %></dd>
+              </div>
+            <% end %>
+            
+            <% if @content_request.content_length.present? %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Length</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @content_request.content_length.humanize %></dd>
+              </div>
+            <% end %>
+            
+            <% if @content_request.campaign_goal.present? %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Campaign Goal</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @content_request.campaign_goal.humanize %></dd>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Brand Context -->
+        <% if @content_request.brand_context.present? %>
+          <div class="bg-white rounded-lg shadow-sm border">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900">Brand Context</h3>
+            </div>
+            <div class="px-6 py-4">
+              <p class="text-sm text-gray-700 leading-relaxed"><%= simple_format(@content_request.brand_context) %></p>
+            </div>
+          </div>
+        <% end %>
+        
+        <!-- Target Audience -->
+        <% if @content_request.target_audience.present? %>
+          <div class="bg-white rounded-lg shadow-sm border">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900">Target Audience</h3>
+            </div>
+            <div class="px-6 py-4">
+              <p class="text-sm text-gray-700 leading-relaxed"><%= simple_format(@content_request.target_audience) %></p>
+            </div>
+          </div>
+        <% end %>
+        
+        <!-- Requirements -->
+        <% if @content_request.required_elements.present? || @content_request.restrictions.present? %>
+          <div class="bg-white rounded-lg shadow-sm border">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900">Content Requirements</h3>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+              <% if @content_request.required_elements.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 mb-2">Must Include</dt>
+                  <dd class="text-sm text-gray-700 leading-relaxed"><%= simple_format(@content_request.required_elements) %></dd>
+                </div>
+              <% end %>
+              
+              <% if @content_request.restrictions.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 mb-2">Avoid</dt>
+                  <dd class="text-sm text-gray-700 leading-relaxed"><%= simple_format(@content_request.restrictions) %></dd>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        
+        <!-- Export Options -->
+        <div class="bg-white rounded-lg shadow-sm border">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Export Content</h3>
+          </div>
+          <div class="px-6 py-4 space-y-3">
+            <%= link_to export_content_management_path(@content_request, format: 'html'), 
+                class: "w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Export as HTML
+            <% end %>
+            
+            <%= link_to export_content_management_path(@content_request, format: 'markdown'), 
+                class: "w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Export as Markdown
+            <% end %>
+            
+            <%= link_to export_content_management_path(@content_request, format: 'json'), 
+                class: "w-full flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              Export as JSON
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column: Content & Preview -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <% if @content_response && @content_response.generated_content.present? %>
+          <!-- Content Preview -->
+          <div class="bg-white rounded-lg shadow-sm border" 
+               data-controller="rich-text-editor"
+               data-rich-text-editor-content-value="<%= @content_response.generated_content %>"
+               data-rich-text-editor-channel-value="<%= @content_request.content_type %>"
+               data-rich-text-editor-editable-value="false">
+            
+            <div class="px-6 py-4 border-b border-gray-200">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">Generated Content</h2>
+                <div class="flex items-center space-x-4">
+                  <!-- Channel Selector -->
+                  <div class="flex items-center">
+                    <label for="preview_channel" class="text-sm font-medium text-gray-700 mr-2">Preview as:</label>
+                    <select id="preview_channel" 
+                            data-rich-text-editor-target="channelSelector"
+                            class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <% @available_channels.each do |channel| %>
+                        <option value="<%= channel %>" 
+                                <%= 'selected' if channel == @content_request.content_type %>>
+                          <%= channel.humanize %>
+                        </option>
+                      <% end %>
+                    </select>
+                  </div>
+                  
+                  <!-- Mobile Toggle -->
+                  <button type="button" 
+                          data-action="click->rich-text-editor#toggleMobilePreview"
+                          class="text-sm text-gray-600 hover:text-gray-900 inline-flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a1 1 0 001-1V4a1 1 0 00-1-1H8a1 1 0 00-1 1v16a1 1 0 001 1z"></path>
+                    </svg>
+                    Mobile View
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-6">
+              <!-- Raw Content (Hidden by default) -->
+              <div class="hidden mb-6">
+                <div class="bg-gray-50 border rounded-lg p-4">
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">Raw HTML Content</h4>
+                  <pre class="text-xs text-gray-600 whitespace-pre-wrap"><%= @content_response.generated_content %></pre>
+                </div>
+              </div>
+              
+              <!-- Channel Preview -->
+              <div data-rich-text-editor-target="preview" class="preview-container min-h-[300px]">
+                <!-- Preview will be rendered here by JavaScript -->
+              </div>
+            </div>
+          </div>
+          
+          <!-- Generation Metadata -->
+          <% if @content_response.response_metadata.present? %>
+            <div class="bg-white rounded-lg shadow-sm border">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Generation Details</h3>
+              </div>
+              <div class="px-6 py-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                  <% metadata = @content_response.response_metadata.is_a?(String) ? JSON.parse(@content_response.response_metadata) : @content_response.response_metadata %>
+                  <% metadata.each do |key, value| %>
+                    <div>
+                      <dt class="font-medium text-gray-500"><%= key.humanize %></dt>
+                      <dd class="mt-1 text-gray-900"><%= value %></dd>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          
+        <% else %>
+          <!-- No Content Generated -->
+          <div class="bg-white rounded-lg shadow-sm border">
+            <div class="text-center py-12">
+              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <h3 class="mt-4 text-lg font-medium text-gray-900">No content generated yet</h3>
+              <p class="mt-2 text-sm text-gray-500">
+                Generate content for this request to see the preview and editing options.
+              </p>
+              <div class="mt-6">
+                <%= link_to edit_content_management_path(@content_request), 
+                    class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" do %>
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  Generate Content
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <!-- Content History (Future Enhancement) -->
+        <div class="bg-white rounded-lg shadow-sm border">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Content History</h3>
+          </div>
+          <div class="px-6 py-4">
+            <div class="text-center py-4 text-sm text-gray-500">
+              Content versioning will be available in a future update.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .preview-container {
+    transition: max-width 0.3s ease;
+  }
+  
+  .mobile-preview {
+    max-width: 375px !important;
+    margin: 0 auto !important;
+  }
+</style>

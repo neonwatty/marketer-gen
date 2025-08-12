@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  campaign: one
+  campaign_id: 1
   name: "Lead Nurturing Journey"
   template_type: "lead_nurturing"
   purpose: "Generate qualified leads"
@@ -11,7 +11,7 @@ one:
   position: 0
 
 two:
-  campaign: two
+  campaign_id: 2
   name: "Customer Retention Journey"
   template_type: "customer_retention"
   purpose: "Keep customers engaged"

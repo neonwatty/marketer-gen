@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import Sortable from 'sortablejs'
+import { mobilePerformance } from '../utils/mobile_performance.js'
 
 // Journey Builder Controller for drag-and-drop stage management
 export default class extends Controller {
@@ -25,6 +26,10 @@ export default class extends Controller {
     this.stageCounter = 0
     this.sortableInstances = []
     
+    // Mobile detection
+    this.isMobile = window.innerWidth <= 640
+    this.isTablet = window.innerWidth > 640 && window.innerWidth <= 1024
+    
     // Undo/Redo functionality
     this.history = []
     this.historyIndex = -1
@@ -33,6 +38,9 @@ export default class extends Controller {
     // Template system
     this.templates = []
     this.templateSearchTimeout = null
+    
+    // Initialize mobile performance optimizations
+    this.initializeMobileOptimizations()
     
     // Load existing stages if available
     if (this.existingStagesValue && this.existingStagesValue.length > 0) {
@@ -43,6 +51,9 @@ export default class extends Controller {
     this.setupSortableJS()
     this.setupKeyboardShortcuts()
     this.loadQuickTemplates()
+    
+    // Setup mobile-specific event listeners
+    this.setupMobileEventListeners()
   }
 
   disconnect() {
@@ -1056,6 +1067,322 @@ export default class extends Controller {
     }
   }
 
+  // Mobile-specific optimizations and integrations
+  
+  // Initialize mobile performance optimizations
+  initializeMobileOptimizations() {
+    // Initialize performance manager
+    mobilePerformance.initialize()
+    
+    // Observe journey builder container
+    mobilePerformance.observeContainer(this.element)
+    
+    // Setup device-specific optimizations
+    if (this.isMobile) {
+      this.enableMobileOptimizations()
+    }
+  }
+
+  // Enable mobile-specific optimizations
+  enableMobileOptimizations() {
+    // Reduce animation complexity
+    this.element.classList.add('mobile-optimized')
+    
+    // Disable expensive effects for low-end devices
+    if (mobilePerformance.isLowEndDevice) {
+      this.element.classList.add('low-end-device')
+    }
+    
+    // Setup touch optimizations
+    this.optimizeForTouch()
+  }
+
+  // Optimize interface for touch interactions
+  optimizeForTouch() {
+    // Increase touch targets
+    const buttons = this.element.querySelectorAll('button')
+    buttons.forEach(button => {
+      if (button.offsetHeight < 44) {
+        button.style.minHeight = '44px'
+      }
+    })
+    
+    // Add touch feedback classes
+    this.element.classList.add('touch-optimized')
+  }
+
+  // Setup mobile-specific event listeners
+  setupMobileEventListeners() {
+    // Listen for mobile-specific events
+    document.addEventListener('journey:addStageFromMobile', this.handleMobileStageAdd.bind(this))
+    document.addEventListener('journey:stageSelected', this.handleMobileStageSelection.bind(this))
+    document.addEventListener('journey:panelChanged', this.handleMobilePanelChange.bind(this))
+    document.addEventListener('journey:loadRemoteData', this.handleRemoteDataLoad.bind(this))
+    
+    // Listen for orientation changes
+    window.addEventListener('orientationchange', this.handleOrientationChange.bind(this))
+    
+    // Listen for resize events with debouncing
+    const debouncedResize = mobilePerformance.debounce(this.handleResize.bind(this), 250)
+    window.addEventListener('resize', debouncedResize)
+  }
+
+  // Handle stage addition from mobile interface
+  handleMobileStageAdd(event) {
+    const { stageType, source } = event.detail
+    
+    if (source === 'mobile') {
+      // Create stage optimized for mobile
+      const stageData = this.createMobileOptimizedStage(stageType)
+      this.addStageToCanvas(stageData, { animate: true, focus: true })
+    }
+  }
+
+  // Create mobile-optimized stage
+  createMobileOptimizedStage(stageType) {
+    return {
+      id: `stage-${++this.stageCounter}`,
+      name: `${stageType.charAt(0).toUpperCase() + stageType.slice(1)} Stage`,
+      type: stageType,
+      description: '',
+      duration_days: 7,
+      position: { x: 50, y: 50 + (this.stages.length * 120) },
+      isMobileCreated: true
+    }
+  }
+
+  // Handle mobile stage selection
+  handleMobileStageSelection(event) {
+    const { stageId, stageData, source } = event.detail
+    
+    if (source === 'mobile') {
+      // Update selection state
+      this.selectedStage = this.stages.find(s => s.id === stageId)
+      
+      // Update visual selection
+      this.updateStageSelection(stageId)
+      
+      // Load configuration panel
+      if (this.selectedStage) {
+        this.loadStageConfiguration(this.selectedStage)
+      }
+    }
+  }
+
+  // Handle mobile panel changes
+  handleMobilePanelChange(event) {
+    const { panel, device } = event.detail
+    
+    // Adjust interface based on current panel
+    this.adaptInterfaceForPanel(panel, device)
+  }
+
+  // Adapt interface for current mobile panel
+  adaptInterfaceForPanel(panel, device) {
+    if (device !== 'mobile') return
+    
+    switch (panel) {
+      case 'canvas':
+        // Optimize canvas for mobile viewing
+        this.optimizeCanvasForMobile()
+        break
+      case 'stages':
+        // Optimize stage library for mobile browsing
+        this.optimizeStageLibraryForMobile()
+        break
+      case 'config':
+        // Prepare configuration panel for mobile editing
+        this.optimizeConfigForMobile()
+        break
+    }
+  }
+
+  // Optimize canvas for mobile viewing
+  optimizeCanvasForMobile() {
+    if (!this.hasCanvasTarget) return
+    
+    // Adjust zoom level for mobile screens
+    const canvasWidth = this.canvasTarget.scrollWidth
+    const viewportWidth = window.innerWidth - 32 // Account for padding
+    
+    if (canvasWidth > viewportWidth) {
+      const scale = viewportWidth / canvasWidth
+      this.canvasTarget.style.transform = `scale(${Math.min(scale, 1)})`
+      this.canvasTarget.style.transformOrigin = 'top left'
+    }
+  }
+
+  // Optimize stage library for mobile
+  optimizeStageLibraryForMobile() {
+    // Enable lazy loading for stage templates
+    const templates = this.element.querySelectorAll('.stage-template')
+    templates.forEach(template => {
+      if (!template.hasAttribute('data-lazy-loaded')) {
+        mobilePerformance.setupLazyLoading(template)
+        template.setAttribute('data-lazy-loaded', 'true')
+      }
+    })
+  }
+
+  // Optimize configuration panel for mobile
+  optimizeConfigForMobile() {
+    // Enable virtual scrolling for long forms
+    const configPanel = this.element.querySelector('.stage-config-panel')
+    if (configPanel && configPanel.scrollHeight > window.innerHeight) {
+      configPanel.setAttribute('data-virtual-scroll', 'true')
+      configPanel.setAttribute('data-item-height', '60')
+    }
+  }
+
+  // Handle orientation changes
+  handleOrientationChange() {
+    // Delay to allow orientation change to complete
+    setTimeout(() => {
+      this.handleResize()
+      this.optimizeCanvasForMobile()
+    }, 100)
+  }
+
+  // Handle window resize
+  handleResize() {
+    // Update device detection
+    this.isMobile = window.innerWidth <= 640
+    this.isTablet = window.innerWidth > 640 && window.innerWidth <= 1024
+    
+    // Reapply mobile optimizations if needed
+    if (this.isMobile && !this.element.classList.contains('mobile-optimized')) {
+      this.enableMobileOptimizations()
+    } else if (!this.isMobile && this.element.classList.contains('mobile-optimized')) {
+      this.disableMobileOptimizations()
+    }
+    
+    // Update canvas layout
+    this.updateCanvasLayout()
+  }
+
+  // Disable mobile optimizations when switching to desktop
+  disableMobileOptimizations() {
+    this.element.classList.remove('mobile-optimized', 'touch-optimized', 'low-end-device')
+    
+    // Reset canvas transform
+    if (this.hasCanvasTarget) {
+      this.canvasTarget.style.transform = ''
+      this.canvasTarget.style.transformOrigin = ''
+    }
+  }
+
+  // Update canvas layout for current screen size
+  updateCanvasLayout() {
+    if (!this.hasStagesContainerTarget) return
+    
+    if (this.isMobile) {
+      // Mobile: vertical layout
+      this.stagesContainerTarget.classList.add('flex-col')
+      this.stagesContainerTarget.classList.remove('flex-row', 'flex-wrap')
+    } else {
+      // Desktop/tablet: horizontal layout
+      this.stagesContainerTarget.classList.add('flex-row', 'flex-wrap')
+      this.stagesContainerTarget.classList.remove('flex-col')
+    }
+  }
+
+  // Handle remote data loading (for conflict resolution)
+  handleRemoteDataLoad(event) {
+    const { data } = event.detail
+    
+    // Load remote journey data
+    this.loadJourneyData(data, { isRemote: true })
+  }
+
+  // Load journey data with mobile optimizations
+  loadJourneyData(journeyData, options = {}) {
+    const { isRemote = false } = options
+    
+    if (isRemote) {
+      // Handle remote data loading
+      this.showNotification('Loading updated journey data...', 'info')
+    }
+    
+    // Clear existing stages
+    this.clearStages()
+    
+    // Load stages with lazy loading on mobile
+    if (this.isMobile && journeyData.stages && journeyData.stages.length > 10) {
+      this.loadStagesLazy(journeyData.stages)
+    } else {
+      this.loadStagesImmediate(journeyData.stages || [])
+    }
+    
+    // Update statistics
+    this.updateStatistics()
+  }
+
+  // Load stages with lazy loading for mobile performance
+  loadStagesLazy(stages) {
+    // Load first few stages immediately
+    const immediateStages = stages.slice(0, 5)
+    const lazyStages = stages.slice(5)
+    
+    this.loadStagesImmediate(immediateStages)
+    
+    // Load remaining stages with delay
+    if (lazyStages.length > 0) {
+      setTimeout(() => {
+        this.loadStagesImmediate(lazyStages)
+      }, 500)
+    }
+  }
+
+  // Load stages immediately
+  loadStagesImmediate(stages) {
+    stages.forEach(stageData => {
+      this.addStageToCanvas(stageData, { animate: false })
+    })
+  }
+
+  // Enhanced stage creation with mobile optimizations
+  addStageToCanvas(stageData, options = {}) {
+    const { animate = false, focus = false } = options
+    
+    // Create stage element
+    const stage = this.createStageElement(stageData)
+    
+    // Add mobile-specific attributes
+    if (this.isMobile) {
+      stage.setAttribute('data-journey-builder-mobile-target', 'mobileStageCard')
+      stage.classList.add('mobile-stage-card')
+    }
+    
+    // Add to stages array
+    this.stages.push(stageData)
+    
+    // Add to DOM
+    if (this.hasStagesContainerTarget) {
+      this.stagesContainerTarget.appendChild(stage)
+    }
+    
+    // Animate appearance if requested
+    if (animate) {
+      stage.classList.add('newly-created')
+      setTimeout(() => {
+        stage.classList.remove('newly-created')
+      }, 400)
+    }
+    
+    // Focus stage if requested (mobile auto-switch)
+    if (focus && this.isMobile) {
+      setTimeout(() => {
+        this.selectStage(stage, stageData.id)
+      }, 300)
+    }
+    
+    // Update statistics
+    this.updateStatistics()
+    
+    // Save state for undo/redo
+    this.saveState()
+  }
+
   cleanup() {
     // Destroy all sortable instances
     this.sortableInstances.forEach(instance => {
@@ -1071,7 +1398,26 @@ export default class extends Controller {
       this.canvasTarget.removeEventListener('drop', this.handleCanvasDrop)
     }
     
+    // Clean up mobile-specific resources
+    this.cleanupMobile()
+    
     // Remove keyboard shortcuts (note: this might affect other controllers)
     // document.removeEventListener('keydown', this.keydownHandler)
+  }
+
+  // Cleanup mobile-specific resources
+  cleanupMobile() {
+    // Remove mobile event listeners
+    document.removeEventListener('journey:addStageFromMobile', this.handleMobileStageAdd)
+    document.removeEventListener('journey:stageSelected', this.handleMobileStageSelection)
+    document.removeEventListener('journey:panelChanged', this.handleMobilePanelChange)
+    document.removeEventListener('journey:loadRemoteData', this.handleRemoteDataLoad)
+    
+    window.removeEventListener('orientationchange', this.handleOrientationChange)
+    
+    // Cleanup mobile performance manager
+    if (mobilePerformance) {
+      mobilePerformance.cleanup()
+    }
   }
 }

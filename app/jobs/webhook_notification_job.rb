@@ -1,8 +1,10 @@
+require 'net/http'
+
 class WebhookNotificationJob < ApplicationJob
   queue_as :webhooks
   
   # Configure retries for webhook delivery
-  retry_on Net::TimeoutError, wait: 5.seconds, attempts: 3
+  retry_on Timeout::Error, wait: 5.seconds, attempts: 3
   retry_on Faraday::TimeoutError, wait: 5.seconds, attempts: 3
   retry_on Net::HTTPServerException, wait: 30.seconds, attempts: 2
   

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./journey_builder_mobile.css";
 
 /* Journey Builder Specific Styles */
 .journey-builder {

@@ -1,0 +1,426 @@
+<% content_for :title, "Content Variants - #{@content_request.display_name}" %>
+
+<div class="min-h-screen bg-gray-50">
+  <!-- Header Section -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <nav class="flex" aria-label="Breadcrumb">
+              <ol class="flex items-center space-x-4">
+                <li>
+                  <%= link_to "Content Management", content_management_index_path, 
+                      class: "text-gray-500 hover:text-gray-700" %>
+                </li>
+                <li>
+                  <div class="flex items-center">
+                    <svg class="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    <%= link_to @content_request.display_name, content_management_path(@content_request), 
+                        class: "ml-4 text-gray-500 hover:text-gray-700" %>
+                  </div>
+                </li>
+                <li>
+                  <div class="flex items-center">
+                    <svg class="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-4 text-gray-900">Variants</span>
+                  </div>
+                </li>
+              </ol>
+            </nav>
+            <div class="mt-2">
+              <h1 class="text-2xl font-bold text-gray-900">Content Variants</h1>
+              <p class="mt-1 text-sm text-gray-500">
+                A/B test variants for "<%= @content_request.display_name %>"
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex space-x-3">
+            <%= link_to "Create Variants", 
+                new_content_request_variant_path(@content_request),
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
+                data: { "turbo-frame": "variant-modal" } %>
+            
+            <% if @variants.length > 1 %>
+              <button type="button" id="compare-variants-btn"
+                      class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      disabled>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Compare Selected
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Performance Overview -->
+    <% if @comparison_data.present? %>
+      <div class="bg-white rounded-lg shadow mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Performance Overview</h3>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-gray-900"><%= @comparison_data[:total_variants] %></div>
+              <div class="text-sm text-gray-500">Total Variants</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-indigo-600"><%= @comparison_data[:performance_range][:highest] %></div>
+              <div class="text-sm text-gray-500">Highest Score</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-gray-600"><%= @comparison_data[:performance_range][:average] %></div>
+              <div class="text-sm text-gray-500">Average Score</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-gray-900"><%= @comparison_data[:content_length_range][:average] %></div>
+              <div class="text-sm text-gray-500">Avg. Length (chars)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Variants Grid -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium text-gray-900">
+            Content Variants 
+            <span class="text-sm font-normal text-gray-500">(<%= @variants.length %>)</span>
+          </h3>
+          
+          <% if @variants.length > 0 %>
+            <div class="flex items-center space-x-4">
+              <!-- Bulk Actions -->
+              <div class="relative" data-controller="dropdown">
+                <button type="button" 
+                        data-action="click->dropdown#toggle"
+                        class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                  Bulk Actions
+                  <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                <div data-dropdown-target="menu" 
+                     class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                  <div class="py-1">
+                    <button type="button" onclick="performBulkAction('activate')" 
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      Activate Selected
+                    </button>
+                    <button type="button" onclick="performBulkAction('archive')" 
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      Archive Selected
+                    </button>
+                    <button type="button" onclick="performBulkAction('delete')" 
+                            class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-gray-100">
+                      Delete Selected
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sort Options -->
+              <select onchange="sortVariants(this.value)" 
+                      class="text-sm border border-gray-300 rounded-md px-3 py-2">
+                <option value="created_at">Sort by Created</option>
+                <option value="performance_score">Sort by Performance</option>
+                <option value="name">Sort by Name</option>
+                <option value="strategy_type">Sort by Strategy</option>
+              </select>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @variants.empty? %>
+        <!-- Empty State -->
+        <div class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No variants yet</h3>
+          <p class="mt-1 text-sm text-gray-500">Get started by creating your first content variant for A/B testing.</p>
+          <div class="mt-6">
+            <%= link_to "Create First Variant", 
+                new_content_request_variant_path(@content_request),
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700" %>
+          </div>
+        </div>
+      <% else %>
+        <!-- Variants List -->
+        <div class="divide-y divide-gray-200" id="variants-container">
+          <% @variants.each do |variant| %>
+            <div class="variant-item p-6 hover:bg-gray-50" data-variant-id="<%= variant.id %>">
+              <div class="flex items-start space-x-4">
+                <!-- Selection Checkbox -->
+                <div class="flex-shrink-0 pt-1">
+                  <input type="checkbox" 
+                         class="variant-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                         value="<%= variant.id %>"
+                         onchange="updateSelectionControls()">
+                </div>
+
+                <!-- Variant Content -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <h4 class="text-lg font-medium text-gray-900 truncate">
+                        <%= variant.name %>
+                      </h4>
+                      
+                      <!-- Status Badge -->
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                   <%= variant.status == 'active' ? 'bg-green-100 text-green-800' :
+                                       variant.status == 'testing' ? 'bg-blue-100 text-blue-800' :
+                                       variant.status == 'completed' ? 'bg-purple-100 text-purple-800' :
+                                       variant.status == 'archived' ? 'bg-gray-100 text-gray-800' :
+                                       'bg-yellow-100 text-yellow-800' %>">
+                        <%= variant.status.humanize %>
+                      </span>
+
+                      <!-- Strategy Badge -->
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                        <%= variant.strategy_type.humanize %>
+                      </span>
+                    </div>
+
+                    <!-- Performance Score -->
+                    <div class="flex items-center space-x-4">
+                      <div class="text-right">
+                        <div class="text-sm font-medium text-gray-900">
+                          Score: <%= (variant.performance_score * 100).round(1) %>%
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          Variant #<%= variant.variant_number %>
+                        </div>
+                      </div>
+                      
+                      <!-- Performance Bar -->
+                      <div class="w-20 bg-gray-200 rounded-full h-2">
+                        <div class="h-2 rounded-full 
+                                    <%= variant.performance_score >= 0.8 ? 'bg-green-500' :
+                                        variant.performance_score >= 0.6 ? 'bg-yellow-500' :
+                                        variant.performance_score >= 0.4 ? 'bg-orange-500' : 'bg-red-500' %>"
+                             style="width: <%= (variant.performance_score * 100).round(1) %>%"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Content Preview -->
+                  <div class="mt-3">
+                    <p class="text-sm text-gray-600 line-clamp-3">
+                      <%= truncate(variant.content, length: 200) %>
+                    </p>
+                  </div>
+
+                  <!-- Content Stats -->
+                  <div class="mt-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-6 text-sm text-gray-500">
+                      <span><%= variant.content.length %> characters</span>
+                      <span><%= variant.content.split.length %> words</span>
+                      <span>Created <%= time_ago_in_words(variant.created_at) %> ago</span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center space-x-2">
+                      <%= link_to "View", variant_path(variant), 
+                          class: "text-indigo-600 hover:text-indigo-900 text-sm font-medium" %>
+                      
+                      <%= link_to "Edit", edit_variant_path(variant), 
+                          class: "text-gray-600 hover:text-gray-900 text-sm font-medium" %>
+                      
+                      <button type="button" 
+                              onclick="duplicateVariant(<%= variant.id %>)"
+                              class="text-gray-600 hover:text-gray-900 text-sm font-medium">
+                        Duplicate
+                      </button>
+                      
+                      <% if variant.ready_for_testing? %>
+                        <button type="button" 
+                                onclick="startTesting(<%= variant.id %>)"
+                                class="text-green-600 hover:text-green-900 text-sm font-medium">
+                          Start Test
+                        </button>
+                      <% end %>
+                    </div>
+                  </div>
+
+                  <!-- Tags -->
+                  <% if variant.tag_list.any? %>
+                    <div class="mt-3 flex flex-wrap gap-1">
+                      <% variant.tag_list.each do |tag| %>
+                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                          <%= tag %>
+                        </span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Turbo Frame for Modals -->
+<turbo-frame id="variant-modal" class="hidden"></turbo-frame>
+
+<!-- JavaScript for Variant Management -->
+<script>
+  let selectedVariants = [];
+
+  function updateSelectionControls() {
+    const checkboxes = document.querySelectorAll('.variant-checkbox:checked');
+    selectedVariants = Array.from(checkboxes).map(cb => cb.value);
+    
+    const compareBtn = document.getElementById('compare-variants-btn');
+    if (compareBtn) {
+      compareBtn.disabled = selectedVariants.length < 2;
+      compareBtn.textContent = selectedVariants.length > 0 ? 
+        `Compare Selected (${selectedVariants.length})` : 'Compare Selected';
+    }
+  }
+
+  function performBulkAction(action) {
+    if (selectedVariants.length === 0) {
+      alert('Please select variants first');
+      return;
+    }
+
+    const confirmMessage = {
+      'delete': 'Are you sure you want to delete the selected variants?',
+      'archive': 'Archive the selected variants?',
+      'activate': 'Activate the selected variants?'
+    };
+
+    if (confirm(confirmMessage[action])) {
+      fetch(`<%= content_request_variants_path(@content_request) %>/bulk_action`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          action: action,
+          variant_ids: selectedVariants.join(',')
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+      });
+    }
+  }
+
+  function compareVariants() {
+    if (selectedVariants.length < 2) {
+      alert('Please select at least 2 variants to compare');
+      return;
+    }
+    
+    window.location.href = `<%= content_request_variants_path(@content_request) %>/compare?variant_ids=${selectedVariants.join(',')}`;
+  }
+
+  function duplicateVariant(variantId) {
+    fetch(`<%= content_request_variants_path(@content_request) %>/duplicate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+      },
+      body: JSON.stringify({
+        source_variant_id: variantId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error: ' + data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred');
+    });
+  }
+
+  function startTesting(variantId) {
+    if (confirm('Start A/B testing for this variant?')) {
+      // Implementation for starting A/B test
+      fetch(`/variants/${variantId}/start_testing`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+      });
+    }
+  }
+
+  function sortVariants(sortBy) {
+    const container = document.getElementById('variants-container');
+    const variants = Array.from(container.children);
+    
+    variants.sort((a, b) => {
+      // This would need actual data attributes or AJAX sorting
+      // For now, just reload with sort parameter
+      window.location.href = window.location.pathname + `?sort=${sortBy}`;
+    });
+  }
+
+  // Compare button click handler
+  document.addEventListener('DOMContentLoaded', function() {
+    const compareBtn = document.getElementById('compare-variants-btn');
+    if (compareBtn) {
+      compareBtn.addEventListener('click', compareVariants);
+    }
+  });
+</script>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

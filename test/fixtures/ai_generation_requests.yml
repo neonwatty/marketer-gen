@@ -1,6 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 social_media_pending:
+  id: 1
   campaign_id: 1
   content_type: social_media_post
   prompt_data: '{"topic": "summer sale", "tone": "exciting", "hashtags": ["SummerSale", "Deals"]}'
@@ -13,6 +14,7 @@ social_media_pending:
   updated_at: <%= 1.hour.ago %> 
 
 email_completed:
+  id: 2
   campaign_id: 1
   content_type: email_content
   prompt_data: '{"subject": "Newsletter signup", "tone": "professional", "audience": "subscribers"}'

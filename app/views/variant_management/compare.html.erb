@@ -1,0 +1,438 @@
+<% content_for :title, "Compare Variants - #{@content_request.display_name}" %>
+
+<div class="min-h-screen bg-gray-50">
+  <!-- Header Section -->
+  <div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="py-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <nav class="flex" aria-label="Breadcrumb">
+              <ol class="flex items-center space-x-4">
+                <li>
+                  <%= link_to "Content Management", content_management_index_path, 
+                      class: "text-gray-500 hover:text-gray-700" %>
+                </li>
+                <li>
+                  <div class="flex items-center">
+                    <svg class="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    <%= link_to @content_request.display_name, content_management_path(@content_request), 
+                        class: "ml-4 text-gray-500 hover:text-gray-700" %>
+                  </div>
+                </li>
+                <li>
+                  <div class="flex items-center">
+                    <svg class="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    <%= link_to "Variants", content_request_variants_path(@content_request), 
+                        class: "ml-4 text-gray-500 hover:text-gray-700" %>
+                  </div>
+                </li>
+                <li>
+                  <div class="flex items-center">
+                    <svg class="flex-shrink-0 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-4 text-gray-900">Compare</span>
+                  </div>
+                </li>
+              </ol>
+            </nav>
+            <div class="mt-2">
+              <h1 class="text-2xl font-bold text-gray-900">Variant Comparison</h1>
+              <p class="mt-1 text-sm text-gray-500">
+                Comparing <%= @variants.length %> variants side-by-side
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex space-x-3">
+            <%= link_to "Back to Variants", content_request_variants_path(@content_request),
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+            
+            <button type="button" onclick="exportComparison()"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Export Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Comparison Overview -->
+    <div class="bg-white rounded-lg shadow mb-8">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Comparison Overview</h3>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-indigo-600">
+              <%= @comparison_analysis[:side_by_side_analysis][:performance_spread][:best_performer] %>
+            </div>
+            <div class="text-sm text-gray-500">Best Performer</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-gray-900">
+              <%= @comparison_analysis[:side_by_side_analysis][:performance_spread][:range].round(3) %>
+            </div>
+            <div class="text-sm text-gray-500">Performance Range</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-gray-600">
+              <%= @comparison_analysis[:side_by_side_analysis][:strategy_diversity][:unique_strategies] %>
+            </div>
+            <div class="text-sm text-gray-500">Unique Strategies</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-orange-600">
+              <%= @comparison_analysis[:side_by_side_analysis][:length_comparison][:difference] %>
+            </div>
+            <div class="text-sm text-gray-500">Length Difference</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Predictions -->
+    <div class="bg-white rounded-lg shadow mb-8">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Performance Predictions</h3>
+      </div>
+      <div class="p-6">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Variant
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Overall Score
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Predicted Engagement
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Predicted Conversion
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Ranking
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @comparison_analysis[:performance_comparison][:overall_ranking].each do |ranked_variant| %>
+                <% variant = @variants.find { |v| v.id == ranked_variant[:id].to_i } %>
+                <tr class="<%= ranked_variant[:rank] == 1 ? 'bg-green-50' : '' %>">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0">
+                        <span class="inline-flex items-center justify-center h-8 w-8 rounded-full 
+                                     <%= ranked_variant[:rank] == 1 ? 'bg-green-100 text-green-800' :
+                                         ranked_variant[:rank] == 2 ? 'bg-yellow-100 text-yellow-800' :
+                                         'bg-gray-100 text-gray-800' %>">
+                          #<%= ranked_variant[:rank] %>
+                        </span>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">
+                          <%= variant.name %>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          <%= variant.strategy_type.humanize %>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="text-sm font-medium text-gray-900">
+                        <%= (ranked_variant[:score] * 100).round(1) %>%
+                      </div>
+                      <div class="ml-2 w-16 bg-gray-200 rounded-full h-2">
+                        <div class="h-2 rounded-full bg-indigo-600" 
+                             style="width: <%= (ranked_variant[:score] * 100).round(1) %>%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= (@performance_predictions[variant.id][:engagement_rate] * 100).round(2) %>%
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= (@performance_predictions[variant.id][:conversion_rate] * 100).round(2) %>%
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if ranked_variant[:rank] == 1 %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Winner
+                      </span>
+                    <% elsif ranked_variant[:rank] == 2 %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Runner-up
+                      </span>
+                    <% else %>
+                      <span class="text-sm text-gray-500">
+                        #<%= ranked_variant[:rank] %>
+                      </span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side-by-Side Content Comparison -->
+    <div class="bg-white rounded-lg shadow mb-8">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Content Comparison</h3>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-<%= [@variants.length, 3].min %> gap-6">
+          <% @variants.each do |variant| %>
+            <div class="border border-gray-200 rounded-lg p-4">
+              <!-- Variant Header -->
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900">
+                    <%= variant.name %>
+                  </h4>
+                  <p class="text-xs text-gray-500">
+                    <%= variant.strategy_type.humanize %>
+                  </p>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold 
+                              <%= variant.performance_score >= 0.8 ? 'text-green-600' :
+                                  variant.performance_score >= 0.6 ? 'text-yellow-600' :
+                                  variant.performance_score >= 0.4 ? 'text-orange-600' : 'text-red-600' %>">
+                    <%= (variant.performance_score * 100).round(1) %>%
+                  </div>
+                  <div class="text-xs text-gray-500">Score</div>
+                </div>
+              </div>
+
+              <!-- Content Preview -->
+              <div class="mb-4">
+                <div class="bg-gray-50 rounded-lg p-3 text-sm">
+                  <div class="prose prose-sm max-w-none">
+                    <%= simple_format(variant.content) %>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Content Stats -->
+              <div class="space-y-2 text-xs text-gray-500">
+                <div class="flex justify-between">
+                  <span>Length:</span>
+                  <span><%= variant.content.length %> chars</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Words:</span>
+                  <span><%= variant.content.split.length %></span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Sentences:</span>
+                  <span><%= variant.content.split(/[.!?]+/).length %></span>
+                </div>
+              </div>
+
+              <!-- Key Differences -->
+              <% variant_analysis = @comparison_analysis[:variants].find { |v| v[:id] == variant.id } %>
+              <% if variant_analysis && variant_analysis[:key_differences].any? %>
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                  <h5 class="text-xs font-medium text-gray-900 mb-2">Key Differences:</h5>
+                  <ul class="space-y-1">
+                    <% variant_analysis[:key_differences].each do |difference| %>
+                      <li class="text-xs text-gray-600">• <%= difference %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+
+              <!-- Strengths & Weaknesses -->
+              <div class="mt-4 pt-4 border-t border-gray-200">
+                <% if variant_analysis && variant_analysis[:strengths].any? %>
+                  <div class="mb-3">
+                    <h5 class="text-xs font-medium text-green-700 mb-1">Strengths:</h5>
+                    <ul class="space-y-1">
+                      <% variant_analysis[:strengths].first(3).each do |strength| %>
+                        <li class="text-xs text-green-600">✓ <%= strength %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% end %>
+
+                <% if variant_analysis && variant_analysis[:weaknesses].any? %>
+                  <div>
+                    <h5 class="text-xs font-medium text-red-700 mb-1">Areas for Improvement:</h5>
+                    <ul class="space-y-1">
+                      <% variant_analysis[:weaknesses].first(3).each do |weakness| %>
+                        <li class="text-xs text-red-600">⚠ <%= weakness %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% end %>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="flex space-x-2">
+                  <%= link_to "View", variant_path(variant), 
+                      class: "flex-1 text-center px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 rounded hover:bg-indigo-100" %>
+                  <%= link_to "Edit", edit_variant_path(variant), 
+                      class: "flex-1 text-center px-3 py-1 text-xs font-medium text-gray-600 bg-gray-50 rounded hover:bg-gray-100" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Testing Recommendations -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Testing Recommendations</h3>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Recommendations -->
+          <div>
+            <h4 class="text-sm font-medium text-gray-900 mb-4">Recommended Actions</h4>
+            <div class="space-y-3">
+              <% @testing_recommendations.each do |recommendation| %>
+                <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div class="text-sm text-blue-800">
+                    <%= recommendation %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Summary Insights -->
+          <div>
+            <h4 class="text-sm font-medium text-gray-900 mb-4">Key Insights</h4>
+            <div class="space-y-4">
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <h5 class="text-sm font-medium text-gray-900 mb-2">Overall Recommendation</h5>
+                <p class="text-sm text-gray-600">
+                  <%= @comparison_analysis[:recommendation] %>
+                </p>
+              </div>
+
+              <div class="p-4 bg-yellow-50 rounded-lg">
+                <h5 class="text-sm font-medium text-yellow-800 mb-2">Strategy Insights</h5>
+                <p class="text-sm text-yellow-700">
+                  <% best_strategies = @comparison_analysis[:side_by_side_analysis][:strategy_diversity][:strategies] %>
+                  The most effective strategies in this comparison are: 
+                  <%= best_strategies.map(&:humanize).join(', ') %>
+                </p>
+              </div>
+
+              <div class="p-4 bg-green-50 rounded-lg">
+                <h5 class="text-sm font-medium text-green-800 mb-2">Next Steps</h5>
+                <ul class="text-sm text-green-700 space-y-1">
+                  <li>• Set up A/B test with top 2-3 performers</li>
+                  <li>• Monitor performance for at least 7 days</li>
+                  <li>• Collect at least 1,000 impressions per variant</li>
+                  <li>• Track engagement, click-through, and conversion rates</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for Comparison Features -->
+<script>
+  function exportComparison() {
+    // Create exportable data
+    const comparisonData = {
+      variants: <%= raw @comparison_analysis[:variants].to_json %>,
+      performance: <%= raw @performance_predictions.to_json %>,
+      recommendations: <%= raw @testing_recommendations.to_json %>,
+      timestamp: new Date().toISOString()
+    };
+
+    // Convert to CSV or JSON format
+    const dataStr = JSON.stringify(comparisonData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    // Create download link
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `variant-comparison-${new Date().toISOString().split('T')[0]}.json`;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Add click handlers for interactive elements
+  document.addEventListener('DOMContentLoaded', function() {
+    // Highlight best performer
+    const bestPerformer = document.querySelector('[data-rank="1"]');
+    if (bestPerformer) {
+      bestPerformer.classList.add('ring-2', 'ring-green-500');
+    }
+
+    // Add hover effects for variant cards
+    const variantCards = document.querySelectorAll('.border.border-gray-200');
+    variantCards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.classList.add('shadow-lg', 'transform', 'scale-105');
+        this.style.transition = 'all 0.2s ease-in-out';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.classList.remove('shadow-lg', 'transform', 'scale-105');
+      });
+    });
+  });
+
+  // Add keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      window.location.href = '<%= content_request_variants_path(@content_request) %>';
+    }
+  });
+</script>
+
+<style>
+  .prose-sm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  .prose-sm p {
+    margin-bottom: 0.75rem;
+  }
+  
+  .prose-sm p:last-child {
+    margin-bottom: 0;
+  }
+</style>

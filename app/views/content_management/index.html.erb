@@ -1,0 +1,255 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Content Management</h1>
+      <p class="text-gray-600 mt-2">Create, edit, and preview marketing content across all channels</p>
+    </div>
+    <%= link_to new_content_management_path, 
+        class: "bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center" do %>
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+      </svg>
+      Create New Content
+    <% end %>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-lg shadow-sm border">
+      <div class="flex items-center">
+        <div class="p-3 bg-blue-100 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-sm font-medium text-gray-500">Total Content</h3>
+          <p class="text-2xl font-bold text-gray-900"><%= @content_requests.count %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-sm border">
+      <div class="flex items-center">
+        <div class="p-3 bg-green-100 rounded-lg">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-sm font-medium text-gray-500">Completed</h3>
+          <p class="text-2xl font-bold text-gray-900">
+            <%= @content_requests.joins(:content_response).where(content_responses: { generation_status: 'completed' }).count %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-sm border">
+      <div class="flex items-center">
+        <div class="p-3 bg-yellow-100 rounded-lg">
+          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-sm font-medium text-gray-500">In Progress</h3>
+          <p class="text-2xl font-bold text-gray-900">
+            <%= @content_requests.joins(:content_response).where(content_responses: { generation_status: 'draft' }).count %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-sm border">
+      <div class="flex items-center">
+        <div class="p-3 bg-purple-100 rounded-lg">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 110 2h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6H3a1 1 0 110-2h4z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-sm font-medium text-gray-500">Channels</h3>
+          <p class="text-2xl font-bold text-gray-900"><%= @channels.count %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white p-4 rounded-lg shadow-sm border mb-8">
+    <div class="flex flex-wrap items-center gap-4">
+      <div class="flex items-center">
+        <label for="channel_filter" class="text-sm font-medium text-gray-700 mr-2">Channel:</label>
+        <select id="channel_filter" class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">All Channels</option>
+          <% @channels.each do |channel| %>
+            <option value="<%= channel %>"><%= channel.humanize %></option>
+          <% end %>
+        </select>
+      </div>
+      
+      <div class="flex items-center">
+        <label for="status_filter" class="text-sm font-medium text-gray-700 mr-2">Status:</label>
+        <select id="status_filter" class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">All Status</option>
+          <option value="completed">Completed</option>
+          <option value="draft">Draft</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+
+      <div class="flex items-center">
+        <label for="search_filter" class="text-sm font-medium text-gray-700 mr-2">Search:</label>
+        <input type="text" id="search_filter" placeholder="Search content..." 
+               class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+  </div>
+
+  <!-- Content List -->
+  <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">Recent Content</h2>
+    </div>
+
+    <% if @content_requests.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Channel</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @content_requests.each do |content_request| %>
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <div class="h-10 w-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        <%= content_request.campaign_name.present? ? content_request.campaign_name : "Content ##{content_request.id}" %>
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        <%= truncate(content_request.brand_context, length: 50) %>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                    <%= case content_request.content_type
+                        when 'social_media' then 'bg-blue-100 text-blue-800'
+                        when 'email' then 'bg-green-100 text-green-800'
+                        when 'ads' then 'bg-yellow-100 text-yellow-800'
+                        when 'landing_page' then 'bg-purple-100 text-purple-800'
+                        else 'bg-gray-100 text-gray-800'
+                        end %>">
+                    <%= content_request.content_type&.humanize || 'General' %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% status = content_request.content_response&.generation_status || 'pending' %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                    <%= case status
+                        when 'completed' then 'bg-green-100 text-green-800'
+                        when 'draft' then 'bg-yellow-100 text-yellow-800'
+                        when 'failed' then 'bg-red-100 text-red-800'
+                        else 'bg-gray-100 text-gray-800'
+                        end %>">
+                    <%= status.humanize %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= time_ago_in_words(content_request.created_at) %> ago
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  <%= link_to content_management_path(content_request), 
+                      class: "text-blue-600 hover:text-blue-900 inline-flex items-center" do %>
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    View
+                  <% end %>
+                  
+                  <%= link_to edit_content_management_path(content_request), 
+                      class: "text-indigo-600 hover:text-indigo-900 inline-flex items-center" do %>
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Edit
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">No content yet</h3>
+        <p class="mt-2 text-sm text-gray-500">Get started by creating your first piece of content.</p>
+        <div class="mt-6">
+          <%= link_to new_content_management_path, 
+              class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Create Content
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+// Simple client-side filtering
+document.addEventListener('DOMContentLoaded', function() {
+  const channelFilter = document.getElementById('channel_filter');
+  const statusFilter = document.getElementById('status_filter');
+  const searchFilter = document.getElementById('search_filter');
+  const tableRows = document.querySelectorAll('tbody tr');
+
+  function filterTable() {
+    const channelValue = channelFilter.value.toLowerCase();
+    const statusValue = statusFilter.value.toLowerCase();
+    const searchValue = searchFilter.value.toLowerCase();
+
+    tableRows.forEach(row => {
+      const channelCell = row.cells[1].textContent.toLowerCase();
+      const statusCell = row.cells[2].textContent.toLowerCase();
+      const contentCell = row.cells[0].textContent.toLowerCase();
+
+      const channelMatch = !channelValue || channelCell.includes(channelValue);
+      const statusMatch = !statusValue || statusCell.includes(statusValue);
+      const searchMatch = !searchValue || contentCell.includes(searchValue);
+
+      if (channelMatch && statusMatch && searchMatch) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  channelFilter.addEventListener('change', filterTable);
+  statusFilter.addEventListener('change', filterTable);
+  searchFilter.addEventListener('input', filterTable);
+});
+</script>

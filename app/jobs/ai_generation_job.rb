@@ -1,3 +1,5 @@
+require 'net/http'
+
 class AIGenerationJob < ApplicationJob
   queue_as :ai_generation
   
@@ -7,7 +9,7 @@ class AIGenerationJob < ApplicationJob
   
   # Configure retries with exponential backoff
   retry_on StandardError, wait: :exponentially_longer, attempts: 5
-  retry_on Net::TimeoutError, wait: 10.seconds, attempts: 3
+  retry_on Timeout::Error, wait: 10.seconds, attempts: 3
   retry_on Faraday::TimeoutError, wait: 10.seconds, attempts: 3
   
   # Discard jobs that fail due to invalid requests or blocked content
@@ -26,7 +28,7 @@ class AIGenerationJob < ApplicationJob
       generation_request = AIGenerationRequest.find(generation_request_id)
       
       # Generate content using AI service
-      ai_service = AIService.new
+      ai_service = AiService.new
       raw_result = ai_service.generate_content(content_type, prompt_data)
       
       # Parse the AI response

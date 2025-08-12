@@ -13,5 +13,23 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+    
+    # Simple stubbing mechanism for tests
+    def stub_method(klass, method_name, return_value)
+      original_method = klass.instance_method(method_name) if klass.method_defined?(method_name)
+      
+      klass.define_method(method_name) do |*args|
+        return_value
+      end
+      
+      # Return a proc to restore the original method
+      lambda do
+        if original_method
+          klass.define_method(method_name, original_method)
+        else
+          klass.remove_method(method_name)
+        end
+      end
+    end
   end
 end

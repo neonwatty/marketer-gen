@@ -1,10 +1,11 @@
 require "test_helper"
+require_relative "../../app/jobs/ai_generation_job"
 
 class AIGenerationJobTest < ActiveJob::TestCase
   include ActiveJob::TestHelper
 
   def setup
-    @campaign = campaigns(:one)
+    @campaign = campaigns(:summer_launch)
     @generation_request = AIGenerationRequest.create!(
       campaign: @campaign,
       content_type: 'social_media_post',
@@ -31,7 +32,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
 
   # Job execution tests
   test "should update job status during execution" do
-    # Mock AIService to return successful response
+    # Mock AiService to return successful response
     mock_ai_service = Minitest::Mock.new
     mock_ai_service.expect :generate_content, {
       content: 'Generated social media content',
@@ -39,7 +40,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     }, ['social_media_post', @generation_request.prompt_data]
 
     # Mock AI service instantiation
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end
@@ -63,7 +64,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
       metadata: { tokens_used: 25, quality_score: 85 }
     }, ['social_media_post', @generation_request.prompt_data]
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end
@@ -97,7 +98,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'anthropic'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end
@@ -135,7 +136,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'anthropic'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end
@@ -169,7 +170,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'openai'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end
@@ -204,7 +205,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'openai'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end
@@ -244,7 +245,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'anthropic'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(email_request.id, 'email_content', email_request.prompt_data)
       end
@@ -286,7 +287,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'anthropic'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(strategy_request.id, 'campaign_strategy', strategy_request.prompt_data)
       end
@@ -309,9 +310,11 @@ class AIGenerationJobTest < ActiveJob::TestCase
     # Set up brand identity for the campaign
     brand_identity = BrandIdentity.create!(
       name: 'Acme Corp',
-      voice_tone: 'professional',
-      core_values: 'innovation, quality, customer focus',
-      target_audience: 'business professionals'
+      guidelines: { 
+        voice_tone: 'professional',
+        core_values: 'innovation, quality, customer focus',
+        target_audience: 'business professionals'
+      }
     )
     @campaign.update!(brand_identity: brand_identity)
 
@@ -328,7 +331,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'anthropic'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end
@@ -366,7 +369,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
 
     # Verify webhook job is enqueued
     assert_enqueued_with(job: WebhookNotificationJob) do
-      AIService.stub :new, mock_ai_service do
+      AiService.stub :new, mock_ai_service do
         perform_enqueued_jobs only: AIGenerationJob do
           AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
         end
@@ -395,7 +398,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
 
     # Verify no webhook job is enqueued
     assert_no_enqueued_jobs only: WebhookNotificationJob do
-      AIService.stub :new, mock_ai_service do
+      AiService.stub :new, mock_ai_service do
         perform_enqueued_jobs only: AIGenerationJob do
           AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
         end
@@ -411,7 +414,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_ai_service = Minitest::Mock.new
     mock_ai_service.expect :generate_content, -> { raise StandardError.new('AI service error') }, ['social_media_post', @generation_request.prompt_data]
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         assert_raises StandardError do
           AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
@@ -460,7 +463,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'anthropic'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end
@@ -496,7 +499,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     }, [String]
 
     AiContentModerator.stub :new, mock_moderator do
-      AIService.stub :new, mock_ai_service do
+      AiService.stub :new, mock_ai_service do
         perform_enqueued_jobs do
           AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
         end
@@ -531,7 +534,7 @@ class AIGenerationJobTest < ActiveJob::TestCase
     mock_provider.expect :provider_name, 'test_provider'
     mock_ai_service.expect :ai_provider, mock_provider
 
-    AIService.stub :new, mock_ai_service do
+    AiService.stub :new, mock_ai_service do
       perform_enqueued_jobs do
         AIGenerationJob.perform_later(@generation_request.id, 'social_media_post', @generation_request.prompt_data)
       end

@@ -43,6 +43,16 @@ Rails.application.routes.draw do
     resources :journeys, except: [:index]
   end
 
+  # Content Management with Rich Text Editor
+  resources :content_management do
+    collection do
+      post :preview
+    end
+    member do
+      get :export
+    end
+  end
+
   # Brand Assets Management
   resources :brand_assets, except: [ :show ] do
     collection do

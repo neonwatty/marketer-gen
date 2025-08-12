@@ -25,5 +25,8 @@ application.register("journey-builder", JourneyBuilderController)
 import JourneyTemplatesController from "./journey_templates_controller"
 application.register("journey-templates", JourneyTemplatesController)
 
+import RichTextEditorController from "./rich_text_editor_controller"
+application.register("rich-text-editor", RichTextEditorController)
+
 import StageConfigController from "./stage_config_controller"
 application.register("stage-config", StageConfigController)

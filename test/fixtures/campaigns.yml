@@ -1,6 +1,7 @@
 # Campaign fixtures for testing
 
 summer_launch:
+  id: 1
   name: "Summer Product Launch 2024"
   purpose: "Introduce our new summer collection to drive Q3 sales growth and increase brand awareness among millennials"
   status: "active"
@@ -21,6 +22,7 @@ summer_launch:
   updated_at: <%= 1.day.ago %>
 
 holiday_campaign:
+  id: 2
   name: "Holiday Spectacular 2024"
   purpose: "Drive end-of-year sales through integrated digital and traditional marketing channels"
   status: "planning"
@@ -39,6 +41,7 @@ holiday_campaign:
   created_at: <%= 2.weeks.ago %>
 
 startup_awareness:
+  id: 3
   name: "TechFlow Brand Awareness Campaign"
   purpose: "Establish brand presence in the competitive tech market and generate initial customer base"
   status: "completed"
@@ -58,6 +61,7 @@ startup_awareness:
   updated_at: <%= 3.months.ago %>
 
 paused_campaign:
+  id: 4
   name: "Paused Marketing Initiative"
   purpose: "Testing campaign pause functionality"
   status: "paused"

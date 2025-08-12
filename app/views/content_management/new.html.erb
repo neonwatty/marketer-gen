@@ -1,0 +1,287 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Create New Content</h1>
+        <p class="text-gray-600 mt-2">Set up your content requirements and generate AI-powered marketing content</p>
+      </div>
+      <%= link_to content_management_index_path, 
+          class: "text-gray-600 hover:text-gray-900 inline-flex items-center" do %>
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Content List
+      <% end %>
+    </div>
+
+    <%= form_with model: @content_request, url: content_management_index_path, 
+                  local: true, class: "space-y-8" do |form| %>
+      
+      <!-- Error Messages -->
+      <% if @content_request.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="flex">
+            <svg class="w-5 h-5 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <% @content_request.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Basic Information -->
+      <div class="bg-white rounded-lg shadow-sm border">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Basic Information</h2>
+          <p class="text-sm text-gray-600 mt-1">Tell us about your content requirements</p>
+        </div>
+        
+        <div class="px-6 py-6 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <%= form.label :campaign_name, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.text_field :campaign_name, 
+                  placeholder: "e.g., Summer Sale 2024",
+                  class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+              <p class="text-xs text-gray-500 mt-1">Give your content a descriptive name</p>
+            </div>
+            
+            <div>
+              <%= form.label :content_type, "Content Channel *", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.select :content_type, 
+                  options_for_select(@channels.map { |c| [c.humanize, c] }),
+                  { prompt: "Select a channel" },
+                  { class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+              <p class="text-xs text-gray-500 mt-1">Choose where this content will be used</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <%= form.label :tone, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.select :tone, 
+                  options_for_select([
+                    ['Professional', 'professional'],
+                    ['Friendly', 'friendly'],
+                    ['Casual', 'casual'],
+                    ['Formal', 'formal'],
+                    ['Enthusiastic', 'enthusiastic'],
+                    ['Conversational', 'conversational']
+                  ]),
+                  { prompt: "Select tone" },
+                  { class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+            </div>
+            
+            <div>
+              <%= form.label :content_length, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.select :content_length, 
+                  options_for_select([
+                    ['Short', 'short'],
+                    ['Medium', 'medium'],
+                    ['Long', 'long']
+                  ]),
+                  { prompt: "Select length" },
+                  { class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+            </div>
+            
+            <div>
+              <%= form.label :campaign_goal, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.select :campaign_goal, 
+                  options_for_select([
+                    ['Awareness', 'awareness'],
+                    ['Engagement', 'engagement'],
+                    ['Conversion', 'conversion'],
+                    ['Retention', 'retention'],
+                    ['Lead Generation', 'lead_generation']
+                  ]),
+                  { prompt: "Select goal" },
+                  { class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+            </div>
+          </div>
+          
+          <div>
+            <%= form.label :platform, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :platform, 
+                placeholder: "e.g., Facebook, Instagram, Google Ads, Email Newsletter",
+                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+            <p class="text-xs text-gray-500 mt-1">Specific platform or medium for this content</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand & Audience Information -->
+      <div class="bg-white rounded-lg shadow-sm border">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Brand & Audience</h2>
+          <p class="text-sm text-gray-600 mt-1">Help us understand your brand and target audience</p>
+        </div>
+        
+        <div class="px-6 py-6 space-y-6">
+          <div>
+            <%= form.label :brand_context, "Brand Information *", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :brand_context, rows: 4,
+                placeholder: "Describe your brand, products/services, unique value proposition, brand voice, and key messaging...",
+                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+            <p class="text-xs text-gray-500 mt-1">The more context you provide, the better our AI can create relevant content</p>
+          </div>
+          
+          <div>
+            <%= form.label :target_audience, "Target Audience *", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :target_audience, rows: 3,
+                placeholder: "Describe your ideal customer: demographics, interests, pain points, behaviors...",
+                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+            <p class="text-xs text-gray-500 mt-1">Help us understand who you're trying to reach</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Requirements -->
+      <div class="bg-white rounded-lg shadow-sm border">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Content Requirements</h2>
+          <p class="text-sm text-gray-600 mt-1">Specify what should be included or avoided in your content</p>
+        </div>
+        
+        <div class="px-6 py-6 space-y-6">
+          <div>
+            <%= form.label :required_elements, "Must Include", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :required_elements, rows: 3,
+                placeholder: "Key messages, specific features, calls-to-action, hashtags, mentions, etc.",
+                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+            <p class="text-xs text-gray-500 mt-1">Elements that must be included in the content</p>
+          </div>
+          
+          <div>
+            <%= form.label :restrictions, "Avoid", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :restrictions, rows: 3,
+                placeholder: "Words, phrases, topics, or approaches to avoid...",
+                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+            <p class="text-xs text-gray-500 mt-1">Things to avoid in the generated content</p>
+          </div>
+          
+          <div>
+            <%= form.label :additional_context, "Additional Context", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :additional_context, rows: 3,
+                placeholder: "Any other relevant information, special requirements, or creative direction...",
+                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+            <p class="text-xs text-gray-500 mt-1">Any other helpful context for content creation</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template Selection (Optional) -->
+      <div class="bg-white rounded-lg shadow-sm border">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Template Selection</h2>
+          <p class="text-sm text-gray-600 mt-1">Choose a specific template (optional - we'll auto-select based on channel)</p>
+        </div>
+        
+        <div class="px-6 py-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <% @available_templates.each do |template_type, template_name| %>
+              <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer template-option">
+                <div class="flex items-center">
+                  <input type="radio" name="template_override" value="<%= template_type %>" 
+                         class="text-blue-600 focus:ring-blue-500 h-4 w-4">
+                  <div class="ml-3">
+                    <div class="text-sm font-medium text-gray-900"><%= template_name %></div>
+                    <div class="text-xs text-gray-500 mt-1"><%= template_type.humanize %></div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-between items-center pt-8 border-t border-gray-200">
+        <div>
+          <%= link_to content_management_index_path, 
+              class: "text-gray-600 hover:text-gray-900 inline-flex items-center" do %>
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Cancel
+          <% end %>
+        </div>
+        
+        <div class="flex space-x-3">
+          <%= form.submit "Save Draft", 
+              class: "bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors inline-flex items-center" %>
+          
+          <%= form.submit "Generate Content", 
+              name: "generate_content",
+              class: "bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center" do %>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Generate Content
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Template option selection
+  const templateOptions = document.querySelectorAll('.template-option');
+  templateOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      const radio = this.querySelector('input[type="radio"]');
+      radio.checked = true;
+    });
+  });
+  
+  // Form validation helper
+  const form = document.querySelector('form');
+  const requiredFields = form.querySelectorAll('[required]');
+  
+  form.addEventListener('submit', function(e) {
+    let hasErrors = false;
+    
+    // Check required fields
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        hasErrors = true;
+        field.classList.add('border-red-300');
+        field.classList.remove('border-gray-300');
+      } else {
+        field.classList.remove('border-red-300');
+        field.classList.add('border-gray-300');
+      }
+    });
+    
+    if (hasErrors) {
+      e.preventDefault();
+      alert('Please fill in all required fields (marked with *)');
+    }
+  });
+});
+</script>
+
+<style>
+  .template-option:hover input[type="radio"]:checked + div {
+    color: #1d4ed8;
+  }
+  
+  input:required {
+    box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.1);
+  }
+  
+  input:required:valid {
+    box-shadow: none;
+  }
+</style>
