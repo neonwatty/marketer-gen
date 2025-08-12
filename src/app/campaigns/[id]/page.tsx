@@ -18,7 +18,9 @@ import {
   Users,
   MessageCircle,
   Mail,
-  Share2
+  Share2,
+  BarChart3,
+  Calculator
 } from "lucide-react"
 import Link from "next/link"
 import { CampaignJourneyVisualization } from "@/components/campaigns/campaign-journey-visualization"
@@ -191,6 +193,24 @@ export default function CampaignDetailPage({ params }: CampaignDetailPageProps) 
         </div>
 
         <div className="flex items-center gap-2">
+          <Link href={`/campaigns/${params.id}/summary`}>
+            <Button variant="outline">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Summary
+            </Button>
+          </Link>
+          <Link href={`/campaigns/${params.id}/timeline`}>
+            <Button variant="outline">
+              <Calendar className="h-4 w-4 mr-2" />
+              Timeline
+            </Button>
+          </Link>
+          <Link href={`/campaigns/${params.id}/budget`}>
+            <Button variant="outline">
+              <Calculator className="h-4 w-4 mr-2" />
+              Budget
+            </Button>
+          </Link>
           <Button variant="outline" onClick={handleEdit}>
             <Edit className="h-4 w-4 mr-2" />
             Edit Campaign

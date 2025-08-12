@@ -5,7 +5,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { PenTool, Wand2, Copy, Download, RefreshCw } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { PenTool, Wand2, Copy, Download, RefreshCw, Zap } from "lucide-react"
+import dynamic from "next/dynamic"
+
+const LLMDemo = dynamic(() => import("@/components/examples/llm-demo"), {
+  loading: () => <div className="flex items-center justify-center h-32">Loading LLM Demo...</div>
+})
 
 export default function GeneratePage() {
   return (
@@ -205,6 +211,29 @@ export default function GeneratePage() {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* LLM API Demo Section */}
+      <Card className="border-2 border-dashed border-primary/20 bg-primary/5">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                LLM API Demo
+                <Badge variant="secondary" className="ml-2">
+                  Preview
+                </Badge>
+              </CardTitle>
+              <CardDescription>
+                Interactive demonstration of the placeholder LLM API with mock responses and realistic features
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <LLMDemo />
         </CardContent>
       </Card>
     </div>
