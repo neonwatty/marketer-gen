@@ -485,7 +485,7 @@
           5,
           6
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -493,7 +493,7 @@
             "description": "Create the main content generation interface with content type selection (social posts, ads, emails, landing pages, video scripts) and configuration options for prompts and brand context",
             "dependencies": [],
             "details": "Implement content type selector with radio buttons or dropdown, prompt configuration textarea with character limits, brand context integration dropdown, target audience selection, and tone/style options. Include form validation and submission handling with loading states.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -504,7 +504,7 @@
               "7.1"
             ],
             "details": "Install and configure TipTap editor with extensions for bold, italic, lists, links, and formatting. Create custom toolbar with content-specific options, implement auto-save functionality, and add character counting. Ensure proper TypeScript integration and accessibility support.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -515,7 +515,7 @@
               "7.2"
             ],
             "details": "Build version storage mechanism using database, implement diff algorithm for content comparison, create version history sidebar with timestamps and change summaries. Add restore functionality and visual diff highlighting with added/removed/modified content indicators.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -526,7 +526,7 @@
               "7.2"
             ],
             "details": "Design state machine for approval flow (draft → review → approved → published), create approval interface with review comments, implement role-based permissions for approvers, and add notification system for status changes. Include rejection handling with feedback loops.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -844,7 +844,7 @@
     ],
     "metadata": {
       "created": "2025-08-09T22:40:56.050Z",
-      "updated": "2025-08-11T22:21:19.843Z",
+      "updated": "2025-08-12T01:01:36.337Z",
       "description": "Tasks for master context"
     }
   }

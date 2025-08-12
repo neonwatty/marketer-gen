@@ -1,4 +1,5 @@
 // Animation and transition utilities for smooth UI state changes
+import * as React from "react"
 
 export const transitions = {
   // Standard easing functions
@@ -51,8 +52,12 @@ export const withTransition = <T extends Record<string, any>>(
   Component: React.ComponentType<T>,
   transitionClass = transitions.classes.all
 ) => {
-  return (props: T) => {
+  const WithTransitionComponent = React.forwardRef<any, T>((props, ref) => {
     const className = `${transitionClass} ${props.className || ""}`
-    return <Component {...props} className={className} />
-  }
+    return React.createElement(Component, { ...props, className, ref } as T)
+  })
+  
+  WithTransitionComponent.displayName = `withTransition(${Component.displayName || Component.name || 'Component'})`
+  
+  return WithTransitionComponent
 }
