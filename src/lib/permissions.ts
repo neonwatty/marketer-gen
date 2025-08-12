@@ -303,3 +303,220 @@ export function getDefaultUserRole(context?: { isOwner?: boolean; isTeamLead?: b
   if (context?.isTeamLead) return 'approver'
   return 'creator' // Default role for new users
 }
+
+// Team-based permission interfaces
+export interface TeamPermissions {
+  canInviteMembers: boolean
+  canRemoveMembers: boolean
+  canManageRoles: boolean
+  canEditTeamSettings: boolean
+  canViewAllProjects: boolean
+  canCreateProjects: boolean
+  canDeleteProjects: boolean
+}
+
+export type TeamRole = 'owner' | 'admin' | 'member' | 'guest'
+
+// Team role permissions matrix
+export const TEAM_ROLE_PERMISSIONS: Record<TeamRole, TeamPermissions> = {
+  guest: {
+    canInviteMembers: false,
+    canRemoveMembers: false,
+    canManageRoles: false,
+    canEditTeamSettings: false,
+    canViewAllProjects: false,
+    canCreateProjects: false,
+    canDeleteProjects: false
+  },
+  member: {
+    canInviteMembers: false,
+    canRemoveMembers: false,
+    canManageRoles: false,
+    canEditTeamSettings: false,
+    canViewAllProjects: true,
+    canCreateProjects: true,
+    canDeleteProjects: false
+  },
+  admin: {
+    canInviteMembers: true,
+    canRemoveMembers: true,
+    canManageRoles: true,
+    canEditTeamSettings: true,
+    canViewAllProjects: true,
+    canCreateProjects: true,
+    canDeleteProjects: true
+  },
+  owner: {
+    canInviteMembers: true,
+    canRemoveMembers: true,
+    canManageRoles: true,
+    canEditTeamSettings: true,
+    canViewAllProjects: true,
+    canCreateProjects: true,
+    canDeleteProjects: true
+  }
+}
+
+// Combined permission checker for user and team contexts
+export class CombinedPermissionChecker {
+  private userRole: UserRole
+  private teamRole?: TeamRole
+  private customPermissions?: Partial<UserPermissions>
+  private customTeamPermissions?: Partial<TeamPermissions>
+
+  constructor(
+    userRole: UserRole,
+    teamRole?: TeamRole,
+    customPermissions?: Partial<UserPermissions>,
+    customTeamPermissions?: Partial<TeamPermissions>
+  ) {
+    this.userRole = userRole
+    this.teamRole = teamRole
+    this.customPermissions = customPermissions
+    this.customTeamPermissions = customTeamPermissions
+  }
+
+  // Get effective user permissions
+  getUserPermissions(): UserPermissions {
+    const basePermissions = ROLE_PERMISSIONS[this.userRole]
+    
+    if (this.customPermissions) {
+      return { ...basePermissions, ...this.customPermissions }
+    }
+    
+    return basePermissions
+  }
+
+  // Get effective team permissions
+  getTeamPermissions(): TeamPermissions | null {
+    if (!this.teamRole) return null
+    
+    const basePermissions = TEAM_ROLE_PERMISSIONS[this.teamRole]
+    
+    if (this.customTeamPermissions) {
+      return { ...basePermissions, ...this.customTeamPermissions }
+    }
+    
+    return basePermissions
+  }
+
+  // Check if user can perform content action
+  canPerformContentAction(action: string): boolean {
+    const userChecker = new PermissionChecker(this.userRole, this.customPermissions)
+    return userChecker.canPerformAction(action)
+  }
+
+  // Check if user can perform team action
+  canPerformTeamAction(action: keyof TeamPermissions): boolean {
+    const teamPermissions = this.getTeamPermissions()
+    if (!teamPermissions) return false
+    
+    return teamPermissions[action]
+  }
+
+  // Check if user has sufficient role for action (considers both user and team context)
+  hasAccessTo(resource: 'content' | 'team', action: string): boolean {
+    if (resource === 'content') {
+      return this.canPerformContentAction(action)
+    }
+    
+    if (resource === 'team') {
+      return this.canPerformTeamAction(action as keyof TeamPermissions)
+    }
+    
+    return false
+  }
+}
+
+// Role management utilities
+export class RoleManager {
+  // Check if a role can assign another role
+  static canAssignRole(assignerRole: UserRole, targetRole: UserRole): boolean {
+    const assignerLevel = new PermissionChecker(assignerRole).getRoleLevel()
+    const targetLevel = new PermissionChecker(targetRole).getRoleLevel()
+    
+    // Can only assign roles at or below their level
+    return assignerLevel >= targetLevel && assignerLevel >= 4 // minimum approver level
+  }
+
+  // Check if a team role can manage another team role
+  static canManageTeamRole(managerRole: TeamRole, targetRole: TeamRole): boolean {
+    const roleLevels = { guest: 1, member: 2, admin: 3, owner: 4 }
+    const managerLevel = roleLevels[managerRole]
+    const targetLevel = roleLevels[targetRole]
+    
+    // Owners can manage anyone, admins can manage members and guests
+    if (managerRole === 'owner') return true
+    if (managerRole === 'admin' && targetRole !== 'owner') return true
+    
+    return false
+  }
+
+  // Get roles that a user can assign
+  static getAssignableRoles(assignerRole: UserRole): UserRole[] {
+    const assignerLevel = new PermissionChecker(assignerRole).getRoleLevel()
+    
+    return Object.entries(ROLE_PERMISSIONS)
+      .filter(([_, permissions]) => {
+        const roleLevel = new PermissionChecker(_ as UserRole).getRoleLevel()
+        return assignerLevel >= roleLevel && assignerLevel >= 4
+      })
+      .map(([role, _]) => role as UserRole)
+  }
+
+  // Get team roles that a user can assign
+  static getAssignableTeamRoles(managerRole: TeamRole): TeamRole[] {
+    const roleLevels = { guest: 1, member: 2, admin: 3, owner: 4 }
+    const managerLevel = roleLevels[managerRole]
+    
+    return Object.keys(roleLevels)
+      .filter(role => {
+        const roleLevel = roleLevels[role as TeamRole]
+        if (managerRole === 'owner') return role !== 'owner' // Owners can assign all except owner
+        if (managerRole === 'admin') return roleLevel <= 2 // Admins can assign member and guest
+        return false
+      }) as TeamRole[]
+  }
+}
+
+// Permission validation for UI components
+export function validateComponentAccess(
+  userRole: UserRole,
+  requiredPermission: keyof UserPermissions,
+  teamRole?: TeamRole,
+  requiredTeamPermission?: keyof TeamPermissions
+): boolean {
+  const checker = new CombinedPermissionChecker(userRole, teamRole)
+  
+  const hasUserPermission = checker.canPerformContentAction(
+    getActionFromPermission(requiredPermission)
+  )
+  
+  if (requiredTeamPermission) {
+    const hasTeamPermission = checker.canPerformTeamAction(requiredTeamPermission)
+    return hasUserPermission && hasTeamPermission
+  }
+  
+  return hasUserPermission
+}
+
+// Helper to convert permission to action
+function getActionFromPermission(permission: keyof UserPermissions): string {
+  const permissionToAction: Record<keyof UserPermissions, string> = {
+    canCreateContent: 'create',
+    canEditContent: 'edit',
+    canDeleteContent: 'delete',
+    canViewContent: 'view',
+    canSubmitForReview: 'submit_for_review',
+    canApproveContent: 'approve',
+    canRejectContent: 'reject',
+    canPublishContent: 'publish',
+    canArchiveContent: 'archive',
+    canBulkApprove: 'bulk_approve',
+    canViewAllContent: 'view_all',
+    canManageUsers: 'manage_users',
+    canConfigureWorkflow: 'configure_workflow'
+  }
+  
+  return permissionToAction[permission] || 'view'
+}

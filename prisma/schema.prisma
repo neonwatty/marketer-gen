@@ -20,6 +20,8 @@ model User {
 
   // Relationships
   brands Brand[]
+  comments Comment[]
+  commentReactions CommentReaction[]
 
   @@map("users")
 }
@@ -357,4 +359,84 @@ enum AnalyticsEventType {
   CONTENT_APPROVE
   CONTENT_PUBLISH
   CUSTOM
+}
+
+// Comment model - for threaded discussions and collaboration
+model Comment {
+  id          String   @id @default(cuid())
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Comment status and moderation
+  isEdited    Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
+  isResolved  Boolean  @default(false)
+  resolvedAt  DateTime?
+  
+  // Threading support
+  parentCommentId String?
+  parentComment   Comment? @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies         Comment[] @relation("CommentReplies")
+  
+  // Relationships
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Polymorphic relationships to different entity types
+  targetType  CommentTargetType
+  targetId    String
+  
+  // Additional data
+  mentions    String?  // JSON array of user IDs mentioned in comment
+  metadata    String?  // JSON string for additional comment data
+  
+  // Related entities
+  reactions   CommentReaction[]
+  
+  // Indexing for performance
+  @@index([targetType, targetId])
+  @@index([authorId])
+  @@index([parentCommentId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+// Comment target types - what can be commented on
+enum CommentTargetType {
+  CAMPAIGN
+  JOURNEY
+  CONTENT
+  BRAND
+}
+
+// Comment reactions model - likes, dislikes, emojis
+model CommentReaction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  // Reaction details
+  type      CommentReactionType
+  
+  // Relationships
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  // Prevent duplicate reactions from same user on same comment
+  @@unique([userId, commentId])
+  @@map("comment_reactions")
+}
+
+// Comment reaction types
+enum CommentReactionType {
+  LIKE
+  DISLIKE
+  LOVE
+  LAUGH
+  ANGRY
+  SAD
+  THUMBS_UP
+  THUMBS_DOWN
 }

@@ -16,12 +16,65 @@ export interface User extends BaseEntity {
   preferences: UserPreferences
 }
 
-export type UserRole = "admin" | "user" | "viewer"
+export type UserRole = 
+  | 'viewer'
+  | 'creator'
+  | 'reviewer'
+  | 'approver' 
+  | 'publisher'
+  | 'admin'
 
 export interface UserPreferences {
   theme: "light" | "dark" | "auto"
   notifications: boolean
   language: string
+}
+
+// Team and Collaboration Types
+export interface Team extends BaseEntity {
+  name: string
+  description?: string
+  ownerId: ID
+  members: TeamMember[]
+  settings: TeamSettings
+}
+
+export interface TeamMember {
+  userId: ID
+  user: User
+  role: TeamRole
+  permissions: TeamPermissions
+  joinedAt: Date
+  invitedBy?: ID
+}
+
+export type TeamRole = 'owner' | 'admin' | 'member' | 'guest'
+
+export interface TeamPermissions {
+  canInviteMembers: boolean
+  canRemoveMembers: boolean
+  canManageRoles: boolean
+  canEditTeamSettings: boolean
+  canViewAllProjects: boolean
+  canCreateProjects: boolean
+  canDeleteProjects: boolean
+}
+
+export interface TeamSettings {
+  visibility: 'private' | 'internal' | 'public'
+  defaultMemberRole: TeamRole
+  requireApprovalForJoining: boolean
+  allowGuestAccess: boolean
+}
+
+export interface TeamInvitation extends BaseEntity {
+  teamId: ID
+  email: string
+  role: TeamRole
+  invitedBy: ID
+  expiresAt: Date
+  status: 'pending' | 'accepted' | 'declined' | 'expired'
+  token: string
 }
 
 // Campaign Types
@@ -99,6 +152,50 @@ export interface ContentResponse {
   }
 }
 
+// LLM API Types
+export interface LLMRequest {
+  prompt: string
+  model?: string
+  maxTokens?: number
+  temperature?: number
+  systemPrompt?: string
+  context?: string[]
+}
+
+export interface LLMResponse {
+  id: string
+  content: string
+  model: string
+  usage: {
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
+  finishReason: "stop" | "length" | "content_filter" | "error"
+  metadata: {
+    requestId: string
+    timestamp: Date
+    processingTime: number
+  }
+}
+
+export interface LLMError {
+  code: string
+  message: string
+  type: "rate_limit" | "invalid_request" | "server_error" | "auth_error"
+  retryAfter?: number
+}
+
+export interface LLMStreamChunk {
+  id: string
+  delta: string
+  isComplete: boolean
+  metadata?: {
+    tokenCount: number
+    model: string
+  }
+}
+
 // Form and UI Types
 export interface FormState<T = Record<string, unknown>> {
   data: T
@@ -143,4 +240,105 @@ export interface FeatureFlags {
   advancedAnalytics: boolean
   teamCollaboration: boolean
   customBranding: boolean
+}
+
+// Collaboration and Workflow Types
+export interface Comment extends BaseEntity {
+  content: string
+  authorId: ID
+  author: User
+  targetType: 'campaign' | 'asset' | 'journey'
+  targetId: ID
+  parentCommentId?: ID
+  replies?: Comment[]
+  reactions: CommentReaction[]
+  mentions: ID[]
+  isResolved: boolean
+  resolvedBy?: ID
+  resolvedAt?: Date
+}
+
+export interface CommentReaction {
+  userId: ID
+  user: User
+  type: 'like' | 'dislike' | 'love' | 'laugh' | 'angry' | 'sad'
+  createdAt: Date
+}
+
+export interface ApprovalWorkflow extends BaseEntity {
+  name: string
+  description?: string
+  teamId: ID
+  stages: ApprovalStage[]
+  isActive: boolean
+  applicableTypes: ('campaign' | 'asset' | 'journey')[]
+}
+
+export interface ApprovalStage {
+  id: ID
+  name: string
+  description?: string
+  order: number
+  approversRequired: number
+  approvers: ID[]
+  autoApprove: boolean
+  timeoutHours?: number
+  skipConditions?: ApprovalCondition[]
+}
+
+export interface ApprovalCondition {
+  type: 'user_role' | 'content_type' | 'budget_threshold' | 'custom'
+  operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains'
+  value: string | number
+}
+
+export interface ApprovalRequest extends BaseEntity {
+  workflowId: ID
+  workflow: ApprovalWorkflow
+  targetType: 'campaign' | 'asset' | 'journey'
+  targetId: ID
+  requesterId: ID
+  requester: User
+  currentStageId: ID
+  currentStage: ApprovalStage
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'expired'
+  approvals: ApprovalAction[]
+  dueDate?: Date
+  notes?: string
+}
+
+export interface ApprovalAction extends BaseEntity {
+  requestId: ID
+  stageId: ID
+  approverId: ID
+  approver: User
+  action: 'approve' | 'reject' | 'request_changes'
+  comment?: string
+  attachments?: string[]
+}
+
+export interface Notification extends BaseEntity {
+  userId: ID
+  user: User
+  type: 'approval_request' | 'comment_mention' | 'workflow_update' | 'team_invitation' | 'system'
+  title: string
+  message: string
+  isRead: boolean
+  readAt?: Date
+  actionUrl?: string
+  metadata?: Record<string, unknown>
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+}
+
+export interface AuditLog extends BaseEntity {
+  userId: ID
+  user: User
+  action: string
+  targetType: string
+  targetId: ID
+  oldValues?: Record<string, unknown>
+  newValues?: Record<string, unknown>
+  metadata?: Record<string, unknown>
+  ipAddress?: string
+  userAgent?: string
 }
