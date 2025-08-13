@@ -8,7 +8,7 @@ import { CampaignStats } from "@/components/ui/campaign-stats"
 import { CampaignStatsSkeleton } from "@/components/ui/campaign-stats-skeleton"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
 import { ErrorDisplay } from "@/components/ui/error-display"
-import { Plus, Search, Filter, LayoutGrid, List } from "lucide-react"
+import { Plus, Search, Filter, LayoutGrid, List, BarChart3, File } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 
@@ -132,7 +132,8 @@ export default function CampaignsPage() {
   }
 
   const handleCopy = (id: string) => {
-    console.log("Copy campaign:", id)
+    // Navigate to the clone page
+    window.location.href = `/campaigns/${id}/clone`
   }
 
   const handleDelete = (id: string) => {
@@ -191,6 +192,18 @@ export default function CampaignsPage() {
           />
         </div>
         <div className="flex gap-2">
+          <Link href="/campaigns/templates">
+            <Button variant="outline" size="sm">
+              <File className="h-4 w-4 mr-2" />
+              Templates
+            </Button>
+          </Link>
+          <Link href="/campaigns/compare">
+            <Button variant="outline" size="sm">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Compare
+            </Button>
+          </Link>
           <Button variant="outline" size="sm">
             <Filter className="h-4 w-4 mr-2" />
             Filter

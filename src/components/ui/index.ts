@@ -119,6 +119,8 @@ export {
   type NavigationAction
 } from "./navigation-guidance"
 export { Switch } from "./switch"
+export { Slider } from "./slider"
+export { Alert, AlertTitle, AlertDescription } from "./alert"
 export { Avatar, AvatarImage, AvatarFallback } from "./avatar"
 export { CampaignCard, type CampaignStatus, type CampaignMetrics, type CampaignCardProps } from "./campaign-card"
 export { CampaignStats, type CampaignStatsProps } from "./campaign-stats"
@@ -151,3 +153,5 @@ export {
 } from "./dropdown-menu"
 export { DataTable, type DataTableProps } from "./data-table"
 export { CampaignDataTable, type CampaignTableData } from "./campaign-data-table"
+export { ScrollArea, ScrollBar } from "./scroll-area"
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./collapsible"

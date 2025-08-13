@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
 // Mock child components
-jest.mock('@/components/team/pending-approvals-widget', () => ({
+vi.mock('@/components/team/pending-approvals-widget', () => ({
   PendingApprovalsWidget: ({ onApprovalAction }: any) => (
     <div data-testid="pending-approvals-widget">
       <button onClick={() => onApprovalAction('approve', 'item-1')}>Approve Item 1</button>
@@ -12,7 +12,7 @@ jest.mock('@/components/team/pending-approvals-widget', () => ({
   )
 }))
 
-jest.mock('@/components/team/assigned-tasks-overview', () => ({
+vi.mock('@/components/team/assigned-tasks-overview', () => ({
   AssignedTasksOverview: ({ teamMember, onTaskAction }: any) => (
     <div data-testid="assigned-tasks-overview">
       {teamMember ? `Tasks for ${teamMember.name}` : 'All Tasks'}
@@ -21,7 +21,7 @@ jest.mock('@/components/team/assigned-tasks-overview', () => ({
   )
 }))
 
-jest.mock('@/components/team/team-activity-feed', () => ({
+vi.mock('@/components/team/team-activity-feed', () => ({
   TeamActivityFeed: ({ activities }: any) => (
     <div data-testid="team-activity-feed">
       {activities?.map((activity: any) => (
@@ -31,7 +31,7 @@ jest.mock('@/components/team/team-activity-feed', () => ({
   )
 }))
 
-jest.mock('@/components/team/workload-visualization', () => ({
+vi.mock('@/components/team/workload-visualization', () => ({
   WorkloadVisualization: ({ teamMembers, viewType }: any) => (
     <div data-testid="workload-visualization">
       View: {viewType}
@@ -42,7 +42,7 @@ jest.mock('@/components/team/workload-visualization', () => ({
   )
 }))
 
-jest.mock('@/components/team/team-member-status', () => ({
+vi.mock('@/components/team/team-member-status', () => ({
   TeamMemberStatus: ({ members, onStatusChange }: any) => (
     <div data-testid="team-member-status">
       {members?.map((member: any) => (
@@ -55,7 +55,7 @@ jest.mock('@/components/team/team-member-status', () => ({
   )
 }))
 
-jest.mock('@/components/team/team-performance-metrics', () => ({
+vi.mock('@/components/team/team-performance-metrics', () => ({
   TeamPerformanceMetrics: ({ metrics, timeRange }: any) => (
     <div data-testid="team-performance-metrics">
       Time Range: {timeRange}
@@ -64,7 +64,7 @@ jest.mock('@/components/team/team-performance-metrics', () => ({
   )
 }))
 
-jest.mock('@/components/team/task-assignment-interface', () => ({
+vi.mock('@/components/team/task-assignment-interface', () => ({
   TaskAssignmentInterface: ({ onAssign, teamMembers }: any) => (
     <div data-testid="task-assignment-interface">
       <button onClick={() => onAssign('task-new', 'user-1')}>Assign Task</button>
@@ -246,7 +246,7 @@ describe('TeamDashboard Component', () => {
 
   describe('Dashboard Functionality', () => {
     test('should handle approval actions', async () => {
-      const mockOnAction = jest.fn()
+      const mockOnAction = vi.fn()
       const user = userEvent.setup()
 
       render(
@@ -263,7 +263,7 @@ describe('TeamDashboard Component', () => {
     })
 
     test('should handle task actions', async () => {
-      const mockOnTaskAction = jest.fn()
+      const mockOnTaskAction = vi.fn()
       const user = userEvent.setup()
 
       render(
@@ -284,7 +284,7 @@ describe('TeamDashboard Component', () => {
     })
 
     test('should handle task assignment', async () => {
-      const mockOnAssign = jest.fn()
+      const mockOnAssign = vi.fn()
       const user = userEvent.setup()
 
       render(
@@ -305,7 +305,7 @@ describe('TeamDashboard Component', () => {
     })
 
     test('should handle member status changes', async () => {
-      const mockOnStatusChange = jest.fn()
+      const mockOnStatusChange = vi.fn()
       const user = userEvent.setup()
 
       render(
@@ -324,7 +324,7 @@ describe('TeamDashboard Component', () => {
 
   describe('Dashboard Controls', () => {
     test('should have refresh functionality', async () => {
-      const mockOnRefresh = jest.fn()
+      const mockOnRefresh = vi.fn()
       const user = userEvent.setup()
 
       render(
@@ -632,7 +632,7 @@ describe('TeamDashboard Component', () => {
     })
 
     test('should handle child component events correctly', async () => {
-      const mockOnAction = jest.fn()
+      const mockOnAction = vi.fn()
       const user = userEvent.setup()
 
       render(

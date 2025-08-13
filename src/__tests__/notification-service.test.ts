@@ -5,60 +5,61 @@ import {
   NotificationPreferences 
 } from '@/lib/notifications/notification-service'
 import { nanoid } from 'nanoid'
+import { vi } from 'vitest'
 
 // Mock dependencies
-jest.mock('nanoid', () => ({
-  nanoid: jest.fn(() => 'test-notification-id-123')
+vi.mock('nanoid', () => ({
+  nanoid: vi.fn(() => 'test-notification-id-123')
 }))
 
 const mockPrismaClient = {
   notification: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    findFirst: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    updateMany: jest.fn(),
-    delete: jest.fn(),
-    deleteMany: jest.fn(),
-    count: jest.fn(),
-    groupBy: jest.fn()
+    create: vi.fn(),
+    findMany: vi.fn(),
+    findFirst: vi.fn(),
+    findUnique: vi.fn(),
+    update: vi.fn(),
+    updateMany: vi.fn(),
+    delete: vi.fn(),
+    deleteMany: vi.fn(),
+    count: vi.fn(),
+    groupBy: vi.fn()
   },
   notificationPreference: {
-    findUnique: jest.fn(),
-    upsert: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn()
+    findUnique: vi.fn(),
+    upsert: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn()
   },
   notificationBatch: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    update: jest.fn()
+    create: vi.fn(),
+    findMany: vi.fn(),
+    update: vi.fn()
   },
   user: {
-    findUnique: jest.fn(),
-    findMany: jest.fn()
+    findUnique: vi.fn(),
+    findMany: vi.fn()
   }
 } as unknown as PrismaClient
 
 // Mock email service
 const mockEmailService = {
-  sendEmail: jest.fn(),
-  sendBulkEmails: jest.fn(),
-  sendDigestEmail: jest.fn()
+  sendEmail: vi.fn(),
+  sendBulkEmails: vi.fn(),
+  sendDigestEmail: vi.fn()
 }
 
 // Mock push service
 const mockPushService = {
-  sendPush: jest.fn(),
-  sendBulkPush: jest.fn()
+  sendPush: vi.fn(),
+  sendBulkPush: vi.fn()
 }
 
 describe('NotificationService', () => {
   let notificationService: NotificationService
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     notificationService = new NotificationService(
       mockPrismaClient,
       mockEmailService,
@@ -679,14 +680,14 @@ describe('NotificationService', () => {
 
       // Mock current time to be 2:00 AM UTC (within quiet hours)
       const mockDate = new Date('2024-01-01T02:00:00Z')
-      jest.spyOn(global, 'Date').mockImplementation(() => mockDate as any)
+      vi.spyOn(global, 'Date').mockImplementation(() => mockDate as any)
 
       const isQuietHours = await notificationService.isUserInQuietHours('user-123')
 
       expect(isQuietHours).toBe(true)
 
       // Restore Date
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
   })
 
@@ -981,7 +982,7 @@ describe('NotificationService Integration Tests', () => {
   let notificationService: NotificationService
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     notificationService = new NotificationService(
       mockPrismaClient,
       mockEmailService,

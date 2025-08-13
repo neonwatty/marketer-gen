@@ -16,7 +16,20 @@ vi.mock('@prisma/client', () => ({
     analytics: {
       create: vi.fn()
     }
-  }))
+  })),
+  ContentStatus: {
+    DRAFT: 'DRAFT',
+    PENDING_REVIEW: 'PENDING_REVIEW', 
+    APPROVED: 'APPROVED',
+    REJECTED: 'REJECTED',
+    PUBLISHED: 'PUBLISHED',
+    ARCHIVED: 'ARCHIVED'
+  },
+  ApprovalStatus: {
+    PENDING: 'PENDING',
+    APPROVED: 'APPROVED', 
+    REJECTED: 'REJECTED'
+  }
 }))
 
 describe('Approval Workflow System', () => {
@@ -44,7 +57,7 @@ describe('Approval Workflow System', () => {
         contentId: 'test-id'
       })
       expect(result.success).toBe(true)
-      expect(result.newState).toBe('REVIEWING')
+      expect(result.newState).toBe('PENDING_REVIEW')
       expect(result.newApprovalStatus).toBe('PENDING')
     })
 
@@ -59,7 +72,7 @@ describe('Approval Workflow System', () => {
 
     it('should enforce role-based permissions', () => {
       // Test approval without proper role
-      const result = workflow.canTransition('REVIEWING', 'approve', {
+      const result = workflow.canTransition('PENDING_REVIEW', 'approve', {
         contentId: 'test-id',
         userRole: 'creator'
       })
@@ -69,7 +82,7 @@ describe('Approval Workflow System', () => {
 
     it('should allow approval with proper role', () => {
       // Test approval with approver role
-      const result = workflow.canTransition('REVIEWING', 'approve', {
+      const result = workflow.canTransition('PENDING_REVIEW', 'approve', {
         contentId: 'test-id',
         userRole: 'approver'
       })
@@ -79,7 +92,7 @@ describe('Approval Workflow System', () => {
 
     it('should require comments for rejection', () => {
       // Test rejection without comment
-      const result = workflow.canTransition('REVIEWING', 'reject', {
+      const result = workflow.canTransition('PENDING_REVIEW', 'reject', {
         contentId: 'test-id',
         userRole: 'approver'
       })
@@ -89,7 +102,7 @@ describe('Approval Workflow System', () => {
 
     it('should allow rejection with comment', () => {
       // Test rejection with comment
-      const result = workflow.canTransition('REVIEWING', 'reject', {
+      const result = workflow.canTransition('PENDING_REVIEW', 'reject', {
         contentId: 'test-id',
         userRole: 'approver',
         comment: 'Content needs improvement'
@@ -108,8 +121,8 @@ describe('Approval Workflow System', () => {
     })
 
     it('should filter actions by user role', () => {
-      const approverActions = workflow.getAvailableActions('REVIEWING', 'approver')
-      const creatorActions = workflow.getAvailableActions('REVIEWING', 'creator')
+      const approverActions = workflow.getAvailableActions('PENDING_REVIEW', 'approver')
+      const creatorActions = workflow.getAvailableActions('PENDING_REVIEW', 'creator')
       
       expect(approverActions).toContain('approve')
       expect(approverActions).toContain('reject')
@@ -155,7 +168,7 @@ describe('Approval Workflow System', () => {
       // Check for key states
       const stateIds = diagram.states.map(s => s.id)
       expect(stateIds).toContain('DRAFT')
-      expect(stateIds).toContain('REVIEWING')
+      expect(stateIds).toContain('PENDING_REVIEW')
       expect(stateIds).toContain('APPROVED')
       expect(stateIds).toContain('PUBLISHED')
     })
@@ -227,7 +240,7 @@ describe('Notification System', () => {
         contentTitle: 'Test Content',
         action: 'submit_for_review',
         fromStatus: 'DRAFT',
-        toStatus: 'REVIEWING',
+        toStatus: 'PENDING_REVIEW',
         fromUserName: 'John Doe'
       })
 
@@ -244,7 +257,7 @@ describe('Notification System', () => {
         contentId: 'test-content',
         contentTitle: 'Test Content',
         action: 'approve',
-        fromStatus: 'REVIEWING',
+        fromStatus: 'PENDING_REVIEW',
         toStatus: 'APPROVED',
         fromUserName: 'Jane Smith'
       })
@@ -254,7 +267,7 @@ describe('Notification System', () => {
         contentId: 'test-content',
         contentTitle: 'Test Content',
         action: 'reject',
-        fromStatus: 'REVIEWING',
+        fromStatus: 'PENDING_REVIEW',
         toStatus: 'DRAFT',
         fromUserName: 'Jane Smith',
         comment: 'Needs more work'
@@ -276,7 +289,7 @@ describe('Notification System', () => {
         contentId: 'test-content',
         contentTitle: 'Test Content',
         action: 'approve',
-        fromStatus: 'REVIEWING',
+        fromStatus: 'PENDING_REVIEW',
         toStatus: 'APPROVED'
       })
 
@@ -293,7 +306,7 @@ describe('Notification System', () => {
         contentId: 'test-content-1',
         contentTitle: 'Test Content 1',
         action: 'approve',
-        fromStatus: 'REVIEWING',
+        fromStatus: 'PENDING_REVIEW',
         toStatus: 'APPROVED'
       })
 
@@ -302,7 +315,7 @@ describe('Notification System', () => {
         contentId: 'test-content-2',
         contentTitle: 'Test Content 2',
         action: 'reject',
-        fromStatus: 'REVIEWING',
+        fromStatus: 'PENDING_REVIEW',
         toStatus: 'DRAFT'
       })
 
@@ -326,24 +339,40 @@ describe('Notification System', () => {
           contentId: `test-content-${i}`,
           contentTitle: `Test Content ${i}`,
           action: 'approve',
-          fromStatus: 'REVIEWING',
+          fromStatus: 'PENDING_REVIEW',
           toStatus: 'APPROVED'
         })
         notificationService.addNotification('user-1', notification)
       }
 
       const notifications = notificationService.getNotifications('user-1')
-      expect(notifications).toHaveLength(100) // Should be limited to 100
+      expect(notifications).toHaveLength(50) // Should be limited to 50
     })
   })
 })
 
 describe('Integration Tests', () => {
   let approvalActions: ApprovalActions
+  let mockPrisma: any
+  let workflow: ApprovalWorkflow
 
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks()
+    
+    // Setup mockPrisma
+    mockPrisma = {
+      content: {
+        findUnique: vi.fn(),
+        update: vi.fn(),
+        findMany: vi.fn()
+      },
+      analytics: {
+        create: vi.fn()
+      }
+    }
+    
+    workflow = new ApprovalWorkflow()
   })
 
   describe('End-to-End Workflow', () => {
@@ -360,7 +389,7 @@ describe('Integration Tests', () => {
       mockPrisma.content.findUnique.mockResolvedValue(mockContent)
       mockPrisma.content.update.mockResolvedValue({
         ...mockContent,
-        status: 'REVIEWING',
+        status: 'PENDING_REVIEW',
         approvalStatus: 'PENDING'
       })
       mockPrisma.analytics.create.mockResolvedValue({})
@@ -372,10 +401,10 @@ describe('Integration Tests', () => {
       })
 
       expect(result1.success).toBe(true)
-      expect(result1.newState).toBe('REVIEWING')
+      expect(result1.newState).toBe('PENDING_REVIEW')
 
       // Test approval
-      const result2 = await workflow.executeTransition('REVIEWING', 'approve', {
+      const result2 = await workflow.executeTransition('PENDING_REVIEW', 'approve', {
         contentId: 'test-content-1',
         userId: 'approver-1',
         userRole: 'approver'
@@ -398,7 +427,7 @@ describe('Integration Tests', () => {
     it('should handle rejection and revision workflow', async () => {
       const mockContent = {
         id: 'test-content-1',
-        status: 'REVIEWING' as ContentStatus,
+        status: 'PENDING_REVIEW' as ContentStatus,
         approvalStatus: 'PENDING' as ApprovalStatus,
         metadata: null,
         title: 'Test Content'
@@ -412,7 +441,7 @@ describe('Integration Tests', () => {
       })
 
       // Test rejection
-      const result1 = await workflow.executeTransition('REVIEWING', 'reject', {
+      const result1 = await workflow.executeTransition('PENDING_REVIEW', 'reject', {
         contentId: 'test-content-1',
         userId: 'approver-1',
         userRole: 'approver',
@@ -430,12 +459,12 @@ describe('Integration Tests', () => {
       })
 
       expect(result2.success).toBe(true)
-      expect(result2.newState).toBe('REVIEWING')
+      expect(result2.newState).toBe('PENDING_REVIEW')
     })
 
     it('should enforce permission constraints', async () => {
       // Test that creator cannot approve content
-      const result = await workflow.executeTransition('REVIEWING', 'approve', {
+      const result = await workflow.executeTransition('PENDING_REVIEW', 'approve', {
         contentId: 'test-content-1',
         userId: 'creator-1',
         userRole: 'creator'

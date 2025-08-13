@@ -124,6 +124,44 @@ export interface GenerateContentRequest {
   context?: string
 }
 
+// LLM API Request/Response Types
+export interface LLMApiRequest {
+  prompt: string
+  model?: string
+  maxTokens?: number
+  temperature?: number
+  systemPrompt?: string
+  context?: string[]
+  stream?: boolean
+}
+
+export interface LLMApiResponse {
+  id: string
+  content: string
+  model: string
+  usage: {
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
+  finishReason: "stop" | "length" | "content_filter" | "error"
+  metadata: {
+    requestId: string
+    timestamp: string
+    processingTime: number
+  }
+}
+
+export interface LLMStreamResponse {
+  id: string
+  delta: string
+  isComplete: boolean
+  metadata?: {
+    tokenCount: number
+    model: string
+  }
+}
+
 // Assets API
 export interface CreateAssetRequest {
   name: string

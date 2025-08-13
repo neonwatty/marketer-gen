@@ -2,15 +2,16 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
+import { vi } from 'vitest'
 
 // Mock the permissions module
-jest.mock('@/lib/permissions', () => ({
-  validateComponentAccess: jest.fn(() => true)
+vi.mock('@/lib/permissions', () => ({
+  validateComponentAccess: vi.fn(() => true)
 }))
 
 // Mock the date-fns module
-jest.mock('date-fns', () => ({
-  formatDistanceToNow: jest.fn(() => '2 minutes ago')
+vi.mock('date-fns', () => ({
+  formatDistanceToNow: vi.fn(() => '2 minutes ago')
 }))
 
 import { CommentSystem } from '@/components/collaboration/comment-system'
@@ -87,18 +88,18 @@ const mockComments: Comment[] = [
 
 // Mock handlers
 const mockHandlers = {
-  onAddComment: jest.fn(),
-  onEditComment: jest.fn(),
-  onDeleteComment: jest.fn(),
-  onReactToComment: jest.fn(),
-  onResolveComment: jest.fn(),
-  onUnresolveComment: jest.fn(),
-  onModerationAction: jest.fn()
+  onAddComment: vi.fn(),
+  onEditComment: vi.fn(),
+  onDeleteComment: vi.fn(),
+  onReactToComment: vi.fn(),
+  onResolveComment: vi.fn(),
+  onUnresolveComment: vi.fn(),
+  onModerationAction: vi.fn()
 }
 
 describe('CommentSystem Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Rendering', () => {

@@ -2,6 +2,7 @@ import { Server as HTTPServer } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
 import { Client } from 'socket.io-client'
 import { PrismaClient } from '@prisma/client'
+import { vi } from 'vitest'
 import { 
   SocketServer,
   ConnectedUser,
@@ -13,32 +14,32 @@ import {
 // Mock Prisma Client
 const mockPrismaClient = {
   realtimeSession: {
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    findMany: jest.fn()
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    findMany: vi.fn()
   },
   realtimeMessage: {
-    create: jest.fn(),
-    findMany: jest.fn()
+    create: vi.fn(),
+    findMany: vi.fn()
   },
   notification: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    update: jest.fn()
+    create: vi.fn(),
+    findMany: vi.fn(),
+    update: vi.fn()
   }
 } as unknown as PrismaClient
 
 // Mock Socket.IO Server
 const mockSocketIOServer = {
-  on: jest.fn(),
-  emit: jest.fn(),
-  to: jest.fn(() => mockSocketIOServer),
-  in: jest.fn(() => mockSocketIOServer),
+  on: vi.fn(),
+  emit: vi.fn(),
+  to: vi.fn(() => mockSocketIOServer),
+  in: vi.fn(() => mockSocketIOServer),
   sockets: {
     sockets: new Map()
   },
-  close: jest.fn()
+  close: vi.fn()
 } as unknown as SocketIOServer
 
 // Mock Socket
@@ -46,11 +47,11 @@ const createMockSocket = (id: string, userId?: string) => ({
   id,
   userId,
   username: `user-${userId}`,
-  emit: jest.fn(),
-  on: jest.fn(),
-  join: jest.fn(),
-  leave: jest.fn(),
-  disconnect: jest.fn(),
+  emit: vi.fn(),
+  on: vi.fn(),
+  join: vi.fn(),
+  leave: vi.fn(),
+  disconnect: vi.fn(),
   handshake: {
     auth: { userId, token: 'mock-token' },
     address: '127.0.0.1'
@@ -63,7 +64,7 @@ describe('SocketServer', () => {
   let httpServer: HTTPServer
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     httpServer = new HTTPServer()
     socketServer = new SocketServer(httpServer, mockPrismaClient)
   })
@@ -838,7 +839,7 @@ describe('SocketServer', () => {
 
     test('should handle socket disconnection edge cases', async () => {
       const socket = createMockSocket('socket-123', 'user-456')
-      socket.disconnect = jest.fn().mockImplementation(() => {
+      socket.disconnect = vi.fn().mockImplementation(() => {
         throw new Error('Disconnect failed')
       })
 
@@ -858,7 +859,7 @@ describe('SocketServer', () => {
       await socketServer.handleConnection(socket as any)
 
       // Mock room join failure
-      socket.join = jest.fn().mockImplementation(() => {
+      socket.join = vi.fn().mockImplementation(() => {
         throw new Error('Failed to join room')
       })
 
@@ -874,7 +875,7 @@ describe('SocketServer', () => {
     test('should handle memory pressure and cleanup', async () => {
       // Simulate memory pressure
       const originalMemoryUsage = process.memoryUsage
-      process.memoryUsage = jest.fn().mockReturnValue({
+      process.memoryUsage = vi.fn().mockReturnValue({
         heapUsed: 1024 * 1024 * 1024 * 1.5, // 1.5GB
         heapTotal: 1024 * 1024 * 1024 * 2,   // 2GB
         external: 0,

@@ -272,6 +272,13 @@ export interface ApprovalWorkflow extends BaseEntity {
   stages: ApprovalStage[]
   isActive: boolean
   applicableTypes: ('campaign' | 'asset' | 'journey')[]
+  autoStart?: boolean
+  allowParallelStages?: boolean
+  requireAllApprovers?: boolean
+  defaultTimeoutHours?: number
+  createdBy: ID
+  conditionRules?: string
+  metadata?: Record<string, unknown>
 }
 
 export interface ApprovalStage {
@@ -281,9 +288,11 @@ export interface ApprovalStage {
   order: number
   approversRequired: number
   approvers: ID[]
+  approverRoles?: UserRole[]
   autoApprove: boolean
   timeoutHours?: number
   skipConditions?: ApprovalCondition[]
+  escalationRules?: string
 }
 
 export interface ApprovalCondition {
@@ -299,12 +308,17 @@ export interface ApprovalRequest extends BaseEntity {
   targetId: ID
   requesterId: ID
   requester: User
-  currentStageId: ID
-  currentStage: ApprovalStage
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'expired'
+  currentStageId?: ID
+  currentStage?: ApprovalStage
+  status: 'pending' | 'in_progress' | 'approved' | 'rejected' | 'cancelled' | 'expired' | 'escalated'
+  priority?: 'low' | 'medium' | 'high' | 'urgent'
   approvals: ApprovalAction[]
   dueDate?: Date
   notes?: string
+  completedAt?: Date
+  escalatedAt?: Date
+  escalationLevel?: number
+  metadata?: Record<string, unknown>
 }
 
 export interface ApprovalAction extends BaseEntity {
@@ -312,9 +326,12 @@ export interface ApprovalAction extends BaseEntity {
   stageId: ID
   approverId: ID
   approver: User
-  action: 'approve' | 'reject' | 'request_changes'
+  action: 'approve' | 'reject' | 'request_changes' | 'delegate' | 'escalate' | 'cancel'
   comment?: string
   attachments?: string[]
+  ipAddress?: string
+  userAgent?: string
+  metadata?: Record<string, unknown>
 }
 
 export interface Notification extends BaseEntity {
@@ -341,4 +358,90 @@ export interface AuditLog extends BaseEntity {
   metadata?: Record<string, unknown>
   ipAddress?: string
   userAgent?: string
+}
+
+// Workflow Template types
+export interface WorkflowTemplate extends BaseEntity {
+  name: string
+  description?: string
+  category: 'MARKETING' | 'CONTENT' | 'BRAND' | 'COMPLIANCE' | 'GENERAL'
+  applicableTypes: string[]
+  isPublic: boolean
+  usageCount: number
+  createdBy: ID
+  tags?: string[]
+  metadata?: Record<string, unknown>
+  stages: WorkflowTemplateStage[]
+}
+
+export interface WorkflowTemplateStage {
+  id: ID
+  name: string
+  description?: string
+  order: number
+  approversRequired: number
+  approverRoles?: UserRole[]
+  autoApprove: boolean
+  timeoutHours?: number
+  skipConditions?: string[]
+}
+
+// Workflow Engine types
+export type WorkflowEventType = 
+  | 'workflow_started'
+  | 'stage_entered'
+  | 'stage_completed'
+  | 'stage_timeout'
+  | 'workflow_completed'
+  | 'workflow_rejected'
+  | 'workflow_cancelled'
+  | 'escalation_triggered'
+
+export interface WorkflowEvent {
+  type: WorkflowEventType
+  requestId: string
+  stageId?: string
+  userId?: string
+  timestamp: Date
+  metadata?: Record<string, unknown>
+}
+
+export interface WorkflowExecutionContext {
+  request: ApprovalRequest
+  workflow: ApprovalWorkflow
+  targetContent: any
+  currentUser?: User
+}
+
+export interface StageValidationResult {
+  canProceed: boolean
+  shouldSkip: boolean
+  reason?: string
+  nextStageId?: string
+}
+
+export interface WorkflowNotification {
+  type: 'approval_request' | 'approval_reminder' | 'approval_completed' | 'approval_timeout'
+  recipientId: string
+  title: string
+  message: string
+  actionUrl?: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  metadata?: Record<string, unknown>
+}
+
+export interface WorkflowMetrics {
+  workflowId: ID
+  totalRequests: number
+  completedRequests: number
+  averageCompletionTime: number
+  approvalRate: number
+  escalationRate: number
+  timeoutRate: number
+  bottleneckStages: Array<{
+    stageId: ID
+    stageName: string
+    averageTime: number
+    timeoutCount: number
+  }>
 }

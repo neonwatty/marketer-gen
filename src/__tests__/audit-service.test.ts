@@ -6,23 +6,24 @@ import {
   AuditSessionInfo 
 } from '@/lib/audit/audit-service'
 import { nanoid } from 'nanoid'
+import { vi } from 'vitest'
 
 // Mock Prisma Client
 const mockPrismaClient = {
   auditLog: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    findFirst: jest.fn(),
-    count: jest.fn(),
-    aggregate: jest.fn(),
-    deleteMany: jest.fn(),
-    groupBy: jest.fn()
+    create: vi.fn(),
+    findMany: vi.fn(),
+    findFirst: vi.fn(),
+    count: vi.fn(),
+    aggregate: vi.fn(),
+    deleteMany: vi.fn(),
+    groupBy: vi.fn()
   }
 } as unknown as PrismaClient
 
 // Mock nanoid
-jest.mock('nanoid', () => ({
-  nanoid: jest.fn(() => 'test-request-id-123')
+vi.mock('nanoid', () => ({
+  nanoid: vi.fn(() => 'test-request-id-123')
 }))
 
 // Mock environment variables
@@ -32,7 +33,7 @@ describe('AuditService', () => {
   let auditService: AuditService
   
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     process.env = {
       ...originalEnv,
       NODE_ENV: 'test',
@@ -503,7 +504,7 @@ describe('AuditService', () => {
   describe('Error Handling', () => {
     test('should handle database errors gracefully', async () => {
       const error = new Error('Database connection failed')
-      mockPrismaClient.auditLog.create = jest.fn().mockRejectedValueOnce(error)
+      mockPrismaClient.auditLog.create = vi.fn().mockRejectedValueOnce(error)
 
       const entry: AuditLogEntry = {
         eventType: AuditEventType.USER_ACTION,
@@ -750,7 +751,7 @@ describe('AuditService Integration Scenarios', () => {
   let auditService: AuditService
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     auditService = new AuditService(mockPrismaClient)
   })
 

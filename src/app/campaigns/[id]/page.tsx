@@ -20,7 +20,8 @@ import {
   Mail,
   Share2,
   BarChart3,
-  Calculator
+  Calculator,
+  Presentation
 } from "lucide-react"
 import Link from "next/link"
 import { CampaignJourneyVisualization } from "@/components/campaigns/campaign-journey-visualization"
@@ -137,7 +138,8 @@ export default function CampaignDetailPage({ params }: CampaignDetailPageProps) 
   }
 
   const handleCopy = () => {
-    console.log("Copy campaign:", params.id)
+    // Navigate to the clone page
+    window.location.href = `/campaigns/${params.id}/clone`
   }
 
   const handleDelete = () => {
@@ -211,6 +213,12 @@ export default function CampaignDetailPage({ params }: CampaignDetailPageProps) 
               Budget
             </Button>
           </Link>
+          <Link href={`/campaigns/${params.id}/presentation`}>
+            <Button variant="outline">
+              <Presentation className="h-4 w-4 mr-2" />
+              Present
+            </Button>
+          </Link>
           <Button variant="outline" onClick={handleEdit}>
             <Edit className="h-4 w-4 mr-2" />
             Edit Campaign
@@ -243,7 +251,7 @@ export default function CampaignDetailPage({ params }: CampaignDetailPageProps) 
               )}
               <DropdownMenuItem onClick={handleCopy}>
                 <Copy className="h-4 w-4 mr-2" />
-                Duplicate Campaign
+                Clone Campaign
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 

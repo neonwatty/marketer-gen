@@ -174,3 +174,55 @@ export const templateSchema = z.object({
 })
 
 export type TemplateFormData = z.infer<typeof templateSchema>
+
+// Bulk generation schema
+export const bulkGenerationSchema = z.object({
+  name: z.string().min(1, "Request name is required").max(100, "Name must be less than 100 characters"),
+  description: z.string().max(500, "Description must be less than 500 characters").optional(),
+  stages: z.array(z.enum(['awareness', 'consideration', 'conversion', 'retention'])).min(1, "At least one journey stage must be selected"),
+  contentTypesPerStage: z.record(z.string(), z.array(z.string())).refine(
+    (data) => Object.values(data).some(types => types.length > 0),
+    { message: "At least one content type must be selected for each stage" }
+  ),
+  channelsPerStage: z.record(z.string(), z.array(z.string())).refine(
+    (data) => Object.values(data).some(channels => channels.length > 0),
+    { message: "At least one channel must be selected for each stage" }
+  ),
+  quantity: z.number().min(1, "Quantity must be at least 1").max(50, "Quantity cannot exceed 50 per stage"),
+  brandContext: z.object({
+    companyName: z.string().optional(),
+    industry: z.string().optional(),
+    targetAudience: z.string().min(1, "Target audience is required"),
+    brandVoice: z.string().optional(),
+    brandGuidelines: z.string().optional(),
+    logoUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+    brandColors: z.array(z.string()).optional(),
+  }),
+  contentSettings: z.object({
+    tone: z.enum([
+      'professional', 
+      'casual', 
+      'friendly', 
+      'persuasive', 
+      'informative',
+      'urgent',
+      'humorous',
+      'authoritative',
+      'empathetic'
+    ], {
+      message: "Please select a tone",
+    }),
+    contentLength: z.enum(['short', 'medium', 'long'], {
+      message: "Please select content length",
+    }),
+    urgencyLevel: z.enum(['low', 'medium', 'high']).optional(),
+    includeHashtags: z.boolean().optional(),
+    includeCTA: z.boolean().optional(),
+    customInstructions: z.string().max(1000, "Instructions must be less than 1000 characters").optional(),
+  }),
+  campaignId: z.string().optional(),
+  scheduledFor: z.date().optional(),
+  priority: z.enum(['low', 'medium', 'high']).default('medium'),
+})
+
+export type BulkGenerationFormData = z.infer<typeof bulkGenerationSchema>

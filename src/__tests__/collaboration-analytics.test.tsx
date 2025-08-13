@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
 // Mock Recharts components
-jest.mock('recharts', () => ({
+vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: any) => <div data-testid="responsive-container">{children}</div>,
   BarChart: ({ children }: any) => <div data-testid="bar-chart">{children}</div>,
   LineChart: ({ children }: any) => <div data-testid="line-chart">{children}</div>,
@@ -322,7 +322,7 @@ describe('CollaborationAnalytics Component', () => {
     })
 
     test('should allow insight actions', async () => {
-      const mockOnInsightAction = jest.fn()
+      const mockOnInsightAction = vi.fn()
       const user = userEvent.setup()
 
       render(
@@ -345,7 +345,7 @@ describe('CollaborationAnalytics Component', () => {
 
   describe('Time Range Functionality', () => {
     test('should update data when time range changes', async () => {
-      const mockOnTimeRangeChange = jest.fn()
+      const mockOnTimeRangeChange = vi.fn()
       const user = userEvent.setup()
 
       render(
@@ -403,7 +403,7 @@ describe('CollaborationAnalytics Component', () => {
     })
 
     test('should handle chart interactions', async () => {
-      const mockOnChartClick = jest.fn()
+      const mockOnChartClick = vi.fn()
       render(
         <CollaborationAnalytics 
           {...defaultProps} 
@@ -416,7 +416,7 @@ describe('CollaborationAnalytics Component', () => {
     })
 
     test('should support data export', async () => {
-      const mockOnExport = jest.fn()
+      const mockOnExport = vi.fn()
       const user = userEvent.setup()
 
       render(

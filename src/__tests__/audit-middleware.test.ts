@@ -7,22 +7,23 @@ import {
 } from '@/lib/audit/audit-middleware'
 import { getAuditService } from '@/lib/audit/audit-service'
 import { nanoid } from 'nanoid'
+import { vi } from 'vitest'
 
 // Mock dependencies
-jest.mock('nanoid', () => ({
-  nanoid: jest.fn(() => 'test-request-id-456')
+vi.mock('nanoid', () => ({
+  nanoid: vi.fn(() => 'test-request-id-456')
 }))
 
-jest.mock('@/lib/audit/audit-service', () => ({
-  getAuditService: jest.fn()
+vi.mock('@/lib/audit/audit-service', () => ({
+  getAuditService: vi.fn()
 }))
 
 const mockAuditService = {
-  log: jest.fn(),
-  logApiRequest: jest.fn(),
-  logApiResponse: jest.fn(),
-  logError: jest.fn(),
-  logPerformance: jest.fn()
+  log: vi.fn(),
+  logApiRequest: vi.fn(),
+  logApiResponse: vi.fn(),
+  logError: vi.fn(),
+  logPerformance: vi.fn()
 }
 
 const mockPrismaClient = {} as PrismaClient
@@ -31,8 +32,8 @@ describe('AuditMiddleware', () => {
   let auditMiddleware: AuditMiddleware
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    ;(getAuditService as jest.Mock).mockReturnValue(mockAuditService)
+    vi.clearAllMocks()
+    ;(getAuditService as vi.Mock).mockReturnValue(mockAuditService)
     auditMiddleware = new AuditMiddleware(mockPrismaClient)
   })
 

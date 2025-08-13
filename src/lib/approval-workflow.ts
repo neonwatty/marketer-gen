@@ -40,7 +40,7 @@ export const WORKFLOW_TRANSITIONS: WorkflowTransition[] = [
   // From DRAFT
   {
     from: 'DRAFT',
-    to: 'REVIEWING',
+    to: 'PENDING_REVIEW',
     action: 'submit_for_review',
     approvalStatus: 'PENDING',
   },
@@ -54,7 +54,7 @@ export const WORKFLOW_TRANSITIONS: WorkflowTransition[] = [
   // From GENERATED (after AI generation)
   {
     from: 'GENERATED',
-    to: 'REVIEWING',
+    to: 'PENDING_REVIEW',
     action: 'submit_for_review',
     approvalStatus: 'PENDING',
   },
@@ -71,16 +71,16 @@ export const WORKFLOW_TRANSITIONS: WorkflowTransition[] = [
     approvalStatus: 'REJECTED',
   },
 
-  // From REVIEWING
+  // From PENDING_REVIEW
   {
-    from: 'REVIEWING',
+    from: 'PENDING_REVIEW',
     to: 'APPROVED',
     action: 'approve',
     approvalStatus: 'APPROVED',
     requiresRole: ['approver', 'admin'],
   },
   {
-    from: 'REVIEWING',
+    from: 'PENDING_REVIEW',
     to: 'DRAFT',
     action: 'reject',
     approvalStatus: 'REJECTED',
@@ -88,7 +88,7 @@ export const WORKFLOW_TRANSITIONS: WorkflowTransition[] = [
     requiresComment: true,
   },
   {
-    from: 'REVIEWING',
+    from: 'PENDING_REVIEW',
     to: 'DRAFT',
     action: 'request_revision',
     approvalStatus: 'NEEDS_REVISION',
@@ -106,7 +106,7 @@ export const WORKFLOW_TRANSITIONS: WorkflowTransition[] = [
   },
   {
     from: 'APPROVED',
-    to: 'REVIEWING',
+    to: 'PENDING_REVIEW',
     action: 'revert_to_draft',
     approvalStatus: 'PENDING',
     requiresRole: ['admin'],
@@ -262,7 +262,7 @@ export class ApprovalWorkflow {
         color: 'purple',
         icon: 'sparkles'
       },
-      REVIEWING: {
+      PENDING_REVIEW: {
         label: 'Under Review',
         description: 'Content is being reviewed for approval',
         color: 'yellow',

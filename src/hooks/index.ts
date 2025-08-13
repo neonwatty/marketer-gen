@@ -259,3 +259,9 @@ export function useMediaQuery(query: string): boolean {
 export function useIsMobile(): boolean {
   return useMediaQuery("(max-width: 768px)")
 }
+
+// Re-export specialized hooks
+export { useLLM } from './useLLM'
+export { useApprovalWorkflow } from './useApprovalWorkflow'
+export { useAISuggestions } from './useAISuggestions'
+export { useJourneyPersistence } from './useJourneyPersistence'
