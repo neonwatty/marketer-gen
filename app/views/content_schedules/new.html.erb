@@ -1,0 +1,75 @@
+<% content_for :title, "New Content Schedule" %>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Schedule New Content</h1>
+      <p class="text-gray-600">Configure when and where your content will be published</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border">
+      <div class="p-6">
+        <%= form_with model: @content_schedule, local: true, class: "space-y-6" do |form| %>
+          <% if @content_schedule.errors.any? %>
+            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+              <div class="text-red-800">
+                <h3 class="font-medium mb-2">Please fix the following errors:</h3>
+                <ul class="list-disc list-inside space-y-1">
+                  <% @content_schedule.errors.full_messages.each do |message| %>
+                    <li class="text-sm"><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          <% end %>
+
+          <div>
+            <%= form.label :campaign_id, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.collection_select :campaign_id, @campaigns, :id, :name, 
+                { prompt: "Select a campaign" }, 
+                { class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" } %>
+          </div>
+
+          <div>
+            <%= form.label :platform, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.select :platform, options_for_select(@platforms.map { |p| [p.humanize, p] }), 
+                { prompt: "Select a platform" }, 
+                { class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" } %>
+          </div>
+
+          <div>
+            <%= form.label :channel, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.select :channel, options_for_select(@channels.map { |c| [c.humanize, c] }), 
+                { prompt: "Select a channel" }, 
+                { class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" } %>
+          </div>
+
+          <div>
+            <%= form.label :scheduled_at, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.datetime_local_field :scheduled_at, 
+                class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+
+          <div>
+            <%= form.label :priority, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.select :priority, (1..5).map { |p| [p, p] }, 
+                { selected: 3 }, 
+                { class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" } %>
+          </div>
+
+          <div class="flex items-center">
+            <%= form.check_box :auto_publish, class: "rounded border-gray-300 text-blue-600 focus:ring-blue-500" %>
+            <%= form.label :auto_publish, "Auto Publish", class: "ml-2 text-sm text-gray-700" %>
+          </div>
+
+          <div class="flex justify-end space-x-4">
+            <%= link_to content_schedules_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+              Cancel
+            <% end %>
+            <%= form.submit "Schedule Content", class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

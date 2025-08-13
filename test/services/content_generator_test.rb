@@ -2,11 +2,26 @@ require 'test_helper'
 
 class ContentGeneratorTest < ActiveSupport::TestCase
   setup do
-    # Mock AI service to avoid external API calls during testing
-    @mock_ai_service = Minitest::Mock.new
+    # Create a simple mock AI service
+    @mock_ai_service = Class.new do
+      def generate_content_for_channel(channel, prompt, options = {})
+        "Mock generated content for #{channel}: #{prompt}"
+      end
+      
+      def health_check
+        { status: 'healthy', provider: 'mock' }
+      end
+
+      def model_name
+        'mock-model'
+      end
+    end.new
     
-    # Initialize generator with mocked AI service
-    @generator = ContentGenerator.new(ai_service: @mock_ai_service)
+    # Initialize generator with mocked AI service and basic brand context
+    @generator = ContentGenerator.new(
+      ai_service: @mock_ai_service,
+      brand_context: { name: 'Test Brand', industry: 'technology' }
+    )
   end
 
   test "should initialize with registry" do
@@ -15,45 +30,36 @@ class ContentGeneratorTest < ActiveSupport::TestCase
   end
 
   test "should generate social media content" do
-    # Setup mock response
-    @mock_ai_service.expect :generate_content_for_channel, 
-      "Check out our amazing new product! Perfect for busy professionals. #productivity #innovation",
-      ['social_media', String, Hash]
-
-    # Create request
+    # Create request - using actual ContentRequest attributes
     request = ContentRequest.new(
-      channel_type: 'social_media',
-      content_type: 'promotional',
-      prompt: 'Promote our new productivity app',
+      content_type: 'social_media',
+      campaign_name: 'Productivity App Launch',
+      additional_context: 'Promote our new productivity app',
       brand_context: {
         name: 'ProductivePro',
         industry: 'software',
         voice: 'professional yet friendly'
       },
-      target_audience: {
-        demographics: 'working professionals age 25-45'
-      }
+      platform: 'twitter',
+      request_metadata: { platform: :twitter }
     )
-    
-    request.set_social_media_constraints(platform: 'twitter')
 
     # Generate content (will use mock)
     response = @generator.generate_content(request)
 
     # Verify response
+    assert_not_nil response
+    # The response should be a ContentResponse object
     assert_instance_of ContentResponse, response
-    assert_equal 'social_media', response.channel_type
-    assert_equal 'promotional', response.content_type
-    assert_not_empty response.content
-
-    @mock_ai_service.verify
+    assert_equal 'completed', response.generation_status
+    assert_not_empty response.generated_content
   end
 
   test "should validate content request" do
-    # Test invalid request
+    # Test invalid request - empty content_type
     invalid_request = ContentRequest.new(
-      channel_type: '', # Missing required field
-      content_type: 'promotional'
+      content_type: '', # Missing required field
+      campaign_name: 'Test Campaign'
     )
 
     assert_raises ContentGeneratorBase::InvalidContentRequestError do

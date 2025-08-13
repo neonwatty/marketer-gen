@@ -1,0 +1,78 @@
+# Publishing Queue fixtures for testing
+
+pending_queue:
+  content_schedule: twitter_schedule
+  scheduled_for: <%= 1.hour.from_now %>
+  processing_status: pending
+  retry_count: 0
+  max_retries: 3
+  batch_id: batch_test_001
+  processing_metadata: "{}"
+
+processing_queue:
+  content_schedule: instagram_schedule
+  scheduled_for: <%= 30.minutes.ago %>
+  processing_status: processing
+  retry_count: 0
+  max_retries: 3
+  attempted_at: <%= 25.minutes.ago %>
+  batch_id: batch_test_002
+  processing_metadata: '{"processing_started_at": "<%= 25.minutes.ago.iso8601 %>"}'
+
+completed_queue:
+  content_schedule: facebook_schedule
+  scheduled_for: <%= 2.hours.ago %>
+  processing_status: completed
+  retry_count: 0
+  max_retries: 3
+  attempted_at: <%= 2.hours.ago %>
+  completed_at: <%= 1.hour.ago %>
+  batch_id: batch_test_003
+  processing_metadata: '{"processing_started_at": "<%= 2.hours.ago.iso8601 %>", "completed_at": "<%= 1.hour.ago.iso8601 %>", "published_post_id": "facebook_abc123"}'
+
+failed_queue:
+  content_schedule: past_schedule
+  scheduled_for: <%= 3.hours.ago %>
+  processing_status: failed
+  retry_count: 2
+  max_retries: 3
+  attempted_at: <%= 3.hours.ago %>
+  error_message: "API rate limit exceeded"
+  batch_id: batch_test_004
+  processing_metadata: '{"failed_at": "<%= 3.hours.ago.iso8601 %>", "failure_count": 2, "last_error": "API rate limit exceeded"}'
+
+cancelled_queue:
+  content_schedule: linkedin_schedule
+  scheduled_for: <%= 4.hours.from_now %>
+  processing_status: cancelled
+  retry_count: 0
+  max_retries: 3
+  batch_id: batch_test_005
+  processing_metadata: "{}"
+
+paused_queue:
+  content_schedule: twitter_schedule
+  scheduled_for: <%= 2.hours.from_now %>
+  processing_status: paused
+  retry_count: 0
+  max_retries: 3
+  batch_id: batch_test_006
+  processing_metadata: "{}"
+
+overdue_queue:
+  content_schedule: instagram_schedule
+  scheduled_for: <%= 1.hour.ago %>
+  processing_status: pending
+  retry_count: 0
+  max_retries: 3
+  batch_id: batch_test_007
+  processing_metadata: "{}"
+
+scheduled_queue:
+  content_schedule: linkedin_schedule
+  scheduled_for: <%= 3.hours.from_now %>
+  processing_status: scheduled
+  retry_count: 0
+  max_retries: 3
+  batch_id: batch_test_008
+  processing_metadata: "{}"

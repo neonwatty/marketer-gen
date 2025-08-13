@@ -48,7 +48,7 @@ class ContentVersion < ApplicationRecord
     merged: 2,
     archived: 3,
     conflicted: 4
-  }
+  }, prefix: :version
 
   # Serialized content data
   serialize :content_data, coder: JSON
@@ -64,7 +64,7 @@ class ContentVersion < ApplicationRecord
   def commit!(message, author = nil)
     transaction do
       self.commit_message = message
-      self.author = author if author
+      self.author_id = author if author
       self.committed_at = Time.current
       self.status = :committed
       save!
@@ -112,7 +112,6 @@ class ContentVersion < ApplicationRecord
         content_data: content_data.deep_dup,
         content_type: content_type,
         commit_message: "Rollback to version #{version_number}",
-        author: author,
         parent: branch&.head_version,
         branch: branch,
         metadata: metadata.merge({

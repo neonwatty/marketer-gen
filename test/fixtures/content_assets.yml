@@ -1,6 +1,7 @@
 # Content Asset fixtures for testing
 
 welcome_email:
+  id: 1
   assetable: summer_launch (Campaign)
   content_type: "text"
   content: |
@@ -30,6 +31,7 @@ welcome_email:
   published_at: <%= 1.week.ago %>
 
 social_media_post:
+  id: 2
   assetable: summer_launch (Campaign)
   content_type: "text"
   content: "🌞 Summer vibes are here! Check out our new eco-friendly collection that's perfect for your sustainable lifestyle. #SustainableFashion #SummerStyle #EcoFriendly"
@@ -50,6 +52,7 @@ social_media_post:
   published_at: <%= 5.days.ago %>
 
 landing_page_copy:
+  id: 3
   assetable: summer_launch (Campaign)
   content_type: "text"
   content: |
@@ -85,6 +88,7 @@ landing_page_copy:
   published_at: <%= 1.week.ago %>
 
 b2b_whitepaper:
+  id: 4
   assetable: startup_awareness (Campaign)
   content_type: "document"
   content: ""
@@ -107,6 +111,7 @@ b2b_whitepaper:
   published_at: <%= 4.months.ago %>
 
 webinar_registration:
+  id: 5
   assetable: startup_awareness (Campaign)
   content_type: "text"
   content: |
@@ -142,6 +147,7 @@ webinar_registration:
   position: 2
 
 holiday_ad_copy:
+  id: 6
   assetable: holiday_campaign (Campaign)
   content_type: "text"
   content: "Make this holiday unforgettable with gifts that matter. Handcrafted with love, delivered with care. ✨ Shop our holiday collection now!"

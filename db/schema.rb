@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_12_211919) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_12_225435) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -248,6 +248,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_12_211919) do
     t.index ["content_request_id"], name: "index_content_responses_on_content_request_id"
   end
 
+  create_table "content_schedules", force: :cascade do |t|
+    t.string "content_item_type", null: false
+    t.integer "content_item_id", null: false
+    t.integer "campaign_id", null: false
+    t.string "channel"
+    t.string "platform"
+    t.datetime "scheduled_at"
+    t.datetime "published_at"
+    t.integer "status"
+    t.integer "priority"
+    t.string "frequency"
+    t.text "recurrence_data"
+    t.boolean "auto_publish"
+    t.string "time_zone"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id"], name: "index_content_schedules_on_campaign_id"
+    t.index ["content_item_type", "content_item_id"], name: "index_content_schedules_on_content_item"
+  end
+
   create_table "content_variants", force: :cascade do |t|
     t.integer "content_request_id", null: false
     t.string "name", null: false
@@ -427,6 +448,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_12_211919) do
     t.index ["prompt_type"], name: "index_prompt_templates_on_prompt_type"
     t.index ["usage_count"], name: "index_prompt_templates_on_usage_count"
     t.index ["version"], name: "index_prompt_templates_on_version"
+  end
+
+  create_table "publishing_queues", force: :cascade do |t|
+    t.integer "content_schedule_id", null: false
+    t.string "batch_id"
+    t.integer "processing_status"
+    t.datetime "scheduled_for"
+    t.datetime "attempted_at"
+    t.datetime "completed_at"
+    t.text "error_message"
+    t.integer "retry_count"
+    t.integer "max_retries"
+    t.text "processing_metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_schedule_id"], name: "index_publishing_queues_on_content_schedule_id"
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
@@ -640,7 +677,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_12_211919) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_generation_requests", "campaigns"
-  add_foreign_key "ai_job_statuses", "generation_requests"
+  add_foreign_key "ai_job_statuses", "ai_generation_requests", column: "generation_request_id"
   add_foreign_key "brand_assets", "brand_assets", column: "parent_asset_id"
   add_foreign_key "campaigns", "brand_identities"
   add_foreign_key "content_branches", "content_versions", column: "head_version_id"
@@ -650,6 +687,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_12_211919) do
   add_foreign_key "content_merges", "content_versions", column: "source_version_id"
   add_foreign_key "content_merges", "content_versions", column: "target_version_id"
   add_foreign_key "content_responses", "content_requests"
+  add_foreign_key "content_schedules", "campaigns"
   add_foreign_key "content_variants", "content_requests"
   add_foreign_key "content_versions", "content_branches", column: "branch_id"
   add_foreign_key "content_versions", "content_versions", column: "parent_id"
@@ -658,6 +696,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_12_211919) do
   add_foreign_key "journey_templates", "journey_templates", column: "parent_template_id"
   add_foreign_key "journeys", "campaigns"
   add_foreign_key "prompt_templates", "prompt_templates", column: "parent_template_id"
+  add_foreign_key "publishing_queues", "content_schedules"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

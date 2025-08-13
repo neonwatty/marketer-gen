@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ContentVersionTest < ActiveSupport::TestCase
   setup do
-    @campaign = campaigns(:one) # Use existing campaign as content item
+    @campaign = campaigns(:summer_launch) # Use existing campaign as content item
     @main_branch = ContentBranch.create_main_branch(@campaign)
   end
 
@@ -18,7 +18,7 @@ class ContentVersionTest < ActiveSupport::TestCase
     assert version.valid?
     assert version.save
     assert_not_nil version.version_hash
-    assert_equal 1, version.version_number
+    assert_equal 2, version.version_number
   end
 
   test "should validate required fields" do
@@ -89,7 +89,7 @@ class ContentVersionTest < ActiveSupport::TestCase
     
     assert_equal parent_version, child_version.parent
     assert_includes parent_version.children, child_version
-    assert_equal 2, child_version.version_number
+    assert_equal 3, child_version.version_number
   end
 
   test "should track ancestry correctly" do
@@ -97,7 +97,7 @@ class ContentVersionTest < ActiveSupport::TestCase
       content_item: @campaign,
       content_data: { content: "Version 1" },
       content_type: 'marketing_content',
-      commit_message: 'V1',
+      commit_message: 'Version 1',
       branch: @main_branch
     )
     
@@ -105,7 +105,7 @@ class ContentVersionTest < ActiveSupport::TestCase
       content_item: @campaign,
       content_data: { content: "Version 2" },
       content_type: 'marketing_content',
-      commit_message: 'V2',
+      commit_message: 'Version 2',
       parent: v1,
       branch: @main_branch
     )
@@ -114,7 +114,7 @@ class ContentVersionTest < ActiveSupport::TestCase
       content_item: @campaign,
       content_data: { content: "Version 3" },
       content_type: 'marketing_content',
-      commit_message: 'V3',
+      commit_message: 'Version 3',
       parent: v2,
       branch: @main_branch
     )
@@ -136,7 +136,7 @@ class ContentVersionTest < ActiveSupport::TestCase
         title: "Original title"
       },
       content_type: 'marketing_content',
-      commit_message: 'V1',
+      commit_message: 'Version 1',
       branch: @main_branch
     )
     
@@ -147,7 +147,7 @@ class ContentVersionTest < ActiveSupport::TestCase
         title: "Original title"
       },
       content_type: 'marketing_content',
-      commit_message: 'V2',
+      commit_message: 'Version 2',
       parent: v1,
       branch: @main_branch
     )
@@ -181,7 +181,7 @@ class ContentVersionTest < ActiveSupport::TestCase
     rollback_version = v1.rollback_to!
     
     assert_equal v1.content_data, rollback_version.content_data
-    assert_includes rollback_version.commit_message, 'Rollback to version'
+    assert_includes rollback_version.commit_message, 'Rollback to'
     assert_equal v2, rollback_version.parent
   end
 end

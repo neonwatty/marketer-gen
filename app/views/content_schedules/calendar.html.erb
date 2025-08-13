@@ -1,0 +1,61 @@
+<% content_for :title, "Content Calendar" %>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Content Calendar</h1>
+      <p class="text-gray-600">View your scheduled content in calendar format</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-gray-800">Calendar View</h2>
+          <div class="flex space-x-2">
+            <%= link_to content_schedules_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+              List View
+            <% end %>
+            <%= link_to new_content_schedule_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" do %>
+              Schedule Content
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div id="calendar" data-events="<%= @content_schedules.to_json(methods: [:content_preview]) %>">
+          <!-- Calendar will be rendered here via JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Basic calendar display - can be enhanced with a proper calendar library
+  const calendarEl = document.getElementById('calendar');
+  const events = JSON.parse(calendarEl.dataset.events || '[]');
+  
+  let calendarHTML = '<div class="grid grid-cols-7 gap-4 text-center">';
+  calendarHTML += '<div class="font-semibold">Sun</div><div class="font-semibold">Mon</div><div class="font-semibold">Tue</div><div class="font-semibold">Wed</div><div class="font-semibold">Thu</div><div class="font-semibold">Fri</div><div class="font-semibold">Sat</div>';
+  
+  // Simple calendar grid - in a real app, you'd use a proper calendar library
+  for (let i = 1; i <= 31; i++) {
+    const dayEvents = events.filter(event => {
+      const eventDate = new Date(event.scheduled_at);
+      return eventDate.getDate() === i;
+    });
+    
+    calendarHTML += `<div class="border p-2 min-h-24 ${dayEvents.length > 0 ? 'bg-blue-50' : ''}">`;
+    calendarHTML += `<div class="font-medium">${i}</div>`;
+    dayEvents.forEach(event => {
+      calendarHTML += `<div class="text-xs bg-blue-100 rounded p-1 mt-1 truncate">${event.content_preview || 'Content'}</div>`;
+    });
+    calendarHTML += '</div>';
+  }
+  
+  calendarHTML += '</div>';
+  calendarEl.innerHTML = calendarHTML;
+});
+</script>

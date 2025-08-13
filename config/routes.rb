@@ -105,6 +105,49 @@ Rails.application.routes.draw do
     end
   end
 
+  # Content Scheduling System
+  resources :content_schedules do
+    collection do
+      get :calendar
+      get :timeline
+      get :conflicts
+      get :available_slots
+      post :bulk_create
+      post :optimal_schedule
+    end
+    
+    member do
+      post :duplicate
+      post :reschedule
+      patch :schedule
+      patch :cancel
+      patch :pause
+      patch :resume
+    end
+  end
+
+  # Multi-Format Export System
+  resources :exports, only: [:index, :create] do
+    collection do
+      get :templates
+      get :preview
+      post :comprehensive
+      post :performance
+      post :calendar
+      post :bulk
+    end
+    
+    member do
+      get :download
+    end
+  end
+
+  # Specific export routes
+  get 'exports/campaigns/:id', to: 'exports#campaign', as: :export_campaign
+  get 'exports/brands/:id', to: 'exports#brand', as: :export_brand
+  get 'exports/download/:type/:format', to: 'exports#download', as: :export_download
+  get 'exports/download/:type/:format/:id', to: 'exports#download', as: :export_download_with_id
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

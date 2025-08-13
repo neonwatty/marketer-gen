@@ -169,7 +169,7 @@ class WorkflowEngine
       workflow.update!(
         current_stage: target_stage.to_s,
         previous_stage: previous_stage,
-        updated_by: @current_user&.id,
+        updated_by_id: @current_user&.id,
         metadata: workflow.metadata.merge({
           last_transition_at: Time.current,
           last_action: action.to_s
@@ -391,7 +391,7 @@ class WorkflowEngine
       action: action.to_s,
       from_stage: from_stage&.to_s,
       to_stage: to_stage&.to_s,
-      performed_by: @current_user,
+      performed_by_id: @current_user,
       comment: comment,
       metadata: {
         timestamp: Time.current,

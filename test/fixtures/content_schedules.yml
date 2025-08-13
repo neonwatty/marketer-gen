@@ -1,0 +1,77 @@
+# Content Schedule fixtures for testing
+
+twitter_schedule:
+  campaign_id: 1
+  content_item_type: ContentAsset
+  content_item_id: 2
+  platform: twitter
+  channel: social_media
+  scheduled_at: <%= 2.hours.from_now %>
+  priority: 3
+  status: 1
+  auto_publish: true
+  frequency: once
+  time_zone: UTC
+  metadata: "{}"
+  recurrence_data: "{}"
+
+instagram_schedule:
+  campaign_id: 1
+  content_item_type: ContentAsset
+  content_item_id: 2
+  platform: instagram
+  channel: social_media
+  scheduled_at: <%= 4.hours.from_now %>
+  priority: 4
+  status: 0
+  auto_publish: true
+  frequency: once
+  time_zone: UTC
+  metadata: "{}"
+  recurrence_data: "{}"
+
+linkedin_schedule:
+  campaign_id: 2
+  content_item_type: ContentAsset
+  content_item_id: 6
+  platform: linkedin
+  channel: social_media
+  scheduled_at: <%= 6.hours.from_now %>
+  priority: 2
+  status: 1
+  auto_publish: false
+  frequency: weekly
+  time_zone: America/New_York
+  metadata: "{}"
+  recurrence_data: '{"interval": 7}'
+
+facebook_schedule:
+  campaign_id: 1
+  content_item_type: ContentAsset
+  content_item_id: 3
+  platform: facebook
+  channel: social_media
+  scheduled_at: <%= 8.hours.from_now %>
+  priority: 3
+  status: 2
+  auto_publish: true
+  frequency: once
+  time_zone: UTC
+  published_at: <%= 1.hour.ago %>
+  metadata: "{}"
+  recurrence_data: "{}"
+
+past_schedule:
+  campaign_id: 3
+  content_item_type: ContentAsset
+  content_item_id: 4
+  platform: twitter
+  channel: social_media
+  scheduled_at: <%= 2.hours.ago %>
+  priority: 5
+  status: 3
+  auto_publish: true
+  frequency: once
+  time_zone: UTC
+  metadata: "{}"
+  recurrence_data: "{}"

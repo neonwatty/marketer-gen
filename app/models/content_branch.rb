@@ -7,7 +7,7 @@ class ContentBranch < ApplicationRecord
   # Author tracking - can be extended when User model is added
   # belongs_to :author, class_name: 'User', optional: true
 
-  has_many :content_versions, dependent: :destroy
+  has_many :content_versions, foreign_key: 'branch_id', dependent: :destroy
   has_many :target_merges, class_name: 'ContentMerge', foreign_key: 'target_branch_id', dependent: :destroy
   has_many :source_merges, class_name: 'ContentMerge', foreign_key: 'source_branch_id', dependent: :destroy
 
@@ -23,9 +23,9 @@ class ContentBranch < ApplicationRecord
     active: 0,
     merged: 1,
     archived: 2,
-    protected: 3,
+    protected_branch: 3,
     deleted: 4
-  }
+  }, prefix: true
 
   # Branch types
   enum :branch_type, {
@@ -37,7 +37,7 @@ class ContentBranch < ApplicationRecord
     review: 5
   }
 
-  scope :active_branches, -> { where(status: :active) }
+  scope :active_branches, -> { status_active }
   scope :by_author, ->(author) { where(author: author) }
   scope :main_branches, -> { where(branch_type: :main) }
   scope :feature_branches, -> { where(branch_type: :feature) }
@@ -51,7 +51,6 @@ class ContentBranch < ApplicationRecord
     create!(
       name: 'main',
       content_item: content_item,
-      author: author,
       branch_type: :main,
       status: :active,
       description: 'Main development branch'
@@ -63,7 +62,6 @@ class ContentBranch < ApplicationRecord
       name: "feature/#{name}",
       content_item: source_branch.content_item,
       source_version: source_branch.head_version,
-      author: author,
       branch_type: :feature,
       status: :active,
       description: "Feature branch for #{name}"
@@ -77,7 +75,6 @@ class ContentBranch < ApplicationRecord
         content_data: content_data,
         content_type: head_version&.content_type || 'marketing_content',
         commit_message: commit_message,
-        author: author,
         parent: head_version,
         branch: self
       )
@@ -149,7 +146,7 @@ class ContentBranch < ApplicationRecord
   end
 
   def delete_branch!(force: false)
-    if protected? && !force
+    if status_protected_branch? && !force
       raise ContentVersioningError, "Cannot delete protected branch"
     end
     
@@ -168,7 +165,7 @@ class ContentBranch < ApplicationRecord
   end
 
   def restore_branch!
-    if deleted?
+    if status_deleted?
       update!(status: :active, deleted_at: nil)
       content_versions.update_all(status: :committed)
     end
@@ -225,7 +222,7 @@ class ContentBranch < ApplicationRecord
   end
 
   def protection_rules
-    return {} unless protected?
+    return {} unless status_protected_branch?
     
     metadata['protection_rules'] || {
       'require_review' => true,
@@ -236,7 +233,7 @@ class ContentBranch < ApplicationRecord
   end
 
   def can_user_push?(user)
-    return true unless protected?
+    return true unless status_protected_branch?
     return true if author == user
     
     rules = protection_rules
@@ -248,7 +245,7 @@ class ContentBranch < ApplicationRecord
 
   # Branch statistics and insights
   def activity_summary
-    versions = content_versions.committed.includes(:author)
+    versions = content_versions.version_committed
     
     {
       total_commits: versions.count,
@@ -289,7 +286,7 @@ class ContentBranch < ApplicationRecord
       last_activity: last_activity,
       commit_count: commit_count,
       head_commit: head_version&.content_summary,
-      is_protected: protected?,
+      is_protected: status_protected_branch?,
       is_stale: is_stale?
     }
   end
@@ -351,11 +348,10 @@ class ContentBranch < ApplicationRecord
       content_data: { content: 'Initial content' },
       content_type: 'marketing_content',
       commit_message: 'Initial commit',
-      author: author,
       branch: self
     )
     
-    initial_version.commit!('Initial commit', author)
+    initial_version.commit!('Initial commit')
     update!(head_version: initial_version)
   end
 
@@ -378,6 +374,7 @@ class ContentBranch < ApplicationRecord
     return nil if author_counts.empty?
     
     most_active_author_id = author_counts.max_by { |_author_id, count| count }.first
-    User.find_by(id: most_active_author_id)&.name
+    # User model not implemented yet, return author_id
+    most_active_author_id
   end
 end

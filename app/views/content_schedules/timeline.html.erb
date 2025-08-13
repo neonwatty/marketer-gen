@@ -1,0 +1,89 @@
+<% content_for :title, "Content Timeline" %>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-6 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Content Timeline</h1>
+      <p class="text-gray-600">View your scheduled content in timeline format</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-gray-800">Timeline View</h2>
+          <div class="flex space-x-2">
+            <%= link_to content_schedules_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+              List View
+            <% end %>
+            <%= link_to new_content_schedule_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-white text-sm font-medium rounded-md hover:bg-blue-700" do %>
+              Schedule Content
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <% if @statistics %>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="text-2xl font-bold text-gray-900"><%= @statistics[:total] %></div>
+              <div class="text-sm text-gray-600">Total Scheduled</div>
+            </div>
+            <div class="bg-green-50 rounded-lg p-4">
+              <div class="text-2xl font-bold text-green-600"><%= @statistics[:published] || 0 %></div>
+              <div class="text-sm text-gray-600">Published</div>
+            </div>
+            <div class="bg-blue-50 rounded-lg p-4">
+              <div class="text-2xl font-bold text-blue-600"><%= @statistics[:scheduled] || 0 %></div>
+              <div class="text-sm text-gray-600">Scheduled</div>
+            </div>
+            <div class="bg-yellow-50 rounded-lg p-4">
+              <div class="text-2xl font-bold text-yellow-600"><%= @statistics[:draft] || 0 %></div>
+              <div class="text-sm text-gray-600">Drafts</div>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="space-y-4">
+          <% if @content_schedules.any? %>
+            <% @content_schedules.group_by { |s| s.scheduled_at.to_date }.each do |date, schedules| %>
+              <div class="border-l-4 border-blue-500 pl-4">
+                <h3 class="font-semibold text-gray-900 mb-2"><%= date.strftime("%B %d, %Y") %></h3>
+                <div class="space-y-2">
+                  <% schedules.each do |schedule| %>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                      <div class="flex justify-between items-start">
+                        <div>
+                          <h4 class="font-medium text-gray-900"><%= schedule.content_preview %></h4>
+                          <p class="text-sm text-gray-600 mt-1">
+                            <%= schedule.scheduled_at.strftime("%I:%M %p") %> • 
+                            <span class="font-medium"><%= schedule.platform.capitalize %></span> • 
+                            <span class="<%= schedule.status == 'published' ? 'text-green-600' : 'text-blue-600' %>">
+                              <%= schedule.status.humanize %>
+                            </span>
+                          </p>
+                        </div>
+                        <div class="flex space-x-2">
+                          <%= link_to content_schedule_path(schedule), class: "text-blue-600 hover:text-blue-800 text-sm" do %>
+                            View
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-8">
+              <p class="text-gray-500 mb-4">No content scheduled for this time period</p>
+              <%= link_to new_content_schedule_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700" do %>
+                Schedule Content
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -18,6 +18,8 @@ class ContentRequest < ApplicationRecord
 
   # Serialized attributes for JSON storage
   serialize :request_metadata, coder: JSON
+  serialize :brand_context, coder: JSON
+  serialize :target_audience, coder: JSON
 
   # Scopes
   scope :by_channel, ->(channel) { where(content_type: channel) }
@@ -31,6 +33,11 @@ class ContentRequest < ApplicationRecord
     self.tone ||= 'professional'
     self.content_length ||= 'medium'
     self.campaign_goal ||= 'engagement'
+  end
+
+  # Alias for compatibility with generator services
+  def channel_type
+    content_type
   end
 
   # Utility methods
@@ -71,13 +78,50 @@ class ContentRequest < ApplicationRecord
       content_length: content_length,
       required_elements: required_elements,
       restrictions: restrictions,
-      additional_context: additional_context
+      additional_context: additional_context,
+      optimization_goals: [] # Default empty array for optimization goals
     }
   end
 
   # Generate a display name for the content request
   def display_name
     campaign_name.present? ? campaign_name : "Content ##{id}"
+  end
+
+  # Channel metadata for adapters
+  def channel_metadata
+    request_metadata || {}
+  end
+
+  def channel_metadata=(metadata)
+    self.request_metadata = metadata
+  end
+
+  # Requirements for content generation
+  def requirements
+    if required_elements.is_a?(String)
+      required_elements.split(',').map(&:strip)
+    else
+      required_elements || []
+    end
+  end
+
+  # Campaign context for adapters
+  def campaign_context
+    {
+      name: campaign_name,
+      goal: campaign_goal
+    }.compact
+  end
+
+  # Request identifier for adapters
+  def request_id
+    id || 'test_request'
+  end
+
+  # Content accessor for adapters
+  def content
+    additional_context
   end
 
   # Check if content has been generated

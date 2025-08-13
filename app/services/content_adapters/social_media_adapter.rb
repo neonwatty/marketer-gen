@@ -51,7 +51,7 @@ class ContentAdapters::SocialMediaAdapter < ContentAdapters::BaseChannelAdapter
 
   def setup_channel_metadata
     super
-    @supported_content_types = %w[post story announcement promotional educational behind_scenes user_generated poll question]
+    @supported_content_types = %w[social_media post story announcement promotional educational behind_scenes user_generated poll question]
     @constraints = determine_platform_constraints
   end
 
@@ -97,16 +97,21 @@ class ContentAdapters::SocialMediaAdapter < ContentAdapters::BaseChannelAdapter
     elements = extract_social_elements(formatted_content, platform_config)
     
     # Build response
-    response = ContentResponse.new(
-      content: formatted_content,
+    metadata = {
       channel_type: 'social_media',
-      content_type: request.content_type,
-      request_id: request.request_id,
+      platform: platform,
       title: elements[:title],
       hashtags: elements[:hashtags],
       mentions: elements[:mentions],
       call_to_action: elements[:cta],
       channel_specific_data: build_social_media_metadata(platform, elements, request)
+    }
+
+    response = ContentResponse.new(
+      generated_content: formatted_content,
+      generation_status: 'completed',
+      content_request_id: request.request_id,
+      response_metadata: metadata.to_json
     )
     
     response
@@ -228,14 +233,14 @@ class ContentAdapters::SocialMediaAdapter < ContentAdapters::BaseChannelAdapter
   end
 
   def validate_social_media_request!(request)
-    platform = request.channel_metadata[:platform]
+    platform = request.channel_metadata[:platform] || request.channel_metadata['platform']
     
     unless platform && PLATFORM_LIMITS.key?(platform.to_sym)
-      raise InvalidContentRequestError, "Valid platform must be specified: #{PLATFORM_LIMITS.keys.join(', ')}"
+      raise ArgumentError, "Valid platform must be specified: #{PLATFORM_LIMITS.keys.join(', ')}. Got: #{request.channel_metadata.inspect}"
     end
     
     if request.content_type.blank?
-      raise InvalidContentRequestError, "Content type is required for social media posts"
+      raise ArgumentError, "Content type is required for social media posts"
     end
   end
 
@@ -277,16 +282,20 @@ class ContentAdapters::SocialMediaAdapter < ContentAdapters::BaseChannelAdapter
     end
     
     # Add target audience context
-    if request.target_audience.any?
+    if request.target_audience.present? && request.target_audience.respond_to?(:any?)
       prompt_parts << "Target audience: #{format_target_audience(request.target_audience)}"
+    elsif request.target_audience.present?
+      prompt_parts << "Target audience: #{request.target_audience}"
     end
     
     # Add campaign context
-    if request.campaign_context.any?
+    if request.campaign_context.present? && request.campaign_context.respond_to?(:any?)
       prompt_parts << "Campaign context: #{format_campaign_context(request.campaign_context)}"
+    elsif request.campaign_context.present?
+      prompt_parts << "Campaign context: #{request.campaign_context}"
     end
     
-    prompt_parts << "Content prompt: #{request.prompt}"
+    prompt_parts << "Content prompt: #{request.additional_context}"
     
     # Add output format instructions
     prompt_parts << "\nFormat your response as follows:"

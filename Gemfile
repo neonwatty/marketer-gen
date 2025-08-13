@@ -49,6 +49,16 @@ gem "image_processing", "~> 1.2"
 # PDF text extraction [https://github.com/yob/pdf-reader]
 gem "pdf-reader"
 
+# PDF generation for export functionality [https://github.com/prawnpdf/prawn]
+gem "prawn"
+gem "prawn-table"
+
+# Calendar export functionality [https://github.com/icalendar/icalendar]
+gem "icalendar"
+
+# CSV export functionality (required for Ruby 3.4+)
+gem "csv"
+
 # Redis for advanced caching and rate limiting [https://github.com/redis/redis-rb]
 gem "redis", "~> 5.0"
 

@@ -52,7 +52,7 @@ class ContentGeneratorBase
 
   def initialize(attributes = {})
     super(attributes)
-    @ai_service ||= AiServiceFactory.create
+    @ai_service = attributes[:ai_service] || AiServiceFactory.create
     validate_configuration!
   end
 
