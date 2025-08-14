@@ -39,6 +39,119 @@ class JourneyTemplate < ApplicationRecord
     journey
   end
 
+  # Template customization methods
+  def clone_template(new_name:, campaign_type: nil, is_default: false)
+    cloned_data = template_data.deep_dup
+    
+    self.class.create!(
+      name: new_name,
+      description: description,
+      campaign_type: campaign_type || self.campaign_type,
+      template_data: cloned_data,
+      is_default: is_default
+    )
+  end
+
+  def customize_stages(new_stages)
+    updated_data = template_data.deep_dup
+    updated_data['stages'] = new_stages
+    
+    # Update step stages to match if they reference old stages
+    if updated_data['steps']
+      updated_data['steps'].each do |step|
+        if step['stage'] && !new_stages.include?(step['stage'])
+          # Assign to first stage if current stage doesn't exist
+          step['stage'] = new_stages.first
+        end
+      end
+    end
+    
+    update!(template_data: updated_data)
+  end
+
+  def add_step(step_data, position: nil)
+    updated_data = template_data.deep_dup
+    updated_data['steps'] ||= []
+    
+    if position && position < updated_data['steps'].length
+      updated_data['steps'].insert(position, step_data)
+    else
+      updated_data['steps'] << step_data
+    end
+    
+    update!(template_data: updated_data)
+  end
+
+  def remove_step(step_index)
+    updated_data = template_data.deep_dup
+    return false unless updated_data['steps'] && step_index < updated_data['steps'].length
+    
+    updated_data['steps'].delete_at(step_index)
+    update!(template_data: updated_data)
+  end
+
+  def reorder_steps(new_order)
+    updated_data = template_data.deep_dup
+    return false unless updated_data['steps'] && new_order.length == updated_data['steps'].length
+    
+    reordered_steps = new_order.map { |index| updated_data['steps'][index] }
+    updated_data['steps'] = reordered_steps
+    
+    update!(template_data: updated_data)
+  end
+
+  def substitute_content_type(from_type, to_type)
+    updated_data = template_data.deep_dup
+    return false unless updated_data['steps']
+    
+    updated_data['steps'].each do |step|
+      if step.dig('content', 'type') == from_type
+        step['content']['type'] = to_type
+      end
+    end
+    
+    update!(template_data: updated_data)
+  end
+
+  def substitute_channel(from_channel, to_channel)
+    updated_data = template_data.deep_dup
+    return false unless updated_data['steps']
+    
+    updated_data['steps'].each do |step|
+      if step['channel'] == from_channel
+        step['channel'] = to_channel
+      end
+    end
+    
+    update!(template_data: updated_data)
+  end
+
+  def get_steps_by_stage(stage_name)
+    return [] unless template_data['steps']
+    
+    template_data['steps'].select { |step| step['stage'] == stage_name }
+  end
+
+  def get_timeline
+    template_data.dig('metadata', 'timeline')
+  end
+
+  def get_key_metrics
+    template_data.dig('metadata', 'key_metrics') || []
+  end
+
+  def get_target_audience
+    template_data.dig('metadata', 'target_audience')
+  end
+
+  def update_metadata(metadata_updates)
+    updated_data = template_data.deep_dup
+    updated_data['metadata'] ||= {}
+    updated_data['metadata'].merge!(metadata_updates)
+    
+    update!(template_data: updated_data)
+  end
+
   private
 
   def only_one_default_per_campaign_type
