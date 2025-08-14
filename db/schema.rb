@@ -10,7 +10,54 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_22_152743) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_14_205910) do
+  create_table "journey_steps", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.string "title", null: false
+    t.text "description"
+    t.string "step_type", null: false
+    t.text "content"
+    t.string "channel"
+    t.integer "sequence_order", default: 0, null: false
+    t.text "settings"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel"], name: "index_journey_steps_on_channel"
+    t.index ["journey_id", "sequence_order"], name: "index_journey_steps_on_journey_id_and_sequence_order", unique: true
+    t.index ["journey_id"], name: "index_journey_steps_on_journey_id"
+    t.index ["step_type"], name: "index_journey_steps_on_step_type"
+  end
+
+  create_table "journey_templates", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "campaign_type", null: false
+    t.text "template_data", null: false
+    t.boolean "is_default", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_type", "is_default"], name: "index_journey_templates_on_campaign_type_and_is_default"
+    t.index ["name"], name: "index_journey_templates_on_name", unique: true
+  end
+
+  create_table "journeys", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "campaign_type", null: false
+    t.integer "user_id", null: false
+    t.text "stages"
+    t.string "status", default: "draft", null: false
+    t.string "template_type"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_type"], name: "index_journeys_on_campaign_type"
+    t.index ["status"], name: "index_journeys_on_status"
+    t.index ["template_type"], name: "index_journeys_on_template_type"
+    t.index ["user_id", "name"], name: "index_journeys_on_user_id_and_name"
+    t.index ["user_id"], name: "index_journeys_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -28,5 +75,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_22_152743) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "journey_steps", "journeys"
+  add_foreign_key "journeys", "users"
   add_foreign_key "sessions", "users"
 end

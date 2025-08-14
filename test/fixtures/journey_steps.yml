@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+awareness_step_one:
+  journey: awareness_journey
+  title: "Welcome Email"
+  description: "Initial welcome email to new subscribers"
+  step_type: "email"
+  content: "Welcome to our brand! Here's what to expect..."
+  channel: "email"
+  sequence_order: 0
+  settings: '{}'
+
+awareness_step_two:
+  journey: awareness_journey
+  title: "Educational Content"
+  description: "Share educational content about our industry"
+  step_type: "content_piece"
+  content: "Learn about the latest trends in..."
+  channel: "blog"
+  sequence_order: 1
+  settings: '{}'
+
+conversion_step_one:
+  journey: conversion_journey
+  title: "Product Demo"
+  description: "Product demonstration webinar"
+  step_type: "webinar"
+  content: "Join us for an exclusive product demo..."
+  channel: "webinar"
+  sequence_order: 0
+  settings: '{}'

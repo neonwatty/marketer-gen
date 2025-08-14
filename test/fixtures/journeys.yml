@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+awareness_journey:
+  name: "Brand Awareness Journey"
+  description: "Journey to build brand awareness"
+  campaign_type: "awareness"
+  user: one
+  stages: '["discovery", "education", "engagement"]'
+  status: "draft"
+  template_type: "email"
+  metadata: '{}'
+
+conversion_journey:
+  name: "Product Conversion Journey"
+  description: "Journey to convert prospects to customers"
+  campaign_type: "conversion"
+  user: one
+  stages: '["decision", "purchase", "onboarding"]'
+  status: "active"
+  template_type: "social_media"
+  metadata: '{}'

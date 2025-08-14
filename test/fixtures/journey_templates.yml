@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+awareness_template:
+  name: "Awareness Campaign Template"
+  description: "Template for awareness campaigns"
+  campaign_type: "awareness"
+  template_data: '{"stages": ["discovery", "education", "engagement"], "steps": []}'
+  is_default: true
+
+conversion_template:
+  name: "Conversion Campaign Template"
+  description: "Template for conversion campaigns"
+  campaign_type: "conversion"
+  template_data: '{"stages": ["decision", "purchase", "onboarding"], "steps": []}'
+  is_default: true

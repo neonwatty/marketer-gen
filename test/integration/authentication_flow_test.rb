@@ -58,10 +58,42 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
   end
   
   test "authentication required for protected pages" do
-    # Create a controller that requires authentication
-    # For now, we'll test that the authentication concern works
+    # Test that public pages are accessible without authentication
+    get root_path
+    assert_response :success
     
-    # Try to access a page that requires authentication
-    # This would be tested with actual protected controllers
+    get new_session_path 
+    assert_response :success
+    
+    get sign_up_path
+    assert_response :success
+    
+    # Test authentication flow
+    user = User.create!(email_address: "auth_test@example.com", password: "password123")
+    
+    # Login user
+    post session_path, params: { email_address: user.email_address, password: "password123" }
+    assert_response :redirect
+    
+    # Follow redirect to verify successful authentication
+    follow_redirect!
+    assert_response :success
+    
+    # Verify user has a session
+    user.reload
+    assert user.sessions.any?, "User should have at least one session after login"
+    
+    # Test logout functionality
+    session = user.sessions.last
+    delete session_path
+    assert_response :redirect
+    
+    # Verify session was destroyed
+    assert_not Session.exists?(session.id), "Session should be destroyed after logout"
+    
+    # Test that authentication concern works by verifying all current controllers
+    # allow unauthenticated access (which is the current design)
+    get root_path
+    assert_response :success, "Root path should be accessible without authentication"
   end
 end

@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": "1",
+        "id": 1,
         "title": "Guided Customer Journey Builder",
         "description": "Develop the core journey builder functionality that allows marketers to define customer journeys and automatically suggests appropriate journey steps.",
         "details": "Create a system that enables marketers to identify campaign purpose and automatically suggests journey steps through stages like Awareness, Consideration, Conversion, and Retention. Include pre-built journey templates for different campaign types and support for multiple journeys per brand or persona.",
@@ -10,10 +10,67 @@
         "status": "pending",
         "priority": "high",
         "dependencies": [],
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Journey Model and Database Schema",
+            "description": "Create the foundational Journey model with database migrations to store customer journey data including stages, steps, templates, and metadata.",
+            "dependencies": [],
+            "details": "Create a Journey model with fields for name, description, campaign_type, user_id (foreign key), stages (json/text), status, template_type, and metadata. Create migration files and establish relationships with User model. Include validations for required fields and proper associations. Set up proper indexes for performance.",
+            "status": "done",
+            "testStrategy": "Unit tests for Journey model validations, associations with User model, and database constraints. Test journey creation, updates, and deletion scenarios."
+          },
+          {
+            "id": 2,
+            "title": "Build Journey Template System",
+            "description": "Implement pre-built journey templates for different campaign types with customizable stages and steps.",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "Create a JourneyTemplate class or module that defines standard templates for Product Launch, Lead Generation, Re-Engagement, and Brand Awareness campaigns. Each template should include predefined stages (Awareness, Consideration, Conversion, Retention) with suggested content types and channels. Store templates as YAML/JSON configuration files or database records. Implement template loading and customization functionality.",
+            "status": "pending",
+            "testStrategy": "Test template loading, template customization, and template application to new journeys. Validate that templates contain appropriate stages and content suggestions for each campaign type."
+          },
+          {
+            "id": 3,
+            "title": "Develop Journey Builder Interface",
+            "description": "Create the web interface for building and editing customer journeys with drag-and-drop functionality and stage management.",
+            "dependencies": [
+              "1.1",
+              "1.2"
+            ],
+            "details": "Build a Rails controller (JourneysController) with CRUD actions for journey management. Create views for journey creation, editing, and listing. Implement a JavaScript-enhanced interface using Stimulus controllers for interactive journey building. Include forms for adding/editing journey steps, stage management, and template selection. Use Tailwind CSS for responsive design consistent with existing application styling.",
+            "status": "pending",
+            "testStrategy": "Integration tests for journey CRUD operations, controller tests for proper authorization and validation, and system tests for the complete journey creation workflow. Test responsive design and JavaScript interactions."
+          },
+          {
+            "id": 4,
+            "title": "Implement AI-Powered Journey Suggestions",
+            "description": "Build the AI suggestion engine that recommends appropriate journey steps based on campaign purpose and customer stage.",
+            "dependencies": [
+              "1.1",
+              "1.2"
+            ],
+            "details": "Create a JourneySuggestionService that analyzes campaign objectives and suggests relevant journey steps, content types, and channels for each stage. Implement logic to recommend touchpoints based on industry best practices and user input. Include fallback suggestions when AI services are unavailable. Design the service to be extensible for future AI/ML integrations while starting with rule-based logic.",
+            "status": "pending",
+            "testStrategy": "Unit tests for suggestion logic, test various campaign types and stages, validate suggestion quality and relevance. Test fallback scenarios and edge cases. Mock external AI services if implemented."
+          },
+          {
+            "id": 5,
+            "title": "Add Multi-Journey Management and Analytics",
+            "description": "Implement features for managing multiple journeys per user with basic analytics and journey comparison capabilities.",
+            "dependencies": [
+              "1.1",
+              "1.3"
+            ],
+            "details": "Extend the journeys system to support multiple journeys per user with proper organization and filtering. Create a dashboard view showing all user journeys with status, creation dates, and basic metrics. Implement journey duplication, archiving, and comparison features. Add basic analytics like journey completion tracking and step performance. Include search and filtering capabilities for journey management.",
+            "status": "pending",
+            "testStrategy": "Test multi-journey creation and management, dashboard functionality, journey duplication and archiving. Validate analytics accuracy and performance with multiple journeys. Test search and filtering features."
+          }
+        ]
       },
       {
-        "id": "2",
+        "id": 2,
         "title": "Brand Identity & Messaging Integration",
         "description": "Build the brand identity system that processes uploaded materials and ensures generated content adheres to brand guidelines.",
         "details": "Develop file upload and processing system for brand guidelines, compliance documents, messaging playbooks, creative assets, and external links. Create AI processing to extract brand voice, tone, restrictions, and rules. Implement messaging framework definition tools.",
@@ -24,7 +81,7 @@
         "subtasks": []
       },
       {
-        "id": "3",
+        "id": 3,
         "title": "LLM Integration for Content Generation",
         "description": "Integrate LLM capabilities for intelligent content generation and campaign planning throughout the platform.",
         "details": "Implement LLM integration for campaign intake conversations, content generation for different channels, brand-aware content creation, and strategic planning. Ensure the LLM can process brand guidelines and generate compliant content. Documentation: https://platform.openai.com/docs/api-reference, https://anthropic.com/api, https://www.langchain.com/",
@@ -34,7 +91,7 @@
         "dependencies": [],
         "subtasks": [
           {
-            "id": "3.1",
+            "id": 1,
             "title": "LLM Provider Integration & Configuration",
             "description": "Set up integration with multiple LLM providers and configure API connections.",
             "details": "Integrate OpenAI GPT-4, Anthropic Claude, and other LLM providers. Implement API key management, rate limiting, and fallback mechanisms. Create provider abstraction layer for easy switching. Documentation: https://platform.openai.com/docs/api-reference, https://anthropic.com/api, https://github.com/vercel/ai",
@@ -42,7 +99,7 @@
             "priority": "high"
           },
           {
-            "id": "3.2",
+            "id": 2,
             "title": "Prompt Engineering & Template System",
             "description": "Develop comprehensive prompt engineering system for different content types and use cases.",
             "details": "Create prompt templates for social media posts, email sequences, ad copy, and landing pages. Implement dynamic prompt generation based on brand guidelines and campaign context. Documentation: https://www.promptingguide.ai/, https://github.com/promptslab/Promptify",
@@ -50,7 +107,7 @@
             "priority": "high"
           },
           {
-            "id": "3.3",
+            "id": 3,
             "title": "Brand-Aware Content Generation",
             "description": "Implement content generation that respects brand guidelines and voice consistency.",
             "details": "Create brand analysis system that extracts voice, tone, and style from uploaded materials. Implement content filtering and validation against brand rules. Documentation: https://www.langchain.com/docs/use_cases/autonomous_agents/, https://github.com/langchain-ai/langchain",
@@ -58,7 +115,7 @@
             "priority": "high"
           },
           {
-            "id": "3.4",
+            "id": 4,
             "title": "Conversational Campaign Intake",
             "description": "Build conversational interface for gathering campaign requirements and context.",
             "details": "Create chat-based interface for campaign intake, using LLM to guide users through requirements gathering. Implement conversation memory and context management. Documentation: https://github.com/vercel/ai-sdk, https://www.langchain.com/docs/use_cases/chatbots/",
@@ -66,7 +123,7 @@
             "priority": "medium"
           },
           {
-            "id": "3.5",
+            "id": 5,
             "title": "Content Optimization & A/B Testing",
             "description": "Implement LLM-powered content optimization and A/B testing suggestions.",
             "details": "Create system for generating content variants, analyzing performance data, and suggesting optimizations. Implement statistical analysis for A/B test results. Documentation: https://www.optimizely.com/optimization-glossary/ab-testing/, https://github.com/facebookexperimental/Recoil",
@@ -74,7 +131,7 @@
             "priority": "medium"
           },
           {
-            "id": "3.6",
+            "id": 6,
             "title": "Multi-Channel Content Adaptation",
             "description": "Develop content adaptation system for different marketing channels and formats.",
             "details": "Create channel-specific content generators for social media, email, ads, and landing pages. Implement format optimization and character limit handling. Documentation: https://buffer.com/library/social-media-content-ideas/, https://mailchimp.com/resources/email-marketing-guide/",
@@ -82,7 +139,7 @@
             "priority": "medium"
           },
           {
-            "id": "3.7",
+            "id": 7,
             "title": "Content Quality Assurance",
             "description": "Implement content quality checks and compliance validation.",
             "details": "Create automated content review system with grammar checking, brand compliance validation, and content scoring. Implement human-in-the-loop review workflows. Documentation: https://www.grammarly.com/developer, https://github.com/errata-ai/vale",
@@ -90,7 +147,7 @@
             "priority": "medium"
           },
           {
-            "id": "3.8",
+            "id": 8,
             "title": "Performance Analytics & Learning",
             "description": "Build system for tracking content performance and improving LLM responses.",
             "details": "Create feedback loop system that tracks content performance and uses data to improve future generations. Implement A/B testing for prompt effectiveness. Documentation: https://mixpanel.com/docs/tracking/how-tos/track-user-actions/, https://amplitude.com/docs/",
@@ -100,50 +157,59 @@
         ]
       },
       {
-        "id": "4",
+        "id": 4,
         "title": "Campaign Summary Plan Generator",
         "description": "Create the campaign summary plan feature that generates comprehensive plans before content creation.",
         "details": "Develop a system that generates structured campaign plans showing what content will be created, where it will appear, and why these decisions were made. Include strategic rationale and creative approach threading through all assets.",
         "testStrategy": "Test plan generation accuracy, stakeholder alignment features, and plan revision capabilities. Validate that plans provide clear guidance for content creation.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["2", "3"],
+        "dependencies": [
+          "2",
+          "3"
+        ],
         "subtasks": []
       },
       {
-        "id": "5",
+        "id": 5,
         "title": "Content Management & Version Control",
         "description": "Build the content management system with version control and editing capabilities.",
         "details": "Create a system for managing generated content, supporting revision and regeneration, format variants, and content approval workflows. Include version tracking and content retirement planning.",
         "testStrategy": "Test content creation, editing, versioning, and approval workflows. Validate that content variants work correctly and version control maintains content history.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["3"],
+        "dependencies": [
+          "3"
+        ],
         "subtasks": []
       },
       {
-        "id": "6",
+        "id": 6,
         "title": "A/B Testing Workflow System",
         "description": "Implement A/B testing capabilities for content optimization and performance tracking.",
         "details": "Create A/B testing workflow that allows users to generate variants, define test goals, track performance, and receive AI-powered recommendations for optimization.",
         "testStrategy": "Test variant generation, performance tracking, statistical analysis, and recommendation accuracy. Validate that A/B testing provides actionable insights.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["4"],
+        "dependencies": [
+          "4"
+        ],
         "subtasks": []
       },
       {
-        "id": "7",
+        "id": 7,
         "title": "Performance Monitoring & Analytics Dashboard",
         "description": "Develop the performance monitoring system with integrations and analytics dashboard.",
         "details": "Create integrations with marketing platforms (Meta, Google Ads, LinkedIn, etc.) and enterprise tools (Salesforce, HubSpot, Marketo). Build analytics dashboard for tracking impressions, CTR, engagement, and conversions. Documentation: https://developers.facebook.com/docs/marketing-api/, https://developers.google.com/google-ads/api/docs/start, https://developer.linkedin.com/docs",
         "testStrategy": "Test platform integrations, data accuracy, dashboard functionality, and real-time updates. Validate that analytics provide meaningful insights for campaign optimization.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["4"],
+        "dependencies": [
+          "4"
+        ],
         "subtasks": [
           {
-            "id": "7.1",
+            "id": 1,
             "title": "Social Media Platform Integrations",
             "description": "Integrate with major social media platforms for data collection and campaign management.",
             "details": "Connect to Facebook Ads, Instagram, LinkedIn, Twitter, and TikTok APIs. Implement data collection for impressions, engagement, clicks, and conversions. Documentation: https://developers.facebook.com/docs/marketing-api/, https://developer.linkedin.com/docs, https://developer.twitter.com/en/docs",
@@ -151,7 +217,7 @@
             "priority": "high"
           },
           {
-            "id": "7.2",
+            "id": 2,
             "title": "Google Ads & Search Integration",
             "description": "Integrate with Google Ads and Google Analytics for comprehensive campaign tracking.",
             "details": "Connect to Google Ads API for campaign data, Google Analytics for website tracking, and Google Search Console for SEO metrics. Documentation: https://developers.google.com/google-ads/api/docs/start, https://developers.google.com/analytics/devguides/reporting/data/v1",
@@ -159,7 +225,7 @@
             "priority": "high"
           },
           {
-            "id": "7.3",
+            "id": 3,
             "title": "Email Marketing Platform Integration",
             "description": "Integrate with email marketing platforms for campaign performance tracking.",
             "details": "Connect to Mailchimp, Constant Contact, SendGrid, and other email platforms. Track open rates, click rates, and conversion metrics. Documentation: https://mailchimp.com/developer/, https://sendgrid.com/docs/for-developers/",
@@ -167,7 +233,7 @@
             "priority": "medium"
           },
           {
-            "id": "7.4",
+            "id": 4,
             "title": "CRM & Marketing Automation Integration",
             "description": "Integrate with CRM and marketing automation platforms for lead tracking.",
             "details": "Connect to Salesforce, HubSpot, Marketo, and Pardot. Track lead generation, conversion rates, and customer journey analytics. Documentation: https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/, https://developers.hubspot.com/docs/api",
@@ -175,7 +241,7 @@
             "priority": "medium"
           },
           {
-            "id": "7.5",
+            "id": 5,
             "title": "Real-Time Analytics Dashboard",
             "description": "Build real-time analytics dashboard with interactive charts and metrics.",
             "details": "Create dashboard with real-time data visualization, interactive charts, and drill-down capabilities. Implement data aggregation and performance alerts using shadcn/ui components via the shadcn MCP server for consistent UI design.",
@@ -183,7 +249,7 @@
             "priority": "high"
           },
           {
-            "id": "7.6",
+            "id": 6,
             "title": "Data Pipeline & ETL Processing",
             "description": "Implement data pipeline for processing and storing analytics data.",
             "details": "Create ETL processes for data transformation, data warehousing, and real-time streaming. Implement data validation and error handling. Documentation: https://www.getdbt.com/, https://airflow.apache.org/, https://kafka.apache.org/",
@@ -191,7 +257,7 @@
             "priority": "medium"
           },
           {
-            "id": "7.7",
+            "id": 7,
             "title": "Performance Alerts & Notifications",
             "description": "Implement automated alerts and notifications for campaign performance.",
             "details": "Create alert system for performance thresholds, anomaly detection, and automated reporting. Implement email and in-app notifications. Documentation: https://nodemailer.com/about/, https://sendgrid.com/docs/for-developers/sending-email/",
@@ -199,7 +265,7 @@
             "priority": "medium"
           },
           {
-            "id": "7.8",
+            "id": 8,
             "title": "Custom Reporting & Export",
             "description": "Build custom reporting system with export capabilities.",
             "details": "Create custom report builder, scheduled reports, and export functionality for PDF, Excel, and CSV formats. Documentation: https://www.npmjs.com/package/jspdf, https://www.npmjs.com/package/xlsx",
@@ -209,39 +275,49 @@
         ]
       },
       {
-        "id": "8",
+        "id": 8,
         "title": "Team Collaboration & Approval Workflows",
         "description": "Implement collaboration features for team-based campaign creation and approval processes.",
         "details": "Build features for sharing content drafts, assigning review roles, setting approval checkpoints, and exporting materials for wider teams. Include stakeholder review and feedback collection.",
         "testStrategy": "Test collaboration workflows, approval processes, role assignments, and export functionality. Validate that team collaboration improves campaign quality and stakeholder alignment.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["1", "5"],
+        "dependencies": [
+          "1",
+          "5"
+        ],
         "subtasks": []
       },
       {
-        "id": "9",
+        "id": 9,
         "title": "Export & Integration System",
         "description": "Create export functionality and platform integrations for seamless campaign deployment.",
         "details": "Develop one-click export for campaign materials, integration with CMS platforms, email marketing tools, social media platforms, and marketing automation systems. Include scheduling and rollout capabilities.",
         "testStrategy": "Test export formats, platform integrations, scheduling accuracy, and deployment reliability. Validate that exports work correctly across different platforms and formats.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["5", "7"],
+        "dependencies": [
+          "5",
+          "7"
+        ],
         "subtasks": []
       },
       {
-        "id": "10",
+        "id": 10,
         "title": "User Interface & Dashboard Design",
         "description": "Design and implement the main user interface with intuitive dashboard and campaign management tools.",
         "details": "Create an intuitive dashboard for campaign management, visual journey builder with drag-and-drop functionality, content preview and editing capabilities, and performance analytics display. Use shadcn/ui components via the shadcn MCP server for consistent UI design.",
         "testStrategy": "Test user interface usability, dashboard functionality, journey builder interactions, and content editing capabilities. Validate that the UI supports efficient campaign creation workflows.",
         "status": "pending",
         "priority": "high",
-        "dependencies": ["1", "2", "4"],
+        "dependencies": [
+          "1",
+          "2",
+          "4"
+        ],
         "subtasks": [
           {
-            "id": "10.1",
+            "id": 1,
             "title": "Main Dashboard & Navigation",
             "description": "Design and implement the main dashboard with navigation and overview components.",
             "details": "Create responsive dashboard with campaign overview, quick actions, recent activity, and navigation menu. Implement breadcrumbs, search functionality, and user notifications using shadcn/ui components via the shadcn MCP server.",
@@ -249,7 +325,7 @@
             "priority": "high"
           },
           {
-            "id": "10.2",
+            "id": 2,
             "title": "Visual Journey Builder",
             "description": "Build drag-and-drop journey builder with visual campaign flow creation.",
             "details": "Create interactive journey builder with drag-and-drop nodes, connection lines, and stage configuration. Implement journey templates, validation, and export capabilities using shadcn/ui components via the shadcn MCP server for UI elements.",
@@ -257,7 +333,7 @@
             "priority": "high"
           },
           {
-            "id": "10.3",
+            "id": 3,
             "title": "Content Editor & Preview",
             "description": "Implement rich content editor with live preview and formatting tools.",
             "details": "Create WYSIWYG content editor with formatting options, media upload, and live preview. Implement content templates and version comparison using shadcn/ui components via the shadcn MCP server for UI elements.",
@@ -265,7 +341,7 @@
             "priority": "high"
           },
           {
-            "id": "10.4",
+            "id": 4,
             "title": "Analytics Dashboard & Charts",
             "description": "Build analytics dashboard with interactive charts and performance metrics.",
             "details": "Create interactive charts for campaign performance, engagement metrics, and conversion tracking. Implement real-time data updates and drill-down capabilities using shadcn/ui components via the shadcn MCP server for consistent UI design.",
@@ -273,7 +349,7 @@
             "priority": "medium"
           },
           {
-            "id": "10.5",
+            "id": 5,
             "title": "Campaign Management Interface",
             "description": "Design campaign management interface with list views and detailed forms.",
             "details": "Create campaign list view with filtering, sorting, and bulk actions. Implement detailed campaign forms with validation and auto-save using shadcn/ui components via the shadcn MCP server.",
@@ -281,7 +357,7 @@
             "priority": "medium"
           },
           {
-            "id": "10.6",
+            "id": 6,
             "title": "Responsive Design & Mobile UI",
             "description": "Ensure responsive design and mobile-optimized user interface.",
             "details": "Implement responsive design patterns, mobile navigation, touch-friendly interactions, and progressive web app features using shadcn/ui components via the shadcn MCP server for consistent responsive design.",
@@ -289,7 +365,7 @@
             "priority": "medium"
           },
           {
-            "id": "10.7",
+            "id": 7,
             "title": "Theme System & Branding",
             "description": "Implement theme system for consistent branding and customization.",
             "details": "Create theme system with color palettes, typography, and component styling. Implement dark mode, brand customization, and accessibility features using shadcn/ui theming system via the shadcn MCP server.",
@@ -297,7 +373,7 @@
             "priority": "low"
           },
           {
-            "id": "10.8",
+            "id": 8,
             "title": "User Experience Optimization",
             "description": "Optimize user experience with loading states, error handling, and feedback.",
             "details": "Implement loading skeletons, error boundaries, toast notifications, and user feedback mechanisms. Create smooth transitions and micro-interactions using shadcn/ui components via the shadcn MCP server.",
@@ -307,176 +383,196 @@
         ]
       },
       {
-        "id": "11",
+        "id": 11,
         "title": "Template System & Journey Frameworks",
         "description": "Develop the template system for pre-built journey frameworks and campaign structures.",
         "details": "Create a comprehensive template system with journey templates for different campaign types (Product Launch, Lead Gen Funnel, Re-Engagement, etc.), customizable frameworks, and industry-specific templates.",
         "testStrategy": "Test template creation, customization capabilities, template effectiveness, and industry-specific adaptations. Validate that templates provide solid starting points for campaign creation.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["2"],
+        "dependencies": [
+          "2"
+        ],
         "subtasks": []
       },
       {
-        "id": "12",
+        "id": 12,
         "title": "Persona Tailoring & Audience Segmentation",
         "description": "Implement persona-based content adaptation and audience segmentation features.",
         "details": "Create functionality for duplicating and adapting content for different personas, adjusting tone and language, and optimizing channel emphasis based on audience characteristics.",
         "testStrategy": "Test persona creation, content adaptation accuracy, tone adjustment, and channel optimization. Validate that persona-specific content performs better than generic content.",
         "status": "pending",
         "priority": "low",
-        "dependencies": ["6"],
+        "dependencies": [
+          "6"
+        ],
         "subtasks": []
       },
       {
-        "id": "13",
+        "id": 13,
         "title": "Security & Compliance Framework",
         "description": "Implement comprehensive security measures and compliance features for enterprise use.",
         "details": "Develop data security protocols, privacy controls, compliance monitoring, audit trails, and enterprise-grade security features for handling sensitive marketing data and brand information.",
         "testStrategy": "Test security measures, compliance monitoring, data protection, and audit trail accuracy. Validate that the platform meets enterprise security and compliance requirements.",
         "status": "pending",
         "priority": "high",
-        "dependencies": ["1", "3"],
+        "dependencies": [
+          "1",
+          "3"
+        ],
         "subtasks": []
       },
       {
-        "id": "14",
+        "id": 14,
         "title": "API Development & Third-Party Integrations",
         "description": "Create comprehensive API for third-party integrations and platform extensibility.",
         "details": "Develop RESTful APIs for platform integration, webhook support, third-party tool connections, and developer documentation for extending platform capabilities.",
         "testStrategy": "Test API functionality, integration reliability, webhook delivery, and developer experience. Validate that APIs support seamless integration with external tools and platforms.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["8", "10"],
+        "dependencies": [
+          "8",
+          "10"
+        ],
         "subtasks": []
       },
       {
-        "id": "15",
+        "id": 15,
         "title": "Mobile Responsiveness & Accessibility",
         "description": "Ensure the platform is fully responsive and accessible across all devices and users.",
         "details": "Implement mobile-responsive design, accessibility features (WCAG compliance), cross-browser compatibility, and responsive content editing capabilities.",
         "testStrategy": "Test mobile responsiveness, accessibility compliance, cross-browser functionality, and responsive design across different screen sizes and devices.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["11"],
+        "dependencies": [
+          "11"
+        ],
         "subtasks": []
       },
       {
-        "id": "16",
+        "id": 16,
         "title": "Performance Optimization & Scalability",
         "description": "Optimize platform performance and ensure scalability for enterprise-level usage.",
         "details": "Implement performance optimization, caching strategies, database optimization, load balancing, and scalability features to handle high-volume usage and large enterprise deployments.",
         "testStrategy": "Test performance under load, scalability limits, response times, and resource utilization. Validate that the platform can handle enterprise-scale usage efficiently.",
         "status": "pending",
         "priority": "medium",
-        "dependencies": ["15"],
+        "dependencies": [
+          "15"
+        ],
         "subtasks": []
       },
       {
-        "id": "17",
+        "id": 17,
         "title": "Documentation & User Training Materials",
         "description": "Create comprehensive documentation and training materials for users and administrators.",
         "details": "Develop user guides, video tutorials, best practices documentation, API documentation, and training materials for different user roles and use cases.",
         "testStrategy": "Test documentation clarity, tutorial effectiveness, and user comprehension. Validate that documentation supports successful platform adoption and usage.",
         "status": "pending",
         "priority": "low",
-        "dependencies": ["11"],
+        "dependencies": [
+          "11"
+        ],
         "subtasks": []
       },
       {
-        "id": "18",
+        "id": 18,
         "title": "Quality Assurance & Testing Framework",
         "description": "Establish comprehensive testing framework and quality assurance processes.",
         "details": "Implement automated testing, manual testing protocols, quality assurance processes, bug tracking, and continuous integration/deployment pipelines for reliable software delivery.",
         "testStrategy": "Test automated testing coverage, manual testing effectiveness, bug tracking accuracy, and CI/CD pipeline reliability. Validate that the testing framework ensures high-quality software delivery.",
         "status": "pending",
         "priority": "high",
-        "dependencies": ["1"],
+        "dependencies": [
+          "1"
+        ],
         "subtasks": []
       },
       {
-        "id": "19",
+        "id": 19,
         "title": "Deployment & Infrastructure Setup",
         "description": "Set up production deployment infrastructure and operational processes.",
         "details": "Configure production servers, database setup, monitoring systems, backup procedures, disaster recovery plans, and operational processes for reliable platform operation.",
         "testStrategy": "Test deployment processes, monitoring effectiveness, backup reliability, and disaster recovery procedures. Validate that the infrastructure supports reliable platform operation.",
         "status": "pending",
         "priority": "high",
-        "dependencies": ["17"],
+        "dependencies": [
+          "17"
+        ],
         "subtasks": []
       },
       {
-      "id": "20",
-      "title": "User Authentication & Account Management System",
-      "description": "Design and implement the core user authentication and account management system for the AI-driven content generation platform using Ruby on Rails 8.",
-      "details": "This should include user registration, login, profile management, and role-based access control for different user types (marketers, team members, administrators). The system should leverage Rails 8's built-in authentication generator, which provides secure authentication out of the box without external gems. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session, https://edgeguides.rubyonrails.org/authentication.html",
-      "testStrategy": "Unit tests for authentication flows using RSpec, integration tests for user management, security testing for access controls, and user acceptance testing for the complete registration/login experience.",
-      "status": "pending",
-      "priority": "high",
-      "dependencies": [],
-      "subtasks": [
-        {
-          "id": "20.1",
-          "title": "Rails 8 Built-in Authentication Setup",
-          "description": "Set up Rails 8's built-in authentication system for user management.",
-          "details": "Generate authentication using 'rails generate authentication', which creates User model, authentication controllers, views, and database migrations. Configure authentication routes and implement basic registration/login functionality. Rails 8's authentication generator includes secure password handling, session management, and CSRF protection out of the box. Documentation: https://edgeguides.rubyonrails.org/authentication.html, https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session",
-          "status": "pending",
-          "priority": "high"
-        },
-        {
-          "id": "20.2",
-          "title": "Role-Based Access Control with Pundit",
-          "description": "Implement role-based access control using Pundit gem for authorization.",
-          "details": "Integrate Pundit gem for authorization, create user roles (marketer, team member, admin), implement policy classes for different resources, and add authorization checks to controllers and views. Documentation: https://github.com/varvet/pundit, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
-          "status": "pending",
-          "priority": "high"
-        },
-        {
-          "id": "20.3",
-          "title": "Password Reset & Account Recovery",
-          "description": "Implement password reset functionality with email delivery using Rails 8.",
-          "details": "Build password reset functionality using Rails 8's authentication system, set up Action Mailer for email delivery, create password reset tokens and forms, and implement account recovery options. Use Rails 8's built-in rate limiting for security. Documentation: https://guides.rubyonrails.org/action_mailer_basics.html, https://guides.rubyonrails.org/security.html#password-management",
-          "status": "pending",
-          "priority": "medium"
-        },
-        {
-          "id": "20.4",
-          "title": "User Profile Management with Active Storage",
-          "description": "Build user profile management using Rails Active Storage for file uploads.",
-          "details": "Create user profile pages with avatar upload using Active Storage, personal information management, notification preferences, and account settings. Implement profile data validation using Rails validations. Documentation: https://guides.rubyonrails.org/active_storage_overview.html, https://guides.rubyonrails.org/active_record_validations.html",
-          "status": "pending",
-          "priority": "medium"
-        },
-        {
-          "id": "20.5",
-          "title": "Session Management & Security with Rails 8",
-          "description": "Implement secure session management using Rails 8's built-in security features.",
-          "details": "Configure Rails 8's session management, implement secure cookie handling, CSRF protection, and security headers. Use Rails 8's built-in rate limiting and request throttling. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session",
-          "status": "pending",
-          "priority": "high"
-        },
-        {
-          "id": "20.7",
-          "title": "User Activity Monitoring with Rails Logging",
-          "description": "Implement user activity tracking using Rails logging and custom audit trails.",
-          "details": "Create activity logs using Rails logging, implement user action tracking, suspicious activity detection, and automated alerts. Use Rails 8's built-in logging and monitoring capabilities. Documentation: https://guides.rubyonrails.org/debugging_rails_applications.html#log-files, https://guides.rubyonrails.org/action_controller_overview.html#filters",
-          "status": "pending",
-          "priority": "low"
-        },
-        {
-          "id": "20.8",
-          "title": "Admin User Management with Rails Admin",
-          "description": "Build admin interface using Rails Admin gem for user management and system administration.",
-          "details": "Integrate Rails Admin gem for admin dashboard, create user management interface, role assignment functionality, account suspension capabilities, and system monitoring. Implement audit trails for admin actions. Documentation: https://github.com/sferik/rails_admin, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
-          "status": "pending",
-          "priority": "medium"
+        "id": 20,
+        "title": "User Authentication & Account Management System",
+        "description": "Design and implement the core user authentication and account management system for the AI-driven content generation platform using Ruby on Rails 8.",
+        "details": "This should include user registration, login, profile management, and role-based access control for different user types (marketers, team members, administrators). The system should leverage Rails 8's built-in authentication generator, which provides secure authentication out of the box without external gems. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session, https://edgeguides.rubyonrails.org/authentication.html",
+        "testStrategy": "Unit tests for authentication flows using RSpec, integration tests for user management, security testing for access controls, and user acceptance testing for the complete registration/login experience.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Rails 8 Built-in Authentication Setup",
+            "description": "Set up Rails 8's built-in authentication system for user management.",
+            "details": "Generate authentication using 'rails generate authentication', which creates User model, authentication controllers, views, and database migrations. Configure authentication routes and implement basic registration/login functionality. Rails 8's authentication generator includes secure password handling, session management, and CSRF protection out of the box. Documentation: https://edgeguides.rubyonrails.org/authentication.html, https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session",
+            "status": "pending",
+            "priority": "high"
+          },
+          {
+            "id": 2,
+            "title": "Role-Based Access Control with Pundit",
+            "description": "Implement role-based access control using Pundit gem for authorization.",
+            "details": "Integrate Pundit gem for authorization, create user roles (marketer, team member, admin), implement policy classes for different resources, and add authorization checks to controllers and views. Documentation: https://github.com/varvet/pundit, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
+            "status": "pending",
+            "priority": "high"
+          },
+          {
+            "id": 3,
+            "title": "Password Reset & Account Recovery",
+            "description": "Implement password reset functionality with email delivery using Rails 8.",
+            "details": "Build password reset functionality using Rails 8's authentication system, set up Action Mailer for email delivery, create password reset tokens and forms, and implement account recovery options. Use Rails 8's built-in rate limiting for security. Documentation: https://guides.rubyonrails.org/action_mailer_basics.html, https://guides.rubyonrails.org/security.html#password-management",
+            "status": "pending",
+            "priority": "medium"
+          },
+          {
+            "id": 4,
+            "title": "User Profile Management with Active Storage",
+            "description": "Build user profile management using Rails Active Storage for file uploads.",
+            "details": "Create user profile pages with avatar upload using Active Storage, personal information management, notification preferences, and account settings. Implement profile data validation using Rails validations. Documentation: https://guides.rubyonrails.org/active_storage_overview.html, https://guides.rubyonrails.org/active_record_validations.html",
+            "status": "pending",
+            "priority": "medium"
+          },
+          {
+            "id": 5,
+            "title": "Session Management & Security with Rails 8",
+            "description": "Implement secure session management using Rails 8's built-in security features.",
+            "details": "Configure Rails 8's session management, implement secure cookie handling, CSRF protection, and security headers. Use Rails 8's built-in rate limiting and request throttling. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session",
+            "status": "pending",
+            "priority": "high"
+          },
+          {
+            "id": 7,
+            "title": "User Activity Monitoring with Rails Logging",
+            "description": "Implement user activity tracking using Rails logging and custom audit trails.",
+            "details": "Create activity logs using Rails logging, implement user action tracking, suspicious activity detection, and automated alerts. Use Rails 8's built-in logging and monitoring capabilities. Documentation: https://guides.rubyonrails.org/debugging_rails_applications.html#log-files, https://guides.rubyonrails.org/action_controller_overview.html#filters",
+            "status": "pending",
+            "priority": "low"
+          },
+          {
+            "id": 8,
+            "title": "Admin User Management with Rails Admin",
+            "description": "Build admin interface using Rails Admin gem for user management and system administration.",
+            "details": "Integrate Rails Admin gem for admin dashboard, create user management interface, role assignment functionality, account suspension capabilities, and system monitoring. Implement audit trails for admin actions. Documentation: https://github.com/sferik/rails_admin, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
+            "status": "pending",
+            "priority": "medium"
           }
         ]
       }
     ],
     "metadata": {
       "created": "2025-07-22T14:53:58.395Z",
-      "updated": "2025-07-22T14:53:58.395Z",
+      "updated": "2025-08-14T21:04:04.783Z",
       "description": "Tasks for master context"
     }
   }
