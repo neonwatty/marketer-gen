@@ -3,848 +3,180 @@
     "tasks": [
       {
         "id": 1,
-        "title": "Initialize Next.js Project with TypeScript and Essential Dependencies",
-        "description": "Set up the foundational Next.js application with TypeScript, configure essential packages, and establish the basic project structure",
-        "details": "Initialize Next.js project using `create-next-app@latest` with TypeScript and App Router. Install core dependencies: @shadcn/ui, @radix-ui components, tailwindcss, lucide-react for icons, class-variance-authority for component variants, and clsx for conditional classes. Configure TypeScript with strict mode, set up Tailwind CSS with shadcn/ui integration, and create initial folder structure following Next.js 13+ app directory conventions (app/, components/, lib/, types/, utils/). Set up shadcn/ui configuration and install initial components (Button, Input, Card, Dialog).",
-        "testStrategy": "Verify project builds successfully with `npm run build`, TypeScript compilation passes without errors, Tailwind CSS is properly configured, and shadcn/ui components can be imported and rendered without issues.",
+        "title": "Initialize Next.js Project with Core Dependencies",
+        "description": "Set up the foundational Next.js application with TypeScript, Shadcn UI, and essential development tools",
+        "details": "Create Next.js 14+ project with TypeScript, install and configure Shadcn UI components, set up ESLint/Prettier, configure Tailwind CSS, and establish basic project structure with src/app directory. Install dependencies: @shadcn/ui, @radix-ui components, class-variance-authority, clsx, tailwind-merge. Use Context7 MCP server for Shadcn component implementation guidance.",
+        "testStrategy": "Verify project builds successfully, TypeScript compilation works, Shadcn components render correctly, and development server starts without errors. Test basic component rendering and styling.",
         "priority": "high",
         "dependencies": [],
         "status": "pending",
         "subtasks": [
           {
             "id": 1,
-            "title": "Initialize Next.js Project with TypeScript and App Router",
-            "description": "Run create-next-app command with TypeScript configuration and App Router setup",
+            "title": "Create Next.js Application with TypeScript and App Router",
+            "description": "Initialize a new Next.js 14+ project using create-next-app with TypeScript support and App Router configuration",
             "dependencies": [],
-            "details": "Execute `npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\"` to initialize the Next.js project with TypeScript, Tailwind CSS, ESLint, App Router, src directory structure, and import alias configuration. Verify the project structure is created correctly with app/ directory and TypeScript configuration files.",
+            "details": "Run `npx create-next-app@latest marketer-gen-nextjs --typescript --app --tailwind --eslint` with the following options: TypeScript: Yes, ESLint: Yes, Tailwind CSS: Yes, src/ directory: Yes, App Router: Yes, import alias: @/*. Verify the project structure is created correctly with app directory and TypeScript configuration files (tsconfig.json, next-env.d.ts). Ensure package.json includes necessary scripts for dev, build, and start commands.",
             "status": "pending",
-            "testStrategy": ""
+            "testStrategy": "After project creation, run 'next build' to verify successful compilation, 'npm run typecheck' (or 'npx tsc --noEmit') to ensure TypeScript compilation works without errors, and 'npm run dev' to confirm development server starts successfully on localhost:3000. Validate presence of essential configuration files: tsconfig.json, next.config.js, package.json, and tailwind.config.js. Confirm package.json contains required scripts: 'dev', 'build', 'start', and 'lint'. Set up Jest or Vitest for automated validation tests including file existence checks and configuration validation."
           },
           {
             "id": 2,
-            "title": "Install and Configure Tailwind CSS with Custom Theme",
-            "description": "Set up Tailwind CSS configuration with custom theme settings and optimization",
+            "title": "Configure Tailwind CSS with Custom Theme Settings",
+            "description": "Set up Tailwind CSS configuration with custom theme colors, fonts, and utility classes for the marketing platform design system",
             "dependencies": [
               "1.1"
             ],
-            "details": "Configure tailwind.config.js with custom color palette, typography settings, and component-specific utilities. Set up CSS variables for theming, configure content paths for proper purging, and add custom utility classes. Ensure Tailwind CSS is properly integrated with the Next.js build system and verify hot reloading works correctly.",
+            "details": "Update tailwind.config.ts to include custom color palette for brand colors, configure font families (Inter for UI, system fonts fallback), set up animation utilities, and configure content paths. Add CSS variables in globals.css for dynamic theming support. Configure dark mode class strategy. Set up custom breakpoints if needed. Install additional Tailwind plugins: @tailwindcss/typography for content formatting, @tailwindcss/forms for form styling.",
             "status": "pending",
-            "testStrategy": ""
+            "testStrategy": "Verify Tailwind CSS configuration by testing custom theme compilation with 'npm run build', validate custom color variables are properly defined in tailwind.config.ts and accessible via CSS utilities, test responsive breakpoints work correctly, verify custom font loading and application, validate that Tailwind plugins (@tailwindcss/typography, @tailwindcss/forms) are installed and functioning. Create component tests to verify Tailwind classes are applied correctly and dark mode functionality works as expected."
           },
           {
             "id": 3,
-            "title": "Set up Shadcn UI with Initial Component Installation",
-            "description": "Install and configure shadcn/ui with core components needed for the application",
+            "title": "Install and Configure Shadcn UI with Initial Components",
+            "description": "Set up shadcn/ui component library and install essential components for the MVP interface",
             "dependencies": [
               "1.2"
             ],
-            "details": "Run `npx shadcn-ui@latest init` to set up shadcn/ui configuration. Install essential dependencies: class-variance-authority, clsx, tailwind-merge, @radix-ui/react-icons, lucide-react. Install initial shadcn/ui components: Button, Card, Input, Dialog, Textarea, Select, Progress, Tabs, and Navigation Menu. Configure components.json and verify component imports work correctly.",
+            "details": "Run `npx shadcn-ui@latest init` to initialize shadcn/ui with default configuration. Install core components using CLI: Button, Card, Input, Dialog, Form, Label, Textarea, Select, Tabs, Badge, Alert, and Skeleton. Configure components.json with correct paths and styling preferences. Install required dependencies: @radix-ui primitives, class-variance-authority, clsx, tailwind-merge. Create lib/utils.ts with cn() helper function. Verify component imports and rendering with a test component.",
             "status": "pending",
-            "testStrategy": ""
+            "testStrategy": "Verify Shadcn UI initialization with 'npx shadcn-ui@latest init' completes successfully, test that components.json configuration file is created with correct settings, validate all required dependencies (@radix-ui primitives, class-variance-authority, clsx, tailwind-merge) are installed and properly versioned. Test component installations by running CLI commands for each component and verifying files are created in correct paths. Create snapshot tests using Jest/Vitest for each installed component to verify correct rendering, test component imports and ensure no TypeScript errors. Validate cn() utility function works correctly and components render with proper styling."
           },
           {
             "id": 4,
-            "title": "Create Base Folder Structure and TypeScript Configuration",
-            "description": "Establish the foundational folder structure and configure TypeScript with strict mode",
+            "title": "Establish Project Structure and Development Configuration",
+            "description": "Create organized folder structure and configure development tools for code quality and consistency",
             "dependencies": [
               "1.3"
             ],
-            "details": "Create organized folder structure: components/ (ui/, forms/, layout/), lib/ (utils/, db/, constants/), types/ (index.ts, api.ts), utils/ (helpers/, formatters/), and hooks/ directories. Configure TypeScript with strict mode enabled, set up path mapping in tsconfig.json, create index files for clean imports, and establish naming conventions. Add initial TypeScript interfaces for common data structures.",
+            "details": "Create directory structure: src/components (ui/, layouts/, features/), src/lib (utils/, constants/, types/), src/app (api/, (routes)/), src/hooks, src/services. Configure ESLint with Next.js recommended rules and add custom rules for import ordering. Set up Prettier with .prettierrc for consistent formatting (2 spaces, single quotes, trailing commas). Create .env.local template file for environment variables. Add .vscode/settings.json for workspace configuration. Create initial TypeScript type definitions in types/index.ts. Set up path aliases in tsconfig.json for clean imports.",
             "status": "pending",
-            "testStrategy": ""
+            "testStrategy": "Create comprehensive test suite to validate project structure setup. Directory validation tests: write Node.js script to check existence of all required folders (src/components with ui/, layouts/, features/ subdirectories; src/lib with utils/, constants/, types/; src/app with api/, (routes)/; src/hooks; src/services). ESLint validation: execute 'npm run lint' command and parse output to ensure zero configuration errors, verify custom import ordering rules are active. Prettier testing: run 'npm run format' or 'npx prettier --check .' to validate formatting configuration applies correctly. TypeScript path alias verification: create test imports using '@/' aliases to verify tsconfig.json configuration works. Environment setup validation: verify .env.local template exists and environment variable loading works in Next.js development mode. Integration test suite: create end-to-end test that sets up a sample component using the established structure, imports, and styling to verify complete development environment functionality."
           }
         ]
       },
       {
         "id": 2,
-        "title": "Configure Database Schema with Prisma ORM",
-        "description": "Design and implement the complete database schema using Prisma ORM to support campaigns, journeys, brand assets, and content management",
-        "details": "Install Prisma ORM and configure with SQLite for development (easily switchable to PostgreSQL for production). Design comprehensive schema including: User model (deferred auth but structure ready), Brand model (guidelines, assets, messaging), Campaign model (goals, status, metadata), Journey model (stages, templates), Content model (generated assets, versions, approvals), Template model (journey templates, content templates), and Analytics model (performance tracking). Set up Prisma Client, configure connection strings, and create initial migration. Establish relationships between models with proper foreign keys and constraints.",
-        "testStrategy": "Run `npx prisma generate` and `npx prisma migrate dev` successfully, verify all models are created with correct relationships, test Prisma Client connection and basic CRUD operations, and ensure schema supports all PRD requirements.",
+        "title": "Database Schema Design and Prisma Setup",
+        "description": "Design and implement database schema for campaigns, journeys, content, brands, and user data using Prisma ORM",
+        "details": "Install Prisma ORM, design schema models for: Campaign (id, name, purpose, goals, status, createdAt), Journey (id, campaignId, stages, templates), Brand (id, name, guidelines, assets, messaging), Content (id, journeyId, type, content, status, variants), ContentTemplate (id, type, template, category). Configure PostgreSQL as primary database with fallback to SQLite for development. Generate Prisma client and set up database connection.",
+        "testStrategy": "Verify schema migration succeeds, Prisma client generates correctly, database connections work, and basic CRUD operations function properly. Test with sample data insertion and retrieval.",
         "priority": "high",
         "dependencies": [
           1
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Install and Configure Prisma with SQLite",
-            "description": "Set up Prisma ORM in the project and configure SQLite database connection for development",
-            "dependencies": [],
-            "details": "Install Prisma CLI and client packages, initialize Prisma in the project, configure database connection string for SQLite in .env file, set up Prisma schema file with basic configuration, and ensure connection is working properly",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Design and Implement Core Models (User, Brand, Campaign)",
-            "description": "Create the foundational database models for User, Brand, and Campaign with proper relationships",
-            "dependencies": [
-              "2.1"
-            ],
-            "details": "Define User model with placeholder structure for future auth integration, create Brand model with fields for guidelines, assets, and messaging, implement Campaign model with goals, status, and metadata fields, establish relationships between User-Brand and Brand-Campaign with proper foreign keys and constraints",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Create Journey, Content, and Template Models",
-            "description": "Implement the content management and journey workflow models with associations",
-            "dependencies": [
-              "2.2"
-            ],
-            "details": "Design Journey model with stages and template references, create Content model for generated assets with version tracking and approval states, implement Template model for both journey and content templates, establish proper relationships between Campaign-Journey, Journey-Content, and Template associations",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Implement Analytics Model and Tracking Relationships",
-            "description": "Create the analytics and performance tracking model with connections to all relevant entities",
-            "dependencies": [
-              "2.3"
-            ],
-            "details": "Design Analytics model with performance metrics and tracking data, create relationships to Campaign, Journey, and Content models for comprehensive tracking, implement fields for engagement metrics, conversion data, and performance indicators, ensure proper indexing for query performance",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Run Migration and Create Seed Data",
-            "description": "Execute initial database migration and create test seed data for development",
-            "dependencies": [
-              "2.4"
-            ],
-            "details": "Run initial Prisma migration to create all database tables, generate Prisma Client for database access, create comprehensive seed data including sample brands, campaigns, journeys, and content for testing purposes, verify all relationships work correctly with seed data",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       },
       {
         "id": 3,
-        "title": "Implement Core UI Components and Layout System",
-        "description": "Create the foundational UI components and layout system using Shadcn UI components with consistent design patterns",
-        "details": "Build responsive layout with header navigation, sidebar, and main content area. Create reusable components: DashboardLayout (main app shell), StepperNavigation (for guided flows), ContentCard (for displaying generated content), FileUpload (drag-and-drop for brand assets), ProgressBar (campaign progress), and FormWrapper (consistent form styling). Implement shadcn/ui components: Navigation Menu, Tabs, Progress, Card, Button variants, Input variations, Textarea, Select, and Dialog. Set up consistent spacing, typography, and color scheme following modern design principles. Create component library structure with proper TypeScript interfaces.",
-        "testStrategy": "Verify all components render correctly across different screen sizes, test keyboard navigation and accessibility features, ensure consistent styling matches design system, and validate TypeScript interfaces for all component props.",
-        "priority": "high",
+        "title": "Authentication System Setup (Deferred Implementation)",
+        "description": "Prepare authentication infrastructure without active implementation to maintain MVP accessibility",
+        "details": "Install NextAuth.js or similar authentication library but keep authentication middleware disabled. Set up user model in database schema, create auth configuration files, and prepare login/signup components without enforcing authentication. Create placeholder user context and session management structure that can be easily activated later.",
+        "testStrategy": "Verify auth dependencies install correctly, placeholder components render, and app remains accessible without authentication. Test that auth infrastructure doesn't interfere with MVP functionality.",
+        "priority": "low",
         "dependencies": [
           1
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create Main Layout Shell with Responsive Navigation",
-            "description": "Build the foundational DashboardLayout component with responsive header navigation and sidebar structure",
-            "dependencies": [],
-            "details": "Implement main app shell using shadcn/ui Navigation Menu component. Create responsive header with mobile hamburger menu, collapsible sidebar navigation, and main content area. Set up proper responsive breakpoints and ensure layout adapts to different screen sizes. Include basic routing structure and active state handling for navigation items.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Build Form Components with Validation",
-            "description": "Create FormWrapper component and standardized form field variations with validation support",
-            "dependencies": [
-              "3.1"
-            ],
-            "details": "Implement FormWrapper component using shadcn/ui form components including Input variations, Textarea, and Select. Add form validation using React Hook Form or similar. Create consistent form styling patterns, error state handling, and accessibility features. Build reusable form field components with proper TypeScript interfaces and validation schemas.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Implement File Upload Component with Drag-and-Drop",
-            "description": "Create FileUpload component with drag-and-drop functionality and file preview capabilities",
-            "dependencies": [
-              "3.1"
-            ],
-            "details": "Build drag-and-drop file upload component for brand assets using react-dropzone or similar. Implement file type validation, size limits, and preview functionality for images and documents. Add progress indicators for upload states, error handling for failed uploads, and integration with file storage solution. Ensure accessibility compliance and mobile-friendly interface.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Create Data Display Components",
-            "description": "Build ContentCard and ProgressBar components for displaying generated content and campaign progress",
-            "dependencies": [
-              "3.1"
-            ],
-            "details": "Implement ContentCard component using shadcn/ui Card for displaying marketing content with actions and metadata. Create ProgressBar component using shadcn/ui Progress for showing campaign completion status. Add proper loading states, empty states, and interactive features. Ensure components are flexible and reusable across different contexts.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Build Navigation Components",
-            "description": "Create StepperNavigation component and enhance Tabs functionality for guided user flows",
-            "dependencies": [
-              "3.2"
-            ],
-            "details": "Implement StepperNavigation component for multi-step workflows using shadcn/ui components. Enhance Tabs component with custom styling and state management. Add step validation, progress indication, and navigation controls. Ensure components work seamlessly with form validation and provide clear user guidance through complex flows.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Set Up Consistent Theming and Typography System",
-            "description": "Establish design system with CSS variables, typography, and consistent styling patterns",
-            "dependencies": [
-              "3.2",
-              "3.3",
-              "3.4",
-              "3.5"
-            ],
-            "details": "Configure shadcn/ui theming with custom CSS variables for colors, spacing, and typography. Set up consistent design tokens and component variants. Implement proper TypeScript interfaces for theme configuration. Create style guide documentation and ensure all components follow consistent design patterns. Add dark mode support and responsive typography scaling.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       },
       {
         "id": 4,
-        "title": "Build Campaign Dashboard and Management Interface",
-        "description": "Create the main dashboard where users can view, create, and manage their marketing campaigns with intuitive navigation",
-        "details": "Implement comprehensive campaign dashboard with campaign overview cards showing status, progress, and key metrics. Create campaign creation wizard with step-by-step guidance, campaign listing with filtering and search capabilities, and detailed campaign view with journey visualization. Build campaign status management (draft, active, paused, completed), bulk operations for multiple campaigns, and recent activity feed. Integrate with Prisma for data persistence and implement optimistic UI updates. Use shadcn/ui Data Table component for campaign listing, Card components for campaign overview, and Dialog components for quick actions.",
-        "testStrategy": "Test campaign CRUD operations work correctly, verify dashboard loads quickly with proper loading states, validate filtering and search functionality, ensure responsive design works on mobile devices, and test data persistence with database.",
+        "title": "Journey Template System and Builder Interface",
+        "description": "Create customer journey builder with pre-built templates for different campaign types and visual drag-and-drop interface",
+        "details": "Build journey template database with predefined templates (Product Launch, Lead Gen Funnel, Re-Engagement). Create visual journey builder using React Flow or similar library. Implement journey stages (Awareness, Consideration, Conversion, Retention) with customizable content types and messaging suggestions. Use Shadcn UI components for forms, modals, and interactive elements. Store journey configurations in database with versioning.",
+        "testStrategy": "Test template loading, journey customization, drag-and-drop functionality, stage configuration, and data persistence. Verify journey builder works across different screen sizes and template types load correctly.",
         "priority": "high",
         "dependencies": [
-          2,
-          3
+          2
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create main dashboard layout with routing and navigation",
-            "description": "Implement the main dashboard page structure with proper routing setup and navigation between different campaign views",
-            "dependencies": [],
-            "details": "Set up Next.js routing for dashboard pages, create main layout component with sidebar navigation, implement breadcrumb navigation, and establish the overall dashboard structure with proper responsive design using shadcn/ui components",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Build campaign overview cards with status indicators and metrics display",
-            "description": "Create campaign overview cards showing key campaign information, status, and performance metrics",
-            "dependencies": [
-              "4.1"
-            ],
-            "details": "Implement campaign card components using shadcn/ui Card components, display campaign status with visual indicators (draft, active, paused, completed), show key metrics like budget, timeline, and performance data, and create responsive grid layout for campaign cards",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Implement campaign listing with DataTable including filters and search",
-            "description": "Build comprehensive campaign listing view using shadcn/ui DataTable with advanced filtering and search capabilities",
-            "dependencies": [
-              "4.1"
-            ],
-            "details": "Integrate shadcn/ui DataTable component for campaign listing, implement search functionality across campaign fields, add filtering by status, date range, and campaign type, create sortable columns for key metrics, and add pagination for large campaign lists",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Create campaign creation wizard with multi-step form validation",
-            "description": "Build step-by-step campaign creation wizard with form validation and progress tracking",
-            "dependencies": [
-              "4.1"
-            ],
-            "details": "Implement multi-step form wizard using shadcn/ui components, add form validation for each step using react-hook-form, create progress indicator for wizard steps, implement data persistence between steps, and add campaign template selection functionality",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Build detailed campaign view with journey visualization component",
-            "description": "Create detailed campaign view page with visual journey mapping and campaign information display",
-            "dependencies": [
-              "4.2"
-            ],
-            "details": "Implement detailed campaign page layout, create journey visualization component showing campaign stages and flow, display comprehensive campaign information and settings, add edit capabilities for campaign details, and implement campaign status management controls",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Implement campaign CRUD operations with Prisma integration",
-            "description": "Build all Create, Read, Update, Delete operations for campaigns with database integration",
-            "dependencies": [
-              "4.3",
-              "4.4"
-            ],
-            "details": "Create API routes for campaign CRUD operations, integrate with Prisma ORM for data persistence, implement campaign creation with proper data validation, add campaign update and deletion functionality, and ensure proper error handling and data consistency",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 7,
-            "title": "Add optimistic UI updates and loading states throughout",
-            "description": "Implement optimistic UI updates and comprehensive loading states for better user experience",
-            "dependencies": [
-              "4.5",
-              "4.6"
-            ],
-            "details": "Add loading skeletons for campaign cards and tables, implement optimistic updates for campaign status changes, create loading states for campaign creation and editing, add error boundaries and error handling UI, and ensure smooth transitions between different states",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       },
       {
         "id": 5,
-        "title": "Implement Guided Customer Journey Builder",
-        "description": "Create an interactive journey builder that guides users through defining customer touchpoints and campaign stages",
-        "details": "Build visual journey builder with drag-and-drop functionality using React DnD or similar. Implement predefined journey templates (Product Launch, Lead Generation, Re-engagement, Brand Awareness) with customizable stages (Awareness, Consideration, Conversion, Retention). Create stage configuration panels with content type suggestions, channel recommendations, and messaging guidance. Build template selection interface with preview capabilities, journey validation to ensure logical flow, and export functionality for journey summaries. Integrate AI suggestions for stage optimization and content recommendations using placeholder API structure (ready for LLM integration).",
-        "testStrategy": "Verify drag-and-drop functionality works smoothly, test journey template loading and customization, validate stage configuration saves correctly, ensure journey visualization renders properly on different devices, and test journey export formats.",
+        "title": "Brand Identity Management System",
+        "description": "Implement brand guidelines upload, processing, and integration system for content generation consistency",
+        "details": "Create file upload system supporting multiple formats (PDF, DOCX, images, links). Implement brand profile management with fields for voice, tone, messaging frameworks, brand pillars, compliance rules. Build brand asset library with categorization and tagging. Create brand guideline parser to extract key information for AI content generation. Use Shadcn UI file upload components and data tables for management interface.",
+        "testStrategy": "Test file upload functionality, brand profile creation/editing, asset organization, guideline parsing accuracy, and brand data retrieval for content generation. Verify file handling security and storage.",
         "priority": "high",
         "dependencies": [
-          3,
-          4
+          2
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Set up React DnD foundation for drag-and-drop functionality",
-            "description": "Install and configure React DnD or @dnd-kit library with basic drag-and-drop providers and context setup",
-            "dependencies": [],
-            "details": "Install @dnd-kit/core, @dnd-kit/sortable, and @dnd-kit/utilities. Set up DndContext provider in the journey builder component. Create basic draggable and droppable components for testing. Configure collision detection and drag overlay functionality.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Create journey canvas component with stage rendering",
-            "description": "Build the main canvas area where journey stages are displayed and connected visually",
-            "dependencies": [
-              "5.1"
-            ],
-            "details": "Create JourneyCanvas component with stage positioning logic. Implement stage cards with connection lines between stages. Add zoom and pan functionality for large journeys. Create stage connection indicators and flow arrows.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Build journey templates system with selection interface",
-            "description": "Create predefined journey templates and template selection UI with preview capabilities",
-            "dependencies": [
-              "5.2"
-            ],
-            "details": "Define template data structure for Product Launch, Lead Generation, Re-engagement, and Brand Awareness journeys. Create TemplateSelector component with template previews. Implement template loading and instantiation logic. Add template customization options.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Implement stage configuration panels with form inputs",
-            "description": "Create detailed configuration panels for each journey stage type with content suggestions and channel recommendations",
-            "dependencies": [
-              "5.2"
-            ],
-            "details": "Build StageConfigPanel component with dynamic forms based on stage type. Implement content type suggestions, channel recommendations, and messaging guidance. Create reusable form components for stage settings. Add stage-specific validation rules.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Create journey validation logic and error handling",
-            "description": "Implement validation system to ensure logical journey flow and provide helpful error messages",
-            "dependencies": [
-              "5.3",
-              "5.4"
-            ],
-            "details": "Build journey validation engine checking for required stages, logical flow, and configuration completeness. Implement error display system with contextual messages. Create validation rules for different journey types. Add real-time validation feedback.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Build journey persistence with Prisma integration",
-            "description": "Implement database operations for saving, loading, and managing journey configurations",
-            "dependencies": [
-              "5.5"
-            ],
-            "details": "Create Prisma schema for journey data model including stages, connections, and configurations. Implement CRUD operations for journeys. Add journey versioning and history tracking. Create data serialization for complex journey structures.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 7,
-            "title": "Implement journey export and import functionality",
-            "description": "Create system for exporting journey summaries and importing journey configurations",
-            "dependencies": [
-              "5.6"
-            ],
-            "details": "Build export functionality for PDF summaries, JSON configurations, and visual diagrams. Implement import system for journey templates and configurations. Create export format validation and error handling. Add batch export capabilities.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 8,
-            "title": "Add AI suggestion placeholders with mock data structure",
-            "description": "Create placeholder system for AI-powered stage optimization and content recommendations",
-            "dependencies": [
-              "5.4"
-            ],
-            "details": "Design API structure for AI suggestions integration. Create mock data for stage optimization recommendations and content suggestions. Implement suggestion display components and integration points. Add placeholder loading states and error handling for future LLM integration.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       },
       {
         "id": 6,
-        "title": "Create Brand Asset Management System",
-        "description": "Build a comprehensive system for uploading, processing, and managing brand guidelines, assets, and messaging frameworks",
-        "details": "Implement file upload system with drag-and-drop interface supporting multiple formats (PDF, images, documents). Create brand profile management with sections for brand guidelines, messaging playbooks, creative assets, compliance documents, and tone/voice definitions. Build asset preview functionality with thumbnail generation, file categorization and tagging system, and version control for brand assets. Implement brand validation rules and compliance checking framework (placeholder for AI integration). Create brand asset library with search and filtering, and asset usage tracking across campaigns.",
-        "testStrategy": "Test file upload with various formats and sizes, verify file storage and retrieval works correctly, validate brand profile creation and editing, ensure asset preview functionality works across different file types, and test search and filtering performance.",
-        "priority": "medium",
+        "title": "LLM Integration and Content Generation Engine",
+        "description": "Integrate Large Language Model APIs for automated content creation across multiple channels and formats",
+        "details": "Integrate OpenAI GPT-4 or Anthropic Claude APIs for content generation. Create content generation templates for social media posts, ads, email sequences, landing page copy, and video scripts. Implement brand-aware prompting system using uploaded brand guidelines. Build content variation generation (short/long-form, promotional/educational). Create content approval workflow with revision and regeneration capabilities. Handle API rate limiting and error handling.",
+        "testStrategy": "Test content generation across different types and formats, brand guideline adherence, content variation quality, API error handling, and generation speed. Verify content meets brand standards and campaign objectives.",
+        "priority": "high",
         "dependencies": [
-          2,
-          3
+          4,
+          5
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Implement File Upload System with Drag-and-Drop Interface",
-            "description": "Create a robust file upload component supporting multiple formats (PDF, images, documents) with drag-and-drop functionality using react-dropzone",
-            "dependencies": [],
-            "details": "Install and configure react-dropzone library. Build FileUpload component with drag-and-drop zone, file validation for supported formats (PDF, JPG, PNG, DOCX, etc.), progress indicators for uploads, and error handling for invalid files or upload failures. Implement file size limits and format restrictions. Add visual feedback for drag states and upload progress.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Create Brand Profile Management Interface",
-            "description": "Build comprehensive brand profile management with sectioned forms for organizing brand guidelines, messaging, and assets",
-            "dependencies": [],
-            "details": "Create BrandProfile component with tabbed sections for brand guidelines, messaging playbooks, creative assets, compliance documents, and tone/voice definitions. Implement form validation and state management for profile data. Build profile creation and editing workflows with save/cancel functionality. Include rich text editing capabilities for brand guidelines and messaging sections.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Build Asset Storage System with File Organization",
-            "description": "Implement backend storage system with proper file organization, metadata management, and database integration",
-            "dependencies": [
-              "6.1"
-            ],
-            "details": "Set up file storage solution (local filesystem or cloud storage). Create asset metadata schema in database including file type, size, upload date, tags, and categorization. Implement file organization structure with folders by brand and asset type. Build API endpoints for asset upload, retrieval, and metadata management. Include file validation and security measures.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Implement Asset Preview with Thumbnail Generation",
-            "description": "Create asset preview functionality with thumbnail generation for different file types and preview capabilities",
-            "dependencies": [
-              "6.3"
-            ],
-            "details": "Implement thumbnail generation for images using Sharp or similar library. Create PDF preview functionality for first page thumbnails. Build document preview for supported formats. Create AssetPreview component with modal view for full-size preview. Implement lazy loading for thumbnails and optimize preview performance. Add fallback previews for unsupported file types.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Create Asset Library UI with Search and Filtering",
-            "description": "Build comprehensive asset library interface with search, filtering, tagging system, and grid/list view options",
-            "dependencies": [
-              "6.4"
-            ],
-            "details": "Create AssetLibrary component with grid and list view modes. Implement search functionality across asset names, tags, and metadata. Build filtering system by file type, upload date, and custom tags. Create tagging interface for adding/removing tags from assets. Implement sorting options (date, name, size, type). Add bulk operations for managing multiple assets.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Add Version Control System for Brand Assets",
-            "description": "Implement version control functionality with asset history tracking, comparison, and rollback capabilities",
-            "dependencies": [
-              "6.5"
-            ],
-            "details": "Create version control schema to track asset versions with timestamps and change descriptions. Implement asset versioning workflow when uploading new versions of existing assets. Build version history interface showing all versions with preview thumbnails. Create version comparison functionality and rollback capabilities. Add version metadata including upload user and change notes. Implement version cleanup policies for managing storage.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       },
       {
         "id": 7,
-        "title": "Develop Content Generation Interface and Management",
-        "description": "Create the interface for AI-powered content generation with editing, approval workflows, and version management",
-        "details": "Build content generation interface with prompt configuration, content type selection (social posts, ads, emails, landing pages, video scripts), and brand context integration. Implement content editor with rich text capabilities using TipTap or similar, version history and comparison tools, approval workflow system with review states, and content variant generation. Create content preview for different channels and formats, bulk content generation for journey stages, and content calendar integration. Set up placeholder API structure for LLM integration with proper error handling and loading states.",
-        "testStrategy": "Test content generation interface with various content types, verify editing functionality works smoothly, validate approval workflow transitions, ensure version history tracking works correctly, and test content export to different formats.",
-        "priority": "high",
+        "title": "Campaign Summary and Planning Dashboard",
+        "description": "Build comprehensive campaign planning interface with automated summary generation and stakeholder-ready outputs",
+        "details": "Create campaign dashboard showing journey overview, content calendar, channel distribution, and strategic rationale. Implement automated campaign summary generation with content mapping, timeline visualization, and resource requirements. Build export functionality for campaign plans, messaging one-pagers, and content calendars. Use Shadcn UI dashboard components, charts, and data visualization tools. Include stakeholder sharing and collaboration features.",
+        "testStrategy": "Test dashboard data accuracy, summary generation quality, export functionality across formats, visualization rendering, and stakeholder sharing capabilities. Verify campaign plans are comprehensive and actionable.",
+        "priority": "medium",
         "dependencies": [
-          5,
           6
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Build content generation form with type selection and configuration",
-            "description": "Create the main content generation interface with content type selection (social posts, ads, emails, landing pages, video scripts) and configuration options for prompts and brand context",
-            "dependencies": [],
-            "details": "Implement content type selector with radio buttons or dropdown, prompt configuration textarea with character limits, brand context integration dropdown, target audience selection, and tone/style options. Include form validation and submission handling with loading states.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Integrate TipTap rich text editor with toolbar customization",
-            "description": "Set up TipTap editor with comprehensive toolbar and editing capabilities for content refinement",
-            "dependencies": [
-              "7.1"
-            ],
-            "details": "Install and configure TipTap editor with extensions for bold, italic, lists, links, and formatting. Create custom toolbar with content-specific options, implement auto-save functionality, and add character counting. Ensure proper TypeScript integration and accessibility support.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Implement version history system with diff visualization",
-            "description": "Create version control system to track content changes with visual diff comparison between versions",
-            "dependencies": [
-              "7.2"
-            ],
-            "details": "Build version storage mechanism using database, implement diff algorithm for content comparison, create version history sidebar with timestamps and change summaries. Add restore functionality and visual diff highlighting with added/removed/modified content indicators.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Create approval workflow with state machine for review stages",
-            "description": "Implement content approval system with defined workflow states and transition controls",
-            "dependencies": [
-              "7.2"
-            ],
-            "details": "Design state machine for approval flow (draft → review → approved → published), create approval interface with review comments, implement role-based permissions for approvers, and add notification system for status changes. Include rejection handling with feedback loops.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Build content preview components for different channels",
-            "description": "Create preview interfaces showing how content will appear across various marketing channels and formats",
-            "dependencies": [
-              "7.2"
-            ],
-            "details": "Implement preview components for social media posts (Facebook, Instagram, Twitter), email templates, ad formats, and landing page sections. Include responsive previews, character limit warnings, and format-specific styling. Add export functionality for each channel format.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Implement bulk generation interface for journey stages",
-            "description": "Create interface for generating multiple content pieces simultaneously for different customer journey stages",
-            "dependencies": [
-              "7.1",
-              "7.4"
-            ],
-            "details": "Build bulk generation form with journey stage selection (awareness, consideration, decision, retention), batch processing interface with progress tracking, and queue management system. Include templates for different stages and bulk approval workflows.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 7,
-            "title": "Set up placeholder LLM API structure with mock responses",
-            "description": "Create API layer structure for future LLM integration with mock data and proper error handling",
-            "dependencies": [],
-            "details": "Design API service layer with TypeScript interfaces for LLM requests/responses, implement mock response system with realistic content generation delays, add comprehensive error handling with user-friendly messages, and create loading states with progress indicators. Include rate limiting simulation and retry logic.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       },
       {
         "id": 8,
-        "title": "Build Campaign Summary and Planning Interface",
-        "description": "Create comprehensive campaign summary views that provide strategic oversight and planning capabilities",
-        "details": "Implement campaign summary dashboard showing complete campaign overview with journey visualization, content breakdown by stage and channel, strategic rationale for decisions, and timeline/calendar view. Create planning interface with budget allocation suggestions, resource requirement calculations, and timeline optimization. Build stakeholder presentation mode with exportable summaries, campaign comparison tools for A/B testing strategies, and integration points for performance data. Implement campaign cloning and template creation from successful campaigns.",
-        "testStrategy": "Verify campaign summaries display accurate information, test export functionality for different formats, validate timeline and calendar calculations, ensure presentation mode renders correctly, and test campaign comparison features.",
+        "title": "Content Management and Version Control System",
+        "description": "Implement content organization, versioning, approval workflows, and collaboration features",
+        "details": "Build content library with search, filtering, and categorization. Implement version control for content iterations with change tracking. Create approval workflow system with reviewer assignment and approval checkpoints. Build collaboration features for team comments, suggestions, and real-time editing. Use Shadcn UI data tables, forms, and modal components for content management interface. Include content status tracking and deadline management.",
+        "testStrategy": "Test content organization, version tracking accuracy, approval workflow functionality, collaboration features, and search capabilities. Verify content history preservation and team collaboration effectiveness.",
         "priority": "medium",
         "dependencies": [
-          4,
-          5,
-          7
+          6
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create Campaign Overview Dashboard with Metrics",
-            "description": "Build the main campaign summary dashboard displaying key metrics, campaign status, and journey visualization",
-            "dependencies": [],
-            "details": "Implement dashboard layout with campaign overview cards showing status, progress, key performance indicators, and journey flow visualization. Create responsive grid layout for metrics display, integrate with campaign data from database, and implement real-time data updates.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Build Timeline and Calendar View Interface",
-            "description": "Implement interactive timeline and calendar components for campaign scheduling and milestone tracking",
-            "dependencies": [
-              "8.1"
-            ],
-            "details": "Create timeline component using FullCalendar or custom React component to display campaign schedules, content deadlines, and key milestones. Implement calendar view with drag-and-drop functionality for rescheduling, filtering options, and integration with campaign data.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Implement Budget Allocation and Resource Planning",
-            "description": "Create budget allocation interface with calculations and resource requirement planning tools",
-            "dependencies": [
-              "8.1"
-            ],
-            "details": "Build budget allocation dashboard with interactive charts, cost calculation engine for different content types and channels, resource requirement estimator, and budget optimization suggestions. Include input forms for budget constraints and automatic allocation algorithms.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Create Stakeholder Presentation Mode",
-            "description": "Build fullscreen presentation mode with exportable summaries for stakeholder meetings",
-            "dependencies": [
-              "8.1",
-              "8.2",
-              "8.3"
-            ],
-            "details": "Implement presentation mode with clean, fullscreen views of campaign summaries, export functionality to PDF/PowerPoint formats, customizable presentation templates, and stakeholder-friendly visualizations with simplified metrics display.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Build Campaign Comparison and A/B Testing Tools",
-            "description": "Create side-by-side campaign comparison interface for analyzing different strategies",
-            "dependencies": [
-              "8.1"
-            ],
-            "details": "Implement campaign comparison dashboard with side-by-side views, performance metrics comparison, A/B testing setup interface, statistical significance calculations, and visual diff tools for comparing campaign elements and strategies.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Implement Campaign Cloning and Template Creation",
-            "description": "Build functionality to clone successful campaigns and create reusable templates",
-            "dependencies": [
-              "8.1",
-              "8.4",
-              "8.5"
-            ],
-            "details": "Create campaign cloning interface with selective element copying, template creation wizard from existing campaigns, template library management, customizable template parameters, and template sharing capabilities for team collaboration.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       },
       {
         "id": 9,
-        "title": "Implement Team Collaboration and Approval Workflows",
-        "description": "Create collaborative features enabling team review, approval processes, and multi-user workflow management",
-        "details": "Build team collaboration interface with user role management (placeholder for future auth integration), content sharing and commenting system, approval workflow engine with customizable review stages, and notification system for workflow events. Implement real-time collaboration features using WebSockets or Server-Sent Events, task assignment and tracking for team members, and audit trail for all changes and approvals. Create team dashboard showing pending approvals and active collaborations, and export capabilities for team reporting.",
-        "testStrategy": "Test collaboration features with multiple user sessions, verify approval workflows function correctly, validate comment and feedback systems, ensure notification delivery works reliably, and test team dashboard accuracy.",
+        "title": "Platform Integration Framework",
+        "description": "Build integration system for marketing platforms, social media, email marketing, and analytics tools",
+        "details": "Create integration framework supporting OAuth connections to major platforms (Meta, Google Ads, LinkedIn, Mailchimp, HubSpot, Salesforce). Implement platform-specific content formatting and publishing capabilities. Build integration management interface with connection status, data sync monitoring, and error handling. Create webhook system for real-time data updates. Use platform APIs for content publishing and performance data retrieval.",
+        "testStrategy": "Test OAuth connections, content publishing to platforms, data synchronization accuracy, error handling for API failures, and integration management interface. Verify platform-specific formatting requirements are met.",
         "priority": "medium",
         "dependencies": [
-          7,
-          8
+          7
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Design Role-Based Access Control System",
-            "description": "Create comprehensive role and permission management system with user role definitions, permission matrix, and access control logic",
-            "dependencies": [],
-            "details": "Define user roles (Admin, Manager, Editor, Viewer) with specific permissions matrix. Implement role assignment interface, permission checking middleware, and role-based UI component visibility. Create placeholder authentication integration points for future auth system connection. Build role management interface for team administrators.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Implement Commenting and Discussion System",
-            "description": "Build comprehensive commenting system with threaded discussions, mentions, and reaction capabilities",
-            "dependencies": [
-              "9.1"
-            ],
-            "details": "Create comment components with thread management, reply functionality, and user mentions. Implement comment persistence with Prisma models, real-time comment updates, and comment moderation features. Add reactions/likes system, comment editing and deletion, and comment filtering/search capabilities.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Build Approval Workflow Engine",
-            "description": "Create configurable approval workflow system with customizable stages, routing rules, and automated transitions",
-            "dependencies": [
-              "9.1"
-            ],
-            "details": "Design workflow configuration interface with drag-and-drop stage builder. Implement workflow state machine, approval routing logic, and stage transition rules. Create approval request generation, reviewer assignment system, and parallel/sequential approval paths. Build workflow templates for common approval processes.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Set Up Real-Time Communication Infrastructure",
-            "description": "Implement WebSocket or Server-Sent Events for real-time collaboration features and live updates",
-            "dependencies": [],
-            "details": "Set up WebSocket server using Socket.io or implement Server-Sent Events for real-time updates. Create connection management, room-based communication for team workspaces, and message broadcasting system. Implement real-time presence indicators, typing indicators, and live cursor sharing for collaborative editing.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Create Notification System",
-            "description": "Build comprehensive notification system with in-app notifications, email placeholders, and notification preferences",
-            "dependencies": [
-              "9.2",
-              "9.3",
-              "9.4"
-            ],
-            "details": "Implement in-app notification center with notification types (mentions, approvals, assignments, updates). Create notification preferences interface, email notification templates (placeholder), and notification delivery system. Build notification history, mark as read functionality, and notification batching to prevent spam.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Implement Comprehensive Audit Trail System",
-            "description": "Create detailed activity logging and audit trail for all collaboration actions and workflow changes",
-            "dependencies": [
-              "9.1"
-            ],
-            "details": "Design audit log data models with comprehensive event tracking (edits, approvals, comments, role changes). Implement activity logging middleware, audit log viewer interface, and filtering/search capabilities. Create audit report generation, data retention policies, and audit log export functionality.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 7,
-            "title": "Build Team Dashboard and Task Management",
-            "description": "Create team dashboard with task assignments, pending approvals, and collaborative workspace overview",
-            "dependencies": [
-              "9.3",
-              "9.5",
-              "9.6"
-            ],
-            "details": "Build team dashboard with pending approval widgets, assigned task overview, and team activity feed. Implement task assignment interface, workload visualization, and team member availability status. Create dashboard customization options, team performance metrics, and collaborative workspace navigation.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 8,
-            "title": "Add Collaboration Analytics and Reporting",
-            "description": "Implement analytics dashboard for team collaboration metrics, workflow performance, and team productivity insights",
-            "dependencies": [
-              "9.6",
-              "9.7"
-            ],
-            "details": "Create collaboration analytics with team productivity metrics, approval workflow performance stats, and collaboration frequency analysis. Build reporting dashboard with customizable date ranges, team comparison charts, and workflow bottleneck identification. Implement export capabilities for team reports and collaboration insights.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       },
       {
         "id": 10,
-        "title": "Create Performance Analytics and Integration Framework",
-        "description": "Build analytics dashboard and prepare integration framework for marketing platform connections and performance tracking",
-        "details": "Implement analytics dashboard with campaign performance metrics visualization using Chart.js or Recharts, integration framework for marketing platforms (placeholder API structure for Meta, Google Ads, LinkedIn, HubSpot, Salesforce), and performance data import/export capabilities. Create A/B testing interface with variant comparison, ROI calculation tools, and optimization recommendations engine. Build reporting system with customizable reports, automated insights generation, and performance alerts. Set up data visualization components for different metric types (engagement, conversion, reach, etc.).",
-        "testStrategy": "Test analytics dashboard with sample data, verify chart rendering and interactivity, validate data import/export functionality, ensure A/B testing calculations are accurate, and test report generation with various data sets.",
+        "title": "Performance Analytics and Optimization Dashboard",
+        "description": "Implement performance tracking, analytics visualization, and AI-driven optimization recommendations",
+        "details": "Build analytics dashboard displaying campaign performance metrics (impressions, CTR, engagement, conversions). Implement data collection from integrated platforms with automated reporting. Create AI-powered optimization suggestion engine analyzing performance patterns. Build A/B testing framework with variant tracking and statistical significance testing. Use Shadcn UI charts and visualization components for analytics display. Include performance alerting and reporting features.",
+        "testStrategy": "Test metrics collection accuracy, dashboard visualization, optimization recommendation quality, A/B testing functionality, and reporting capabilities. Verify analytics data integrity and insight actionability.",
         "priority": "medium",
         "dependencies": [
-          8,
           9
         ],
         "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Set up Chart.js or Recharts with responsive chart components",
-            "description": "Install and configure charting library (Chart.js or Recharts) with responsive chart components for various metric visualizations",
-            "dependencies": [],
-            "details": "Install Chart.js or Recharts library, create base chart components (line, bar, pie, area charts), implement responsive design with proper scaling, add chart configuration options for colors/themes, and create reusable chart wrapper components with error handling and loading states.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 2,
-            "title": "Create metrics dashboard with configurable widgets and layouts",
-            "description": "Build main analytics dashboard with drag-and-drop widget system and customizable layouts for displaying campaign metrics",
-            "dependencies": [
-              "10.1"
-            ],
-            "details": "Implement dashboard grid layout system, create metric widgets (KPI cards, trend charts, comparison charts), build widget configuration panels for customizing displayed metrics, implement drag-and-drop widget repositioning, add dashboard layout persistence, and create preset dashboard templates.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
-            "title": "Build integration framework with adapter pattern for different platforms",
-            "description": "Create extensible integration framework using adapter pattern to support multiple marketing platforms",
-            "dependencies": [],
-            "details": "Design adapter interface for marketing platforms, create placeholder adapters for Meta, Google Ads, LinkedIn, HubSpot, Salesforce, implement integration configuration UI, build data mapping system for different platform metrics, add authentication flow templates, and create integration testing framework.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 4,
-            "title": "Implement A/B testing interface with statistical calculations",
-            "description": "Build A/B testing interface with variant comparison, statistical significance calculations, and test result visualization",
-            "dependencies": [
-              "10.1"
-            ],
-            "details": "Create A/B test setup form with variant configuration, implement statistical significance calculations (confidence intervals, p-values), build variant performance comparison charts, add test duration and sample size calculators, implement winner determination logic, and create test results reporting interface.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 5,
-            "title": "Create custom report builder with drag-and-drop metrics",
-            "description": "Build customizable report builder allowing users to create reports by dragging and dropping different metrics and visualizations",
-            "dependencies": [
-              "10.1",
-              "10.2"
-            ],
-            "details": "Implement drag-and-drop report builder interface, create metric selection panel with available KPIs, build report template system with predefined layouts, add report customization options (date ranges, filters, grouping), implement report preview functionality, and create report saving/sharing capabilities.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 6,
-            "title": "Build data import/export system with CSV/JSON support",
-            "description": "Implement data import/export functionality supporting CSV and JSON formats for campaign performance data",
-            "dependencies": [
-              "10.3"
-            ],
-            "details": "Create file upload interface for data import, implement CSV/JSON parsers with validation, build data mapping interface for column matching, add export functionality with format selection, implement bulk data processing with progress indicators, and create data transformation utilities for different platform formats.",
-            "status": "pending",
-            "testStrategy": ""
-          },
-          {
-            "id": 7,
-            "title": "Implement performance alerts and automated insights engine",
-            "description": "Build automated alert system and insights engine that analyzes performance data and provides optimization recommendations",
-            "dependencies": [
-              "10.2",
-              "10.3"
-            ],
-            "details": "Create alert configuration system with threshold settings, implement automated performance monitoring, build insights generation engine with trend analysis, add recommendation algorithms for optimization suggestions, create alert notification system (email, in-app), and implement insights dashboard with actionable recommendations.",
-            "status": "pending",
-            "testStrategy": ""
-          }
-        ]
+        "subtasks": []
       }
     ],
     "metadata": {
-      "created": "2025-08-09T22:40:56.050Z",
-      "updated": "2025-08-09T22:40:56.050Z",
+      "created": "2025-08-14T21:12:18.479Z",
+      "updated": "2025-08-14T21:12:18.479Z",
       "description": "Tasks for master context"
     }
   }
