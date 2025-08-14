@@ -2,74 +2,6 @@
   "master": {
     "tasks": [
       {
-        "id": "1",
-        "title": "User Authentication & Account Management System",
-        "description": "Design and implement the core user authentication and account management system for the AI-driven content generation platform using Ruby on Rails 8.",
-        "details": "This should include user registration, login, profile management, and role-based access control for different user types (marketers, team members, administrators). The system should leverage Rails 8's built-in authentication generator, which provides secure authentication out of the box without external gems. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session, https://edgeguides.rubyonrails.org/authentication.html",
-        "testStrategy": "Unit tests for authentication flows using RSpec, integration tests for user management, security testing for access controls, and user acceptance testing for the complete registration/login experience.",
-        "status": "pending",
-        "priority": "high",
-        "dependencies": [],
-        "subtasks": [
-          {
-            "id": "1.1",
-            "title": "Rails 8 Built-in Authentication Setup",
-            "description": "Set up Rails 8's built-in authentication system for user management.",
-            "details": "Generate authentication using 'rails generate authentication', which creates User model, authentication controllers, views, and database migrations. Configure authentication routes and implement basic registration/login functionality. Rails 8's authentication generator includes secure password handling, session management, and CSRF protection out of the box. Documentation: https://edgeguides.rubyonrails.org/authentication.html, https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session",
-            "status": "pending",
-            "priority": "high"
-          },
-          {
-            "id": "1.2",
-            "title": "Role-Based Access Control with Pundit",
-            "description": "Implement role-based access control using Pundit gem for authorization.",
-            "details": "Integrate Pundit gem for authorization, create user roles (marketer, team member, admin), implement policy classes for different resources, and add authorization checks to controllers and views. Documentation: https://github.com/varvet/pundit, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
-            "status": "pending",
-            "priority": "high"
-          },
-          {
-            "id": "1.3",
-            "title": "Password Reset & Account Recovery",
-            "description": "Implement password reset functionality with email delivery using Rails 8.",
-            "details": "Build password reset functionality using Rails 8's authentication system, set up Action Mailer for email delivery, create password reset tokens and forms, and implement account recovery options. Use Rails 8's built-in rate limiting for security. Documentation: https://guides.rubyonrails.org/action_mailer_basics.html, https://guides.rubyonrails.org/security.html#password-management",
-            "status": "pending",
-            "priority": "medium"
-          },
-          {
-            "id": "1.4",
-            "title": "User Profile Management with Active Storage",
-            "description": "Build user profile management using Rails Active Storage for file uploads.",
-            "details": "Create user profile pages with avatar upload using Active Storage, personal information management, notification preferences, and account settings. Implement profile data validation using Rails validations. Documentation: https://guides.rubyonrails.org/active_storage_overview.html, https://guides.rubyonrails.org/active_record_validations.html",
-            "status": "pending",
-            "priority": "medium"
-          },
-          {
-            "id": "1.5",
-            "title": "Session Management & Security with Rails 8",
-            "description": "Implement secure session management using Rails 8's built-in security features.",
-            "details": "Configure Rails 8's session management, implement secure cookie handling, CSRF protection, and security headers. Use Rails 8's built-in rate limiting and request throttling. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session",
-            "status": "pending",
-            "priority": "high"
-          },
-          {
-            "id": "1.7",
-            "title": "User Activity Monitoring with Rails Logging",
-            "description": "Implement user activity tracking using Rails logging and custom audit trails.",
-            "details": "Create activity logs using Rails logging, implement user action tracking, suspicious activity detection, and automated alerts. Use Rails 8's built-in logging and monitoring capabilities. Documentation: https://guides.rubyonrails.org/debugging_rails_applications.html#log-files, https://guides.rubyonrails.org/action_controller_overview.html#filters",
-            "status": "pending",
-            "priority": "low"
-          },
-          {
-            "id": "1.8",
-            "title": "Admin User Management with Rails Admin",
-            "description": "Build admin interface using Rails Admin gem for user management and system administration.",
-            "details": "Integrate Rails Admin gem for admin dashboard, create user management interface, role assignment functionality, account suspension capabilities, and system monitoring. Implement audit trails for admin actions. Documentation: https://github.com/sferik/rails_admin, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
-            "status": "pending",
-            "priority": "medium"
-          }
-        ]
-      },
-      {
         "id": "2",
         "title": "Guided Customer Journey Builder",
         "description": "Develop the core journey builder functionality that allows marketers to define customer journeys and automatically suggests appropriate journey steps.",
@@ -246,7 +178,7 @@
             "id": "8.5",
             "title": "Real-Time Analytics Dashboard",
             "description": "Build real-time analytics dashboard with interactive charts and metrics.",
-            "details": "Create dashboard with real-time data visualization, interactive charts, and drill-down capabilities. Implement data aggregation and performance alerts. Documentation: https://recharts.org/, https://www.chartjs.org/, https://d3js.org/",
+            "details": "Create dashboard with real-time data visualization, interactive charts, and drill-down capabilities. Implement data aggregation and performance alerts using shadcn/ui components via the shadcn MCP server for consistent UI design.",
             "status": "pending",
             "priority": "high"
           },
@@ -302,7 +234,7 @@
         "id": "11",
         "title": "User Interface & Dashboard Design",
         "description": "Design and implement the main user interface with intuitive dashboard and campaign management tools.",
-        "details": "Create an intuitive dashboard for campaign management, visual journey builder with drag-and-drop functionality, content preview and editing capabilities, and performance analytics display. Documentation: https://mui.com/material-ui/getting-started/, https://reactflow.dev/, https://recharts.org/",
+        "details": "Create an intuitive dashboard for campaign management, visual journey builder with drag-and-drop functionality, content preview and editing capabilities, and performance analytics display. Use shadcn/ui components via the shadcn MCP server for consistent UI design.",
         "testStrategy": "Test user interface usability, dashboard functionality, journey builder interactions, and content editing capabilities. Validate that the UI supports efficient campaign creation workflows.",
         "status": "pending",
         "priority": "high",
@@ -312,7 +244,7 @@
             "id": "11.1",
             "title": "Main Dashboard & Navigation",
             "description": "Design and implement the main dashboard with navigation and overview components.",
-            "details": "Create responsive dashboard with campaign overview, quick actions, recent activity, and navigation menu. Implement breadcrumbs, search functionality, and user notifications. Documentation: https://mui.com/material-ui/getting-started/, https://reactrouter.com/en/main",
+            "details": "Create responsive dashboard with campaign overview, quick actions, recent activity, and navigation menu. Implement breadcrumbs, search functionality, and user notifications using shadcn/ui components via the shadcn MCP server.",
             "status": "pending",
             "priority": "high"
           },
@@ -320,7 +252,7 @@
             "id": "11.2",
             "title": "Visual Journey Builder",
             "description": "Build drag-and-drop journey builder with visual campaign flow creation.",
-            "details": "Create interactive journey builder with drag-and-drop nodes, connection lines, and stage configuration. Implement journey templates, validation, and export capabilities. Documentation: https://reactflow.dev/, https://d3js.org/, https://react-dnd.github.io/react-dnd/",
+            "details": "Create interactive journey builder with drag-and-drop nodes, connection lines, and stage configuration. Implement journey templates, validation, and export capabilities using shadcn/ui components via the shadcn MCP server for UI elements.",
             "status": "pending",
             "priority": "high"
           },
@@ -328,7 +260,7 @@
             "id": "11.3",
             "title": "Content Editor & Preview",
             "description": "Implement rich content editor with live preview and formatting tools.",
-            "details": "Create WYSIWYG content editor with formatting options, media upload, and live preview. Implement content templates and version comparison. Documentation: https://tiptap.dev/, https://draftjs.org/, https://quilljs.com/",
+            "details": "Create WYSIWYG content editor with formatting options, media upload, and live preview. Implement content templates and version comparison using shadcn/ui components via the shadcn MCP server for UI elements.",
             "status": "pending",
             "priority": "high"
           },
@@ -336,7 +268,7 @@
             "id": "11.4",
             "title": "Analytics Dashboard & Charts",
             "description": "Build analytics dashboard with interactive charts and performance metrics.",
-            "details": "Create interactive charts for campaign performance, engagement metrics, and conversion tracking. Implement real-time data updates and drill-down capabilities. Documentation: https://recharts.org/, https://nivo.rocks/, https://www.chartjs.org/",
+            "details": "Create interactive charts for campaign performance, engagement metrics, and conversion tracking. Implement real-time data updates and drill-down capabilities using shadcn/ui components via the shadcn MCP server for consistent UI design.",
             "status": "pending",
             "priority": "medium"
           },
@@ -344,7 +276,7 @@
             "id": "11.5",
             "title": "Campaign Management Interface",
             "description": "Design campaign management interface with list views and detailed forms.",
-            "details": "Create campaign list view with filtering, sorting, and bulk actions. Implement detailed campaign forms with validation and auto-save. Documentation: https://react-table.tanstack.com/, https://react-hook-form.com/docs",
+            "details": "Create campaign list view with filtering, sorting, and bulk actions. Implement detailed campaign forms with validation and auto-save using shadcn/ui components via the shadcn MCP server.",
             "status": "pending",
             "priority": "medium"
           },
@@ -352,7 +284,7 @@
             "id": "11.6",
             "title": "Responsive Design & Mobile UI",
             "description": "Ensure responsive design and mobile-optimized user interface.",
-            "details": "Implement responsive design patterns, mobile navigation, touch-friendly interactions, and progressive web app features. Documentation: https://mui.com/material-ui/guides/responsive-ui/, https://web.dev/progressive-web-apps/",
+            "details": "Implement responsive design patterns, mobile navigation, touch-friendly interactions, and progressive web app features using shadcn/ui components via the shadcn MCP server for consistent responsive design.",
             "status": "pending",
             "priority": "medium"
           },
@@ -360,7 +292,7 @@
             "id": "11.7",
             "title": "Theme System & Branding",
             "description": "Implement theme system for consistent branding and customization.",
-            "details": "Create theme system with color palettes, typography, and component styling. Implement dark mode, brand customization, and accessibility features. Documentation: https://mui.com/material-ui/customization/theming/, https://styled-components.com/",
+            "details": "Create theme system with color palettes, typography, and component styling. Implement dark mode, brand customization, and accessibility features using shadcn/ui theming system via the shadcn MCP server.",
             "status": "pending",
             "priority": "low"
           },
@@ -368,7 +300,7 @@
             "id": "11.8",
             "title": "User Experience Optimization",
             "description": "Optimize user experience with loading states, error handling, and feedback.",
-            "details": "Implement loading skeletons, error boundaries, toast notifications, and user feedback mechanisms. Create smooth transitions and micro-interactions. Documentation: https://mui.com/material-ui/react-skeleton/, https://react-hot-toast.com/",
+            "details": "Implement loading skeletons, error boundaries, toast notifications, and user feedback mechanisms. Create smooth transitions and micro-interactions using shadcn/ui components via the shadcn MCP server.",
             "status": "pending",
             "priority": "low"
           }
@@ -472,6 +404,74 @@
         "priority": "high",
         "dependencies": ["17"],
         "subtasks": []
+      },
+      {
+      "id": "21",
+      "title": "User Authentication & Account Management System",
+      "description": "Design and implement the core user authentication and account management system for the AI-driven content generation platform using Ruby on Rails 8.",
+      "details": "This should include user registration, login, profile management, and role-based access control for different user types (marketers, team members, administrators). The system should leverage Rails 8's built-in authentication generator, which provides secure authentication out of the box without external gems. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session, https://edgeguides.rubyonrails.org/authentication.html",
+      "testStrategy": "Unit tests for authentication flows using RSpec, integration tests for user management, security testing for access controls, and user acceptance testing for the complete registration/login experience.",
+      "status": "pending",
+      "priority": "high",
+      "dependencies": [],
+      "subtasks": [
+        {
+          "id": "21.1",
+          "title": "Rails 8 Built-in Authentication Setup",
+          "description": "Set up Rails 8's built-in authentication system for user management.",
+          "details": "Generate authentication using 'rails generate authentication', which creates User model, authentication controllers, views, and database migrations. Configure authentication routes and implement basic registration/login functionality. Rails 8's authentication generator includes secure password handling, session management, and CSRF protection out of the box. Documentation: https://edgeguides.rubyonrails.org/authentication.html, https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session",
+          "status": "pending",
+          "priority": "high"
+        },
+        {
+          "id": "21.2",
+          "title": "Role-Based Access Control with Pundit",
+          "description": "Implement role-based access control using Pundit gem for authorization.",
+          "details": "Integrate Pundit gem for authorization, create user roles (marketer, team member, admin), implement policy classes for different resources, and add authorization checks to controllers and views. Documentation: https://github.com/varvet/pundit, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
+          "status": "pending",
+          "priority": "high"
+        },
+        {
+          "id": "21.3",
+          "title": "Password Reset & Account Recovery",
+          "description": "Implement password reset functionality with email delivery using Rails 8.",
+          "details": "Build password reset functionality using Rails 8's authentication system, set up Action Mailer for email delivery, create password reset tokens and forms, and implement account recovery options. Use Rails 8's built-in rate limiting for security. Documentation: https://guides.rubyonrails.org/action_mailer_basics.html, https://guides.rubyonrails.org/security.html#password-management",
+          "status": "pending",
+          "priority": "medium"
+        },
+        {
+          "id": "21.4",
+          "title": "User Profile Management with Active Storage",
+          "description": "Build user profile management using Rails Active Storage for file uploads.",
+          "details": "Create user profile pages with avatar upload using Active Storage, personal information management, notification preferences, and account settings. Implement profile data validation using Rails validations. Documentation: https://guides.rubyonrails.org/active_storage_overview.html, https://guides.rubyonrails.org/active_record_validations.html",
+          "status": "pending",
+          "priority": "medium"
+        },
+        {
+          "id": "21.5",
+          "title": "Session Management & Security with Rails 8",
+          "description": "Implement secure session management using Rails 8's built-in security features.",
+          "details": "Configure Rails 8's session management, implement secure cookie handling, CSRF protection, and security headers. Use Rails 8's built-in rate limiting and request throttling. Documentation: https://guides.rubyonrails.org/security.html, https://guides.rubyonrails.org/action_controller_overview.html#session",
+          "status": "pending",
+          "priority": "high"
+        },
+        {
+          "id": "21.7",
+          "title": "User Activity Monitoring with Rails Logging",
+          "description": "Implement user activity tracking using Rails logging and custom audit trails.",
+          "details": "Create activity logs using Rails logging, implement user action tracking, suspicious activity detection, and automated alerts. Use Rails 8's built-in logging and monitoring capabilities. Documentation: https://guides.rubyonrails.org/debugging_rails_applications.html#log-files, https://guides.rubyonrails.org/action_controller_overview.html#filters",
+          "status": "pending",
+          "priority": "low"
+        },
+        {
+          "id": "21.8",
+          "title": "Admin User Management with Rails Admin",
+          "description": "Build admin interface using Rails Admin gem for user management and system administration.",
+          "details": "Integrate Rails Admin gem for admin dashboard, create user management interface, role assignment functionality, account suspension capabilities, and system monitoring. Implement audit trails for admin actions. Documentation: https://github.com/sferik/rails_admin, https://guides.rubyonrails.org/action_controller_overview.html#strong-parameters",
+          "status": "pending",
+          "priority": "medium"
+          }
+        ]
       }
     ],
     "metadata": {
