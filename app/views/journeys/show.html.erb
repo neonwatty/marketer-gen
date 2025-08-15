@@ -1,0 +1,156 @@
+<div class="container mx-auto px-6 py-8">
+  <!-- Journey Header -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900"><%= @journey.name %></h1>
+          <p class="text-gray-600 mt-1"><%= @journey.description %></p>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <%= status_badge_classes(@journey.status) %>">
+            <%= @journey.status.humanize %>
+          </span>
+          <%= link_to "Edit Journey", edit_journey_path(@journey), class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+        </div>
+      </div>
+    </div>
+    
+    <div class="px-6 py-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Campaign Type</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @journey.campaign_type.humanize %></dd>
+        </div>
+        
+        <% if @journey.template_type.present? %>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Template Type</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @journey.template_type.humanize %></dd>
+          </div>
+        <% end %>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Total Steps</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= pluralize(@journey.total_steps, 'step') %></dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Created</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @journey.created_at.strftime("%B %d, %Y") %></dd>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journey Stages -->
+  <% if @journey.stages.present? %>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Journey Stages</h3>
+      </div>
+      
+      <div class="px-6 py-4">
+        <div class="flex items-center space-x-4 overflow-x-auto">
+          <% @journey.stages.each_with_index do |stage, index| %>
+            <div class="flex items-center flex-shrink-0">
+              <div class="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full text-sm font-medium">
+                <%= index + 1 %>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-900"><%= stage.humanize %></p>
+              </div>
+              <% unless index == @journey.stages.length - 1 %>
+                <div class="ml-6 flex-shrink-0">
+                  <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Journey Steps -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">Journey Steps</h3>
+        <%= link_to "Add Step", new_journey_journey_step_path(@journey), class: "bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+      </div>
+    </div>
+    
+    <% if @journey_steps.any? %>
+      <div class="divide-y divide-gray-200" data-controller="journey-builder" data-journey-builder-journey-id-value="<%= @journey.id %>">
+        <div data-journey-builder-target="stepsContainer">
+          <% @journey_steps.each_with_index do |step, index| %>
+            <div class="px-6 py-4 cursor-move hover:bg-gray-50 transition-colors" 
+                 data-controller="journey-step" 
+                 data-step-id="<%= step.id %>"
+                 data-journey-builder-target="step">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0 flex items-center space-x-3">
+                  <div class="drag-handle text-gray-400 hover:text-gray-600 cursor-move">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M7 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                    </svg>
+                  </div>
+                  <div class="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-full text-sm font-medium step-number">
+                    <%= step.sequence_order + 1 %>
+                  </div>
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-lg font-medium text-gray-900"><%= step.title %></h4>
+                  <% if step.description.present? %>
+                    <p class="text-gray-600 mt-1"><%= step.description %></p>
+                  <% end %>
+                  
+                  <div class="flex flex-wrap gap-2 mt-3">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <%= step.step_type.humanize %>
+                    </span>
+                    <% if step.channel.present? %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <%= step.channel.humanize %>
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center space-x-2 ml-4">
+                <%= link_to "Edit", edit_journey_journey_step_path(@journey, step), class: "text-blue-600 hover:text-blue-700 font-medium text-sm" %>
+                <%= link_to "Delete", journey_journey_step_path(@journey, step), method: :delete, 
+                           confirm: "Are you sure you want to delete this step?",
+                           class: "text-red-600 hover:text-red-700 font-medium text-sm" %>
+              </div>
+            </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="px-6 py-12 text-center">
+        <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+        </div>
+        <h4 class="text-lg font-medium text-gray-900 mb-2">No steps yet</h4>
+        <p class="text-gray-600 mb-4">Start building your journey by adding the first step.</p>
+        <%= link_to "Add First Step", new_journey_journey_step_path(@journey), class: "bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Back Button -->
+  <div class="mt-6">
+    <%= link_to "← Back to Journeys", journeys_path, class: "text-blue-600 hover:text-blue-700 font-medium" %>
+  </div>
+</div>

@@ -1,11 +1,20 @@
 Rails.application.routes.draw do
   root "home#index"
   
+  resource :profile, only: [:show, :edit, :update]
+  
   get "sign_up", to: "registrations#new"
   post "sign_up", to: "registrations#create"
   
   resource :session
   resources :passwords, param: :token
+  
+  resources :journeys do
+    member do
+      patch :reorder_steps
+    end
+    resources :journey_steps, except: [:show]
+  end
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

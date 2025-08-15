@@ -38,6 +38,7 @@ class JourneyStep < ApplicationRecord
 
   private
 
+
   def set_next_sequence_order
     # Query the database directly to get the actual max sequence order
     max_order = JourneyStep.where(journey_id: journey_id).maximum(:sequence_order) || -1

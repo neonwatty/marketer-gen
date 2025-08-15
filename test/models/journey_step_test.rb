@@ -36,11 +36,13 @@ class JourneyStepTest < ActiveSupport::TestCase
 
   test "should validate uniqueness of sequence_order within journey" do
     existing_step = @step
+    
     new_step = @journey.journey_steps.build(
       title: "New Step",
       step_type: "email",
       sequence_order: existing_step.sequence_order
     )
+    
     new_step.valid?
     assert_includes new_step.errors[:sequence_order], "must be unique within the journey"
   end

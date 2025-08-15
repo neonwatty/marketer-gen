@@ -1,0 +1,89 @@
+<div class="container mx-auto px-6 py-8">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Create New Journey</h1>
+      <p class="text-gray-600 mt-2">Set up a new customer journey campaign</p>
+    </div>
+
+    <%= form_with model: @journey, local: true, class: "space-y-6", data: { controller: "journey-form" } do |form| %>
+      <% if @journey.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+              <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                <% @journey.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Journey Details</h3>
+        </div>
+        
+        <div class="px-6 py-4 space-y-6">
+          <div>
+            <%= form.label :name, "Journey Name", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :name, placeholder: "Enter a descriptive name for your journey", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+
+          <div>
+            <%= form.label :description, "Description", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :description, rows: 3, placeholder: "Describe the purpose and goals of this journey", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <%= form.label :campaign_type, "Campaign Type", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.select :campaign_type, options_for_select(Journey::CAMPAIGN_TYPES.map {|t| [t.humanize, t]}, @journey.campaign_type), { prompt: "Select campaign type" }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", data: { action: "change->journey-form#updateStages" } } %>
+            </div>
+
+            <div>
+              <%= form.label :template_type, "Template Type", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.select :template_type, options_for_select(Journey::TEMPLATE_TYPES.map {|t| [t.humanize, t]}, @journey.template_type), { prompt: "Select template type (optional)" }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+            </div>
+          </div>
+
+          <div>
+            <%= form.label :target_audience, "Target Audience", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :target_audience, placeholder: "Define your target audience", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+
+          <div>
+            <%= form.label :status, "Status", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.select :status, options_for_select(Journey::STATUSES.map {|s| [s.humanize, s]}, @journey.status || 'draft'), {}, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journey Stages Preview -->
+      <div class="bg-white shadow-sm rounded-lg border border-gray-200" data-journey-form-target="stagesContainer">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Journey Stages</h3>
+          <p class="text-sm text-gray-500 mt-1">These stages will be automatically set based on your campaign type</p>
+        </div>
+        
+        <div class="px-6 py-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4" data-journey-form-target="stagesPreview">
+            <!-- Stages will be populated by Stimulus controller -->
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <%= link_to "Cancel", journeys_path, class: "bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors" %>
+        <%= form.submit "Create Journey", class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

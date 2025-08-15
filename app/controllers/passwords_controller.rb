@@ -1,5 +1,6 @@
 class PasswordsController < ApplicationController
   allow_unauthenticated_access
+  rate_limit to: 5, within: 1.hour, only: :create, with: -> { redirect_to new_password_path, alert: "Too many password reset attempts. Please try again later." }
   before_action :set_user_by_token, only: %i[ edit update ]
 
   def new
@@ -17,10 +18,13 @@ class PasswordsController < ApplicationController
   end
 
   def update
-    if @user.update(params.permit(:password, :password_confirmation))
-      redirect_to new_session_path, notice: "Password has been reset."
+    if @user.update(password_params)
+      # Invalidate all existing sessions for this user
+      @user.sessions.destroy_all
+      redirect_to new_session_path, notice: "Password has been reset successfully. Please sign in with your new password."
     else
-      redirect_to edit_password_path(params[:token]), alert: "Passwords did not match."
+      flash.now[:alert] = @user.errors.full_messages.join(", ")
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -29,5 +33,9 @@ class PasswordsController < ApplicationController
       @user = User.find_by_password_reset_token!(params[:token])
     rescue ActiveSupport::MessageVerifier::InvalidSignature
       redirect_to new_password_path, alert: "Password reset link is invalid or has expired."
+    end
+
+    def password_params
+      params.permit(:password, :password_confirmation)
     end
 end

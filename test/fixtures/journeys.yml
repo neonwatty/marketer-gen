@@ -14,7 +14,7 @@ conversion_journey:
   name: "Product Conversion Journey"
   description: "Journey to convert prospects to customers"
   campaign_type: "conversion"
-  user: one
+  user: two
   stages: '["decision", "purchase", "onboarding"]'
   status: "active"
   template_type: "social_media"

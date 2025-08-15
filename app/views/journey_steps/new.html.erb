@@ -1,0 +1,113 @@
+<div class="container mx-auto px-6 py-8">
+  <div class="max-w-2xl mx-auto">
+    <div class="mb-8">
+      <nav class="text-sm font-medium text-gray-500 mb-4">
+        <%= link_to "Journeys", journeys_path, class: "text-blue-600 hover:text-blue-700" %> →
+        <%= link_to @journey.name, @journey, class: "text-blue-600 hover:text-blue-700" %> →
+        <span class="text-gray-900">New Step</span>
+      </nav>
+      
+      <h1 class="text-3xl font-bold text-gray-900">Add Journey Step</h1>
+      <p class="text-gray-600 mt-2">Create a new step in "<%= @journey.name %>"</p>
+    </div>
+
+    <%= form_with model: [@journey, @journey_step], local: true, class: "space-y-6", data: { controller: "journey-step-form" } do |form| %>
+      <% if @journey_step.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+              <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                <% @journey_step.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Step Details</h3>
+        </div>
+        
+        <div class="px-6 py-4 space-y-6">
+          <div>
+            <%= form.label :title, "Step Title", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :title, placeholder: "Enter a descriptive title for this step", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+
+          <div>
+            <%= form.label :description, "Description", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :description, rows: 3, placeholder: "Describe what happens in this step", class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <%= form.label :step_type, "Step Type", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.select :step_type, options_for_select(JourneyStep::STEP_TYPES.map {|t| [t.humanize, t]}, @journey_step.step_type), { prompt: "Select step type" }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+            </div>
+
+            <div>
+              <%= form.label :channel, "Channel", class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.select :channel, options_for_select(JourneyStep::CHANNELS.map {|c| [c.humanize, c]}, @journey_step.channel), { prompt: "Select channel (optional)" }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+            </div>
+          </div>
+
+          <div>
+            <%= form.label :sequence_order, "Position", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <div class="flex items-center space-x-4">
+              <%= form.number_field :sequence_order, placeholder: "Leave empty to add at the end", min: 0, class: "block w-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+              <p class="text-sm text-gray-500">Current journey has <%= @journey.total_steps %> steps. Leave empty to add this step at the end.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Settings (expandable) -->
+      <div class="bg-white shadow-sm rounded-lg border border-gray-200" data-journey-step-form-target="settingsContainer">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <button type="button" 
+                  class="flex items-center justify-between w-full text-left"
+                  data-action="click->journey-step-form#toggleSettings">
+            <h3 class="text-lg font-medium text-gray-900">Advanced Settings</h3>
+            <svg class="w-5 h-5 text-gray-400 transform transition-transform" data-journey-step-form-target="settingsIcon">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="px-6 py-4 hidden" data-journey-step-form-target="settingsContent">
+          <div class="space-y-4">
+            <p class="text-sm text-gray-600">Additional step-specific configuration will be available here based on the step type.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Timing (Optional)</label>
+                <input type="text" placeholder="e.g., Send immediately, Wait 3 days" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                  <option>Normal</option>
+                  <option>High</option>
+                  <option>Low</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <%= link_to "Cancel", @journey, class: "bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors" %>
+        <%= form.submit "Create Step", class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

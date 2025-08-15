@@ -1,4 +1,25 @@
-<p>
-  You can reset your password within the next 15 minutes on
-  <%= link_to "this password reset page", edit_password_url(@user.password_reset_token) %>.
-</p>
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h2 style="color: #2563eb; margin-bottom: 20px;">Reset Your Password</h2>
+  
+  <p style="margin-bottom: 20px;">
+    We received a request to reset your password for your Marketer Gen account.
+  </p>
+  
+  <p style="margin-bottom: 20px;">
+    Click the button below to reset your password. This link will expire in 15 minutes for security.
+  </p>
+  
+  <div style="text-align: center; margin: 30px 0;">
+    <%= link_to "Reset Password", edit_password_url(@user.password_reset_token), 
+        style: "background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;" %>
+  </div>
+  
+  <p style="margin-bottom: 20px; font-size: 14px; color: #666;">
+    If you didn't request this password reset, you can safely ignore this email. Your password will not be changed.
+  </p>
+  
+  <p style="font-size: 14px; color: #666;">
+    If the button doesn't work, copy and paste this link into your browser:<br>
+    <%= edit_password_url(@user.password_reset_token) %>
+  </p>
+</div>
