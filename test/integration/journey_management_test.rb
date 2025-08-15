@@ -68,7 +68,7 @@ class JourneyManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "multiple users can have journeys with same name" do
-    user2 = User.create!(email_address: "user2@example.com", password: "password123")
+    user2 = User.create!(email_address: "user3@example.com", password: "password123")
     
     journey1 = @user.journeys.create!(name: "Same Name", campaign_type: "awareness")
     journey2 = user2.journeys.create!(name: "Same Name", campaign_type: "conversion")

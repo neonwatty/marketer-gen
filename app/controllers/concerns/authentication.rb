@@ -85,6 +85,9 @@ module Authentication
         
         # Log session creation for security monitoring
         Rails.logger.info "New session created for user #{user.id} from IP #{request.remote_ip}"
+        
+        # Monitor session security
+        SecurityMonitoringService.new(user: user, session: session, request: request).monitor_session_security
       end
     end
 

@@ -5,7 +5,7 @@ class ProfilePolicyTest < ActiveSupport::TestCase
     @user = users(:one)
     @other_user = users(:two)
     @admin = User.create!(
-      email_address: "admin@example.com",
+      email_address: "profile_admin@example.com",
       password: "password123",
       role: "admin"
     )

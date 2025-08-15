@@ -25,6 +25,14 @@
         <p class="text-gray-600 mb-4">Track performance and optimize your marketing efforts.</p>
         <button class="bg-gray-400 text-white font-medium py-2 px-4 rounded-lg cursor-not-allowed" disabled>Coming Soon</button>
       </div>
+
+      <% if Current.user&.admin? %>
+        <div class="bg-red-50 p-6 rounded-lg shadow-md border border-red-200">
+          <h3 class="text-xl font-semibold mb-2 text-red-800">Admin Panel</h3>
+          <p class="text-red-600 mb-4">Manage users, sessions, and system administration.</p>
+          <%= link_to "Admin Dashboard", rails_admin_path, class: "bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors", target: "_blank" %>
+        </div>
+      <% end %>
     </div>
     
     <div class="space-x-4">

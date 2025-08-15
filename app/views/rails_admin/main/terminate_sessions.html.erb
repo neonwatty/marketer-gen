@@ -1,0 +1,85 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'rails_admin', 'data-turbo-track': 'reload' %>
+<% end %>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <i class="fa fa-warning"></i>
+          Terminate All Sessions
+        </h3>
+      </div>
+      <div class="panel-body">
+        <p class="lead">
+          <strong>Warning:</strong> You are about to terminate all active sessions for user 
+          <code><%= @user.email_address %></code>.
+        </p>
+        
+        <div class="alert alert-warning">
+          <h4>This action will:</h4>
+          <ul>
+            <li>Log out the user from all devices immediately</li>
+            <li>Invalidate all existing session cookies</li>
+            <li>Require the user to sign in again on all devices</li>
+            <li>Be logged in the admin audit trail</li>
+          </ul>
+        </div>
+
+        <div class="well well-sm">
+          <h5>Current Sessions (<%= @user.sessions.count %>):</h5>
+          <% @user.sessions.each do |session| %>
+            <div class="session-info" style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              <strong>Session ID:</strong> <%= session.id %><br>
+              <strong>IP Address:</strong> <%= session.ip_address %><br>
+              <strong>Last Activity:</strong> <%= session.last_activity_at&.strftime('%Y-%m-%d %H:%M:%S') || 'Unknown' %><br>
+              <strong>User Agent:</strong> <%= truncate(session.user_agent, length: 80) %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="form-actions">
+          <%= form_tag(rails_admin.terminate_sessions_path(model_name: @abstract_model.param_key, id: @user.id), method: :post, class: 'form-inline') do %>
+            <%= submit_tag 'Yes, Terminate All Sessions', 
+                  class: 'btn btn-danger btn-lg', 
+                  data: { confirm: "Are you absolutely sure you want to terminate all sessions for #{@user.email_address}?" } %>
+            <%= link_to 'Cancel', 
+                  rails_admin.show_path(model_name: @abstract_model.param_key, id: @user.id), 
+                  class: 'btn btn-default btn-lg' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h4 class="panel-title">User Information</h4>
+      </div>
+      <div class="panel-body">
+        <dl class="dl-horizontal">
+          <dt>Email:</dt>
+          <dd><%= @user.email_address %></dd>
+          
+          <dt>Name:</dt>
+          <dd><%= @user.full_name %></dd>
+          
+          <dt>Role:</dt>
+          <dd><span class="label label-<%= @user.admin? ? 'danger' : 'info' %>"><%= @user.role.humanize %></span></dd>
+          
+          <dt>Created:</dt>
+          <dd><%= @user.created_at.strftime('%Y-%m-%d') %></dd>
+          
+          <dt>Last Sign In:</dt>
+          <dd><%= @user.sessions.last&.created_at&.strftime('%Y-%m-%d %H:%M') || 'Never' %></dd>
+        </dl>
+        
+        <%= link_to 'View User Details', 
+              rails_admin.show_path(model_name: @abstract_model.param_key, id: @user.id), 
+              class: 'btn btn-info btn-block' %>
+      </div>
+    </div>
+  </div>
+</div>

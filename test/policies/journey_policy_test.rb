@@ -2,10 +2,10 @@ require "test_helper"
 
 class JourneyPolicyTest < ActiveSupport::TestCase
   def setup
-    @marketer = User.create!(email_address: "marketer@example.com", password: "password123", role: "marketer")
-    @team_member = User.create!(email_address: "team@example.com", password: "password123", role: "team_member")
-    @admin = User.create!(email_address: "admin@example.com", password: "password123", role: "admin")
-    @other_marketer = User.create!(email_address: "other@example.com", password: "password123", role: "marketer")
+    @marketer = User.create!(email_address: "policy_marketer@example.com", password: "password123", role: "marketer")
+    @team_member = User.create!(email_address: "policy_team@example.com", password: "password123", role: "team_member")
+    @admin = User.create!(email_address: "policy_admin@example.com", password: "password123", role: "admin")
+    @other_marketer = User.create!(email_address: "policy_other@example.com", password: "password123", role: "marketer")
     
     @journey = Journey.create!(
       name: "Test Journey",

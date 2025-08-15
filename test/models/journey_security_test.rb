@@ -33,7 +33,7 @@ class JourneySecurityTest < ActiveSupport::TestCase
 
   test "journey isolation between users" do
     user1 = users(:one)
-    user2 = User.create!(email_address: "user2@example.com", password: "password123")
+    user2 = User.create!(email_address: "user4@example.com", password: "password123")
     
     journey1 = user1.journeys.create!(name: "User 1 Journey", campaign_type: "awareness")
     journey2 = user2.journeys.create!(name: "User 2 Journey", campaign_type: "awareness")

@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Authentication
+  include ActivityMonitoring
   include Pundit::Authorization
   
   # Security configurations

@@ -68,8 +68,8 @@ class TemplateWorkflowTest < ActionDispatch::IntegrationTest
   test "template system supports multi-user scenarios" do
     
     # Create additional users
-    user2 = User.create!(email_address: "user2@example.com", password: "password123")
-    user3 = User.create!(email_address: "user3@example.com", password: "password123")
+    user2 = User.create!(email_address: "template_user2@example.com", password: "password123")
+    user3 = User.create!(email_address: "template_user3@example.com", password: "password123")
     
     template = JourneyTemplate.find_by(name: 'Lead Generation Campaign')
     
