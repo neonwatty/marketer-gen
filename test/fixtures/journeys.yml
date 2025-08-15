@@ -19,3 +19,23 @@ conversion_journey:
   status: "active"
   template_type: "social_media"
   metadata: '{}'
+
+admin_email_journey:
+  name: "Admin Email Journey"
+  description: "Admin user email campaign journey"
+  campaign_type: "awareness"
+  user: admin_user
+  stages: '["discovery", "education", "engagement"]'
+  status: "draft"
+  template_type: "email"
+  metadata: '{}'
+
+admin_social_journey:
+  name: "Admin Social Journey"
+  description: "Admin user social media campaign journey"
+  campaign_type: "consideration"
+  user: admin_user
+  stages: '["research", "evaluation", "comparison"]'
+  status: "active"
+  template_type: "social_media"
+  metadata: '{}'

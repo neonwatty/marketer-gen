@@ -31,6 +31,18 @@ class JourneyPolicy < ApplicationPolicy
     update?
   end
 
+  def duplicate?
+    show?
+  end
+
+  def archive?
+    update?
+  end
+
+  def compare?
+    index?
+  end
+
   class Scope < Scope
     def resolve
       if user.admin?

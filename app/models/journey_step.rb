@@ -3,12 +3,14 @@ class JourneyStep < ApplicationRecord
 
   STEP_TYPES = %w[email social_post content_piece webinar event landing_page automation custom].freeze
   CHANNELS = %w[email social_media website blog video podcast webinar event sms push_notification].freeze
+  STATUSES = %w[draft active completed paused].freeze
 
   validates :title, presence: true, length: { maximum: 255 }
   validates :description, length: { maximum: 1000 }
   validates :step_type, presence: true, inclusion: { in: STEP_TYPES }
   validates :channel, inclusion: { in: CHANNELS }, allow_blank: true
   validates :sequence_order, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :status, presence: true, inclusion: { in: STATUSES }
 
   validates :sequence_order, uniqueness: { scope: :journey_id, message: "must be unique within the journey" }
 

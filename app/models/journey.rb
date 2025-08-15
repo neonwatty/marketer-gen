@@ -39,6 +39,40 @@ class Journey < ApplicationRecord
     journey_steps.order(:sequence_order)
   end
 
+  def completion_rate
+    return 0 if total_steps.zero?
+    completed_steps = journey_steps.where(status: 'completed').count
+    (completed_steps.to_f / total_steps * 100).round(1)
+  end
+
+  def last_activity
+    journey_steps.maximum(:updated_at) || updated_at
+  end
+
+  def duration_since_creation
+    ((Time.current - created_at) / 1.day).round(1)
+  end
+
+  def can_be_duplicated?
+    true
+  end
+
+  def can_be_archived?
+    %w[completed draft].include?(status)
+  end
+
+  def analytics_summary
+    {
+      total_steps: total_steps,
+      completion_rate: completion_rate,
+      last_activity: last_activity,
+      duration: duration_since_creation,
+      status: status,
+      campaign_type: campaign_type,
+      template_type: template_type
+    }
+  end
+
   private
 
   def set_default_stages

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_14_234818) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_15_190447) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -50,9 +50,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_234818) do
     t.text "settings"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status", default: "draft", null: false
     t.index ["channel"], name: "index_journey_steps_on_channel"
     t.index ["journey_id", "sequence_order"], name: "index_journey_steps_on_journey_id_and_sequence_order", unique: true
     t.index ["journey_id"], name: "index_journey_steps_on_journey_id"
+    t.index ["status"], name: "index_journey_steps_on_status"
     t.index ["step_type"], name: "index_journey_steps_on_step_type"
   end
 

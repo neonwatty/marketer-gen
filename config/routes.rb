@@ -11,9 +11,14 @@ Rails.application.routes.draw do
   resources :passwords, param: :token
   
   resources :journeys do
+    collection do
+      get :compare
+    end
     member do
       patch :reorder_steps
       get :suggestions
+      post :duplicate
+      patch :archive
     end
     resources :journey_steps, except: [:show]
   end

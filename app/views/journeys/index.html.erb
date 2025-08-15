@@ -7,40 +7,131 @@
     <%= link_to "New Journey", new_journey_path, class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
   </div>
 
-  <!-- Filters -->
+  <!-- Analytics Dashboard -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="p-3 rounded-full bg-blue-100">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Total Journeys</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= @analytics[:total_journeys] %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="p-3 rounded-full bg-green-100">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Active</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= @analytics[:active_journeys] %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="p-3 rounded-full bg-purple-100">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Completed</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= @analytics[:completed_journeys] %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="p-3 rounded-full bg-yellow-100">
+          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Avg. Completion</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= number_with_precision(@analytics[:average_completion_rate], precision: 1) %>%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
   <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6" data-controller="filters">
-    <h3 class="text-lg font-medium text-gray-900 mb-4">Filter Journeys</h3>
-    <%= form_with url: journeys_path, method: :get, local: true, class: "grid grid-cols-1 md:grid-cols-4 gap-4" do |form| %>
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Search & Filter Journeys</h3>
+    <%= form_with url: journeys_path, method: :get, local: true, class: "space-y-4" do |form| %>
+      <!-- Search Bar -->
       <div>
-        <%= form.label :campaign_type, "Campaign Type", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.select :campaign_type, options_for_select([["All Types", ""]] + Journey::CAMPAIGN_TYPES.map {|t| [t.humanize, t]}), { selected: params[:campaign_type] }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+        <%= form.label :search, "Search journeys", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <div class="relative">
+          <%= form.text_field :search, placeholder: "Search by name or description...", value: params[:search], class: "block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" %>
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+        </div>
       </div>
-      
-      <div>
-        <%= form.label :template_type, "Template Type", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.select :template_type, options_for_select([["All Templates", ""]] + Journey::TEMPLATE_TYPES.map {|t| [t.humanize, t]}), { selected: params[:template_type] }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
-      </div>
-      
-      <div>
-        <%= form.label :status, "Status", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.select :status, options_for_select([["All Statuses", ""]] + Journey::STATUSES.map {|s| [s.humanize, s]}), { selected: params[:status] }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
-      </div>
-      
-      <div class="flex items-end">
-        <%= form.submit "Apply Filters", class: "bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors" %>
-        <%= link_to "Clear", journeys_path, class: "ml-2 text-gray-600 hover:text-gray-800 font-medium py-2 px-4" %>
+
+      <!-- Filters -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <%= form.label :campaign_type, "Campaign Type", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :campaign_type, options_for_select([["All Types", ""]] + Journey::CAMPAIGN_TYPES.map {|t| [t.humanize, t]}), { selected: params[:campaign_type] }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+        </div>
+        
+        <div>
+          <%= form.label :template_type, "Template Type", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :template_type, options_for_select([["All Templates", ""]] + Journey::TEMPLATE_TYPES.map {|t| [t.humanize, t]}), { selected: params[:template_type] }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+        </div>
+        
+        <div>
+          <%= form.label :status, "Status", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :status, options_for_select([["All Statuses", ""]] + Journey::STATUSES.map {|s| [s.humanize, s]}), { selected: params[:status] }, { class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" } %>
+        </div>
+        
+        <div class="flex items-end">
+          <%= form.submit "Apply Filters", class: "bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors mr-2" %>
+          <%= link_to "Clear", journeys_path, class: "text-gray-600 hover:text-gray-800 font-medium py-2 px-4" %>
+        </div>
       </div>
     <% end %>
   </div>
 
-  <!-- Journeys Grid -->
+  <!-- Journey Comparison -->
   <% if @journeys.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <% @journeys.each do |journey| %>
+    <%= form_with url: compare_journeys_path, method: :get, local: true, class: "mb-6" do |form| %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-medium text-gray-900">Compare Journeys</h3>
+          <div class="flex space-x-2">
+            <button type="button" onclick="selectAllJourneys(false)" class="text-sm text-gray-600 hover:text-gray-800">Clear All</button>
+            <%= form.submit "Compare Selected", class: "bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors", disabled: true, id: "compare-button" %>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 mt-1">Select 2-4 journeys to compare their performance and structure.</p>
+      </div>
+    
+      <!-- Journeys Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-controller="journey-comparison">
+        <% @journeys.each do |journey| %>
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
           <div class="p-6">
             <div class="flex justify-between items-start mb-4">
-              <h3 class="text-lg font-semibold text-gray-900 truncate"><%= journey.name %></h3>
+              <div class="flex items-center space-x-3">
+                <%= form.check_box :journey_ids, { multiple: true, class: "rounded border-gray-300 text-purple-600 focus:ring-purple-500", onchange: "updateCompareButton()" }, journey.id, "" %>
+                <h3 class="text-lg font-semibold text-gray-900 truncate"><%= journey.name %></h3>
+              </div>
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= status_badge_classes(journey.status) %>">
                 <%= journey.status.humanize %>
               </span>
@@ -59,19 +150,41 @@
               <% end %>
             </div>
             
-            <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
-              <span><%= pluralize(journey.total_steps, 'step') %></span>
-              <span><%= time_ago_in_words(journey.created_at) %> ago</span>
+            <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+              <div class="text-gray-500">
+                <span class="font-medium"><%= pluralize(journey.total_steps, 'step') %></span>
+              </div>
+              <div class="text-gray-500">
+                <span class="font-medium"><%= journey.completion_rate %>% complete</span>
+              </div>
+              <div class="text-gray-500">
+                <span>Created <%= time_ago_in_words(journey.created_at) %> ago</span>
+              </div>
+              <div class="text-gray-500">
+                <span>Last activity <%= time_ago_in_words(journey.last_activity) %> ago</span>
+              </div>
             </div>
             
-            <div class="flex space-x-2">
-              <%= link_to "View", journey, class: "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-3 rounded-md text-sm font-medium transition-colors" %>
-              <%= link_to "Edit", edit_journey_path(journey), class: "flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors" %>
+            <div class="flex flex-col space-y-2">
+              <div class="flex space-x-2">
+                <%= link_to "View", journey, class: "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-3 rounded-md text-sm font-medium transition-colors" %>
+                <%= link_to "Edit", edit_journey_path(journey), class: "flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-center py-2 px-3 rounded-md text-sm font-medium transition-colors" %>
+              </div>
+              
+              <div class="flex space-x-2">
+                <%= link_to "Duplicate", duplicate_journey_path(journey), method: :post, class: "flex-1 bg-green-100 hover:bg-green-200 text-green-700 text-center py-1 px-2 rounded text-xs font-medium transition-colors" %>
+                <% if journey.can_be_archived? %>
+                  <%= link_to "Archive", archive_journey_path(journey), method: :patch, 
+                      data: { confirm: "Are you sure you want to archive this journey?" },
+                      class: "flex-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 text-center py-1 px-2 rounded text-xs font-medium transition-colors" %>
+                <% end %>
+              </div>
             </div>
           </div>
         </div>
-      <% end %>
-    </div>
+        <% end %>
+      </div>
+    <% end %>
   <% else %>
     <div class="text-center py-12">
       <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -85,3 +198,27 @@
     </div>
   <% end %>
 </div>
+
+<script>
+function updateCompareButton() {
+  const checkboxes = document.querySelectorAll('input[name="journey_ids[]"]:checked');
+  const compareButton = document.getElementById('compare-button');
+  const count = checkboxes.length;
+  
+  if (count >= 2 && count <= 4) {
+    compareButton.disabled = false;
+    compareButton.textContent = `Compare Selected (${count})`;
+  } else {
+    compareButton.disabled = true;
+    compareButton.textContent = count === 0 ? 'Compare Selected' : 
+                                count === 1 ? 'Select 1 more' : 
+                                'Too many selected (max 4)';
+  }
+}
+
+function selectAllJourneys(select) {
+  const checkboxes = document.querySelectorAll('input[name="journey_ids[]"]');
+  checkboxes.forEach(checkbox => checkbox.checked = select);
+  updateCompareButton();
+}
+</script>
