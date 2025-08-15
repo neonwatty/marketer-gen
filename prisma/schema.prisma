@@ -10,3 +10,73 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+// Core User model
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  brands    Brand[]
+  campaigns Campaign[]
+
+  @@map("users")
+}
+
+// Brand model with flexible JSON fields for guidelines, assets, and messaging
+model Brand {
+  id         String   @id @default(cuid())
+  name       String
+  guidelines Json?    // Brand guidelines as JSON
+  assets     Json?    // Brand assets (logos, colors, fonts) as JSON
+  messaging  Json?    // Brand messaging (tone, voice, values) as JSON
+  userId     String   // Foreign key to User
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relationships
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaigns Campaign[]
+
+  @@map("brands")
+}
+
+// Campaign model with flexible goals and status tracking
+model Campaign {
+  id        String         @id @default(cuid())
+  name      String
+  purpose   String?        // Campaign purpose/description
+  goals     Json?          // Campaign goals as JSON
+  status    CampaignStatus @default(DRAFT)
+  brandId   String         // Foreign key to Brand
+  userId    String         // Foreign key to User
+  startDate DateTime?      // Optional start date
+  endDate   DateTime?      // Optional end date
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  // Relationships
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("campaigns")
+}
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+  MANAGER
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
