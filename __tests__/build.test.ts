@@ -5,7 +5,7 @@ describe('Build Process', () => {
   it('should have TypeScript configuration', () => {
     const tsconfigPath = path.join(process.cwd(), 'tsconfig.json')
     expect(fs.existsSync(tsconfigPath)).toBe(true)
-    
+
     const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, 'utf8'))
     expect(tsconfig.compilerOptions).toBeDefined()
     expect(tsconfig.include).toContain('**/*.ts')

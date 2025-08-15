@@ -131,16 +131,20 @@ describe('cn utility function', () => {
       const result = cn({
         'base-class': true,
         'active-class': true,
-        'hidden-class': false
+        'hidden-class': false,
       })
       expect(result).toBe('base-class active-class')
     })
 
     it('handles mixed object and string inputs', () => {
-      const result = cn('always-included', {
-        'conditional-true': true,
-        'conditional-false': false
-      }, 'also-included')
+      const result = cn(
+        'always-included',
+        {
+          'conditional-true': true,
+          'conditional-false': false,
+        },
+        'also-included'
+      )
       expect(result).toBe('always-included conditional-true also-included')
     })
 
@@ -148,7 +152,7 @@ describe('cn utility function', () => {
       const result = cn({
         'bg-red-500': true,
         'bg-blue-500': true,
-        'text-white': true
+        'text-white': true,
       })
       expect(result).toContain('bg-blue-500')
       expect(result).toContain('text-white')
@@ -261,18 +265,15 @@ describe('cn utility function', () => {
       const variant = 'primary'
       const size = 'lg'
       const disabled = false
-      
-      const result = cn(
-        'btn',
-        {
-          'btn-primary': variant === 'primary',
-          'btn-secondary': variant === 'secondary',
-          'btn-lg': size === 'lg',
-          'btn-sm': size === 'sm',
-          'btn-disabled': disabled
-        }
-      )
-      
+
+      const result = cn('btn', {
+        'btn-primary': variant === 'primary',
+        'btn-secondary': variant === 'secondary',
+        'btn-lg': size === 'lg',
+        'btn-sm': size === 'sm',
+        'btn-disabled': disabled,
+      })
+
       expect(result).toBe('btn btn-primary btn-lg')
     })
 
@@ -280,7 +281,7 @@ describe('cn utility function', () => {
       const isLoading = true
       const hasError = false
       const isSuccess = false
-      
+
       const result = cn(
         'form-input',
         'border-gray-300',
@@ -288,7 +289,7 @@ describe('cn utility function', () => {
         hasError && 'border-red-500 text-red-900',
         isSuccess && 'border-green-500 text-green-900'
       )
-      
+
       expect(result).toBe('form-input border-gray-300 opacity-50 cursor-not-allowed')
     })
 
@@ -302,8 +303,10 @@ describe('cn utility function', () => {
         'lg:grid-cols-4',
         'xl:grid-cols-6'
       )
-      
-      expect(result).toBe('grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6')
+
+      expect(result).toBe(
+        'grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6'
+      )
     })
 
     it('handles theme-based styling', () => {
@@ -313,7 +316,7 @@ describe('cn utility function', () => {
         theme === 'light' ? 'bg-white text-black' : 'bg-gray-900 text-white',
         'rounded-lg shadow-md'
       )
-      
+
       expect(result).toBe('card bg-gray-900 text-white rounded-lg shadow-md')
     })
   })

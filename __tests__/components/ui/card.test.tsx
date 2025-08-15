@@ -26,7 +26,7 @@ describe('Card Components', () => {
     it('applies correct CSS classes', () => {
       render(<Card className="custom-class">Content</Card>)
       const card = screen.getByText('Content')
-      
+
       expect(card).toHaveClass('custom-class')
       expect(card).toHaveClass('bg-card', 'text-card-foreground', 'flex', 'flex-col')
     })
@@ -39,7 +39,7 @@ describe('Card Components', () => {
     it('forwards ref correctly', () => {
       const ref = React.createRef<HTMLDivElement>()
       render(<Card ref={ref}>Card with ref</Card>)
-      
+
       expect(ref.current).toBeInstanceOf(HTMLDivElement)
       expect(ref.current).toHaveTextContent('Card with ref')
     })
@@ -49,7 +49,7 @@ describe('Card Components', () => {
     it('renders correctly', () => {
       render(<CardHeader data-testid="card-header">Header content</CardHeader>)
       const header = screen.getByTestId('card-header')
-      
+
       expect(header).toBeInTheDocument()
       expect(header).toHaveTextContent('Header content')
     })
@@ -57,14 +57,14 @@ describe('Card Components', () => {
     it('applies correct spacing classes', () => {
       render(<CardHeader data-testid="header">Content</CardHeader>)
       const header = screen.getByTestId('header')
-      
+
       expect(header).toHaveClass('grid', 'px-6', 'gap-1.5')
     })
 
     it('accepts custom className', () => {
       render(<CardHeader className="custom-header">Content</CardHeader>)
       const header = screen.getByText('Content')
-      
+
       expect(header).toHaveClass('custom-header')
     })
   })
@@ -73,7 +73,7 @@ describe('Card Components', () => {
     it('renders with correct styling', () => {
       render(<CardTitle>Title Text</CardTitle>)
       const title = screen.getByText('Title Text')
-      
+
       expect(title).toBeInTheDocument()
       expect(title.tagName).toBe('DIV')
     })
@@ -81,21 +81,21 @@ describe('Card Components', () => {
     it('has correct typography classes', () => {
       render(<CardTitle>Title</CardTitle>)
       const title = screen.getByText('Title')
-      
+
       expect(title).toHaveClass('font-semibold', 'leading-none')
     })
 
     it('renders as div by default', () => {
       render(<CardTitle>Default Title</CardTitle>)
       const title = screen.getByText('Default Title')
-      
+
       expect(title.tagName).toBe('DIV')
     })
 
     it('accepts custom className', () => {
       render(<CardTitle className="custom-title">Title</CardTitle>)
       const title = screen.getByText('Title')
-      
+
       expect(title).toHaveClass('custom-title')
     })
   })
@@ -104,7 +104,7 @@ describe('Card Components', () => {
     it('has muted styling', () => {
       render(<CardDescription>Description text</CardDescription>)
       const description = screen.getByText('Description text')
-      
+
       expect(description).toBeInTheDocument()
       expect(description).toHaveClass('text-muted-foreground')
     })
@@ -112,21 +112,21 @@ describe('Card Components', () => {
     it('has correct typography', () => {
       render(<CardDescription>Description</CardDescription>)
       const description = screen.getByText('Description')
-      
+
       expect(description).toHaveClass('text-sm')
     })
 
     it('renders as div by default', () => {
       render(<CardDescription>Description text</CardDescription>)
       const description = screen.getByText('Description text')
-      
+
       expect(description.tagName).toBe('DIV')
     })
 
     it('accepts custom className', () => {
       render(<CardDescription className="custom-desc">Description</CardDescription>)
       const description = screen.getByText('Description')
-      
+
       expect(description).toHaveClass('custom-desc')
     })
   })
@@ -135,14 +135,14 @@ describe('Card Components', () => {
     it('renders content correctly', () => {
       render(<CardContent>Card content here</CardContent>)
       const content = screen.getByText('Card content here')
-      
+
       expect(content).toBeInTheDocument()
     })
 
     it('has correct padding', () => {
       render(<CardContent data-testid="content">Content</CardContent>)
       const content = screen.getByTestId('content')
-      
+
       expect(content).toHaveClass('px-6')
     })
 
@@ -156,7 +156,7 @@ describe('Card Components', () => {
           </div>
         </CardContent>
       )
-      
+
       expect(screen.getByText('Nested heading')).toBeInTheDocument()
       expect(screen.getByText('Nested paragraph')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Nested button' })).toBeInTheDocument()
@@ -165,7 +165,7 @@ describe('Card Components', () => {
     it('accepts custom className', () => {
       render(<CardContent className="custom-content">Content</CardContent>)
       const content = screen.getByText('Content')
-      
+
       expect(content).toHaveClass('custom-content')
     })
   })
@@ -183,10 +183,10 @@ describe('Card Components', () => {
           </CardContent>
         </Card>
       )
-      
+
       const article = screen.getByRole('article')
       expect(article).toHaveAttribute('aria-labelledby', 'card-title')
-      
+
       const title = screen.getByText('Accessible Card Title')
       expect(title).toHaveAttribute('id', 'card-title')
     })
@@ -194,12 +194,10 @@ describe('Card Components', () => {
     it('supports ARIA attributes', () => {
       render(
         <Card aria-describedby="card-description" data-testid="test-card">
-          <CardContent id="card-description">
-            This card has proper ARIA relationships
-          </CardContent>
+          <CardContent id="card-description">This card has proper ARIA relationships</CardContent>
         </Card>
       )
-      
+
       const card = screen.getByTestId('test-card')
       expect(card).toHaveAttribute('aria-describedby', 'card-description')
     })
@@ -221,7 +219,7 @@ describe('Card Components', () => {
           </CardContent>
         </Card>
       )
-      
+
       expect(screen.getByLabelText('Test Input')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument()
     })
@@ -238,7 +236,7 @@ describe('Card Components', () => {
           </CardContent>
         </Card>
       )
-      
+
       expect(screen.getByText('Nested Card')).toBeInTheDocument()
     })
   })

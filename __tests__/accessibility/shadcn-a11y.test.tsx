@@ -24,7 +24,7 @@ describe('Shadcn UI Accessibility', () => {
     it('should not have accessibility violations on home page', async () => {
       const { container } = render(<Home />)
       const results = await axe(container)
-      
+
       expect(results).toHaveNoViolations()
     })
 
@@ -34,10 +34,10 @@ describe('Shadcn UI Accessibility', () => {
         rules: {
           'landmark-one-main': { enabled: true },
           'page-has-heading-one': { enabled: false }, // We don't have H1 in this test page
-          'region': { enabled: true }
-        }
+          region: { enabled: true },
+        },
       })
-      
+
       expect(results).toHaveNoViolations()
     })
   })
@@ -53,7 +53,7 @@ describe('Shadcn UI Accessibility', () => {
           <Button disabled>Disabled Button</Button>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -66,7 +66,7 @@ describe('Shadcn UI Accessibility', () => {
           <div id="input-help">Helper text for input</div>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -83,7 +83,7 @@ describe('Shadcn UI Accessibility', () => {
           </CardContent>
         </Card>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -95,14 +95,16 @@ describe('Shadcn UI Accessibility', () => {
             <AlertTitle>Information Alert</AlertTitle>
             <AlertDescription>This is important information for users</AlertDescription>
           </Alert>
-          
+
           <Alert variant="destructive" role="alert">
             <AlertTitle>Error Alert</AlertTitle>
-            <AlertDescription>This is an error message that needs immediate attention</AlertDescription>
+            <AlertDescription>
+              This is an error message that needs immediate attention
+            </AlertDescription>
           </Alert>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -111,11 +113,15 @@ describe('Shadcn UI Accessibility', () => {
       const { container } = render(
         <div>
           <h2>User Status</h2>
-          <Badge role="status" aria-label="User is currently online">Online</Badge>
-          
+          <Badge role="status" aria-label="User is currently online">
+            Online
+          </Badge>
+
           <h2>Notification Count</h2>
-          <Badge variant="destructive" aria-label="5 unread messages">5</Badge>
-          
+          <Badge variant="destructive" aria-label="5 unread messages">
+            5
+          </Badge>
+
           <h2>Category Tags</h2>
           <div role="group" aria-label="Article categories">
             <Badge variant="outline">React</Badge>
@@ -124,7 +130,7 @@ describe('Shadcn UI Accessibility', () => {
           </div>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -150,14 +156,14 @@ describe('Shadcn UI Accessibility', () => {
           </Alert>
         </div>
       )
-      
+
       // Run axe specifically for color contrast
       const results = await axe(container, {
         rules: {
-          'color-contrast': { enabled: true }
-        }
+          'color-contrast': { enabled: true },
+        },
       })
-      
+
       expect(results).toHaveNoViolations()
     })
 
@@ -177,7 +183,7 @@ describe('Shadcn UI Accessibility', () => {
           </Card>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -193,7 +199,7 @@ describe('Shadcn UI Accessibility', () => {
           <Button tabIndex={-1}>Non-focusable button</Button>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -208,7 +214,7 @@ describe('Shadcn UI Accessibility', () => {
           </Card>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -219,14 +225,10 @@ describe('Shadcn UI Accessibility', () => {
       const { container } = render(
         <form aria-labelledby="form-title">
           <h2 id="form-title">Accessible Form</h2>
-          
+
           <div>
             <Label htmlFor="name">Full Name</Label>
-            <Input 
-              id="name" 
-              required 
-              aria-describedby="name-help name-error"
-            />
+            <Input id="name" required aria-describedby="name-help name-error" />
             <div id="name-help">Enter your full legal name</div>
             <div id="name-error" role="alert" style={{ display: 'none' }}>
               Name is required
@@ -235,12 +237,7 @@ describe('Shadcn UI Accessibility', () => {
 
           <div>
             <Label htmlFor="email">Email Address</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              required
-              aria-describedby="email-help"
-            />
+            <Input id="email" type="email" required aria-describedby="email-help" />
             <div id="email-help">We'll never share your email</div>
           </div>
 
@@ -253,18 +250,18 @@ describe('Shadcn UI Accessibility', () => {
           </fieldset>
 
           <Alert>
-            <AlertDescription>
-              Please review your information before submitting
-            </AlertDescription>
+            <AlertDescription>Please review your information before submitting</AlertDescription>
           </Alert>
 
           <div>
             <Button type="submit">Submit Form</Button>
-            <Button type="button" variant="outline">Cancel</Button>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
           </div>
         </form>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -274,25 +271,19 @@ describe('Shadcn UI Accessibility', () => {
         <form>
           <div>
             <Label htmlFor="required-field">Required Field</Label>
-            <Input 
-              id="required-field"
-              aria-invalid="true"
-              aria-describedby="field-error"
-            />
+            <Input id="required-field" aria-invalid="true" aria-describedby="field-error" />
             <div id="field-error" role="alert">
               This field is required
             </div>
           </div>
-          
+
           <Alert variant="destructive" role="alert">
             <AlertTitle>Form Errors</AlertTitle>
-            <AlertDescription>
-              Please correct the errors above before submitting
-            </AlertDescription>
+            <AlertDescription>Please correct the errors above before submitting</AlertDescription>
           </Alert>
         </form>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -317,7 +308,7 @@ describe('Shadcn UI Accessibility', () => {
           </div>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -330,7 +321,7 @@ describe('Shadcn UI Accessibility', () => {
               <AlertDescription>Operation completed successfully</AlertDescription>
             </Alert>
           </div>
-          
+
           <div aria-live="assertive" aria-label="Error messages">
             <Alert variant="destructive" role="alert">
               <AlertDescription>Critical error occurred</AlertDescription>
@@ -338,7 +329,7 @@ describe('Shadcn UI Accessibility', () => {
           </div>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -352,16 +343,18 @@ describe('Shadcn UI Accessibility', () => {
           <Button>Default Button</Button>
           <Button size="lg">Large Button</Button>
           <Input placeholder="Touch input" />
-          <Badge role="button" tabIndex={0}>Interactive Badge</Badge>
+          <Badge role="button" tabIndex={0}>
+            Interactive Badge
+          </Badge>
         </div>
       )
-      
+
       const results = await axe(container, {
         rules: {
-          'target-size': { enabled: true }
-        }
+          'target-size': { enabled: true },
+        },
       })
-      
+
       expect(results).toHaveNoViolations()
     })
   })
@@ -372,27 +365,20 @@ describe('Shadcn UI Accessibility', () => {
         <div>
           <main role="main" aria-label="Main content">
             <h1>Page Title</h1>
-            
+
             <section aria-labelledby="section-title">
               <h2 id="section-title">Component Examples</h2>
-              
+
               <Card role="article" aria-labelledby="card-title">
                 <CardHeader>
                   <CardTitle id="card-title">Example Card</CardTitle>
-                  <CardDescription>
-                    This card demonstrates accessible markup
-                  </CardDescription>
+                  <CardDescription>This card demonstrates accessible markup</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form>
                     <Label htmlFor="example-input">Example Input</Label>
-                    <Input 
-                      id="example-input" 
-                      aria-describedby="input-description"
-                    />
-                    <div id="input-description">
-                      Additional context for screen readers
-                    </div>
+                    <Input id="example-input" aria-describedby="input-description" />
+                    <div id="input-description">Additional context for screen readers</div>
                     <Button type="submit">Submit</Button>
                   </form>
                 </CardContent>
@@ -401,7 +387,7 @@ describe('Shadcn UI Accessibility', () => {
           </main>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -410,48 +396,28 @@ describe('Shadcn UI Accessibility', () => {
       const { container } = render(
         <div>
           <div role="tablist" aria-label="Example tabs">
-            <Button 
-              role="tab" 
-              aria-selected="true" 
-              aria-controls="panel1"
-              id="tab1"
-            >
+            <Button role="tab" aria-selected="true" aria-controls="panel1" id="tab1">
               Tab 1
             </Button>
-            <Button 
-              role="tab" 
-              aria-selected="false" 
-              aria-controls="panel2"
-              id="tab2"
-            >
+            <Button role="tab" aria-selected="false" aria-controls="panel2" id="tab2">
               Tab 2
             </Button>
           </div>
-          
-          <div 
-            role="tabpanel" 
-            id="panel1" 
-            aria-labelledby="tab1"
-            tabIndex={0}
-          >
+
+          <div role="tabpanel" id="panel1" aria-labelledby="tab1" tabIndex={0}>
             <Card>
               <CardContent>Content for tab 1</CardContent>
             </Card>
           </div>
-          
-          <div 
-            role="tabpanel" 
-            id="panel2" 
-            aria-labelledby="tab2"
-            hidden
-          >
+
+          <div role="tabpanel" id="panel2" aria-labelledby="tab2" hidden>
             <Card>
               <CardContent>Content for tab 2</CardContent>
             </Card>
           </div>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
@@ -467,14 +433,14 @@ describe('Shadcn UI Accessibility', () => {
           <Badge>Badge without context</Badge>
         </div>
       )
-      
+
       // This might have violations, but shouldn't crash
       const results = await axe(container, {
         rules: {
-          'label': { enabled: true }
-        }
+          label: { enabled: true },
+        },
       })
-      
+
       // We expect this to potentially have violations for the unlabeled input
       // This test ensures the testing setup works even with accessibility issues
       expect(results.violations.length).toBeGreaterThanOrEqual(0)
@@ -495,7 +461,7 @@ describe('Shadcn UI Accessibility', () => {
           </Card>
         </div>
       )
-      
+
       const results = await axe(container)
       expect(results).toHaveNoViolations()
     })

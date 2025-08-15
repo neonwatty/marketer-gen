@@ -202,7 +202,7 @@ describe('Shadcn UI Build Integration', () => {
       const content = fs.readFileSync(globalsPath, 'utf-8')
       
       // Should have Tailwind directives
-      expect(content).toContain('@import "tailwindcss"')
+      expect(content).toContain("@import 'tailwindcss'")
       
       // Should have shadcn-specific CSS
       expect(content).toContain('--primary')

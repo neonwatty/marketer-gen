@@ -5,7 +5,7 @@ describe('Font Configuration', () => {
     const path = require('path')
     const layoutPath = path.join(process.cwd(), 'src/app/layout.tsx')
     const layoutContent = fs.readFileSync(layoutPath, 'utf8')
-    
+
     expect(layoutContent).toContain('Geist')
     expect(layoutContent).toContain('Geist_Mono')
     expect(layoutContent).toContain('next/font/google')
@@ -16,9 +16,9 @@ describe('Font Configuration', () => {
     const path = require('path')
     const layoutPath = path.join(process.cwd(), 'src/app/layout.tsx')
     const layoutContent = fs.readFileSync(layoutPath, 'utf8')
-    
+
     expect(layoutContent).toContain('--font-geist-sans')
     expect(layoutContent).toContain('--font-geist-mono')
-    expect(layoutContent).toContain('subsets: ["latin"]')
+    expect(layoutContent).toContain("subsets: ['latin']")
   })
 })

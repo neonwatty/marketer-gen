@@ -1,0 +1,55 @@
+{
+  "recommendations": [
+    // Essential for React/Next.js development
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+    
+    // React and JSX support
+    "ms-vscode.vscode-json",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    
+    // Git and version control
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+    
+    // Code quality and debugging
+    "usernamehw.errorlens",
+    "ms-vscode.vscode-jest",
+    "orta.vscode-jest",
+    
+    // Productivity
+    "christian-kohler.npm-intellisense",
+    "eg2.vscode-npm-script",
+    "bradlc.vscode-tailwindcss",
+    "steoates.autoimport-es6-ts",
+    
+    // UI and theming
+    "pkief.material-icon-theme",
+    "github.github-vscode-theme",
+    
+    // Documentation and markdown
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    
+    // Environment and configuration
+    "mikestead.dotenv",
+    "ms-vscode.vscode-json",
+    
+    // Performance and optimization
+    "wayou.vscode-todo-highlight",
+    "gruntfuggly.todo-tree",
+    
+    // Advanced features
+    "ms-vscode.vscode-typescript-next",
+    "ms-playwright.playwright",
+    "ms-vscode.test-adapter-converter"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript",
+    "hookyqr.beautify",
+    "dbaeumer.jshint"
+  ]
+}

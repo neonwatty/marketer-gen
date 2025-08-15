@@ -10,7 +10,7 @@ describe('Alert Components', () => {
           <AlertDescription>This is an alert message</AlertDescription>
         </Alert>
       )
-      
+
       expect(screen.getByText('This is an alert message')).toBeInTheDocument()
     })
 
@@ -21,7 +21,7 @@ describe('Alert Components', () => {
           <AlertDescription>Alert description content</AlertDescription>
         </Alert>
       )
-      
+
       expect(screen.getByText('Alert Title')).toBeInTheDocument()
       expect(screen.getByText('Alert description content')).toBeInTheDocument()
     })
@@ -32,7 +32,7 @@ describe('Alert Components', () => {
           <AlertDescription>Description only alert</AlertDescription>
         </Alert>
       )
-      
+
       expect(screen.getByText('Description only alert')).toBeInTheDocument()
     })
 
@@ -42,7 +42,7 @@ describe('Alert Components', () => {
           <AlertDescription>Custom alert</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByTestId('alert')
       expect(alert).toHaveClass('custom-alert')
     })
@@ -55,7 +55,7 @@ describe('Alert Components', () => {
           <AlertDescription>Default alert</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByTestId('alert')
       expect(alert).toHaveClass('border')
     })
@@ -66,7 +66,7 @@ describe('Alert Components', () => {
           <AlertDescription>Error alert</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByTestId('alert')
       expect(alert).toHaveClass('text-destructive')
     })
@@ -77,7 +77,7 @@ describe('Alert Components', () => {
           <AlertDescription>Default styling</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByTestId('alert')
       expect(alert).toHaveClass('bg-card', 'text-card-foreground')
     })
@@ -88,7 +88,7 @@ describe('Alert Components', () => {
           <AlertDescription>Destructive styling</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByTestId('alert')
       expect(alert).toHaveClass('text-destructive', 'bg-card')
     })
@@ -98,7 +98,7 @@ describe('Alert Components', () => {
     it('renders as div', () => {
       render(<AlertTitle>Alert Title</AlertTitle>)
       const title = screen.getByText('Alert Title')
-      
+
       expect(title).toBeInTheDocument()
       expect(title.tagName).toBe('DIV')
     })
@@ -106,21 +106,21 @@ describe('Alert Components', () => {
     it('has correct typography classes', () => {
       render(<AlertTitle>Title</AlertTitle>)
       const title = screen.getByText('Title')
-      
+
       expect(title).toHaveClass('font-medium', 'tracking-tight')
     })
 
     it('accepts custom className', () => {
       render(<AlertTitle className="custom-title">Title</AlertTitle>)
       const title = screen.getByText('Title')
-      
+
       expect(title).toHaveClass('custom-title')
     })
 
     it('renders as div by default', () => {
       render(<AlertTitle>Default Title</AlertTitle>)
       const title = screen.getByText('Default Title')
-      
+
       expect(title.tagName).toBe('DIV')
     })
   })
@@ -129,28 +129,28 @@ describe('Alert Components', () => {
     it('renders description text', () => {
       render(<AlertDescription>Alert description content</AlertDescription>)
       const description = screen.getByText('Alert description content')
-      
+
       expect(description).toBeInTheDocument()
     })
 
     it('has correct typography', () => {
       render(<AlertDescription>Description</AlertDescription>)
       const description = screen.getByText('Description')
-      
+
       expect(description).toHaveClass('text-sm', '[&_p]:leading-relaxed')
     })
 
     it('renders as div by default', () => {
       render(<AlertDescription>Description text</AlertDescription>)
       const description = screen.getByText('Description text')
-      
+
       expect(description.tagName).toBe('DIV')
     })
 
     it('accepts custom className', () => {
       render(<AlertDescription className="custom-desc">Description</AlertDescription>)
       const description = screen.getByText('Description')
-      
+
       expect(description).toHaveClass('custom-desc')
     })
 
@@ -162,7 +162,7 @@ describe('Alert Components', () => {
           <strong>Bold content</strong>
         </AlertDescription>
       )
-      
+
       expect(screen.getByText('Paragraph content')).toBeInTheDocument()
       expect(screen.getByRole('link', { name: 'Link content' })).toBeInTheDocument()
       expect(screen.getByText('Bold content')).toBeInTheDocument()
@@ -176,7 +176,7 @@ describe('Alert Components', () => {
           <AlertDescription>Alert message</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByTestId('alert')
       expect(alert).toHaveAttribute('role', 'alert')
     })
@@ -187,7 +187,7 @@ describe('Alert Components', () => {
           <AlertDescription>Status message</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByTestId('alert')
       expect(alert).toHaveAttribute('role', 'status')
     })
@@ -198,7 +198,7 @@ describe('Alert Components', () => {
           <AlertDescription>Important message</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByRole('alert')
       expect(alert).toBeInTheDocument()
     })
@@ -210,10 +210,10 @@ describe('Alert Components', () => {
           <AlertDescription>This is important information</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByRole('alert')
       const title = screen.getByText('Important Alert')
-      
+
       expect(alert).toHaveAttribute('aria-labelledby', 'alert-title')
       expect(title).toHaveAttribute('id', 'alert-title')
     })
@@ -221,12 +221,10 @@ describe('Alert Components', () => {
     it('supports aria-describedby', () => {
       render(
         <Alert aria-describedby="alert-desc">
-          <AlertDescription id="alert-desc">
-            Detailed alert description
-          </AlertDescription>
+          <AlertDescription id="alert-desc">Detailed alert description</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByRole('alert')
       expect(alert).toHaveAttribute('aria-describedby', 'alert-desc')
     })
@@ -239,7 +237,7 @@ describe('Alert Components', () => {
           <AlertDescription>Layout test</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByTestId('alert')
       expect(alert).toHaveClass('relative', 'w-full', 'rounded-lg', 'border', 'px-4', 'py-3')
     })
@@ -251,7 +249,7 @@ describe('Alert Components', () => {
           <AlertDescription>Description</AlertDescription>
         </Alert>
       )
-      
+
       const title = screen.getByText('Title')
       expect(title).toHaveClass('col-start-2')
     })
@@ -264,7 +262,7 @@ describe('Alert Components', () => {
           <AlertDescription>This alert has an icon</AlertDescription>
         </Alert>
       )
-      
+
       expect(screen.getByTestId('alert-icon')).toBeInTheDocument()
       expect(screen.getByText('Alert with Icon')).toBeInTheDocument()
     })
@@ -275,15 +273,13 @@ describe('Alert Components', () => {
       render(
         <form>
           <Alert>
-            <AlertDescription>
-              Please correct the errors below
-            </AlertDescription>
+            <AlertDescription>Please correct the errors below</AlertDescription>
           </Alert>
           <input type="text" aria-invalid="true" />
           <button type="submit">Submit</button>
         </form>
       )
-      
+
       expect(screen.getByText('Please correct the errors below')).toBeInTheDocument()
       expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true')
     })
@@ -295,7 +291,7 @@ describe('Alert Components', () => {
           <AlertDescription>Your changes have been saved</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByRole('status')
       expect(alert).toBeInTheDocument()
       expect(screen.getByText('Success!')).toBeInTheDocument()
@@ -308,7 +304,7 @@ describe('Alert Components', () => {
           <AlertDescription>Something went wrong</AlertDescription>
         </Alert>
       )
-      
+
       const alert = screen.getByRole('alert')
       expect(alert).toBeInTheDocument()
       expect(screen.getByText('Error')).toBeInTheDocument()
@@ -323,7 +319,7 @@ describe('Alert Components', () => {
           <AlertDescription>Ref test</AlertDescription>
         </Alert>
       )
-      
+
       expect(ref.current).toBeInstanceOf(HTMLDivElement)
       expect(ref.current).toHaveTextContent('Ref test')
     })

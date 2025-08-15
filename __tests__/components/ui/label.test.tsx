@@ -7,7 +7,7 @@ describe('Label Component', () => {
     it('renders label text correctly', () => {
       render(<Label>Test Label</Label>)
       const label = screen.getByText('Test Label')
-      
+
       expect(label).toBeInTheDocument()
       expect(label.tagName).toBe('LABEL')
     })
@@ -15,7 +15,7 @@ describe('Label Component', () => {
     it('renders with htmlFor attribute', () => {
       render(<Label htmlFor="test-input">Input Label</Label>)
       const label = screen.getByText('Input Label')
-      
+
       expect(label).toHaveAttribute('for', 'test-input')
     })
 
@@ -26,7 +26,7 @@ describe('Label Component', () => {
           <input id="associated-input" type="text" />
         </div>
       )
-      
+
       const input = screen.getByLabelText('Associated Label')
       expect(input).toBeInTheDocument()
       expect(input).toHaveAttribute('id', 'associated-input')
@@ -37,21 +37,21 @@ describe('Label Component', () => {
     it('has correct base styling classes', () => {
       render(<Label>Styled Label</Label>)
       const label = screen.getByText('Styled Label')
-      
+
       expect(label).toHaveClass('text-sm', 'font-medium', 'leading-none')
     })
 
     it('applies custom className', () => {
       render(<Label className="custom-label-class">Custom Label</Label>)
       const label = screen.getByText('Custom Label')
-      
+
       expect(label).toHaveClass('custom-label-class')
     })
 
     it('has proper peer styling for form validation', () => {
       render(<Label>Validation Label</Label>)
       const label = screen.getByText('Validation Label')
-      
+
       // Should have peer validation styling
       expect(label).toHaveClass('peer-disabled:cursor-not-allowed', 'peer-disabled:opacity-50')
     })
@@ -60,16 +60,11 @@ describe('Label Component', () => {
   describe('HTML Attributes', () => {
     it('supports all standard label attributes', () => {
       render(
-        <Label 
-          htmlFor="test"
-          id="label-id"
-          title="Label tooltip"
-          data-testid="test-label"
-        >
+        <Label htmlFor="test" id="label-id" title="Label tooltip" data-testid="test-label">
           Full Attributes Label
         </Label>
       )
-      
+
       const label = screen.getByTestId('test-label')
       expect(label).toHaveAttribute('for', 'test')
       expect(label).toHaveAttribute('id', 'label-id')
@@ -78,15 +73,11 @@ describe('Label Component', () => {
 
     it('forwards all props correctly', () => {
       render(
-        <Label 
-          role="presentation"
-          aria-hidden="true"
-          data-custom="value"
-        >
+        <Label role="presentation" aria-hidden="true" data-custom="value">
           Props Label
         </Label>
       )
-      
+
       const label = screen.getByText('Props Label')
       expect(label).toHaveAttribute('role', 'presentation')
       expect(label).toHaveAttribute('aria-hidden', 'true')
@@ -107,7 +98,7 @@ describe('Label Component', () => {
           <strong>Content</strong>
         </Label>
       )
-      
+
       expect(screen.getByText('Complex')).toBeInTheDocument()
       expect(screen.getByText('Content')).toBeInTheDocument()
     })
@@ -119,7 +110,7 @@ describe('Label Component', () => {
           Email Address
         </Label>
       )
-      
+
       const label = screen.getByText('Email Address')
       expect(label).toBeInTheDocument()
       expect(label).toHaveTextContent('📧Email Address')
@@ -128,7 +119,7 @@ describe('Label Component', () => {
     it('handles empty content', () => {
       render(<Label data-testid="empty-label"></Label>)
       const label = screen.getByTestId('empty-label')
-      
+
       expect(label).toBeInTheDocument()
       expect(label).toBeEmptyDOMElement()
     })
@@ -137,7 +128,7 @@ describe('Label Component', () => {
   describe('Form Integration', () => {
     it('works with various input types', () => {
       const inputTypes = ['text', 'email', 'password', 'number', 'tel'] as const
-      
+
       inputTypes.forEach(type => {
         const { unmount } = render(
           <div>
@@ -145,10 +136,10 @@ describe('Label Component', () => {
             <input id={`${type}-input`} type={type} />
           </div>
         )
-        
+
         const input = screen.getByLabelText(`${type} Label`)
         expect(input).toHaveAttribute('type', type)
-        
+
         unmount()
       })
     })
@@ -160,7 +151,7 @@ describe('Label Component', () => {
           <textarea id="textarea-input" />
         </div>
       )
-      
+
       const textarea = screen.getByLabelText('Textarea Label')
       expect(textarea.tagName).toBe('TEXTAREA')
     })
@@ -175,7 +166,7 @@ describe('Label Component', () => {
           </select>
         </div>
       )
-      
+
       const select = screen.getByLabelText('Select Label')
       expect(select.tagName).toBe('SELECT')
     })
@@ -187,7 +178,7 @@ describe('Label Component', () => {
           <span aria-hidden="true">*</span>
         </Label>
       )
-      
+
       const label = screen.getByText('Required Field')
       expect(label).toHaveTextContent('Required Field*')
     })
@@ -201,7 +192,7 @@ describe('Label Component', () => {
           <input id="accessible-input" type="text" />
         </div>
       )
-      
+
       const input = screen.getByRole('textbox', { name: 'Accessible Label' })
       expect(input).toBeInTheDocument()
     })
@@ -210,15 +201,11 @@ describe('Label Component', () => {
       render(
         <div>
           <Label htmlFor="described-input">Input with Description</Label>
-          <input 
-            id="described-input" 
-            type="text"
-            aria-describedby="input-description"
-          />
+          <input id="described-input" type="text" aria-describedby="input-description" />
           <div id="input-description">Additional help text</div>
         </div>
       )
-      
+
       const input = screen.getByLabelText('Input with Description')
       expect(input).toHaveAttribute('aria-describedby', 'input-description')
     })
@@ -227,16 +214,18 @@ describe('Label Component', () => {
       render(
         <div>
           <Label htmlFor="invalid-input">Invalid Input</Label>
-          <input 
-            id="invalid-input" 
+          <input
+            id="invalid-input"
             type="text"
             aria-invalid="true"
             aria-describedby="error-message"
           />
-          <div id="error-message" role="alert">This field has an error</div>
+          <div id="error-message" role="alert">
+            This field has an error
+          </div>
         </div>
       )
-      
+
       const input = screen.getByLabelText('Invalid Input')
       expect(input).toHaveAttribute('aria-invalid', 'true')
       expect(input).toHaveAttribute('aria-describedby', 'error-message')
@@ -249,7 +238,7 @@ describe('Label Component', () => {
           <span className="sr-only">Additional context for screen readers</span>
         </Label>
       )
-      
+
       const label = screen.getByText('Visible Label')
       expect(label).toBeInTheDocument()
       expect(label).toHaveTextContent('Visible LabelAdditional context for screen readers')
@@ -264,10 +253,10 @@ describe('Label Component', () => {
           <input id="disabled-input" type="text" disabled />
         </div>
       )
-      
+
       const input = screen.getByLabelText('Disabled Input Label')
       expect(input).toBeDisabled()
-      
+
       // Label should have peer styling for disabled state
       const label = screen.getByText('Disabled Input Label')
       expect(label).toHaveClass('peer-disabled:cursor-not-allowed', 'peer-disabled:opacity-50')
@@ -277,15 +266,10 @@ describe('Label Component', () => {
       render(
         <form>
           <Label htmlFor="peer-input">Peer Input Label</Label>
-          <input 
-            id="peer-input" 
-            type="text" 
-            className="peer"
-            required
-          />
+          <input id="peer-input" type="text" className="peer" required />
         </form>
       )
-      
+
       const label = screen.getByText('Peer Input Label')
       expect(label).toHaveClass('peer-disabled:cursor-not-allowed', 'peer-disabled:opacity-50')
     })
@@ -295,14 +279,15 @@ describe('Label Component', () => {
     it('handles special characters in content', () => {
       render(<Label>Label with special chars: @#$%^&*()</Label>)
       const label = screen.getByText('Label with special chars: @#$%^&*()')
-      
+
       expect(label).toBeInTheDocument()
     })
 
     it('handles very long label text', () => {
-      const longText = 'This is a very long label text that might wrap to multiple lines and should still work correctly'
+      const longText =
+        'This is a very long label text that might wrap to multiple lines and should still work correctly'
       render(<Label>{longText}</Label>)
-      
+
       const label = screen.getByText(longText)
       expect(label).toBeInTheDocument()
     })
@@ -310,7 +295,7 @@ describe('Label Component', () => {
     it('handles numeric content', () => {
       render(<Label>{42}</Label>)
       const label = screen.getByText('42')
-      
+
       expect(label).toBeInTheDocument()
     })
 
@@ -322,7 +307,7 @@ describe('Label Component', () => {
           {showOptional && <span> (Optional)</span>}
         </Label>
       )
-      
+
       const label = screen.getAllByText((content, element) => {
         return element && element.textContent === 'Required Field (Optional)'
       })[0] // Take the first one
@@ -334,20 +319,20 @@ describe('Label Component', () => {
     it('works with controlled components', () => {
       const TestForm = () => {
         const [value, setValue] = React.useState('')
-        
+
         return (
           <div>
             <Label htmlFor="controlled-input">Controlled Input</Label>
-            <input 
+            <input
               id="controlled-input"
               type="text"
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={e => setValue(e.target.value)}
             />
           </div>
         )
       }
-      
+
       render(<TestForm />)
       const input = screen.getByLabelText('Controlled Input')
       expect(input).toBeInTheDocument()
@@ -356,29 +341,27 @@ describe('Label Component', () => {
     it('maintains association during dynamic updates', () => {
       const DynamicForm = () => {
         const [fieldName, setFieldName] = React.useState('initial')
-        
+
         return (
           <div>
-            <button onClick={() => setFieldName('updated')}>
-              Update Field
-            </button>
+            <button onClick={() => setFieldName('updated')}>Update Field</button>
             <Label htmlFor={`${fieldName}-input`}>{fieldName} Label</Label>
             <input id={`${fieldName}-input`} type="text" />
           </div>
         )
       }
-      
+
       render(<DynamicForm />)
-      
+
       // Initial state
       expect(screen.getByLabelText('initial Label')).toBeInTheDocument()
-      
+
       // After update
       const button = screen.getByRole('button', { name: 'Update Field' })
       act(() => {
         button.click()
       })
-      
+
       expect(screen.getByLabelText('updated Label')).toBeInTheDocument()
     })
   })
@@ -387,15 +370,19 @@ describe('Label Component', () => {
     it('forwards ref correctly', () => {
       const ref = React.createRef<HTMLLabelElement>()
       render(<Label ref={ref}>Ref Label</Label>)
-      
+
       expect(ref.current).toBeInstanceOf(HTMLLabelElement)
       expect(ref.current).toHaveTextContent('Ref Label')
     })
 
     it('allows focusing through ref', () => {
       const ref = React.createRef<HTMLLabelElement>()
-      render(<Label ref={ref} tabIndex={0}>Focusable Label</Label>)
-      
+      render(
+        <Label ref={ref} tabIndex={0}>
+          Focusable Label
+        </Label>
+      )
+
       ref.current?.focus()
       expect(ref.current).toHaveFocus()
     })

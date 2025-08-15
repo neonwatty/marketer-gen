@@ -12,7 +12,7 @@ describe('Project Configuration', () => {
     expect(packageJson.dependencies).toHaveProperty('next')
     expect(packageJson.dependencies).toHaveProperty('react')
     expect(packageJson.dependencies).toHaveProperty('react-dom')
-    expect(packageJson.dependencies).toHaveProperty('typescript')
+    expect(packageJson.devDependencies).toHaveProperty('typescript')
   })
 
   it('should have testing dependencies', () => {

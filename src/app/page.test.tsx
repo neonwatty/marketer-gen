@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+
 import Home from './page'
 
 // Fixed Next.js Image mock
@@ -24,7 +25,9 @@ describe('Home Page with Shadcn UI', () => {
 
     it('renders the test card with correct structure', () => {
       expect(screen.getByText('Shadcn UI Test Components')).toBeInTheDocument()
-      expect(screen.getByText(/Testing the installed components to verify they're working correctly/)).toBeInTheDocument()
+      expect(
+        screen.getByText(/Testing the installed components to verify they're working correctly/)
+      ).toBeInTheDocument()
     })
 
     it('renders all button variants', () => {
@@ -50,7 +53,7 @@ describe('Home Page with Shadcn UI', () => {
     it('allows typing in the test input', async () => {
       const user = userEvent.setup()
       const input = screen.getByLabelText('Test Input')
-      
+
       await user.type(input, 'Hello World')
       expect(input).toHaveValue('Hello World')
     })
@@ -58,7 +61,7 @@ describe('Home Page with Shadcn UI', () => {
     it('buttons are clickable', async () => {
       const user = userEvent.setup()
       const primaryButton = screen.getByRole('button', { name: 'Primary Button' })
-      
+
       await user.click(primaryButton)
       // Add custom click handlers in future and test them here
       expect(primaryButton).toBeInTheDocument()
@@ -97,7 +100,7 @@ describe('Home Page with Shadcn UI', () => {
     it('renders main action buttons with correct href', () => {
       const deployLink = screen.getByRole('link', { name: /Deploy now/ })
       const docsLink = screen.getByRole('link', { name: /Read our docs/ })
-      
+
       expect(deployLink).toHaveAttribute('href', expect.stringContaining('vercel.com/new'))
       expect(docsLink).toHaveAttribute('href', expect.stringContaining('nextjs.org/docs'))
     })
@@ -106,7 +109,7 @@ describe('Home Page with Shadcn UI', () => {
       const learnLink = screen.getByRole('link', { name: /Learn/ })
       const examplesLink = screen.getByRole('link', { name: /Examples/ })
       const nextjsLink = screen.getByRole('link', { name: /Go to nextjs.org/ })
-      
+
       expect(learnLink).toHaveAttribute('href', expect.stringContaining('nextjs.org/learn'))
       expect(examplesLink).toHaveAttribute('href', expect.stringContaining('vercel.com/templates'))
       expect(nextjsLink).toHaveAttribute('href', expect.stringContaining('nextjs.org'))
@@ -114,7 +117,7 @@ describe('Home Page with Shadcn UI', () => {
 
     it('opens external links in new tab', () => {
       const externalLinks = screen.getAllByRole('link')
-      
+
       externalLinks.forEach(link => {
         expect(link).toHaveAttribute('target', '_blank')
         expect(link).toHaveAttribute('rel', 'noopener noreferrer')
@@ -126,7 +129,7 @@ describe('Home Page with Shadcn UI', () => {
     it('applies responsive classes correctly', () => {
       const mainElement = screen.getByRole('main')
       expect(mainElement).toHaveClass('sm:items-start')
-      
+
       const buttonContainer = mainElement.querySelector('.flex.gap-4')
       expect(buttonContainer).toHaveClass('flex-col', 'sm:flex-row')
     })
@@ -142,9 +145,12 @@ describe('Home Page with Shadcn UI', () => {
     it('has aria-hidden images in footer', () => {
       const images = screen.getAllByRole('img')
       const footerImages = images.slice(-3) // last 3 images are in footer
-      
+
       footerImages.forEach(img => {
-        if (img.getAttribute('alt') !== 'Next.js logo' && img.getAttribute('alt') !== 'Vercel logomark') {
+        if (
+          img.getAttribute('alt') !== 'Next.js logo' &&
+          img.getAttribute('alt') !== 'Vercel logomark'
+        ) {
           expect(img).toHaveAttribute('aria-hidden')
         }
       })

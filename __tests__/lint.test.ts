@@ -13,7 +13,7 @@ describe('ESLint Configuration', () => {
   it('should have ESLint configuration file', () => {
     const fs = require('fs')
     const path = require('path')
-    
+
     // Check for eslint config file
     const eslintConfigPath = path.join(process.cwd(), 'eslint.config.mjs')
     expect(fs.existsSync(eslintConfigPath)).toBe(true)

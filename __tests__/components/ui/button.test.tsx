@@ -14,7 +14,7 @@ describe('Button Component', () => {
 
     it('renders all variants correctly', () => {
       const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'] as const
-      
+
       variants.forEach(variant => {
         const { unmount } = render(<Button variant={variant}>{variant} button</Button>)
         const button = screen.getByRole('button', { name: `${variant} button` })
@@ -25,7 +25,7 @@ describe('Button Component', () => {
 
     it('renders all sizes correctly', () => {
       const sizes = ['default', 'sm', 'lg', 'icon'] as const
-      
+
       sizes.forEach(size => {
         const { unmount } = render(<Button size={size}>{size} button</Button>)
         const button = screen.getByRole('button', { name: `${size} button` })
@@ -45,10 +45,10 @@ describe('Button Component', () => {
     it('handles click events', async () => {
       const user = userEvent.setup()
       const handleClick = jest.fn()
-      
+
       render(<Button onClick={handleClick}>Click me</Button>)
       const button = screen.getByRole('button', { name: 'Click me' })
-      
+
       await user.click(button)
       expect(handleClick).toHaveBeenCalledTimes(1)
     })
@@ -56,7 +56,7 @@ describe('Button Component', () => {
     it('is disabled when disabled prop is true', () => {
       render(<Button disabled>Disabled button</Button>)
       const button = screen.getByRole('button', { name: 'Disabled button' })
-      
+
       expect(button).toBeDisabled()
       expect(button).toHaveClass('disabled:pointer-events-none', 'disabled:opacity-50')
     })
@@ -64,17 +64,21 @@ describe('Button Component', () => {
     it('can be used with different HTML elements', () => {
       render(<Button type="submit">Submit Button</Button>)
       const button = screen.getByRole('button', { name: 'Submit Button' })
-      
+
       expect(button).toHaveAttribute('type', 'submit')
     })
 
     it('prevents click when disabled', async () => {
       const user = userEvent.setup()
       const handleClick = jest.fn()
-      
-      render(<Button disabled onClick={handleClick}>Disabled button</Button>)
+
+      render(
+        <Button disabled onClick={handleClick}>
+          Disabled button
+        </Button>
+      )
       const button = screen.getByRole('button', { name: 'Disabled button' })
-      
+
       await user.click(button)
       expect(handleClick).not.toHaveBeenCalled()
     })
@@ -84,7 +88,7 @@ describe('Button Component', () => {
     it('has proper focus styles', () => {
       render(<Button>Focus me</Button>)
       const button = screen.getByRole('button', { name: 'Focus me' })
-      
+
       expect(button).toHaveClass('focus-visible:ring-ring/50', 'focus-visible:ring-[3px]')
     })
 
@@ -94,7 +98,7 @@ describe('Button Component', () => {
           Button
         </Button>
       )
-      
+
       const button = screen.getByRole('button', { name: 'Custom aria label' })
       expect(button).toHaveAttribute('aria-describedby', 'description')
     })
