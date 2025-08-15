@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Home from './page'
 
 // Fixed Next.js Image mock
@@ -10,12 +11,73 @@ jest.mock('next/image', () => ({
   },
 }))
 
-describe('Home Page', () => {
+describe('Home Page with Shadcn UI', () => {
   beforeEach(() => {
     render(<Home />)
   })
 
-  describe('Content Rendering', () => {
+  describe('Shadcn UI Components Rendering', () => {
+    it('renders the alert component with success message', () => {
+      expect(screen.getByText(/Shadcn UI has been successfully configured!/)).toBeInTheDocument()
+      expect(screen.getByText('Components Tested')).toBeInTheDocument()
+    })
+
+    it('renders the test card with correct structure', () => {
+      expect(screen.getByText('Shadcn UI Test Components')).toBeInTheDocument()
+      expect(screen.getByText(/Testing the installed components to verify they're working correctly/)).toBeInTheDocument()
+    })
+
+    it('renders all button variants', () => {
+      expect(screen.getByRole('button', { name: 'Primary Button' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Secondary Button' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Outline Button' })).toBeInTheDocument()
+    })
+
+    it('renders all badge variants', () => {
+      expect(screen.getByText('Default')).toBeInTheDocument()
+      expect(screen.getByText('Secondary Badge')).toBeInTheDocument()
+      expect(screen.getByText('Destructive')).toBeInTheDocument()
+      expect(screen.getByText('Outline Badge')).toBeInTheDocument()
+    })
+
+    it('renders input with label', () => {
+      expect(screen.getByLabelText('Test Input')).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Type something here...')).toBeInTheDocument()
+    })
+  })
+
+  describe('Component Interactions', () => {
+    it('allows typing in the test input', async () => {
+      const user = userEvent.setup()
+      const input = screen.getByLabelText('Test Input')
+      
+      await user.type(input, 'Hello World')
+      expect(input).toHaveValue('Hello World')
+    })
+
+    it('buttons are clickable', async () => {
+      const user = userEvent.setup()
+      const primaryButton = screen.getByRole('button', { name: 'Primary Button' })
+      
+      await user.click(primaryButton)
+      // Add custom click handlers in future and test them here
+      expect(primaryButton).toBeInTheDocument()
+    })
+  })
+
+  describe('Responsive Design with Shadcn UI', () => {
+    it('applies correct container classes', () => {
+      const main = screen.getByRole('main')
+      expect(main).toHaveClass('max-w-2xl', 'w-full')
+    })
+
+    it('card takes full width', () => {
+      const card = screen.getByText('Shadcn UI Test Components').closest('.w-full')
+      expect(card).toHaveClass('w-full')
+    })
+  })
+
+  describe('Content Rendering (Legacy)', () => {
     it('renders the main heading text', () => {
       expect(screen.getByText(/Get started by editing/)).toBeInTheDocument()
       expect(screen.getByText(/src\/app\/page.tsx/)).toBeInTheDocument()

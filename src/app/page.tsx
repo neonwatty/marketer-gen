@@ -1,9 +1,15 @@
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start max-w-2xl w-full">
         <Image
           className="dark:invert"
           src="/next.svg"
@@ -12,6 +18,39 @@ export default function Home() {
           height={38}
           priority
         />
+        
+        <Alert>
+          <AlertDescription>
+            Shadcn UI has been successfully configured! <Badge variant="secondary">Components Tested</Badge>
+          </AlertDescription>
+        </Alert>
+
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Shadcn UI Test Components</CardTitle>
+            <CardDescription>
+              Testing the installed components to verify they&apos;re working correctly.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="test-input">Test Input</Label>
+              <Input id="test-input" placeholder="Type something here..." />
+            </div>
+            <div className="flex gap-2">
+              <Button>Primary Button</Button>
+              <Button variant="secondary">Secondary Button</Button>
+              <Button variant="outline">Outline Button</Button>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <Badge>Default</Badge>
+              <Badge variant="secondary">Secondary Badge</Badge>
+              <Badge variant="destructive">Destructive</Badge>
+              <Badge variant="outline">Outline Badge</Badge>
+            </div>
+          </CardContent>
+        </Card>
+
         <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{" "}
