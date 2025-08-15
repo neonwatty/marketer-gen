@@ -15,7 +15,11 @@
     "test:coverage": "jest --coverage",
     "test:prisma": "jest --testPathPatterns=\"(database|prisma)\"",
     "test:api": "jest --testPathPatterns=\"api\"",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -62,6 +66,10 @@
     "prisma": "^6.14.0",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.6",
+    "tsx": "^4.19.2",
     "typescript": "^5.9.2"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

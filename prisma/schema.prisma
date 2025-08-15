@@ -19,6 +19,7 @@ model User {
   role      UserRole @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime? // Soft delete functionality
 
   // Relationships
   brands    Brand[]
@@ -37,6 +38,9 @@ model Brand {
   userId     String   // Foreign key to User
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  deletedAt  DateTime? // Soft delete functionality
+  createdBy  String?   // User who created this brand
+  updatedBy  String?   // User who last updated this brand
 
   // Relationships
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -58,12 +62,107 @@ model Campaign {
   endDate   DateTime?      // Optional end date
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
+  deletedAt DateTime?      // Soft delete functionality
+  createdBy String?        // User who created this campaign
+  updatedBy String?        // User who last updated this campaign
 
   // Relationships
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  journeys Journey[]
+  analytics Analytics[]
 
   @@map("campaigns")
+}
+
+// Journey model for workflow stages and automation
+model Journey {
+  id         String        @id @default(cuid())
+  campaignId String        // Foreign key to Campaign
+  stages     Json          // Journey stages as JSON array
+  status     JourneyStatus @default(DRAFT)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  deletedAt  DateTime?     // Soft delete functionality
+  createdBy  String?       // User who created this journey
+  updatedBy  String?       // User who last updated this journey
+
+  // Relationships
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  content  Content[]
+  analytics Analytics[]
+
+  @@map("journeys")
+}
+
+// Content model for generated content within journeys
+model Content {
+  id        String        @id @default(cuid())
+  journeyId String        // Foreign key to Journey
+  type      ContentType   // Type of content (email, social, ad, etc.)
+  content   String        // The actual content text
+  status    ContentStatus @default(DRAFT)
+  variants  Json?         // Content variants as JSON
+  metadata  Json?         // Additional metadata as JSON
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  deletedAt DateTime?     // Soft delete functionality
+  createdBy String?       // User who created this content
+  updatedBy String?       // User who last updated this content
+
+  // Relationships
+  journey Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  analytics Analytics[]
+
+  @@map("content")
+}
+
+// ContentTemplate model for reusable content templates
+model ContentTemplate {
+  id        String      @id @default(cuid())
+  type      ContentType // Type of content this template is for
+  template  String      // The template text with variables
+  category  String?     // Template category for organization
+  variables Json?       // Variables available in template as JSON
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  deletedAt DateTime?   // Soft delete functionality
+  createdBy String?     // User who created this template
+  updatedBy String?     // User who last updated this template
+
+  @@map("content_templates")
+}
+
+// Analytics model for tracking campaign and content performance
+model Analytics {
+  id         String        @id @default(cuid())
+  campaignId String        // Foreign key to Campaign
+  contentId  String?       // Optional foreign key to Content
+  journeyId  String?       // Optional foreign key to Journey
+  eventType  EventType     // Type of analytics event
+  metrics    Json          // Metrics data (impressions, CTR, engagement, conversions)
+  timestamp  DateTime      @default(now())
+  source     String?       // Source of the analytics data
+  sessionId  String?       // Session identifier for tracking
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  deletedAt  DateTime?     // Soft delete functionality
+  createdBy  String?       // User who created this record
+  updatedBy  String?       // User who last updated this record
+
+  // Relationships
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  content  Content? @relation(fields: [contentId], references: [id], onDelete: SetNull)
+  journey  Journey? @relation(fields: [journeyId], references: [id], onDelete: SetNull)
+
+  // Indexes for efficient querying
+  @@index([campaignId])
+  @@index([contentId])
+  @@index([journeyId])
+  @@index([timestamp])
+  @@index([eventType])
+  @@map("analytics")
 }
 
 // Enums
@@ -79,4 +178,48 @@ enum CampaignStatus {
   PAUSED
   COMPLETED
   CANCELLED
+}
+
+enum JourneyStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum ContentStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ContentType {
+  EMAIL
+  SOCIAL_POST
+  SOCIAL_AD
+  SEARCH_AD
+  BLOG_POST
+  LANDING_PAGE
+  VIDEO_SCRIPT
+  INFOGRAPHIC
+  NEWSLETTER
+  PRESS_RELEASE
+}
+
+enum EventType {
+  IMPRESSION
+  CLICK
+  OPEN
+  CONVERSION
+  ENGAGEMENT
+  SHARE
+  DOWNLOAD
+  SIGNUP
+  PURCHASE
+  VIEW
+  BOUNCE
+  UNSUBSCRIBE
 }
