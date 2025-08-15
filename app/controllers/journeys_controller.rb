@@ -1,6 +1,6 @@
 class JourneysController < ApplicationController
   before_action :require_authentication
-  before_action :set_journey, only: [:show, :edit, :update, :destroy, :reorder_steps]
+  before_action :set_journey, only: [:show, :edit, :update, :destroy, :reorder_steps, :suggestions]
 
   def index
     authorize Journey
@@ -76,6 +76,48 @@ class JourneysController < ApplicationController
     head :ok
   rescue ActiveRecord::RecordNotFound
     head :not_found
+  end
+
+  def suggestions
+    authorize @journey, :show?
+    
+    # Get existing steps for filtering
+    existing_steps = @journey.journey_steps.map { |step| { step_type: step.step_type } }
+    
+    # Get current stage from params or use first stage (handle parameter pollution)
+    stage_param = params[:stage].is_a?(Array) ? params[:stage].first : params[:stage]
+    current_stage = stage_param || @journey.stages&.first
+    
+    # Initialize suggestion service
+    suggestion_service = JourneySuggestionService.new(
+      campaign_type: @journey.campaign_type,
+      template_type: @journey.template_type,
+      current_stage: current_stage,
+      existing_steps: existing_steps
+    )
+    
+    # Get suggestions with safe limit parameter handling
+    limit = params[:limit].is_a?(Array) ? params[:limit].first : params[:limit]
+    limit = limit&.to_i || 5
+    suggestions = suggestion_service.suggest_steps(limit: limit)
+    
+    # Enhance suggestions with additional details
+    enhanced_suggestions = suggestions.map do |suggestion|
+      channels = suggestion_service.suggest_channels_for_step(suggestion[:step_type])
+      content = suggestion_service.suggest_content_for_step(suggestion[:step_type], current_stage)
+      
+      suggestion.merge(
+        suggested_channels: channels,
+        content_suggestions: content
+      )
+    end
+    
+    render json: {
+      suggestions: enhanced_suggestions,
+      current_stage: current_stage,
+      available_stages: @journey.stages,
+      campaign_type: @journey.campaign_type
+    }
   end
 
   private

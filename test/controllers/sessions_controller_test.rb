@@ -29,9 +29,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "should destroy session" do
-    # First sign in
+    # First sign in with correct password
     post session_url, params: { email_address: @user.email_address, password: "password123" }
-    session_id = cookies[:session_id]
+    assert_redirected_to root_url
+    
+    # Verify session was created
+    assert Session.exists?(user: @user)
     
     assert_difference("Session.count", -1) do
       delete session_url

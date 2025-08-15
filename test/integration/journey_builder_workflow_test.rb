@@ -276,6 +276,10 @@ class JourneyBuilderWorkflowTest < ActionDispatch::IntegrationTest
   end
 
   test "journey with template type workflow" do
+    # Ensure we're authenticated by checking an authenticated route first
+    get journeys_path
+    assert_response :success
+    
     # Create journey with specific template type
     get new_journey_path, params: { template_type: "webinar" }
     assert_response :success

@@ -287,6 +287,117 @@ class JourneysControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  # Suggestions Tests
+  test "should get suggestions when authenticated" do
+    sign_in_as(@user)
+    get suggestions_journey_path(@journey)
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    assert json_response.key?('suggestions')
+    assert json_response.key?('current_stage')
+    assert json_response.key?('available_stages')
+    assert json_response.key?('campaign_type')
+    
+    assert json_response['suggestions'].is_a?(Array)
+    assert_equal @journey.campaign_type, json_response['campaign_type']
+  end
+
+  test "should get suggestions with stage parameter" do
+    sign_in_as(@user)
+    get suggestions_journey_path(@journey), params: { stage: 'education' }
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    assert_equal 'education', json_response['current_stage']
+  end
+
+  test "should get suggestions with limit parameter" do
+    sign_in_as(@user)
+    get suggestions_journey_path(@journey), params: { limit: 3 }
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    assert json_response['suggestions'].length <= 3
+  end
+
+  test "should include enhanced suggestion details" do
+    sign_in_as(@user)
+    get suggestions_journey_path(@journey)
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    suggestions = json_response['suggestions']
+    
+    unless suggestions.empty?
+      suggestion = suggestions.first
+      assert suggestion.key?('step_type')
+      assert suggestion.key?('title')
+      assert suggestion.key?('description')
+      assert suggestion.key?('priority')
+      assert suggestion.key?('estimated_effort')
+      assert suggestion.key?('suggested_channels')
+      assert suggestion.key?('content_suggestions')
+      
+      assert suggestion['suggested_channels'].is_a?(Array)
+      assert suggestion['content_suggestions'].is_a?(Hash)
+    end
+  end
+
+  test "should filter out existing step types from suggestions" do
+    sign_in_as(@user)
+    
+    # Create a journey with existing steps
+    test_journey = @user.journeys.create!(
+      name: "Test Journey with Steps",
+      campaign_type: "awareness",
+      status: "draft"
+    )
+    test_journey.journey_steps.create!(title: "Existing Email", step_type: "email", sequence_order: 0)
+    test_journey.journey_steps.create!(title: "Existing Social", step_type: "social_post", sequence_order: 1)
+    
+    get suggestions_journey_path(test_journey)
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    suggestions = json_response['suggestions']
+    suggested_types = suggestions.map { |s| s['step_type'] }
+    
+    # Should not suggest already existing step types
+    refute_includes suggested_types, 'email'
+    refute_includes suggested_types, 'social_post'
+  end
+
+  test "should require authentication for suggestions" do
+    get suggestions_journey_path(@journey)
+    assert_redirected_to new_session_path
+  end
+
+  test "should not get suggestions for other user journey" do
+    sign_in_as(@user)
+    get suggestions_journey_path(@other_journey)
+    assert_response :not_found
+  end
+
+  test "should handle journey without stages gracefully" do
+    sign_in_as(@user)
+    
+    # Create a journey without stages
+    journey_without_stages = @user.journeys.create!(
+      name: "No Stages Journey",
+      campaign_type: "awareness",
+      status: "draft"
+    )
+    journey_without_stages.update_column(:stages, nil)
+    
+    get suggestions_journey_path(journey_without_stages)
+    assert_response :success
+    
+    json_response = JSON.parse(response.body)
+    assert_nil json_response['current_stage']
+    assert_nil json_response['available_stages']
+  end
+
   private
 
   def sign_in_as(user)

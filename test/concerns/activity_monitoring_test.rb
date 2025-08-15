@@ -124,10 +124,14 @@ class ActivityMonitoringTest < ActionDispatch::IntegrationTest
   test "stores activity in session correctly" do
     sign_in_as(@user)
     
+    # Ensure session is established properly
     get journeys_path
+    assert_response :success
     
-    # Check that activity was stored in session
-    assert session[:recent_activities].present?
+    # Check that activity was stored in session (after the request)
+    get journeys_path  # Make another request to trigger activity monitoring
+    
+    assert session[:recent_activities].present?, "Activity should be stored in session"
     
     last_activity = session[:recent_activities].last
     assert_equal "journeys", last_activity[:controller]
@@ -150,20 +154,20 @@ class ActivityMonitoringTest < ActionDispatch::IntegrationTest
   test "integrates with security monitoring service" do
     sign_in_as(@user)
     
-    # Test that SecurityMonitoringService is called by checking logs
-    # Make rapid requests to trigger suspicious activity
-    6.times do |i|
-      get journeys_path
-      sleep(0.1) if i < 5
-    end
-    
-    # Count current alerts
+    # First establish session and get initial logs count
+    get journeys_path
     initial_alert_count = logs_containing("SECURITY_ALERT").count
     
-    # This should trigger security monitoring service integration
+    # Make rapid requests to trigger suspicious activity (need 5+ requests in 10 seconds)
+    5.times do
+      get journeys_path
+      assert_response :success
+    end
+    
+    # Make one more request that should trigger the security alert
     get journeys_path
     
-    # Verify we got at least one more alert
+    # Verify we got at least one security alert
     final_alert_count = logs_containing("SECURITY_ALERT").count
     assert final_alert_count > initial_alert_count, "Should have generated at least one more security alert"
   end

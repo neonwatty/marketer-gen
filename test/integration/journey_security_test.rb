@@ -250,6 +250,10 @@ class JourneySecurityIntegrationTest < ActionDispatch::IntegrationTest
   test "handles malformed JSON in reorder request" do
     sign_in_as(@user)
     
+    # Verify authentication worked
+    get journeys_path
+    assert_response :success
+    
     # Send malformed request
     patch reorder_steps_journey_path(@journey), 
           params: "malformed json",
@@ -261,6 +265,10 @@ class JourneySecurityIntegrationTest < ActionDispatch::IntegrationTest
 
   test "handles extremely long parameter values" do
     sign_in_as(@user)
+    
+    # Verify authentication worked
+    get journeys_path
+    assert_response :success
     
     very_long_string = "a" * 10000
     

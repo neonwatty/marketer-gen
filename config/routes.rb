@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :journeys do
     member do
       patch :reorder_steps
+      get :suggestions
     end
     resources :journey_steps, except: [:show]
   end
