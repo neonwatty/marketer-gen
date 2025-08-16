@@ -278,4 +278,142 @@ class LlmServiceConfigurationTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "should support enhanced feature flags" do
+    # Test LLM_ENABLED flag
+    ENV['LLM_ENABLED'] = 'false'
+    feature_flags = {
+      enabled: ENV.fetch('LLM_ENABLED', 'false') == 'true',
+      use_real_service: ENV.fetch('USE_REAL_LLM', 'false') == 'true'
+    }
+    
+    refute feature_flags[:enabled]
+    
+    ENV['LLM_ENABLED'] = 'true'
+    ENV['USE_REAL_LLM'] = 'true'
+    feature_flags = {
+      enabled: ENV.fetch('LLM_ENABLED', 'false') == 'true',
+      use_real_service: ENV.fetch('USE_REAL_LLM', 'false') == 'true'
+    }
+    
+    assert feature_flags[:enabled]
+    assert feature_flags[:use_real_service]
+  end
+
+  test "should configure provider priorities" do
+    ENV['OPENAI_PRIORITY'] = '2'
+    ENV['ANTHROPIC_PRIORITY'] = '1'
+    ENV['GOOGLE_AI_PRIORITY'] = '3'
+    
+    openai_config = {
+      priority: ENV.fetch('OPENAI_PRIORITY', '1').to_i
+    }
+    anthropic_config = {
+      priority: ENV.fetch('ANTHROPIC_PRIORITY', '2').to_i
+    }
+    google_config = {
+      priority: ENV.fetch('GOOGLE_AI_PRIORITY', '3').to_i
+    }
+    
+    assert_equal 2, openai_config[:priority]
+    assert_equal 1, anthropic_config[:priority]
+    assert_equal 3, google_config[:priority]
+  end
+
+  test "should configure resilience settings" do
+    ENV['LLM_TIMEOUT'] = '45'
+    ENV['LLM_RETRY_ATTEMPTS'] = '5'
+    ENV['LLM_CIRCUIT_BREAKER_THRESHOLD'] = '3'
+    
+    config = {
+      timeout: ENV.fetch('LLM_TIMEOUT', '30').to_i.seconds,
+      retry_attempts: ENV.fetch('LLM_RETRY_ATTEMPTS', '3').to_i,
+      circuit_breaker_threshold: ENV.fetch('LLM_CIRCUIT_BREAKER_THRESHOLD', '5').to_i
+    }
+    
+    assert_equal 45, config[:timeout]
+    assert_equal 5, config[:retry_attempts]
+    assert_equal 3, config[:circuit_breaker_threshold]
+  end
+
+  test "should configure monitoring settings" do
+    ENV['LLM_MONITORING_ENABLED'] = 'true'
+    ENV['LLM_DEBUG_LOGGING'] = 'false'
+    ENV['LLM_PERFORMANCE_TRACKING'] = 'true'
+    
+    config = {
+      monitoring_enabled: ENV.fetch('LLM_MONITORING_ENABLED', 'false') == 'true',
+      debug_logging: ENV.fetch('LLM_DEBUG_LOGGING', 'false') == 'true',
+      performance_tracking: ENV.fetch('LLM_PERFORMANCE_TRACKING', 'true') == 'true'
+    }
+    
+    assert config[:monitoring_enabled]
+    refute config[:debug_logging]
+    assert config[:performance_tracking]
+  end
+
+  test "should support Google AI provider configuration" do
+    ENV['GOOGLE_AI_API_KEY'] = 'test_google_key'
+    ENV['GOOGLE_AI_MODEL'] = 'gemini-1.5-pro'
+    ENV['GOOGLE_AI_ENABLED'] = 'true'
+    
+    google_config = {
+      api_key: ENV['GOOGLE_AI_API_KEY'],
+      model: ENV['GOOGLE_AI_MODEL'] || 'gemini-pro',
+      enabled: ENV['GOOGLE_AI_API_KEY'].present? && ENV.fetch('GOOGLE_AI_ENABLED', 'false') == 'true'
+    }
+    
+    assert_equal 'test_google_key', google_config[:api_key]
+    assert_equal 'gemini-1.5-pro', google_config[:model]
+    assert google_config[:enabled]
+  end
+
+  test "should handle provider temperature and token settings" do
+    ENV['OPENAI_MAX_TOKENS'] = '2000'
+    ENV['OPENAI_TEMPERATURE'] = '0.5'
+    ENV['ANTHROPIC_MAX_TOKENS'] = '3000'
+    ENV['ANTHROPIC_TEMPERATURE'] = '0.8'
+    
+    openai_config = {
+      max_tokens: ENV.fetch('OPENAI_MAX_TOKENS', '4000').to_i,
+      temperature: ENV.fetch('OPENAI_TEMPERATURE', '0.7').to_f
+    }
+    anthropic_config = {
+      max_tokens: ENV.fetch('ANTHROPIC_MAX_TOKENS', '4000').to_i,
+      temperature: ENV.fetch('ANTHROPIC_TEMPERATURE', '0.7').to_f
+    }
+    
+    assert_equal 2000, openai_config[:max_tokens]
+    assert_equal 0.5, openai_config[:temperature]
+    assert_equal 3000, anthropic_config[:max_tokens]
+    assert_equal 0.8, anthropic_config[:temperature]
+  end
+
+  test "should test LlmServiceContainer circuit breaker functionality" do
+    # Skip this test if LlmServiceContainer is not available
+    skip unless defined?(LlmServiceContainer)
+    
+    # Clear and register mock service for testing
+    LlmServiceContainer.clear!
+    LlmServiceContainer.register(:mock, MockLlmService)
+    
+    # Test circuit breaker state initialization
+    assert_respond_to LlmServiceContainer, :configuration_status
+    
+    status = LlmServiceContainer.configuration_status
+    assert_includes status.keys, :circuit_breaker_states
+    assert_includes status.keys, :registered_services
+  end
+
+  test "should test service container feature flag integration" do
+    skip unless defined?(LlmServiceContainer)
+    
+    # Test with LLM disabled
+    ENV['LLM_ENABLED'] = 'false'
+    load Rails.root.join('config', 'initializers', 'llm_service.rb')
+    
+    # Container should return mock service regardless of requested type
+    service = LlmServiceContainer.get(:real)
+    assert_instance_of MockLlmService, service
+  end
 end

@@ -6,14 +6,29 @@ class LlmServiceContainerEdgeCasesTest < ActiveSupport::TestCase
   def setup
     @original_services = LlmServiceContainer.instance_variable_get(:@services).dup
     @original_instances = LlmServiceContainer.instance_variable_get(:@instances)&.dup
+    @original_circuit_breakers = LlmServiceContainer.instance_variable_get(:@circuit_breakers).dup
+    @original_feature_flags = Rails.application.config.llm_feature_flags.dup
+    
     LlmServiceContainer.clear!
+    
+    # Set up basic feature flags for testing
+    Rails.application.config.llm_feature_flags = {
+      enabled: true,
+      use_real_service: false,
+      fallback_enabled: true
+    }
+    
+    # Register mock service for tests that need it
+    LlmServiceContainer.register(:mock, MockLlmService)
   end
 
   def teardown
     LlmServiceContainer.clear!
+    Rails.application.config.llm_feature_flags = @original_feature_flags
     # Restore original services
     LlmServiceContainer.instance_variable_set(:@services, @original_services)
     LlmServiceContainer.instance_variable_set(:@instances, @original_instances)
+    LlmServiceContainer.instance_variable_set(:@circuit_breakers, @original_circuit_breakers)
   end
 
   test "should handle service registration collision" do
@@ -73,6 +88,9 @@ class LlmServiceContainerEdgeCasesTest < ActiveSupport::TestCase
   end
 
   test "should list all registered services" do
+    # Clear and start fresh for this test
+    LlmServiceContainer.clear!
+    
     LlmServiceContainer.register(:service_a, MockLlmService)
     LlmServiceContainer.register(:service_b, String)
     
@@ -92,10 +110,14 @@ class LlmServiceContainerEdgeCasesTest < ActiveSupport::TestCase
   end
 
   test "should raise descriptive error for unregistered service" do
+    # Test the direct service access path (not :real or :mock with feature flags disabled)
+    Rails.application.config.llm_feature_flags[:enabled] = true
+    
     error = assert_raises(ArgumentError) do
       LlmServiceContainer.get(:nonexistent)
     end
     
+    # This should hit the original logic path for specific service requests
     assert_match(/Service nonexistent not registered/, error.message)
   end
 
