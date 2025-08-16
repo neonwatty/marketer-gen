@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "shared/:token", to: "shared_campaign_plans#show", as: :shared_campaign_plan
   resources :brand_identities do
     member do
       patch :activate
@@ -12,6 +13,9 @@ Rails.application.routes.draw do
       post :generate
       post :regenerate
       patch :archive
+      get :export_pdf
+      get :export_presentation
+      post :share_plan
     end
   end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'

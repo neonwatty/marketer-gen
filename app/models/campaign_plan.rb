@@ -7,6 +7,7 @@ class CampaignPlan < ApplicationRecord
   has_many :plan_versions, dependent: :destroy
   has_many :feedback_comments, through: :plan_versions
   has_many :plan_audit_logs, dependent: :destroy
+  has_many :plan_share_tokens, dependent: :destroy
   
   CAMPAIGN_TYPES = %w[product_launch brand_awareness lead_generation customer_retention sales_promotion event_marketing].freeze
   OBJECTIVES = %w[brand_awareness lead_generation customer_acquisition customer_retention sales_growth market_expansion].freeze

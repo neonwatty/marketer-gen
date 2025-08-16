@@ -1,0 +1,119 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900"><%= @campaign_plan.name %></h1>
+          <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              <%= @campaign_plan.campaign_type.humanize %>
+            </span>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <%= @campaign_plan.objective.humanize %>
+            </span>
+            <span>Access expires: <%= @share_token.expires_at.strftime('%b %d, %Y at %I:%M %p') %></span>
+          </div>
+        </div>
+        <div class="text-right text-sm text-gray-500">
+          <p>Shared by: <%= @campaign_plan.user.full_name %></p>
+          <p>Created: <%= @campaign_plan.created_at.strftime('%B %d, %Y') %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <% if @campaign_plan.description.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Description</h2>
+        <p class="text-gray-700"><%= simple_format(@campaign_plan.description) %></p>
+      </div>
+    <% end %>
+
+    <!-- Summary -->
+    <% if @campaign_plan.generated_summary.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Campaign Summary</h2>
+        <div class="prose max-w-none">
+          <%= simple_format(@campaign_plan.generated_summary) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Strategy -->
+    <% if @campaign_plan.generated_strategy.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Strategy</h2>
+        <div class="prose max-w-none">
+          <%= render_json_content(@campaign_plan.generated_strategy) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Timeline -->
+    <% if @campaign_plan.generated_timeline.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Timeline</h2>
+        <div class="prose max-w-none">
+          <%= render_json_content(@campaign_plan.generated_timeline) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Content Strategy -->
+    <% if @campaign_plan.content_strategy.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Content Strategy</h2>
+        <div class="prose max-w-none">
+          <%= render_json_content(@campaign_plan.content_strategy) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Creative Approach -->
+    <% if @campaign_plan.creative_approach.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Creative Approach</h2>
+        <div class="prose max-w-none">
+          <%= render_json_content(@campaign_plan.creative_approach) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Strategic Rationale -->
+    <% if @campaign_plan.strategic_rationale.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Strategic Rationale</h2>
+        <div class="prose max-w-none">
+          <%= render_json_content(@campaign_plan.strategic_rationale) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Content Mapping -->
+    <% if @campaign_plan.content_mapping.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Content Mapping</h2>
+        <div class="prose max-w-none">
+          <%= render_json_content(@campaign_plan.content_mapping) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Assets -->
+    <% if @campaign_plan.generated_assets.present? %>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-3">Generated Assets</h2>
+        <div class="prose max-w-none">
+          <%= render_json_content(@campaign_plan.generated_assets) %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Footer -->
+    <div class="bg-gray-100 rounded-lg p-4 text-center text-sm text-gray-600">
+      <p>This campaign plan was shared securely and will expire on <%= @share_token.expires_at.strftime('%B %d, %Y at %I:%M %p') %>.</p>
+      <p class="mt-1">If you have questions about this plan, please contact <%= @campaign_plan.user.full_name %> directly.</p>
+    </div>
+  </div>
+</div>

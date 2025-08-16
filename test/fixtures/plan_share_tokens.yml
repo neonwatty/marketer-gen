@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  campaign_plan: completed_plan
+  token: unique_token_one_123456789
+  email: stakeholder1@example.com
+  expires_at: <%= 7.days.from_now %>
+  accessed_at: <%= 1.hour.ago %>
+  access_count: 1
+
+two:
+  campaign_plan: completed_plan
+  token: unique_token_two_987654321
+  email: stakeholder2@example.com
+  expires_at: <%= 7.days.from_now %>
+  accessed_at: 
+  access_count: 0

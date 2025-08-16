@@ -2,8 +2,8 @@ class CampaignPlansController < ApplicationController
   include Authentication
   
   before_action :require_authentication
-  before_action :set_campaign_plan, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive]
-  before_action :ensure_owner, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive]
+  before_action :set_campaign_plan, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan]
+  before_action :ensure_owner, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan]
   
   def index
     @campaign_plans = Current.user.campaign_plans
@@ -103,6 +103,57 @@ class CampaignPlansController < ApplicationController
       redirect_to campaign_plans_path, notice: 'Campaign plan was successfully archived.'
     else
       redirect_to @campaign_plan, alert: 'Campaign plan cannot be archived.'
+    end
+  end
+
+  def export_pdf
+    unless @campaign_plan.completed?
+      return redirect_to @campaign_plan, alert: 'Campaign plan must be completed before exporting.'
+    end
+
+    service = PlanPdfExportService.new(@campaign_plan)
+    result = service.generate_pdf
+
+    if result[:success]
+      pdf = result[:pdf]
+      filename = "#{@campaign_plan.name.parameterize}-campaign-plan.pdf"
+      
+      send_data pdf.render,
+                filename: filename,
+                type: 'application/pdf',
+                disposition: 'attachment'
+    else
+      redirect_to @campaign_plan, alert: result[:message]
+    end
+  end
+
+  def export_presentation
+    unless @campaign_plan.completed?
+      return redirect_to @campaign_plan, alert: 'Campaign plan must be completed before exporting.'
+    end
+
+    redirect_to @campaign_plan, alert: 'Presentation export is coming soon!'
+  end
+
+  def share_plan
+    unless @campaign_plan.completed?
+      return redirect_to @campaign_plan, alert: 'Campaign plan must be completed before sharing.'
+    end
+
+    email = params[:email]
+    
+    if email.blank? || !email.match?(URI::MailTo::EMAIL_REGEXP)
+      return redirect_to @campaign_plan, alert: 'Please provide a valid email address.'
+    end
+
+    begin
+      share_token = @campaign_plan.plan_share_tokens.create!(email: email)
+      PlanShareMailer.share_plan(share_token, Current.user).deliver_now
+      
+      redirect_to @campaign_plan, notice: "Campaign plan shared successfully with #{email}. Access expires in 7 days."
+    rescue => e
+      Rails.logger.error "Failed to share plan: #{e.message}"
+      redirect_to @campaign_plan, alert: 'Failed to share campaign plan. Please try again.'
     end
   end
   

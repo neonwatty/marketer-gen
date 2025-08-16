@@ -1,0 +1,18 @@
+Campaign Plan Shared
+
+Hi there,
+
+<%= @sender.full_name %> has shared a campaign plan with you:
+
+Campaign: <%= @campaign_plan.name %>
+<% if @campaign_plan.description.present? %>Description: <%= @campaign_plan.description %><% end %>
+Campaign Type: <%= @campaign_plan.campaign_type.humanize %>
+Objective: <%= @campaign_plan.objective.humanize %>
+
+To view this campaign plan, visit:
+<%= @access_url %>
+
+⏰ Access expires: <%= @expires_at.strftime('%B %d, %Y at %I:%M %p') %>
+
+This campaign plan was shared securely. The link will expire after the date shown above.
+If you have any questions, please contact <%= @sender.full_name %> directly.

@@ -1,0 +1,51 @@
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h1 style="color: #333; border-bottom: 2px solid #e5e5e5; padding-bottom: 10px;">
+    Campaign Plan Shared
+  </h1>
+  
+  <p style="font-size: 16px; color: #555;">
+    Hi there,
+  </p>
+  
+  <p style="font-size: 16px; color: #555;">
+    <strong><%= @sender.full_name %></strong> has shared a campaign plan with you:
+  </p>
+  
+  <div style="background-color: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 8px; padding: 20px; margin: 20px 0;">
+    <h2 style="color: #333; margin-top: 0;"><%= @campaign_plan.name %></h2>
+    
+    <% if @campaign_plan.description.present? %>
+      <p style="color: #666; margin-bottom: 10px;">
+        <%= @campaign_plan.description %>
+      </p>
+    <% end %>
+    
+    <p style="color: #666; margin: 5px 0;">
+      <strong>Campaign Type:</strong> <%= @campaign_plan.campaign_type.humanize %>
+    </p>
+    <p style="color: #666; margin: 5px 0;">
+      <strong>Objective:</strong> <%= @campaign_plan.objective.humanize %>
+    </p>
+  </div>
+  
+  <div style="text-align: center; margin: 30px 0;">
+    <a href="<%= @access_url %>" 
+       style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+      View Campaign Plan
+    </a>
+  </div>
+  
+  <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 20px 0;">
+    <p style="color: #856404; margin: 0; font-size: 14px;">
+      <strong>⏰ Access expires:</strong> <%= @expires_at.strftime('%B %d, %Y at %I:%M %p') %>
+    </p>
+  </div>
+  
+  <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 30px 0;">
+  
+  <p style="font-size: 12px; color: #888; text-align: center;">
+    This campaign plan was shared securely. The link will expire after the date shown above.
+    <br>
+    If you have any questions, please contact <%= @sender.full_name %> directly.
+  </p>
+</div>

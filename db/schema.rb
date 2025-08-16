@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_135840) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_204132) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -190,6 +190,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_135840) do
     t.index ["user_id"], name: "index_plan_audit_logs_on_user_id"
   end
 
+  create_table "plan_share_tokens", force: :cascade do |t|
+    t.integer "campaign_plan_id", null: false
+    t.string "token", null: false
+    t.string "email", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "accessed_at"
+    t.integer "access_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_plan_id"], name: "index_plan_share_tokens_on_campaign_plan_id"
+    t.index ["email"], name: "index_plan_share_tokens_on_email"
+    t.index ["expires_at"], name: "index_plan_share_tokens_on_expires_at"
+    t.index ["token"], name: "index_plan_share_tokens_on_token", unique: true
+  end
+
   create_table "plan_versions", force: :cascade do |t|
     t.integer "campaign_plan_id", null: false
     t.integer "version_number", null: false
@@ -246,6 +261,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_135840) do
   add_foreign_key "plan_audit_logs", "campaign_plans"
   add_foreign_key "plan_audit_logs", "plan_versions"
   add_foreign_key "plan_audit_logs", "users"
+  add_foreign_key "plan_share_tokens", "campaign_plans"
   add_foreign_key "plan_versions", "campaign_plans"
   add_foreign_key "plan_versions", "users", column: "created_by_id"
   add_foreign_key "sessions", "users"
