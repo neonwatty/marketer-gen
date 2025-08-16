@@ -14,7 +14,7 @@ expect.extend(toHaveNoViolations)
 // Mock Next.js Image for a11y testing
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+  default: ({ alt, priority, ...props }: any) => {
     return <img alt={alt} {...props} />
   },
 }))

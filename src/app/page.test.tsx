@@ -6,7 +6,7 @@ import Home from './page'
 // Fixed Next.js Image mock
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+  default: ({ alt, priority, ...props }: any) => {
     // eslint-disable-next-line @next/next/no-img-element
     return <img alt={alt} {...props} />
   },

@@ -41,7 +41,7 @@ jest.mock('@/components/ui/card', () => ({
 }))
 
 jest.mock('@/components/ui/form', () => ({
-  Form: ({ children, ...props }: any) => <form {...props}>{children}</form>,
+  Form: ({ children, handleSubmit, formState, setValue, register, watch, ...props }: any) => <div {...props}>{children}</div>,
   FormControl: ({ children }: any) => <div data-testid="form-control">{children}</div>,
   FormField: ({ control, name, render }: any) => {
     const field = {
