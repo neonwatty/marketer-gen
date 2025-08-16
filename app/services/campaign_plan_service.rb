@@ -49,6 +49,10 @@ class CampaignPlanService < ApplicationService
       generated_strategy: nil,
       generated_timeline: nil,
       generated_assets: nil,
+      content_strategy: nil,
+      creative_approach: nil,
+      strategic_rationale: nil,
+      content_mapping: nil,
       metadata: (@campaign_plan.metadata || {}).merge(regenerated_at: Time.current)
     )
 
@@ -111,6 +115,15 @@ class CampaignPlanService < ApplicationService
       user_context: {
         company: @user.company,
         industry: extract_industry_from_brand_context(brand_context)
+      },
+      strategic_requirements: {
+        include_content_strategy: true,
+        include_creative_approach: true,
+        include_strategic_rationale: true,
+        include_content_mapping: true,
+        cross_asset_consistency: true,
+        platform_specific_adaptations: true,
+        justification_required: true
       }
     }
   end
@@ -122,6 +135,12 @@ class CampaignPlanService < ApplicationService
     timeline = response[:timeline] || response['timeline']
     assets = response[:assets] || response['assets']
     metadata = response[:metadata] || response['metadata']
+    
+    # Extract strategic elements
+    content_strategy = response[:content_strategy] || response['content_strategy']
+    creative_approach = response[:creative_approach] || response['creative_approach']
+    strategic_rationale = response[:strategic_rationale] || response['strategic_rationale']
+    content_mapping = response[:content_mapping] || response['content_mapping']
 
     # Update the campaign plan with generated content
     @campaign_plan.update!(
@@ -129,6 +148,10 @@ class CampaignPlanService < ApplicationService
       generated_strategy: strategy.is_a?(Hash) ? strategy : { description: strategy },
       generated_timeline: timeline.is_a?(Array) ? timeline : [{ activity: timeline }],
       generated_assets: assets.is_a?(Array) ? assets : [assets].compact,
+      content_strategy: content_strategy.present? ? (content_strategy.is_a?(Hash) ? content_strategy : { description: content_strategy }) : nil,
+      creative_approach: creative_approach.present? ? (creative_approach.is_a?(Hash) ? creative_approach : { description: creative_approach }) : nil,
+      strategic_rationale: strategic_rationale.present? ? (strategic_rationale.is_a?(Hash) ? strategic_rationale : { description: strategic_rationale }) : nil,
+      content_mapping: content_mapping.present? ? (content_mapping.is_a?(Array) ? content_mapping : [content_mapping]) : nil,
       metadata: (@campaign_plan.metadata || {}).merge(
         llm_metadata: metadata || {},
         generated_at: Time.current,

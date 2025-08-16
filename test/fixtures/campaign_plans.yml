@@ -24,6 +24,10 @@ completed_plan:
   generated_strategy: '{"phases": ["Discovery", "Launch", "Optimization"], "channels": ["Social Media", "Email", "Content Marketing"]}'
   generated_timeline: '[{"week": 1, "activity": "Campaign setup"}, {"week": 2, "activity": "Content creation"}]'
   generated_assets: '["Social media graphics", "Email templates", "Landing page copy"]'
+  content_strategy: '{"key_themes": ["trust", "expertise"], "approach": "multi-channel"}'
+  creative_approach: '{"style": "professional", "tone": "confident"}'
+  strategic_rationale: '{"reasoning": "Target market research supports professional approach"}'
+  content_mapping: '[{"platform": "LinkedIn", "content_type": "article"}, {"platform": "Email", "content_type": "newsletter"}]'
   metadata: '{"generated_at": "2025-01-15T10:00:00Z"}'
 
 generating_plan:

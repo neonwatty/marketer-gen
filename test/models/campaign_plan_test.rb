@@ -168,13 +168,17 @@ class CampaignPlanTest < ActiveSupport::TestCase
     plan = campaign_plans(:completed_plan)
     assert_equal 100, plan.generation_progress
 
-    # Test partial progress
+    # Test partial progress (1 out of 8 fields = 12.5%, rounded to 13%)
     plan.generated_summary = "Summary"
     plan.generated_strategy = nil
     plan.generated_timeline = nil
     plan.generated_assets = nil
+    plan.content_strategy = nil
+    plan.creative_approach = nil
+    plan.strategic_rationale = nil
+    plan.content_mapping = nil
     plan.status = "generating"
-    assert_equal 25, plan.generation_progress
+    assert_equal 13, plan.generation_progress
   end
 
   test "context summary methods should handle JSON and text" do
@@ -327,5 +331,90 @@ class CampaignPlanTest < ActiveSupport::TestCase
     # Test metadata serialization
     assert plan.metadata.is_a?(Hash)
     assert_not_nil plan.metadata["generated_at"]
+  end
+
+  # Strategic fields tests
+  test "strategic fields should serialize JSON correctly" do
+    @campaign_plan.content_strategy = { key_themes: ["innovation", "trust"], approach: "multi-channel" }
+    @campaign_plan.creative_approach = { style: "modern", tone: "professional" }
+    @campaign_plan.strategic_rationale = { reasoning: "Market analysis supports this approach" }
+    @campaign_plan.content_mapping = [{ platform: "LinkedIn", content_type: "article" }]
+    @campaign_plan.save!
+
+    @campaign_plan.reload
+    assert @campaign_plan.content_strategy.is_a?(Hash)
+    assert_equal "multi-channel", @campaign_plan.content_strategy["approach"]
+    assert @campaign_plan.creative_approach.is_a?(Hash)
+    assert_equal "professional", @campaign_plan.creative_approach["tone"]
+    assert @campaign_plan.strategic_rationale.is_a?(Hash)
+    assert @campaign_plan.content_mapping.is_a?(Array)
+    assert_equal "LinkedIn", @campaign_plan.content_mapping.first["platform"]
+  end
+
+  test "has_generated_content should include strategic fields" do
+    plan = CampaignPlan.new(
+      user: @user,
+      name: "Test Campaign",
+      campaign_type: "product_launch",
+      objective: "brand_awareness"
+    )
+    assert_not plan.has_generated_content?
+
+    plan.content_strategy = { key_themes: ["innovation"] }
+    assert plan.has_generated_content?
+
+    plan.content_strategy = nil
+    plan.creative_approach = { style: "modern" }
+    assert plan.has_generated_content?
+
+    plan.creative_approach = nil
+    plan.strategic_rationale = { reasoning: "test" }
+    assert plan.has_generated_content?
+
+    plan.strategic_rationale = nil
+    plan.content_mapping = [{ platform: "test" }]
+    assert plan.has_generated_content?
+  end
+
+  test "generation_progress should include strategic fields in calculation" do
+    plan = campaign_plans(:draft_plan)
+    plan.status = "generating"
+    assert_equal 0, plan.generation_progress
+
+    # Add one strategic field (1/8 = 12.5%, rounded to 13%)
+    plan.content_strategy = { key_themes: ["innovation"] }
+    assert_equal 13, plan.generation_progress
+
+    # Add another strategic field (2/8 = 25%)
+    plan.creative_approach = { style: "modern" }
+    assert_equal 25, plan.generation_progress
+
+    # Add all fields (8/8 = 100%)
+    plan.generated_summary = "Summary"
+    plan.generated_strategy = { description: "Strategy" }
+    plan.generated_timeline = [{ activity: "Timeline" }]
+    plan.generated_assets = ["Asset"]
+    plan.strategic_rationale = { reasoning: "Rationale" }
+    plan.content_mapping = [{ platform: "Platform" }]
+    assert_equal 100, plan.generation_progress
+  end
+
+  test "plan_analytics should include strategic fields in content_sections" do
+    plan = CampaignPlan.new(
+      user: @user,
+      name: "Test Campaign",
+      campaign_type: "product_launch",
+      objective: "brand_awareness"
+    )
+    plan.content_strategy = { key_themes: ["innovation"] }
+    plan.creative_approach = { style: "modern" }
+    plan.strategic_rationale = { reasoning: "test" }
+    plan.content_mapping = [{ platform: "test" }]
+    
+    analytics = plan.plan_analytics
+    assert analytics[:content_sections][:content_strategy]
+    assert analytics[:content_sections][:creative_approach]
+    assert analytics[:content_sections][:strategic_rationale]
+    assert analytics[:content_sections][:content_mapping]
   end
 end

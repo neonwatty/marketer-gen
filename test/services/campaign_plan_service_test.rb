@@ -330,4 +330,164 @@ class CampaignPlanServiceTest < ActiveSupport::TestCase
     assert_equal([{ "activity" => "String timeline" }], @campaign_plan.generated_timeline)
     assert_equal(["String assets"], @campaign_plan.generated_assets)
   end
+
+  # Strategic elements tests
+  test "should include strategic requirements in LLM parameters" do
+    # Mock LLM service to capture the parameters
+    captured_params = nil
+    mock_llm_service = stub('llm_service')
+    mock_llm_service.stubs(:generate_campaign_plan).with do |params|
+      captured_params = params
+      true
+    end.returns({summary: "Test"})
+    
+    @service.stubs(:llm_service).returns(mock_llm_service)
+    @service.generate_plan
+    
+    assert_not_nil captured_params
+    strategic_requirements = captured_params[:strategic_requirements]
+    assert strategic_requirements[:include_content_strategy]
+    assert strategic_requirements[:include_creative_approach]
+    assert strategic_requirements[:include_strategic_rationale]
+    assert strategic_requirements[:include_content_mapping]
+    assert strategic_requirements[:cross_asset_consistency]
+    assert strategic_requirements[:platform_specific_adaptations]
+    assert strategic_requirements[:justification_required]
+  end
+
+  test "should process strategic elements from LLM response" do
+    mock_response = {
+      summary: "Comprehensive product launch campaign",
+      strategy: { phases: ["Pre-launch", "Launch", "Post-launch"] },
+      timeline: [{ week: 1, activity: "Content creation" }],
+      assets: ["Social media graphics"],
+      content_strategy: { 
+        key_themes: ["innovation", "reliability"],
+        messaging_pillars: ["trust", "expertise"],
+        approach: "multi-channel"
+      },
+      creative_approach: { 
+        style: "modern",
+        tone: "professional",
+        visual_identity: "clean_minimal"
+      },
+      strategic_rationale: { 
+        reasoning: "Market analysis shows demand for innovative solutions",
+        target_alignment: "Approach resonates with tech-savvy professionals"
+      },
+      content_mapping: [
+        { platform: "LinkedIn", content_type: "article", frequency: "weekly" },
+        { platform: "Twitter", content_type: "thread", frequency: "bi-weekly" }
+      ]
+    }
+
+    @service.stubs(:llm_service).returns(stub(generate_campaign_plan: mock_response))
+    
+    result = @service.generate_plan
+    
+    assert result[:success]
+    
+    @campaign_plan.reload
+    assert_equal "Comprehensive product launch campaign", @campaign_plan.generated_summary
+    
+    # Test strategic elements
+    assert @campaign_plan.content_strategy.is_a?(Hash)
+    assert_equal "multi-channel", @campaign_plan.content_strategy["approach"]
+    assert_includes @campaign_plan.content_strategy["key_themes"], "innovation"
+    
+    assert @campaign_plan.creative_approach.is_a?(Hash)
+    assert_equal "professional", @campaign_plan.creative_approach["tone"]
+    assert_equal "modern", @campaign_plan.creative_approach["style"]
+    
+    assert @campaign_plan.strategic_rationale.is_a?(Hash)
+    assert_includes @campaign_plan.strategic_rationale["reasoning"], "Market analysis"
+    
+    assert @campaign_plan.content_mapping.is_a?(Array)
+    assert_equal 2, @campaign_plan.content_mapping.length
+    assert_equal "LinkedIn", @campaign_plan.content_mapping.first["platform"]
+  end
+
+  test "should handle strategic elements as strings and convert to hashes" do
+    mock_response = {
+      summary: "Test summary",
+      strategy: {},
+      timeline: [],
+      assets: [],
+      content_strategy: "Focus on innovation and trust messaging",
+      creative_approach: "Modern, professional design approach",
+      strategic_rationale: "Based on market research findings",
+      content_mapping: { platform: "LinkedIn", content_type: "article" }
+    }
+
+    @service.stubs(:llm_service).returns(stub(generate_campaign_plan: mock_response))
+    
+    result = @service.generate_plan
+    assert result[:success]
+    
+    @campaign_plan.reload
+    assert_equal({ "description" => "Focus on innovation and trust messaging" }, @campaign_plan.content_strategy)
+    assert_equal({ "description" => "Modern, professional design approach" }, @campaign_plan.creative_approach)
+    assert_equal({ "description" => "Based on market research findings" }, @campaign_plan.strategic_rationale)
+    assert_equal([{ "platform" => "LinkedIn", "content_type" => "article" }], @campaign_plan.content_mapping)
+  end
+
+  test "regenerate_plan should clear strategic fields" do
+    # Set up a completed campaign plan with strategic content
+    completed_plan = campaign_plans(:completed_plan)
+    completed_plan.update!(
+      content_strategy: { key_themes: ["original"] },
+      creative_approach: { style: "original" },
+      strategic_rationale: { reasoning: "original" },
+      content_mapping: [{ platform: "original" }]
+    )
+    
+    service = CampaignPlanService.new(completed_plan)
+    
+    # Mock LLM service for regeneration
+    service.stubs(:llm_service).returns(stub(generate_campaign_plan: {
+      summary: "New summary",
+      strategy: {},
+      timeline: [],
+      assets: [],
+      content_strategy: { key_themes: ["new"] },
+      creative_approach: { style: "new" },
+      strategic_rationale: { reasoning: "new" },
+      content_mapping: [{ platform: "new" }]
+    }))
+    
+    result = service.regenerate_plan
+    assert result[:success]
+    
+    completed_plan.reload
+    # Verify strategic fields were updated with new content
+    assert_equal "new", completed_plan.content_strategy["key_themes"].first
+    assert_equal "new", completed_plan.creative_approach["style"]
+    assert_equal "new", completed_plan.strategic_rationale["reasoning"]
+    assert_equal "new", completed_plan.content_mapping.first["platform"]
+  end
+
+  test "should handle missing strategic elements gracefully" do
+    # Response with only traditional fields, no strategic elements
+    mock_response = {
+      summary: "Traditional campaign summary",
+      strategy: { phases: ["Phase 1"] },
+      timeline: [{ week: 1, activity: "Activity" }],
+      assets: ["Asset"]
+      # No strategic elements
+    }
+
+    @service.stubs(:llm_service).returns(stub(generate_campaign_plan: mock_response))
+    
+    result = @service.generate_plan
+    assert result[:success]
+    
+    @campaign_plan.reload
+    assert_equal "Traditional campaign summary", @campaign_plan.generated_summary
+    
+    # Strategic fields should be nil/empty but not cause errors
+    assert_nil @campaign_plan.content_strategy
+    assert_nil @campaign_plan.creative_approach
+    assert_nil @campaign_plan.strategic_rationale
+    assert_nil @campaign_plan.content_mapping
+  end
 end

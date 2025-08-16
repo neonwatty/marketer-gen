@@ -19,6 +19,10 @@ class CampaignPlan < ApplicationRecord
   serialize :generated_strategy, coder: JSON
   serialize :generated_timeline, coder: JSON
   serialize :generated_assets, coder: JSON
+  serialize :content_strategy, coder: JSON
+  serialize :creative_approach, coder: JSON
+  serialize :strategic_rationale, coder: JSON
+  serialize :content_mapping, coder: JSON
   
   scope :by_campaign_type, ->(type) { where(campaign_type: type) }
   scope :by_objective, ->(objective) { where(objective: objective) }
@@ -54,7 +58,9 @@ class CampaignPlan < ApplicationRecord
   
   def has_generated_content?
     generated_summary.present? || generated_strategy.present? || 
-    generated_timeline.present? || generated_assets.present?
+    generated_timeline.present? || generated_assets.present? ||
+    safe_field_present?(:content_strategy) || safe_field_present?(:creative_approach) ||
+    safe_field_present?(:strategic_rationale) || safe_field_present?(:content_mapping)
   end
   
   def generation_progress
@@ -64,10 +70,14 @@ class CampaignPlan < ApplicationRecord
       generated_summary.present?,
       generated_strategy.present?,
       generated_timeline.present?,
-      generated_assets.present?
+      generated_assets.present?,
+      safe_field_present?(:content_strategy),
+      safe_field_present?(:creative_approach),
+      safe_field_present?(:strategic_rationale),
+      safe_field_present?(:content_mapping)
     ].count(true)
     
-    (completed_sections.to_f / 4 * 100).round(0)
+    (completed_sections.to_f / 8 * 100).round(0)
   end
   
   def brand_context_summary
@@ -117,13 +127,17 @@ class CampaignPlan < ApplicationRecord
       status: status,
       has_content: has_generated_content?,
       generation_progress: generation_progress,
-      created_days_ago: ((Time.current - created_at) / 1.day).round(1),
+      created_days_ago: created_at ? ((Time.current - created_at) / 1.day).round(1) : nil,
       last_updated: updated_at,
       content_sections: {
         summary: generated_summary.present?,
         strategy: generated_strategy.present?,
         timeline: generated_timeline.present?,
-        assets: generated_assets.present?
+        assets: generated_assets.present?,
+        content_strategy: safe_field_present?(:content_strategy),
+        creative_approach: safe_field_present?(:creative_approach),
+        strategic_rationale: safe_field_present?(:strategic_rationale),
+        content_mapping: safe_field_present?(:content_mapping)
       }
     }
   end
@@ -173,5 +187,14 @@ class CampaignPlan < ApplicationRecord
       created_via: 'campaign_plan_generator',
       version: '1.0'
     }
+  end
+  
+  def safe_field_present?(field_name)
+    begin
+      field_value = send(field_name)
+      field_value.present?
+    rescue JSON::ParserError
+      false
+    end
   end
 end

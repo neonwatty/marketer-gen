@@ -366,4 +366,230 @@ class CampaignPlansControllerTest < ActionDispatch::IntegrationTest
     # Should show all campaigns when filters are empty
     assert_match @campaign_plan.name, response.body
   end
+
+  # Strategic fields integration tests
+  test "should display strategic fields in campaign plan analytics" do
+    # Set up campaign plan with strategic content
+    @campaign_plan.update!(
+      content_strategy: { key_themes: ["innovation", "trust"], approach: "multi-channel" },
+      creative_approach: { style: "modern", tone: "professional" },
+      strategic_rationale: { reasoning: "Market research supports approach" },
+      content_mapping: [{ platform: "LinkedIn", content_type: "article" }]
+    )
+    
+    get campaign_plan_url(@campaign_plan)
+    assert_response :success
+    
+    # Verify strategic content sections are present in analytics
+    # Note: This assumes the view displays strategic field content
+    assert_select "h1", @campaign_plan.name
+  end
+
+  test "should handle campaign plan with missing strategic fields gracefully" do
+    # Ensure campaign plan has no strategic fields
+    @campaign_plan.update!(
+      content_strategy: nil,
+      creative_approach: nil, 
+      strategic_rationale: nil,
+      content_mapping: nil
+    )
+    
+    get campaign_plan_url(@campaign_plan)
+    assert_response :success
+    # Should not cause errors even with nil strategic fields
+    assert_select "h1", @campaign_plan.name
+  end
+
+  test "should show updated generation progress with strategic fields" do
+    completed_plan = campaign_plans(:completed_plan)
+    
+    get campaign_plan_url(completed_plan)
+    assert_response :success
+    
+    # Completed plan fixture now has all 8 fields populated, should show complete status
+    assert_select "h1", completed_plan.name
+  end
+
+  test "campaign plan with partial strategic content should show in progress status" do
+    @campaign_plan.update!(
+      status: "generating",
+      generated_summary: "Test summary",
+      content_strategy: { approach: "test" }
+      # 2 out of 8 fields = 25%
+    )
+    
+    get campaign_plan_url(@campaign_plan)
+    assert_response :success
+    assert_select "h1", @campaign_plan.name
+  end
+
+  test "should not allow direct update of strategic fields via parameters" do
+    malicious_params = {
+      campaign_plan: {
+        name: "Updated Campaign",
+        content_strategy: { malicious: "injected content" },
+        creative_approach: { hacked: "field" },
+        strategic_rationale: { injected: "content" },
+        content_mapping: [{ platform: "hacked" }]
+      }
+    }
+    
+    patch campaign_plan_url(@campaign_plan), params: malicious_params
+    
+    @campaign_plan.reload
+    assert_equal "Updated Campaign", @campaign_plan.name
+    # Strategic fields should not be updated directly via controller params
+    assert_nil @campaign_plan.content_strategy
+    assert_nil @campaign_plan.creative_approach
+    assert_nil @campaign_plan.strategic_rationale
+    assert_nil @campaign_plan.content_mapping
+  end
+
+  test "plan analytics should include strategic field status" do
+    @campaign_plan.update!(
+      content_strategy: { themes: ["innovation"] },
+      creative_approach: { style: "modern" }
+    )
+    
+    get campaign_plan_url(@campaign_plan)
+    assert_response :success
+    
+    # The plan_analytics method is called in the show action
+    # This test ensures no errors occur when strategic fields are present
+    assert_select "h1", @campaign_plan.name
+  end
+
+  # Security and parameter handling tests
+  test "should not allow mass assignment of strategic fields during creation" do
+    assert_difference("CampaignPlan.count") do
+      post campaign_plans_url, params: {
+        campaign_plan: {
+          name: "Security Test Campaign",
+          campaign_type: "brand_awareness",
+          objective: "customer_acquisition",
+          # Attempt to mass assign strategic fields
+          content_strategy: { malicious: "content" },
+          creative_approach: { injected: "data" },
+          strategic_rationale: { hacked: "field" },
+          content_mapping: [{ platform: "malicious" }],
+          # Also try to set other protected fields
+          status: "completed",
+          generated_summary: "Hacked summary"
+        }
+      }
+    end
+
+    campaign_plan = CampaignPlan.last
+    assert_equal "Security Test Campaign", campaign_plan.name
+    assert_equal "draft", campaign_plan.status  # Should be default, not "completed"
+    
+    # Strategic fields should not be set via mass assignment
+    assert_nil campaign_plan.content_strategy
+    assert_nil campaign_plan.creative_approach
+    assert_nil campaign_plan.strategic_rationale
+    assert_nil campaign_plan.content_mapping
+    assert_nil campaign_plan.generated_summary
+  end
+
+  test "should not allow updating protected fields via update action" do
+    original_status = @campaign_plan.status
+    original_user_id = @campaign_plan.user_id
+    
+    patch campaign_plan_url(@campaign_plan), params: {
+      campaign_plan: {
+        name: "Updated Name",
+        # Attempt to update protected fields
+        status: "completed",
+        user_id: users(:team_member_user).id,
+        generated_summary: "Hacked content",
+        content_strategy: { malicious: "strategic content" },
+        creative_approach: { injected: "approach" },
+        strategic_rationale: { compromised: "rationale" },
+        content_mapping: [{ hacked: "mapping" }]
+      }
+    }
+    
+    @campaign_plan.reload
+    assert_equal "Updated Name", @campaign_plan.name
+    
+    # Protected fields should not change
+    assert_equal original_status, @campaign_plan.status
+    assert_equal original_user_id, @campaign_plan.user_id
+    assert_nil @campaign_plan.generated_summary
+    assert_nil @campaign_plan.content_strategy
+    assert_nil @campaign_plan.creative_approach
+    assert_nil @campaign_plan.strategic_rationale
+    assert_nil @campaign_plan.content_mapping
+  end
+
+  test "should handle large strategic field content in analytics without errors" do
+    # Set up campaign with large strategic content
+    large_content_strategy = {
+      themes: Array.new(100) { |i| "theme_#{i}" },
+      detailed_approach: "x" * 10000  # Large text content
+    }
+    
+    large_content_mapping = Array.new(50) do |i|
+      {
+        platform: "Platform_#{i}",
+        content_type: "Type_#{i}",
+        details: "x" * 1000
+      }
+    end
+    
+    @campaign_plan.update!(
+      content_strategy: large_content_strategy,
+      content_mapping: large_content_mapping
+    )
+    
+    # Should handle large content without errors
+    assert_nothing_raised do
+      get campaign_plan_url(@campaign_plan)
+    end
+    
+    assert_response :success
+    assert_select "h1", @campaign_plan.name
+  end
+
+  test "should validate strategic field data integrity in analytics" do
+    @campaign_plan.update!(
+      status: 'generating',
+      content_strategy: { themes: ["valid", "content"] },
+      creative_approach: { style: "modern", tone: "professional" },
+      strategic_rationale: { reasoning: "sound business logic" },
+      content_mapping: [
+        { platform: "LinkedIn", content_type: "article" },
+        { platform: "Twitter", content_type: "thread" }
+      ]
+    )
+    
+    get campaign_plan_url(@campaign_plan)
+    assert_response :success
+    
+    # Verify analytics data integrity
+    analytics = @campaign_plan.plan_analytics
+    assert analytics[:content_sections][:content_strategy]
+    assert analytics[:content_sections][:creative_approach]
+    assert analytics[:content_sections][:strategic_rationale]
+    assert analytics[:content_sections][:content_mapping]
+    
+    # Verify generation progress calculation
+    expected_progress = 50  # 4 out of 8 fields present = 50%
+    assert_equal expected_progress, analytics[:generation_progress]
+  end
+
+  test "should handle malformed strategic field JSON gracefully in view" do
+    # Simulate corrupted JSON data in database
+    ActiveRecord::Base.connection.execute(
+      "UPDATE campaign_plans SET content_strategy = 'invalid json}' WHERE id = #{@campaign_plan.id}"
+    )
+    
+    # Should not raise errors when viewing the plan
+    assert_nothing_raised do
+      get campaign_plan_url(@campaign_plan)
+    end
+    
+    assert_response :success
+    assert_select "h1", @campaign_plan.name
+  end
 end

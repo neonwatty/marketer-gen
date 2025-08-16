@@ -1,3 +1,45 @@
+# SimpleCov must be started before any other code is required
+require 'simplecov'
+
+SimpleCov.start 'rails' do
+  # Set minimum coverage threshold - start with achievable goal
+  minimum_coverage 30
+  
+  # Configure groups for better reporting
+  add_group 'Models', 'app/models'
+  add_group 'Controllers', 'app/controllers'
+  add_group 'Services', 'app/services'
+  add_group 'Jobs', 'app/jobs'
+  add_group 'Helpers', 'app/helpers'
+  add_group 'Policies', 'app/policies'
+  add_group 'Mailers', 'app/mailers'
+  add_group 'Concerns', 'app/controllers/concerns'
+  
+  # Exclude files that don't need coverage
+  add_filter '/config/'
+  add_filter '/db/migrate/'
+  add_filter '/vendor/'
+  add_filter '/test/'
+  add_filter '/spec/'
+  add_filter 'app/channels/application_cable/'
+  add_filter 'app/jobs/application_job.rb'
+  add_filter 'app/mailers/application_mailer.rb'
+  add_filter 'app/models/application_record.rb'
+  add_filter 'app/controllers/application_controller.rb'
+  
+  # Configure output
+  formatter SimpleCov::Formatter::HTMLFormatter
+  
+  coverage_dir 'coverage'
+  
+  # Enable branch coverage for more detailed analysis (if supported)
+  begin
+    enable_coverage :branch if ENV['COVERAGE_BRANCH'] == 'true'
+  rescue ArgumentError
+    # Branch coverage not supported in this Ruby version
+  end
+end
+
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"

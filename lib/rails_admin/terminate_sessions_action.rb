@@ -49,7 +49,5 @@ module RailsAdmin
         register_instance_option :authorization_key do
           :terminate_sessions
         end
-      end
-    end
   end
 end
