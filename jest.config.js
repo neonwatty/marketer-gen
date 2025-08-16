@@ -10,11 +10,12 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.setup.prisma.js'],
   testEnvironment: 'jsdom',
   moduleDirectories: ['node_modules', '<rootDir>/'],
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/playwright-temp/'],
-  // Transform ES modules from Prisma
+  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/', '<rootDir>/e2e/'],
+  // Transform ES modules from Prisma and auth adapters
   transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$|@prisma/client))',
+    'node_modules/(?!(.*\\.mjs$|@prisma/client|@auth/prisma-adapter|@auth/.*|oauth4webapi|next-auth))',
   ],
+  extensionsToTreatAsEsm: ['.ts'],
   // Handle Prisma client imports
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',

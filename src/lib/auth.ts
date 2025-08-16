@@ -39,12 +39,17 @@ export const authOptions: NextAuthOptions = {
       if (session?.user && user) {
         (session.user as any).id = user.id;
         // Add custom user fields to session if needed
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { role: true },
-        });
-        if (dbUser) {
-          (session.user as any).role = dbUser.role;
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { role: true },
+          });
+          if (dbUser) {
+            (session.user as any).role = dbUser.role;
+          }
+        } catch (error) {
+          // Log error but don't fail the session
+          console.error('Error fetching user role:', error);
         }
       }
       return session;
