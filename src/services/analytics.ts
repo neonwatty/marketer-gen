@@ -3,13 +3,17 @@
  */
 class AnalyticsService {
   private isInitialized = false
-  private readonly isDevelopment = process.env.NODE_ENV === 'development'
+  
+  private get isDevelopment(): boolean {
+    return process.env.NODE_ENV === 'development'
+  }
 
   /**
    * Initialize analytics service
    */
   init(): void {
-    if (this.isInitialized || typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !window) return
+    if (this.isInitialized) return
 
     // Initialize analytics providers here (Google Analytics, PostHog, etc.)
     if (process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID) {
@@ -27,8 +31,11 @@ class AnalyticsService {
    * Track page view
    */
   trackPageView(url: string, title?: string): void {
-    if (!this.isInitialized || this.isDevelopment) {
+    if (this.isDevelopment) {
       console.log('Analytics: Page view', { url, title })
+    }
+    
+    if (!this.isInitialized) {
       return
     }
 
@@ -57,8 +64,11 @@ class AnalyticsService {
     properties?: Record<string, any>,
     options?: { category?: string; label?: string; value?: number }
   ): void {
-    if (!this.isInitialized || this.isDevelopment) {
-      console.log('Analytics: Event', { eventName, properties, options })
+    if (this.isDevelopment) {
+      console.log('Analytics: Event', { event: eventName, data: properties })
+    }
+    
+    if (!this.isInitialized) {
       return
     }
 
@@ -82,8 +92,11 @@ class AnalyticsService {
    * Track user identification
    */
   identifyUser(userId: string, userProperties?: Record<string, any>): void {
-    if (!this.isInitialized || this.isDevelopment) {
-      console.log('Analytics: Identify user', { userId, userProperties })
+    if (this.isDevelopment) {
+      console.log('Analytics: Identify', { userId, properties: userProperties })
+    }
+    
+    if (!this.isInitialized) {
       return
     }
 
@@ -99,6 +112,13 @@ class AnalyticsService {
     if (typeof window !== 'undefined' && (window as any).posthog) {
       ;(window as any).posthog.identify(userId, userProperties)
     }
+  }
+
+  /**
+   * Alias for identifyUser for compatibility
+   */
+  identify(userId: string, userProperties?: Record<string, any>): void {
+    return this.identifyUser(userId, userProperties)
   }
 
   /**
@@ -226,8 +246,11 @@ class AnalyticsService {
    * Reset analytics (for logout, etc.)
    */
   reset(): void {
-    if (!this.isInitialized || this.isDevelopment) {
+    if (this.isDevelopment) {
       console.log('Analytics: Reset')
+    }
+    
+    if (!this.isInitialized) {
       return
     }
 
@@ -250,6 +273,13 @@ class AnalyticsService {
     if (typeof window !== 'undefined' && (window as any).posthog) {
       ;(window as any).posthog.people.set(properties)
     }
+  }
+
+  /**
+   * Reset initialization state (for testing purposes)
+   */
+  resetForTesting(): void {
+    this.isInitialized = false
   }
 }
 

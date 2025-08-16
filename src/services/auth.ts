@@ -1,8 +1,19 @@
 import { AUTH_CONFIG } from '@/lib/constants'
+import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, getSession as nextAuthGetSession } from 'next-auth/react'
 
 import { apiClient } from './api'
 
 import type { User } from '@/lib/types'
+
+interface AuthResult {
+  success: boolean
+  error?: string
+}
+
+interface Session {
+  user: User
+  expires: string
+}
 
 /**
  * Authentication service for handling user authentication
@@ -11,7 +22,51 @@ class AuthService {
   /**
    * Sign in user with email and password
    */
-  async signIn(email: string, password: string): Promise<{ user: User; token: string }> {
+  async signIn(credentials: { email: string; password: string }): Promise<AuthResult> {
+    try {
+      const result = await nextAuthSignIn('credentials', {
+        email: credentials.email,
+        password: credentials.password,
+        redirect: false,
+      })
+
+      if (!result) {
+        return { success: false, error: 'Authentication failed' }
+      }
+
+      if (result.error) {
+        return { success: false, error: result.error }
+      }
+
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Authentication failed' }
+    }
+  }
+
+  /**
+   * Sign in with OAuth provider
+   */
+  async signInWithProvider(provider: string): Promise<AuthResult> {
+    try {
+      const result = await nextAuthSignIn(provider, {
+        callbackUrl: '/dashboard',
+      })
+
+      if (result?.error) {
+        return { success: false, error: result.error }
+      }
+
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'OAuth authentication failed' }
+    }
+  }
+
+  /**
+   * Legacy sign in method for backward compatibility
+   */
+  async legacySignIn(email: string, password: string): Promise<{ user: User; token: string }> {
     const response = await apiClient.post<{ user: User; token: string }>('/auth/signin', {
       email,
       password,
@@ -46,7 +101,35 @@ class AuthService {
   /**
    * Sign out current user
    */
-  async signOut(): Promise<void> {
+  async signOut(callbackUrl?: string): Promise<AuthResult> {
+    try {
+      await nextAuthSignOut({
+        callbackUrl: callbackUrl || '/',
+        redirect: false,
+      })
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Sign out failed' }
+    }
+  }
+
+  /**
+   * Get current session
+   */
+  async getSession(): Promise<Session | null> {
+    try {
+      const session = await nextAuthGetSession()
+      return session as Session | null
+    } catch (error) {
+      console.error('Failed to get session:', error)
+      return null
+    }
+  }
+
+  /**
+   * Legacy sign out method for backward compatibility
+   */
+  async legacySignOut(): Promise<void> {
     try {
       await apiClient.post('/auth/signout')
     } finally {
@@ -58,11 +141,8 @@ class AuthService {
    * Get current user
    */
   async getCurrentUser(): Promise<User | null> {
-    const token = this.getToken()
-    if (!token) return null
-
-    const response = await apiClient.get<User>('/auth/me')
-    return response.success && response.data ? response.data : null
+    const session = await this.getSession()
+    return session?.user || null
   }
 
   /**
@@ -153,7 +233,30 @@ class AuthService {
   /**
    * Check if user is authenticated
    */
-  isAuthenticated(): boolean {
+  async isAuthenticated(): Promise<boolean> {
+    const session = await this.getSession()
+    return !!session
+  }
+
+  /**
+   * Check if current session is valid
+   */
+  async isSessionValid(): Promise<boolean> {
+    const session = await this.getSession()
+    if (!session) return false
+
+    try {
+      const expiryDate = new Date(session.expires)
+      return expiryDate.getTime() > Date.now()
+    } catch (error) {
+      return false
+    }
+  }
+
+  /**
+   * Check if user is authenticated (legacy sync method)
+   */
+  isAuthenticatedSync(): boolean {
     return this.getToken() !== null
   }
 }

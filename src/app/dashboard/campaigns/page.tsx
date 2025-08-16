@@ -1,6 +1,10 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
+import { Plus } from 'lucide-react'
 
+import { CampaignExample } from '@/components/features/dashboard/CampaignExample'
 import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
+import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Campaigns | Dashboard',
@@ -28,17 +32,15 @@ export default function CampaignsPage() {
               Manage and monitor your marketing campaigns
             </p>
           </div>
+          <Button asChild>
+            <Link href="/dashboard/campaigns/new" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Create Campaign
+            </Link>
+          </Button>
         </div>
 
-        {/* Placeholder for campaigns content - will be implemented in subsequent tasks */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-          <div className="flex items-center space-x-2">
-            <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-            <p className="text-sm text-muted-foreground">
-              Campaign listing and management components will be added in task 4.3
-            </p>
-          </div>
-        </div>
+        <CampaignExample />
       </div>
     </div>
   )

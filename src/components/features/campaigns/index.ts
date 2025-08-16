@@ -1,0 +1,1 @@
+export { CampaignDataTable } from './CampaignDataTable'

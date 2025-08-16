@@ -40,6 +40,7 @@ class ApiClient {
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
+        ...this.defaultHeaders,
         ...fetchConfig.headers,
       },
     }
@@ -53,6 +54,13 @@ class ApiClient {
       }
 
       const data = await response.json()
+      
+      // If the API already returns a success/error format, return it directly
+      if (data && typeof data === 'object' && ('success' in data || 'error' in data)) {
+        return data
+      }
+      
+      // Otherwise wrap in our standard format
       return {
         success: true,
         data,
@@ -136,8 +144,10 @@ class ApiClient {
    * Remove authorization header
    */
   clearAuthToken(): void {
-    const { Authorization: _auth, ...headers } = this.defaultHeaders
-    this.defaultHeaders = headers
+    if (this.defaultHeaders.Authorization) {
+      const { Authorization: _auth, ...headers } = this.defaultHeaders
+      this.defaultHeaders = headers
+    }
   }
 
   private defaultHeaders: Record<string, string> = {}

@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { CampaignGrid } from './CampaignGrid'
+
+import { CampaignDataTable } from '../campaigns/CampaignDataTable'
+
 import { type Campaign } from './CampaignCard'
 
 // Mock data for demonstration
@@ -129,9 +131,9 @@ export function CampaignExample() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Campaign Overview</h2>
+          <h2 className="text-2xl font-bold">Campaign Management</h2>
           <p className="text-muted-foreground">
-            Manage and monitor your marketing campaigns
+            Comprehensive campaign listing with advanced filtering and sorting
           </p>
         </div>
         <button
@@ -142,7 +144,7 @@ export function CampaignExample() {
         </button>
       </div>
 
-      <CampaignGrid
+      <CampaignDataTable
         campaigns={mockCampaigns}
         isLoading={isLoading}
         onView={handleView}

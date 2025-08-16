@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { CampaignCard, type Campaign } from './CampaignCard'
+import { type Campaign,CampaignCard } from './CampaignCard'
 import { CampaignCardSkeletonGrid } from './CampaignCardSkeleton'
 
 export interface CampaignGridProps {

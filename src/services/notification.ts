@@ -145,6 +145,46 @@ class NotificationService {
   }
 
   /**
+   * Show an in-app notification (alias for show method)
+   */
+  showNotification(options: NotificationOptions): string {
+    // Log to console in development
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+      if (options.type === 'error') {
+        console.error(`${options.title}: ${options.message}`)
+      } else {
+        console.log(`${options.title}: ${options.message}`)
+      }
+    }
+    return this.show(options)
+  }
+
+  /**
+   * Request permission for notifications
+   */
+  async requestPermission(): Promise<NotificationPermission> {
+    if (!('Notification' in window)) {
+      return 'denied'
+    }
+
+    if (Notification.permission === 'granted') {
+      return 'granted'
+    }
+
+    return await Notification.requestPermission()
+  }
+
+  /**
+   * Clear all notifications (alias for dismissAll)
+   */
+  clearAll(): void {
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+      console.log('Clearing all notifications')
+    }
+    this.dismissAll()
+  }
+
+  /**
    * Request permission for push notifications
    */
   async requestPushPermission(): Promise<boolean> {
