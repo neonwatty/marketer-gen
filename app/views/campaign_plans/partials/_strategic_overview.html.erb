@@ -1,0 +1,110 @@
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 strategic-overview">
+  <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+    Strategic Overview
+  </h2>
+  
+  <div class="space-y-6">
+    <!-- Campaign Objectives -->
+    <div class="border-l-4 border-blue-500 pl-4">
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Campaign Objectives</h3>
+      <div class="prose max-w-none text-gray-700">
+        <% if campaign_plan.generated_strategy.is_a?(Hash) && campaign_plan.generated_strategy['objectives'] %>
+          <ul class="list-disc list-inside space-y-1">
+            <% campaign_plan.generated_strategy['objectives'].each do |objective| %>
+              <li><%= objective %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-gray-600 italic">Strategic objectives will be defined based on your campaign parameters and target audience analysis.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Campaign Phases -->
+    <% if campaign_plan.generated_strategy.is_a?(Hash) && campaign_plan.generated_strategy['phases'] %>
+      <div class="border-l-4 border-purple-500 pl-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Campaign Phases</h3>
+        <div class="prose max-w-none text-gray-700">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <% campaign_plan.generated_strategy['phases'].each_with_index do |phase, index| %>
+              <div class="bg-purple-50 rounded-md p-3 border border-purple-200">
+                <div class="flex items-center mb-2">
+                  <span class="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full mr-2">
+                    <%= index + 1 %>
+                  </span>
+                  <span class="text-sm font-medium text-purple-800">Phase <%= index + 1 %></span>
+                </div>
+                <p class="text-sm text-purple-700"><%= phase %></p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Key Messages -->
+    <div class="border-l-4 border-green-500 pl-4">
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Key Messages</h3>
+      <div class="prose max-w-none text-gray-700">
+        <% if campaign_plan.generated_strategy.is_a?(Hash) && campaign_plan.generated_strategy['key_messages'] %>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <% campaign_plan.generated_strategy['key_messages'].each do |message| %>
+              <div class="bg-green-50 rounded-md p-3 border border-green-200">
+                <p class="text-sm text-green-800"><%= message %></p>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-gray-600 italic">Core messaging themes will be developed to resonate with your target audience and support campaign objectives.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Success Metrics -->
+    <div class="border-l-4 border-orange-500 pl-4">
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Success Metrics</h3>
+      <div class="prose max-w-none text-gray-700">
+        <% 
+          metrics = case campaign_plan.objective
+          when 'awareness', 'brand_awareness'
+            ['Reach', 'Impressions', 'Brand Recall']
+          when 'conversion', 'customer_acquisition'
+            ['Conversion Rate', 'Cost per Acquisition', 'Revenue']
+          when 'engagement'
+            ['Engagement Rate', 'Time on Site', 'Social Shares']
+          when 'lead_generation'
+            ['Lead Quality Score', 'Cost per Lead', 'Lead-to-Customer Rate']
+          when 'sales_growth'
+            ['Revenue Growth', 'Sales Volume', 'Average Order Value']
+          when 'customer_retention'
+            ['Retention Rate', 'Customer Lifetime Value', 'Churn Rate']
+          else
+            ['Reach', 'Engagement Rate', 'Conversion Rate']
+          end
+        %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <% metrics.each do |metric| %>
+            <div class="bg-orange-50 rounded-md p-3 border border-orange-200">
+              <p class="text-sm font-medium text-orange-800"><%= metric %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Strategic Rationale -->
+    <div class="border-l-4 border-purple-500 pl-4">
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Strategic Rationale</h3>
+      <div class="prose max-w-none text-gray-700">
+        <% if campaign_plan.generated_strategy.is_a?(Hash) && campaign_plan.generated_strategy['rationale'] %>
+          <%= simple_format(campaign_plan.generated_strategy['rationale']) %>
+        <% else %>
+          <p class="text-gray-600 italic">Strategic decision-making framework and approach rationale will be detailed here, explaining why specific channels, timing, and messaging strategies were selected.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

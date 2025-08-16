@@ -1,4 +1,4 @@
-<% content_for :page_title, @campaign_plan.name %>
+<% content_for :title, @campaign_plan.name %>
 
 <div class="container mx-auto px-4 py-8">
   <div class="max-w-4xl mx-auto">
@@ -100,103 +100,50 @@
     <!-- Generated Content -->
     <% if @campaign_plan.has_generated_content? %>
       <div class="space-y-6">
-        <!-- Campaign Summary -->
+        <!-- Strategic Overview Section -->
+        <%= render 'campaign_plans/partials/strategic_overview', campaign_plan: @campaign_plan %>
+        
+        <!-- Content Mapping Section -->
+        <%= render 'campaign_plans/partials/content_map', campaign_plan: @campaign_plan %>
+        
+        <!-- Creative Approach Section -->
+        <%= render 'campaign_plans/partials/creative_approach', campaign_plan: @campaign_plan %>
+        
+        <!-- Enhanced Timeline Visualization -->
+        <%= render 'campaign_plans/partials/timeline_visualization', campaign_plan: @campaign_plan %>
+        
+        <!-- Strategic Rationale Section -->
+        <%= render 'campaign_plans/partials/strategic_rationale', campaign_plan: @campaign_plan %>
+
+        <!-- Campaign Summary (Legacy) -->
         <% if @campaign_plan.generated_summary.present? %>
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Campaign Summary</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <svg class="w-6 h-6 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Campaign Summary
+            </h2>
             <div class="prose max-w-none">
               <%= simple_format(@campaign_plan.generated_summary) %>
             </div>
           </div>
         <% end %>
 
-        <!-- Strategy -->
-        <% if @campaign_plan.generated_strategy.present? %>
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Strategy</h2>
-            <div class="prose max-w-none">
-              <% strategy = @campaign_plan.generated_strategy %>
-              <% if strategy.is_a?(Hash) %>
-                <% if strategy['description'] %>
-                  <%= simple_format(strategy['description']) %>
-                <% end %>
-                
-                <% if strategy['phases'] %>
-                  <h3 class="text-lg font-semibold mt-4 mb-2">Campaign Phases</h3>
-                  <ul class="list-disc list-inside space-y-1">
-                    <% strategy['phases'].each do |phase| %>
-                      <li><%= phase %></li>
-                    <% end %>
-                  </ul>
-                <% end %>
-                
-                <% if strategy['channels'] %>
-                  <h3 class="text-lg font-semibold mt-4 mb-2">Marketing Channels</h3>
-                  <ul class="list-disc list-inside space-y-1">
-                    <% strategy['channels'].each do |channel| %>
-                      <li><%= channel %></li>
-                    <% end %>
-                  </ul>
-                <% end %>
-                
-                <% if strategy['budget_allocation'] %>
-                  <h3 class="text-lg font-semibold mt-4 mb-2">Budget Allocation</h3>
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <% strategy['budget_allocation'].each do |channel, percentage| %>
-                      <div class="bg-gray-50 rounded-md p-3 text-center">
-                        <div class="text-sm text-gray-600 capitalize"><%= channel.to_s.humanize %></div>
-                        <div class="text-lg font-semibold text-gray-900"><%= percentage %>%</div>
-                      </div>
-                    <% end %>
-                  </div>
-                <% end %>
-              <% else %>
-                <%= simple_format(strategy.to_s) %>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Timeline -->
-        <% if @campaign_plan.generated_timeline.present? %>
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Timeline</h2>
-            <div class="space-y-3">
-              <% timeline = @campaign_plan.generated_timeline %>
-              <% if timeline.is_a?(Array) %>
-                <% timeline.each_with_index do |item, index| %>
-                  <div class="flex items-start gap-4 p-3 bg-gray-50 rounded-md">
-                    <div class="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-sm font-medium">
-                      <%= index + 1 %>
-                    </div>
-                    <div class="flex-1">
-                      <% if item.is_a?(Hash) %>
-                        <% if item['week'] %>
-                          <div class="text-sm font-medium text-gray-900">Week <%= item['week'] %></div>
-                        <% end %>
-                        <div class="text-sm text-gray-700"><%= item['activity'] || item.values.join(' - ') %></div>
-                      <% else %>
-                        <div class="text-sm text-gray-700"><%= item %></div>
-                      <% end %>
-                    </div>
-                  </div>
-                <% end %>
-              <% else %>
-                <%= simple_format(timeline.to_s) %>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Assets -->
+        <!-- Required Assets -->
         <% if @campaign_plan.generated_assets.present? %>
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Required Assets</h2>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <svg class="w-6 h-6 text-teal-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              Required Assets
+            </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <% assets = @campaign_plan.generated_assets %>
               <% if assets.is_a?(Array) %>
                 <% assets.each do |asset| %>
-                  <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-md">
+                  <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
                     <div class="flex-shrink-0 w-6 h-6 bg-green-100 text-green-800 rounded-full flex items-center justify-center">
                       <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>

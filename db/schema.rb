@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_131922) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_135840) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -80,11 +80,46 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_131922) do
     t.text "creative_approach"
     t.text "strategic_rationale"
     t.text "content_mapping"
+    t.string "approval_status", default: "draft"
+    t.datetime "submitted_for_approval_at"
+    t.datetime "approved_at"
+    t.integer "approved_by_id"
+    t.datetime "rejected_at"
+    t.integer "rejected_by_id"
+    t.integer "current_version_id"
+    t.text "rejection_reason"
+    t.text "stakeholder_notes"
+    t.index ["approval_status"], name: "index_campaign_plans_on_approval_status"
+    t.index ["approved_by_id"], name: "index_campaign_plans_on_approved_by_id"
     t.index ["campaign_type"], name: "index_campaign_plans_on_campaign_type"
+    t.index ["current_version_id"], name: "index_campaign_plans_on_current_version_id"
     t.index ["objective"], name: "index_campaign_plans_on_objective"
+    t.index ["rejected_by_id"], name: "index_campaign_plans_on_rejected_by_id"
     t.index ["status"], name: "index_campaign_plans_on_status"
+    t.index ["submitted_for_approval_at"], name: "index_campaign_plans_on_submitted_for_approval_at"
     t.index ["user_id", "name"], name: "index_campaign_plans_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_campaign_plans_on_user_id"
+  end
+
+  create_table "feedback_comments", force: :cascade do |t|
+    t.integer "plan_version_id", null: false
+    t.integer "user_id", null: false
+    t.text "content", null: false
+    t.string "comment_type", default: "general"
+    t.string "priority", default: "medium"
+    t.string "status", default: "open"
+    t.json "metadata"
+    t.integer "parent_comment_id"
+    t.text "section_reference"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["comment_type"], name: "index_feedback_comments_on_comment_type"
+    t.index ["parent_comment_id"], name: "index_feedback_comments_on_parent_comment_id"
+    t.index ["plan_version_id", "status"], name: "index_feedback_comments_on_plan_version_id_and_status"
+    t.index ["plan_version_id"], name: "index_feedback_comments_on_plan_version_id"
+    t.index ["priority"], name: "index_feedback_comments_on_priority"
+    t.index ["user_id", "created_at"], name: "index_feedback_comments_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_feedback_comments_on_user_id"
   end
 
   create_table "journey_steps", force: :cascade do |t|
@@ -136,6 +171,43 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_131922) do
     t.index ["user_id"], name: "index_journeys_on_user_id"
   end
 
+  create_table "plan_audit_logs", force: :cascade do |t|
+    t.integer "campaign_plan_id", null: false
+    t.integer "user_id", null: false
+    t.string "action", null: false
+    t.json "details"
+    t.json "metadata"
+    t.integer "plan_version_id"
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_plan_audit_logs_on_action"
+    t.index ["campaign_plan_id", "created_at"], name: "index_plan_audit_logs_on_campaign_plan_id_and_created_at"
+    t.index ["campaign_plan_id"], name: "index_plan_audit_logs_on_campaign_plan_id"
+    t.index ["plan_version_id"], name: "index_plan_audit_logs_on_plan_version_id"
+    t.index ["user_id", "created_at"], name: "index_plan_audit_logs_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_plan_audit_logs_on_user_id"
+  end
+
+  create_table "plan_versions", force: :cascade do |t|
+    t.integer "campaign_plan_id", null: false
+    t.integer "version_number", null: false
+    t.json "content"
+    t.json "metadata"
+    t.integer "created_by_id", null: false
+    t.string "status", default: "draft"
+    t.text "change_summary"
+    t.boolean "is_current", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_plan_id", "is_current"], name: "index_plan_versions_on_campaign_plan_id_and_is_current"
+    t.index ["campaign_plan_id", "version_number"], name: "index_plan_versions_on_campaign_plan_id_and_version_number", unique: true
+    t.index ["campaign_plan_id"], name: "index_plan_versions_on_campaign_plan_id"
+    t.index ["created_by_id"], name: "index_plan_versions_on_created_by_id"
+    t.index ["status"], name: "index_plan_versions_on_status"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -164,7 +236,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_131922) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "brand_identities", "users"
   add_foreign_key "campaign_plans", "users"
+  add_foreign_key "campaign_plans", "users", column: "approved_by_id"
+  add_foreign_key "campaign_plans", "users", column: "rejected_by_id"
+  add_foreign_key "feedback_comments", "feedback_comments", column: "parent_comment_id"
+  add_foreign_key "feedback_comments", "plan_versions"
+  add_foreign_key "feedback_comments", "users"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journeys", "users"
+  add_foreign_key "plan_audit_logs", "campaign_plans"
+  add_foreign_key "plan_audit_logs", "plan_versions"
+  add_foreign_key "plan_audit_logs", "users"
+  add_foreign_key "plan_versions", "campaign_plans"
+  add_foreign_key "plan_versions", "users", column: "created_by_id"
   add_foreign_key "sessions", "users"
 end

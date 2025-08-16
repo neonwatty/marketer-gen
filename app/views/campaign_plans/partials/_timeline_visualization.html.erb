@@ -1,0 +1,263 @@
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+  <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    <svg class="w-6 h-6 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    Interactive Timeline
+  </h2>
+  
+  <% if campaign_plan.generated_timeline.present? %>
+    <% timeline = campaign_plan.generated_timeline %>
+    <% if timeline.is_a?(Array) && timeline.any? %>
+      
+      <!-- Timeline Controls -->
+      <div class="flex items-center justify-between mb-6 p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-center space-x-4">
+          <button id="timeline-play" class="flex items-center px-3 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 8h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Animate Timeline
+          </button>
+          <div class="text-sm text-gray-600">
+            <span id="timeline-counter">0</span> / <%= timeline.length %> activities
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <label class="text-sm text-gray-600">View:</label>
+          <select id="timeline-view" class="text-sm border-gray-300 rounded-md">
+            <option value="detailed">Detailed</option>
+            <option value="compact">Compact</option>
+            <option value="overview">Overview</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Timeline Visualization -->
+      <div class="timeline-container relative">
+        <!-- Progress Line -->
+        <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+        <div id="timeline-progress" class="timeline-progress absolute left-6 top-0 w-0.5 bg-emerald-500 transition-all duration-500" style="height: 0%;"></div>
+        
+        <!-- Timeline Items -->
+        <div class="timeline-items space-y-4">
+          <% timeline.each_with_index do |item, index| %>
+            <div class="timeline-item flex items-start gap-6 p-4 rounded-lg transition-all duration-300" 
+                 data-index="<%= index %>"
+                 data-week="<%= item.is_a?(Hash) ? item['week'] : index + 1 %>">
+              
+              <!-- Timeline Node -->
+              <div class="timeline-node flex-shrink-0 relative">
+                <div class="w-12 h-12 bg-white border-4 border-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 transition-all duration-300">
+                  <% if item.is_a?(Hash) && item['week'] %>
+                    W<%= item['week'] %>
+                  <% else %>
+                    <%= index + 1 %>
+                  <% end %>
+                </div>
+                
+                <!-- Completion Indicator -->
+                <div class="timeline-check absolute -top-1 -right-1 w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center opacity-0 transition-all duration-300">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Timeline Content -->
+              <div class="timeline-content flex-1 min-h-12 opacity-70 transition-all duration-300">
+                <div class="timeline-card bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                  <% if item.is_a?(Hash) %>
+                    <% if item['activity'] %>
+                      <h3 class="text-sm font-medium text-gray-900 mb-2">
+                        <% if item['week'] %>Week <%= item['week'] %>: <% end %><%= item['activity'] %>
+                      </h3>
+                    <% end %>
+                    
+                    <% if item['description'] %>
+                      <p class="text-sm text-gray-600 mb-2"><%= item['description'] %></p>
+                    <% end %>
+                    
+                    <% if item['deliverables'] %>
+                      <div class="flex flex-wrap gap-1 mt-2">
+                        <% item['deliverables'].each do |deliverable| %>
+                          <span class="px-2 py-1 text-xs bg-emerald-100 text-emerald-800 rounded-md">
+                            <%= deliverable %>
+                          </span>
+                        <% end %>
+                      </div>
+                    <% end %>
+                    
+                    <% unless item['activity'] || item['description'] %>
+                      <p class="text-sm text-gray-700"><%= item.values.join(' - ') %></p>
+                    <% end %>
+                  <% else %>
+                    <p class="text-sm text-gray-700"><%= item %></p>
+                  <% end %>
+                  
+                  <!-- Timeline Item Actions -->
+                  <div class="mt-3 flex items-center justify-between">
+                    <div class="text-xs text-gray-500">
+                      <% estimated_duration = case index % 4
+                           when 0 then '3-5 days'
+                           when 1 then '1-2 weeks'
+                           when 2 then '1 week'
+                           else '2-3 days'
+                           end %>
+                      Estimated: <%= estimated_duration %>
+                    </div>
+                    <button class="timeline-details-toggle text-xs text-emerald-600 hover:text-emerald-800 transition-colors"
+                            onclick="toggleTimelineDetails(this)">
+                      View Details
+                    </button>
+                  </div>
+                  
+                  <!-- Hidden Details -->
+                  <div class="timeline-details hidden mt-3 pt-3 border-t border-gray-200">
+                    <div class="text-xs text-gray-600 space-y-1">
+                      <div><strong>Dependencies:</strong> 
+                        <% if index > 0 %>
+                          Previous milestone completion
+                        <% else %>
+                          Campaign setup and approval
+                        <% end %>
+                      </div>
+                      <div><strong>Resources needed:</strong> 
+                        <% resources = ['Content team', 'Design team', 'Marketing manager'].sample(2) %>
+                        <%= resources.join(', ') %>
+                      </div>
+                      <div><strong>Success metrics:</strong> 
+                        <% metrics = ['Engagement rate', 'Reach', 'Conversion rate', 'Click-through rate'].sample(2) %>
+                        <%= metrics.join(', ') %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
+    <% else %>
+      <!-- Fallback for non-array timeline -->
+      <div class="bg-gray-50 rounded-lg p-6">
+        <div class="prose max-w-none">
+          <%= simple_format(timeline.to_s) %>
+        </div>
+      </div>
+    <% end %>
+    
+  <% else %>
+    <!-- No Timeline Content -->
+    <div class="text-center py-12">
+      <div class="text-gray-400 mb-4">
+        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Timeline Coming Soon</h3>
+      <p class="text-gray-600">Your interactive campaign timeline will be displayed here once the plan is generated, showing phased rollout and key milestones.</p>
+    </div>
+  <% end %>
+</div>
+
+<script>
+let timelineAnimation = null;
+let currentTimelineIndex = 0;
+
+function animateTimeline() {
+  const items = document.querySelectorAll('.timeline-item');
+  const progressBar = document.getElementById('timeline-progress');
+  const counter = document.getElementById('timeline-counter');
+  const playButton = document.getElementById('timeline-play');
+  
+  if (timelineAnimation) {
+    clearInterval(timelineAnimation);
+    timelineAnimation = null;
+    playButton.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 8h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>Animate Timeline';
+    return;
+  }
+  
+  playButton.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Stop Animation';
+  currentTimelineIndex = 0;
+  
+  // Reset all items
+  items.forEach(item => {
+    item.querySelector('.timeline-content').style.opacity = '0.3';
+    item.querySelector('.timeline-node div').style.borderColor = '#E5E7EB';
+    item.querySelector('.timeline-check').style.opacity = '0';
+  });
+  
+  timelineAnimation = setInterval(() => {
+    if (currentTimelineIndex < items.length) {
+      const item = items[currentTimelineIndex];
+      
+      // Animate current item
+      item.querySelector('.timeline-content').style.opacity = '1';
+      item.querySelector('.timeline-node div').style.borderColor = '#10B981';
+      item.querySelector('.timeline-node div').style.backgroundColor = '#ECFDF5';
+      
+      setTimeout(() => {
+        item.querySelector('.timeline-check').style.opacity = '1';
+      }, 300);
+      
+      // Update progress
+      const progress = ((currentTimelineIndex + 1) / items.length) * 100;
+      progressBar.style.height = progress + '%';
+      counter.textContent = currentTimelineIndex + 1;
+      
+      currentTimelineIndex++;
+    } else {
+      clearInterval(timelineAnimation);
+      timelineAnimation = null;
+      playButton.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 8h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>Animate Timeline';
+    }
+  }, 800);
+}
+
+function toggleTimelineDetails(button) {
+  const details = button.closest('.timeline-card').querySelector('.timeline-details');
+  const isHidden = details.classList.contains('hidden');
+  
+  details.classList.toggle('hidden');
+  button.textContent = isHidden ? 'Hide Details' : 'View Details';
+}
+
+function changeTimelineView() {
+  const view = document.getElementById('timeline-view').value;
+  const items = document.querySelectorAll('.timeline-item');
+  
+  items.forEach(item => {
+    const card = item.querySelector('.timeline-card');
+    const details = item.querySelector('.timeline-details');
+    
+    switch(view) {
+      case 'compact':
+        card.classList.add('py-2');
+        details.classList.add('hidden');
+        break;
+      case 'overview':
+        card.classList.add('py-1');
+        details.classList.add('hidden');
+        break;
+      default:
+        card.classList.remove('py-1', 'py-2');
+    }
+  });
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  const playButton = document.getElementById('timeline-play');
+  const viewSelect = document.getElementById('timeline-view');
+  
+  if (playButton) {
+    playButton.addEventListener('click', animateTimeline);
+  }
+  
+  if (viewSelect) {
+    viewSelect.addEventListener('change', changeTimelineView);
+  }
+});
+</script>

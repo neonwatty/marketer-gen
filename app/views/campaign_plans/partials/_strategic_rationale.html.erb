@@ -1,0 +1,223 @@
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 strategic-rationale">
+  <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    <svg class="w-6 h-6 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+    </svg>
+    Strategic Rationale
+  </h2>
+  
+  <div class="space-y-6">
+    <!-- Decision Framework -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Channel Selection Rationale -->
+      <div class="bg-amber-50 rounded-lg p-4 border border-amber-200">
+        <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center">
+          <svg class="w-5 h-5 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          Channel Selection
+        </h3>
+        
+        <div class="space-y-3">
+          <% if campaign_plan.generated_strategy.is_a?(Hash) && campaign_plan.generated_strategy['channels'] %>
+            <% campaign_plan.generated_strategy['channels'].each_with_index do |channel, index| %>
+              <div class="bg-white rounded-md p-3 border border-amber-100">
+                <h4 class="text-sm font-medium text-gray-900 mb-1"><%= channel %></h4>
+                <p class="text-xs text-gray-600">
+                  <% rationale = case channel.downcase
+                       when /social|instagram|facebook|twitter/
+                         'Selected for high engagement potential and viral reach capabilities within target demographic'
+                       when /email/
+                         'Chosen for direct communication and high conversion rates with existing customer base'
+                       when /content|blog/
+                         'Leveraged for SEO benefits and thought leadership positioning in the industry'
+                       when /video|youtube/
+                         'Utilized for visual storytelling and higher retention rates among target audience'
+                       when /search|google/
+                         'Implemented for capturing high-intent traffic and immediate conversion opportunities'
+                       when /display|banner/
+                         'Deployed for brand awareness and retargeting previous website visitors'
+                       else
+                         'Strategically chosen based on target audience behavior analysis and campaign objectives'
+                       end %>
+                  <%= rationale %>
+                </p>
+              </div>
+            <% end %>
+          <% else %>
+            <p class="text-sm text-gray-600 italic">Channel selection rationale will be detailed here based on target audience analysis, budget allocation, and campaign objectives.</p>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Timing Strategy -->
+      <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+        <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Timing Strategy
+        </h3>
+        
+        <div class="space-y-3">
+          <div class="bg-white rounded-md p-3 border border-blue-100">
+            <h4 class="text-sm font-medium text-gray-900 mb-1">Launch Timing</h4>
+            <p class="text-xs text-gray-600">
+              Campaign timing aligns with <% if campaign_plan.timeline_constraints.present? %>
+                <%= campaign_plan.timeline_constraints.downcase %>
+              <% else %>
+                optimal market conditions and audience engagement patterns
+              <% end %> to maximize impact and reach.
+            </p>
+          </div>
+          
+          <div class="bg-white rounded-md p-3 border border-blue-100">
+            <h4 class="text-sm font-medium text-gray-900 mb-1">Phased Approach</h4>
+            <p class="text-xs text-gray-600">
+              Sequential rollout strategy ensures proper testing, optimization, and resource allocation while building momentum throughout the campaign lifecycle.
+            </p>
+          </div>
+          
+          <div class="bg-white rounded-md p-3 border border-blue-100">
+            <h4 class="text-sm font-medium text-gray-900 mb-1">Seasonal Considerations</h4>
+            <p class="text-xs text-gray-600">
+              Campaign schedule accounts for seasonal trends, industry events, and competitor activity to optimize market positioning and audience receptivity.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Allocation Logic -->
+    <% if campaign_plan.generated_strategy.is_a?(Hash) && campaign_plan.generated_strategy['budget_allocation'] %>
+      <div class="border border-gray-200 rounded-lg p-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center">
+          <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+          </svg>
+          Budget Allocation Logic
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% campaign_plan.generated_strategy['budget_allocation'].each do |channel, percentage| %>
+            <div class="bg-gray-50 rounded-md p-3">
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="text-sm font-medium text-gray-900 capitalize"><%= channel.to_s.humanize %></h4>
+                <span class="text-lg font-semibold text-green-600"><%= percentage %>%</span>
+              </div>
+              <p class="text-xs text-gray-600">
+                <% allocation_rationale = case channel.to_s.downcase
+                     when /paid|advertising/
+                       'High allocation for immediate reach and measurable ROI through targeted advertising campaigns'
+                     when /content|organic/
+                       'Investment in sustainable growth through quality content creation and organic engagement'
+                     when /social/
+                       'Balanced spend for community building and engagement amplification across social platforms'
+                     when /email/
+                       'Cost-effective allocation for direct customer communication and retention efforts'
+                     when /influencer/
+                       'Strategic investment in authentic brand advocacy and expanded audience reach'
+                     else
+                       'Allocated based on expected ROI and alignment with campaign objectives'
+                     end %>
+                <%= allocation_rationale %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Risk Mitigation -->
+    <div class="border border-gray-200 rounded-lg p-4">
+      <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center">
+        <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+        Risk Mitigation Strategy
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-red-50 rounded-md p-3 border border-red-200">
+          <h4 class="text-sm font-medium text-gray-900 mb-2">Market Risks</h4>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li>• Competitive response monitoring</li>
+            <li>• Market condition adaptability</li>
+            <li>• Audience behavior shifts</li>
+            <li>• Platform algorithm changes</li>
+          </ul>
+        </div>
+        
+        <div class="bg-yellow-50 rounded-md p-3 border border-yellow-200">
+          <h4 class="text-sm font-medium text-gray-900 mb-2">Execution Risks</h4>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li>• Resource availability backup</li>
+            <li>• Timeline contingency plans</li>
+            <li>• Quality control checkpoints</li>
+            <li>• Performance monitoring alerts</li>
+          </ul>
+        </div>
+        
+        <div class="bg-purple-50 rounded-md p-3 border border-purple-200">
+          <h4 class="text-sm font-medium text-gray-900 mb-2">Performance Risks</h4>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li>• Real-time optimization protocols</li>
+            <li>• Budget reallocation triggers</li>
+            <li>• Creative performance testing</li>
+            <li>• KPI threshold monitoring</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Metrics Framework -->
+    <div class="border border-gray-200 rounded-lg p-4">
+      <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center">
+        <svg class="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        Success Measurement Framework
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <h4 class="text-sm font-medium text-gray-900">Primary KPIs</h4>
+          <% primary_kpis = case campaign_plan.objective
+               when 'awareness' then ['Reach', 'Impressions', 'Brand Recall', 'Share of Voice']
+               when 'engagement' then ['Engagement Rate', 'Time on Site', 'Social Shares', 'Comment Quality']
+               when 'conversion' then ['Conversion Rate', 'Cost per Acquisition', 'Revenue', 'ROAS']
+               when 'retention' then ['Customer Lifetime Value', 'Repeat Purchase Rate', 'Churn Rate', 'NPS Score']
+               else ['Reach', 'Engagement', 'Conversions', 'ROI']
+               end %>
+          <div class="flex flex-wrap gap-2">
+            <% primary_kpis.each do |kpi| %>
+              <span class="px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-md">
+                <%= kpi %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          <h4 class="text-sm font-medium text-gray-900">Secondary Metrics</h4>
+          <div class="flex flex-wrap gap-2">
+            <% secondary_metrics = ['Click-through Rate', 'Cost per Click', 'Quality Score', 'Brand Sentiment', 'Market Share'] %>
+            <% secondary_metrics.each do |metric| %>
+              <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md">
+                <%= metric %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-4 p-3 bg-indigo-50 rounded-md border border-indigo-200">
+        <p class="text-sm text-indigo-800">
+          <strong>Measurement Philosophy:</strong> Success will be evaluated through a balanced scorecard approach, 
+          combining quantitative performance metrics with qualitative brand impact assessment to ensure 
+          comprehensive campaign evaluation and optimization opportunities.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

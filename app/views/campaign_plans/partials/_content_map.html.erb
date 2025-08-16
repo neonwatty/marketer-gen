@@ -1,0 +1,121 @@
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+  <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+    <svg class="w-6 h-6 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+    Content Mapping
+  </h2>
+  
+  <div class="space-y-6">
+    <!-- Platform-Specific Content Strategy -->
+    <% if campaign_plan.generated_strategy.is_a?(Hash) && campaign_plan.generated_strategy['channels'] %>
+      <% campaign_plan.generated_strategy['channels'].each_with_index do |channel, index| %>
+        <div class="border border-gray-200 rounded-lg p-4 content-map-platform" data-platform="<%= channel.downcase.gsub(/\s+/, '-') %>">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-medium text-gray-900 flex items-center">
+              <span class="w-8 h-8 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                <%= index + 1 %>
+              </span>
+              <%= channel %>
+            </h3>
+            <button class="content-map-toggle text-gray-400 hover:text-gray-600 transition-colors" 
+                    onclick="toggleContentSection(this)" 
+                    aria-label="Toggle content details">
+              <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+          
+          <div class="content-details space-y-4" style="display: none;">
+            <!-- Content Types -->
+            <div class="bg-gray-50 rounded-md p-3">
+              <h4 class="text-sm font-medium text-gray-900 mb-2">Recommended Content Types</h4>
+              <div class="flex flex-wrap gap-2">
+                <% content_types = case channel.downcase
+                     when /social|instagram|facebook|twitter|linkedin/
+                       ['Visual Posts', 'Stories', 'Video Content', 'User-Generated Content']
+                     when /email/
+                       ['Welcome Series', 'Product Announcements', 'Newsletter', 'Promotional Campaigns']
+                     when /blog|content/
+                       ['How-to Guides', 'Industry Insights', 'Case Studies', 'Thought Leadership']
+                     when /video|youtube/
+                       ['Product Demos', 'Behind-the-Scenes', 'Educational Content', 'Testimonials']
+                     else
+                       ['Brand Awareness', 'Educational', 'Promotional', 'Engagement']
+                     end %>
+                <% content_types.each do |type| %>
+                  <span class="px-2 py-1 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-md">
+                    <%= type %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+            
+            <!-- Content Frequency -->
+            <div class="bg-blue-50 rounded-md p-3">
+              <h4 class="text-sm font-medium text-gray-900 mb-2">Publishing Frequency</h4>
+              <p class="text-sm text-gray-700">
+                <% frequency = case channel.downcase
+                     when /social|daily|twitter|instagram/
+                       '3-5 posts per week'
+                     when /email/
+                       'Weekly newsletter + monthly campaigns'
+                     when /blog/
+                       '2-3 articles per week'
+                     when /video/
+                       '1-2 videos per week'
+                     else
+                       '2-4 pieces per week'
+                     end %>
+                <%= frequency %>
+              </p>
+            </div>
+            
+            <!-- Strategic Purpose -->
+            <div class="bg-green-50 rounded-md p-3">
+              <h4 class="text-sm font-medium text-gray-900 mb-2">Strategic Purpose</h4>
+              <p class="text-sm text-gray-700">
+                <% purpose = case channel.downcase
+                     when /awareness|display/
+                       'Build brand awareness and reach new audiences'
+                     when /engagement|social/
+                       'Foster community engagement and brand loyalty'
+                     when /conversion|email/
+                       'Drive conversions and nurture leads'
+                     when /retention/
+                       'Maintain customer relationships and encourage repeat business'
+                     else
+                       'Support overall campaign objectives through targeted messaging'
+                     end %>
+                <%= purpose %>
+              </p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="text-center py-8">
+        <div class="text-gray-400 mb-4">
+          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Content Strategy Pending</h3>
+        <p class="text-gray-600">Detailed content mapping will be available once your campaign plan is generated, showing platform-specific strategies and content recommendations.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+function toggleContentSection(button) {
+  const contentDetails = button.closest('.content-map-platform').querySelector('.content-details');
+  const isVisible = contentDetails.style.display !== 'none';
+  
+  contentDetails.style.display = isVisible ? 'none' : 'block';
+  
+  const icon = button.querySelector('svg');
+  icon.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+</script>

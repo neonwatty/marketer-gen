@@ -417,4 +417,256 @@ class CampaignPlanTest < ActiveSupport::TestCase
     assert analytics[:content_sections][:strategic_rationale]
     assert analytics[:content_sections][:content_mapping]
   end
+
+  # Collaboration workflow tests
+  test "submit_for_approval! should update approval status and create version" do
+    @campaign_plan.update!(
+      status: "completed",
+      generated_summary: "Test summary",
+      generated_strategy: { description: "Strategy" }
+    )
+    
+    assert_difference 'PlanVersion.count', 1 do
+      assert_difference 'PlanAuditLog.count', 1 do
+        @campaign_plan.submit_for_approval!(@user)
+      end
+    end
+    
+    @campaign_plan.reload
+    assert_equal "pending_approval", @campaign_plan.approval_status
+    assert_not_nil @campaign_plan.submitted_for_approval_at
+    assert_not_nil @campaign_plan.current_version_id
+    
+    # Check audit log
+    audit_log = PlanAuditLog.last
+    assert_equal "submitted_for_approval", audit_log.action
+    assert_equal @user, audit_log.user
+  end
+
+  test "approve! should update approval status and timestamps" do
+    @campaign_plan.update!(approval_status: "pending_approval")
+    approver = users(:admin_user)
+    
+    assert_difference 'PlanAuditLog.count', 1 do
+      @campaign_plan.approve!(approver)
+    end
+    
+    @campaign_plan.reload
+    assert_equal "approved", @campaign_plan.approval_status
+    assert_equal approver, @campaign_plan.approved_by
+    assert_not_nil @campaign_plan.approved_at
+    
+    # Check audit log
+    audit_log = PlanAuditLog.last
+    assert_equal "approved", audit_log.action
+    assert_equal approver, audit_log.user
+  end
+
+  test "reject! should update approval status with reason" do
+    @campaign_plan.update!(approval_status: "pending_approval")
+    approver = users(:admin_user)
+    reason = "Content needs improvement"
+    
+    assert_difference 'PlanAuditLog.count', 1 do
+      @campaign_plan.reject!(approver, reason)
+    end
+    
+    @campaign_plan.reload
+    assert_equal "rejected", @campaign_plan.approval_status
+    assert_equal approver, @campaign_plan.rejected_by
+    assert_equal reason, @campaign_plan.rejection_reason
+    assert_not_nil @campaign_plan.rejected_at
+    
+    # Check audit log
+    audit_log = PlanAuditLog.last
+    assert_equal "rejected", audit_log.action
+    assert_equal reason, audit_log.details["reason"]
+  end
+
+  test "create_version! should create snapshot with proper content" do
+    @campaign_plan.update!(
+      generated_summary: "Test summary",
+      generated_strategy: { phases: ["Discovery"] },
+      content_strategy: { themes: ["Innovation"] },
+      target_audience: "Tech professionals"
+    )
+    
+    assert_difference 'PlanVersion.count', 1 do
+      version = @campaign_plan.create_version!(@user)
+      
+      assert_equal @campaign_plan, version.campaign_plan
+      assert_equal @user, version.created_by
+      assert_equal "Test summary", version.content["generated_summary"]
+      assert_equal ["Discovery"], version.content["generated_strategy"]["phases"]
+      assert_equal "Tech professionals", version.metadata["target_audience"]
+      assert_equal version.id, @campaign_plan.reload.current_version_id
+    end
+  end
+
+  test "create_version! with change summary should include it" do
+    change_summary = "Updated strategic approach based on market research"
+    
+    version = @campaign_plan.create_version!(@user, change_summary)
+    assert_equal change_summary, version.change_summary
+  end
+
+  # Approval workflow predicate tests
+  test "can_be_submitted_for_approval? should work correctly" do
+    # Draft plan with content can be submitted
+    @campaign_plan.update!(
+      status: "completed",
+      generated_summary: "Summary",
+      approval_status: "draft"
+    )
+    assert @campaign_plan.can_be_submitted_for_approval?
+    
+    # Already pending approval cannot be resubmitted
+    @campaign_plan.update!(approval_status: "pending_approval")
+    assert_not @campaign_plan.can_be_submitted_for_approval?
+    
+    # Already approved cannot be resubmitted
+    @campaign_plan.update!(approval_status: "approved")
+    assert_not @campaign_plan.can_be_submitted_for_approval?
+    
+    # Plan without content cannot be submitted
+    @campaign_plan.update!(
+      approval_status: "draft",
+      generated_summary: nil,
+      status: "draft"
+    )
+    assert_not @campaign_plan.can_be_submitted_for_approval?
+  end
+
+  test "needs_approval? should work correctly" do
+    @campaign_plan.update!(approval_status: "pending_approval")
+    assert @campaign_plan.needs_approval?
+    
+    @campaign_plan.update!(approval_status: "approved")
+    assert_not @campaign_plan.needs_approval?
+    
+    @campaign_plan.update!(approval_status: "draft")
+    assert_not @campaign_plan.needs_approval?
+  end
+
+  test "is_approved? should work correctly" do
+    @campaign_plan.update!(approval_status: "approved")
+    assert @campaign_plan.is_approved?
+    
+    @campaign_plan.update!(approval_status: "pending_approval")
+    assert_not @campaign_plan.is_approved?
+  end
+
+  test "is_rejected? should work correctly" do
+    @campaign_plan.update!(approval_status: "rejected")
+    assert @campaign_plan.is_rejected?
+    
+    @campaign_plan.update!(approval_status: "approved")
+    assert_not @campaign_plan.is_rejected?
+  end
+
+  # Association tests for collaboration features
+  test "should have many plan_versions" do
+    version1 = PlanVersion.create!(campaign_plan: @campaign_plan, created_by: @user)
+    version2 = PlanVersion.create!(campaign_plan: @campaign_plan, created_by: @user)
+    
+    assert_includes @campaign_plan.plan_versions, version1
+    assert_includes @campaign_plan.plan_versions, version2
+  end
+
+  test "should destroy dependent plan_versions" do
+    version = PlanVersion.create!(campaign_plan: @campaign_plan, created_by: @user)
+    
+    assert_difference 'PlanVersion.count', -1 do
+      @campaign_plan.destroy
+    end
+  end
+
+  test "should have many plan_audit_logs" do
+    log1 = PlanAuditLog.create!(campaign_plan: @campaign_plan, user: @user, action: "created")
+    log2 = PlanAuditLog.create!(campaign_plan: @campaign_plan, user: @user, action: "updated")
+    
+    assert_includes @campaign_plan.plan_audit_logs, log1
+    assert_includes @campaign_plan.plan_audit_logs, log2
+  end
+
+  test "should destroy dependent plan_audit_logs" do
+    log = PlanAuditLog.create!(campaign_plan: @campaign_plan, user: @user, action: "created")
+    
+    assert_difference 'PlanAuditLog.count', -1 do
+      @campaign_plan.destroy
+    end
+  end
+
+  test "should belong to approved_by and rejected_by users" do
+    approver = users(:admin_user)
+    @campaign_plan.update!(approved_by: approver)
+    assert_equal approver, @campaign_plan.approved_by
+    
+    rejector = users(:team_member_user)
+    @campaign_plan.update!(rejected_by: rejector)
+    assert_equal rejector, @campaign_plan.rejected_by
+  end
+
+  test "current_version should return the current plan version" do
+    version1 = PlanVersion.create!(campaign_plan: @campaign_plan, created_by: @user, is_current: false)
+    version2 = PlanVersion.create!(campaign_plan: @campaign_plan, created_by: @user, is_current: true)
+    
+    @campaign_plan.update!(current_version_id: version2.id)
+    assert_equal version2, @campaign_plan.current_version
+  end
+
+  # Feedback relationship tests
+  test "feedback_comments should return all feedback through versions" do
+    version1 = PlanVersion.create!(campaign_plan: @campaign_plan, created_by: @user)
+    version2 = PlanVersion.create!(campaign_plan: @campaign_plan, created_by: @user)
+    
+    comment1 = FeedbackComment.create!(
+      plan_version: version1,
+      user: @user,
+      content: "Feedback for version 1",
+      comment_type: "general",
+      priority: "medium"
+    )
+    
+    comment2 = FeedbackComment.create!(
+      plan_version: version2,
+      user: @user,
+      content: "Feedback for version 2",
+      comment_type: "suggestion",
+      priority: "high"
+    )
+    
+    all_feedback = @campaign_plan.feedback_comments
+    assert_includes all_feedback, comment1
+    assert_includes all_feedback, comment2
+  end
+
+  # Audit trail tests
+  test "should create audit log when campaign plan is created" do
+    assert_difference 'PlanAuditLog.count', 1 do
+      CampaignPlan.create!(
+        user: @user,
+        name: "New Campaign Plan",
+        campaign_type: "brand_awareness",
+        objective: "customer_acquisition"
+      )
+    end
+    
+    audit_log = PlanAuditLog.last
+    assert_equal "created", audit_log.action
+    assert_equal @user, audit_log.user
+  end
+
+  test "should create audit log when campaign plan is updated" do
+    original_name = @campaign_plan.name
+    
+    assert_difference 'PlanAuditLog.count', 1 do
+      @campaign_plan.update!(name: "Updated Campaign Name")
+    end
+    
+    audit_log = PlanAuditLog.last
+    assert_equal "updated", audit_log.action
+    assert_includes audit_log.details["changed_fields"], "name"
+    assert_equal [original_name, "Updated Campaign Name"], audit_log.details["changes"]["name"]
+  end
 end
