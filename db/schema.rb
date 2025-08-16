@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_15_190447) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_030514) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_190447) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "brand_identities", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.text "brand_voice"
+    t.text "tone_guidelines"
+    t.text "messaging_framework"
+    t.text "restrictions"
+    t.string "status", default: "draft", null: false
+    t.boolean "is_active", default: false, null: false
+    t.text "processed_guidelines"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_brand_identities_on_is_active"
+    t.index ["status"], name: "index_brand_identities_on_status"
+    t.index ["user_id", "name"], name: "index_brand_identities_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_brand_identities_on_user_id"
   end
 
   create_table "journey_steps", force: :cascade do |t|
@@ -114,6 +133,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_190447) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "brand_identities", "users"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journeys", "users"
   add_foreign_key "sessions", "users"

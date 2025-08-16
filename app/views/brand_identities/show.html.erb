@@ -1,0 +1,158 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900"><%= @brand_identity.name %></h1>
+        <p class="text-gray-600 mt-2"><%= @brand_identity.description if @brand_identity.description.present? %></p>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <% unless @brand_identity.is_active? %>
+          <%= link_to "Activate", activate_brand_identity_path(@brand_identity), 
+              method: :patch,
+              class: "bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200",
+              data: { confirm: "This will deactivate any other active brand identity. Continue?" } %>
+        <% else %>
+          <%= link_to "Deactivate", deactivate_brand_identity_path(@brand_identity), 
+              method: :patch,
+              class: "bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200" %>
+        <% end %>
+        
+        <%= link_to "Edit", edit_brand_identity_path(@brand_identity), 
+            class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200" %>
+        
+        <%= link_to "Back to List", brand_identities_path, 
+            class: "bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200" %>
+      </div>
+    </div>
+
+    <!-- Status and Processing Info -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Status</h3>
+        <div class="flex items-center">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+            <%= case @brand_identity.status
+                when 'draft' then 'bg-gray-100 text-gray-800'
+                when 'processing' then 'bg-yellow-100 text-yellow-800'
+                when 'active' then 'bg-green-100 text-green-800'
+                when 'archived' then 'bg-red-100 text-red-800'
+                end %>">
+            <%= @brand_identity.status.humanize %>
+          </span>
+          
+          <% if @brand_identity.is_active? %>
+            <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              Active
+            </span>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Files Processed</h3>
+        <p class="text-2xl font-bold text-blue-600">
+          <%= @brand_identity.processed_guidelines_summary[:files_processed] || 0 %>
+        </p>
+        <p class="text-sm text-gray-500">Brand material files</p>
+      </div>
+      
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Created</h3>
+        <p class="text-sm text-gray-600">
+          <%= time_ago_in_words(@brand_identity.created_at) %> ago
+        </p>
+        <p class="text-xs text-gray-500">
+          <%= @brand_identity.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+        </p>
+      </div>
+    </div>
+
+    <!-- Brand Guidelines -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <% if @brand_identity.brand_voice.present? %>
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-3">Brand Voice</h3>
+          <p class="text-gray-700 whitespace-pre-wrap"><%= @brand_identity.brand_voice %></p>
+        </div>
+      <% end %>
+      
+      <% if @brand_identity.tone_guidelines.present? %>
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-3">Tone Guidelines</h3>
+          <p class="text-gray-700 whitespace-pre-wrap"><%= @brand_identity.tone_guidelines %></p>
+        </div>
+      <% end %>
+      
+      <% if @brand_identity.messaging_framework.present? %>
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-3">Messaging Framework</h3>
+          <p class="text-gray-700 whitespace-pre-wrap"><%= @brand_identity.messaging_framework %></p>
+        </div>
+      <% end %>
+      
+      <% if @brand_identity.restrictions.present? %>
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 class="text-lg font-medium text-gray-900 mb-3">Content Restrictions</h3>
+          <p class="text-gray-700 whitespace-pre-wrap"><%= @brand_identity.restrictions %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Processing Actions -->
+    <% if @brand_identity.brand_materials.attached? || @brand_identity.logo_files.attached? || @brand_identity.style_guides.attached? %>
+      <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+        <div class="flex justify-between items-center">
+          <div>
+            <h3 class="text-lg font-medium text-gray-900">Brand Materials Processing</h3>
+            <p class="text-gray-600 mt-1">
+              Reprocess uploaded materials to extract updated brand guidelines
+            </p>
+          </div>
+          
+          <%= link_to "Reprocess Materials", process_materials_brand_identity_path(@brand_identity), 
+              method: :post,
+              class: "bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200",
+              data: { confirm: "This will reprocess all uploaded materials. Continue?" } %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Compliance Summary (if active) -->
+    <% if @brand_identity.active? && @compliance_summary.present? %>
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Compliance Summary</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center">
+            <p class="text-2xl font-bold text-blue-600"><%= @compliance_summary[:total_content_checks] %></p>
+            <p class="text-sm text-gray-500">Total Checks</p>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-2xl font-bold text-green-600"><%= @compliance_summary[:compliant_content] %></p>
+            <p class="text-sm text-gray-500">Compliant Content</p>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-2xl font-bold text-purple-600">
+              <%= number_to_percentage(@compliance_summary[:compliance_rate] * 100, precision: 1) %>
+            </p>
+            <p class="text-sm text-gray-500">Compliance Rate</p>
+          </div>
+        </div>
+        
+        <% if @compliance_summary[:common_violations].any? %>
+          <div class="mt-4">
+            <h4 class="text-sm font-medium text-gray-900 mb-2">Common Violations</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <% @compliance_summary[:common_violations].each do |violation| %>
+                <li>• <%= violation %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

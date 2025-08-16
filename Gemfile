@@ -70,5 +70,7 @@ group :test do
   gem "selenium-webdriver"
   # Rails controller testing helpers
   gem "rails-controller-testing"
+  # Mocking and stubbing for tests
+  gem "mocha"
 end
 gem "cssbundling-rails"

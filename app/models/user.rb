@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :journeys, dependent: :destroy
+  has_many :brand_identities, dependent: :destroy
   has_one_attached :avatar
 
   ROLES = %w[marketer team_member admin].freeze
@@ -92,6 +93,14 @@ class User < ApplicationRecord
     score -= old_sessions.count * 10
     
     [score, 0].max
+  end
+
+  def active_brand_identity
+    brand_identities.find_by(is_active: true)
+  end
+
+  def has_brand_identity?
+    brand_identities.active.exists?
   end
 
   private

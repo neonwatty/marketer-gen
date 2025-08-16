@@ -1,0 +1,34 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+valid_brand:
+  user: one
+  name: "Test Brand"
+  description: "A test brand identity for our company"
+  brand_voice: "Professional yet approachable"
+  tone_guidelines: "Always positive and helpful"
+  messaging_framework: "Focus on customer success"
+  restrictions: "Avoid technical jargon"
+  status: "draft"
+  is_active: false
+
+active_brand:
+  user: one
+  name: "Active Brand"
+  description: "The currently active brand identity"
+  brand_voice: "Friendly and conversational"
+  tone_guidelines: "Casual but professional"
+  messaging_framework: "Innovation and simplicity"
+  restrictions: "No negative language"
+  status: "active"
+  is_active: true
+
+other_user_brand:
+  user: two
+  name: "Other Brand"
+  description: "Brand identity for another user"
+  brand_voice: "Corporate and authoritative"
+  tone_guidelines: "Formal and precise"
+  messaging_framework: "Quality and reliability"
+  restrictions: "Avoid colloquialisms"
+  status: "draft"
+  is_active: false

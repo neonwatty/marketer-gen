@@ -1,4 +1,11 @@
 Rails.application.routes.draw do
+  resources :brand_identities do
+    member do
+      patch :activate
+      patch :deactivate  
+      post :process_materials
+    end
+  end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root "home#index"
   
