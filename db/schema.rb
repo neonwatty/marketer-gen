@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_030514) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_114922) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -56,6 +56,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_030514) do
     t.index ["status"], name: "index_brand_identities_on_status"
     t.index ["user_id", "name"], name: "index_brand_identities_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_brand_identities_on_user_id"
+  end
+
+  create_table "campaign_plans", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.string "campaign_type", null: false
+    t.string "objective", null: false
+    t.text "target_audience"
+    t.text "brand_context"
+    t.text "budget_constraints"
+    t.text "timeline_constraints"
+    t.text "generated_summary"
+    t.text "generated_strategy"
+    t.text "generated_timeline"
+    t.text "generated_assets"
+    t.string "status", default: "draft", null: false
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_type"], name: "index_campaign_plans_on_campaign_type"
+    t.index ["objective"], name: "index_campaign_plans_on_objective"
+    t.index ["status"], name: "index_campaign_plans_on_status"
+    t.index ["user_id", "name"], name: "index_campaign_plans_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_campaign_plans_on_user_id"
   end
 
   create_table "journey_steps", force: :cascade do |t|
@@ -134,6 +159,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_030514) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "brand_identities", "users"
+  add_foreign_key "campaign_plans", "users"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journeys", "users"
   add_foreign_key "sessions", "users"

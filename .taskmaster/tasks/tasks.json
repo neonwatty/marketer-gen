@@ -152,7 +152,7 @@
         "description": "Create the campaign summary plan feature that generates comprehensive plans before content creation.",
         "details": "Develop a system that generates structured campaign plans showing what content will be created, where it will appear, and why these decisions were made. Include strategic rationale and creative approach threading through all assets.",
         "testStrategy": "Test plan generation accuracy, stakeholder alignment features, and plan revision capabilities. Validate that plans provide clear guidance for content creation.",
-        "status": "pending",
+        "status": "done",
         "priority": "medium",
         "dependencies": [
           "2",
@@ -565,11 +565,69 @@
             "priority": "medium"
           }
         ]
+      },
+      {
+        "id": 21,
+        "title": "Campaign Plan Model and Database Migration",
+        "description": "Implement the core data model for storing campaign summary plans with strategic elements, relationships to journeys and brand identities, and comprehensive validations.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          3
+        ],
+        "priority": "medium",
+        "details": "Create a CampaignPlan model with fields for strategic elements (objectives, target audience, key messages, success metrics), relationships to Journey and BrandIdentity models, and validations for required fields. Include database migration with proper indexes and foreign key constraints. Implement model methods for plan generation, validation, and retrieval. Add scope methods for filtering plans by status, brand, or campaign type. Include soft delete functionality and audit trail capabilities. Ensure proper ActiveRecord associations and validation callbacks.",
+        "testStrategy": "Implement comprehensive Rails testing following Rails guides patterns: 1) Unit tests for model validations (presence, uniqueness, format validations for all required fields), 2) Association tests (belongs_to :journey, :brand_identity with proper foreign key constraints), 3) Factory/fixture tests for reliable test data creation and edge cases, 4) Scopes and query method tests (filtering by status, brand, campaign type), 5) Database migration tests (schema changes, indexes, constraints), 6) Model callback tests for audit trail and soft delete functionality, 7) Integration tests for model interactions with plan generation services. Use both RSpec and Minitest patterns as demonstrated in Rails testing guides. Include performance tests for query optimization and comprehensive edge case testing for invalid data handling.",
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "Campaign Plan Service Layer",
+        "description": "Implement service classes for generating campaign plans including PlanGeneratorService, PlanValidationService, and PlanRefinementService with comprehensive test coverage.",
+        "details": "Create service layer classes following Rails service object patterns: 1) PlanGeneratorService - handles campaign plan generation logic, integrates with LLM service for content suggestions, processes journey and brand identity data to create structured plans, implements plan template selection based on campaign type; 2) PlanValidationService - validates plan completeness, checks strategic alignment with brand guidelines, ensures all required elements are present, validates target audience and messaging consistency; 3) PlanRefinementService - handles plan updates and iterations, manages stakeholder feedback integration, implements plan versioning and comparison features. Each service should follow single responsibility principle, include proper error handling, implement dependency injection for testability, and provide clear interfaces for controller integration. Services should interact with CampaignPlan model and related associations, handle business logic separate from controllers, and provide methods for plan CRUD operations with validation.",
+        "testStrategy": "Implement comprehensive Rails testing following Rails guides patterns: 1) Unit tests for service methods - test PlanGeneratorService plan creation logic, PlanValidationService validation rules, PlanRefinementService update operations, verify error handling and edge cases; 2) Integration tests for service interactions - test service-to-service communication, database transaction handling, LLM service integration through mocks; 3) Mock/stub tests for external dependencies - mock LLM service calls, stub database queries for performance testing, mock file system operations; 4) Controller tests for service integration - test controller actions that use services, verify proper error handling and response formatting, test authorization and parameter validation. Include factory setup for test data, test plan generation with different journey types, validate service response formats, and ensure proper cleanup of test data.",
+        "status": "pending",
+        "dependencies": [
+          21,
+          3
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "Campaign Plan Controller and UI",
+        "description": "Implement Rails controller and views for campaign plan management including CRUD operations, plan generation forms, visualization views, and stakeholder collaboration features.",
+        "details": "Create CampaignPlansController with full CRUD actions (index, show, new, create, edit, update, destroy) following Rails conventions. Implement views including: 1) Index view - displays campaign plans in a filterable table with status indicators, search functionality, and pagination; 2) Show view - comprehensive plan visualization with strategic elements, timeline view, stakeholder comments section, and export options; 3) New/Edit forms - multi-step form wizard for plan creation with journey selection, brand identity integration, strategic objectives input, and target audience definition; 4) Partial views for plan components (objectives, messaging, timeline, metrics). Add strong parameters for security, implement authorization checks, and include AJAX functionality for real-time collaboration features. Integrate with PlanGeneratorService for plan creation and validation. Include responsive design patterns and accessibility features. Implement stakeholder invitation system with role-based permissions (viewer, reviewer, approver).",
+        "testStrategy": "Implement comprehensive Rails testing following Rails guides patterns: 1) Controller tests - test all CRUD actions with valid/invalid parameters, authorization checks, response formats (HTML/JSON), and error handling; 2) View tests - test form rendering, data display, responsive layout, and accessibility compliance; 3) Integration tests - test complete request-response cycles including form submissions, AJAX requests, file uploads, and stakeholder workflows; 4) System tests using Capybara - test user interactions including plan creation workflow, collaboration features, form validations, and cross-browser compatibility. Test performance with large datasets and concurrent user access.",
+        "status": "pending",
+        "dependencies": [
+          21,
+          22
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "Campaign Plan API and Integration Testing",
+        "description": "Implement comprehensive API endpoints for campaign plan management with external system integrations and full testing suite including API tests, integration tests, performance tests, and end-to-end workflow validation.",
+        "details": "Create RESTful API endpoints for campaign plan operations: 1) GET /api/v1/campaign_plans - list plans with filtering, pagination, and search capabilities; 2) POST /api/v1/campaign_plans - create new plans with JSON schema validation; 3) GET /api/v1/campaign_plans/:id - retrieve specific plan with related data; 4) PUT/PATCH /api/v1/campaign_plans/:id - update existing plans; 5) DELETE /api/v1/campaign_plans/:id - soft delete plans. Implement external integrations for marketing platforms (Meta Ads API, Google Ads API, LinkedIn Campaign Manager) and CRM systems (Salesforce, HubSpot). Add authentication middleware with API key and JWT token support. Include rate limiting, request/response logging, and comprehensive error handling with standardized JSON error responses. Implement JSON schema validation for all request payloads and response formatting. Add API versioning support and backward compatibility handling.",
+        "testStrategy": "Implement comprehensive testing suite following Rails API testing best practices: 1) API endpoint tests - test all CRUD operations with valid/invalid payloads, authentication scenarios, authorization checks, JSON schema validation, error response formats, and edge cases using RSpec request specs; 2) Integration tests - test external API connections with VCR cassettes for recorded responses, test authentication flows with marketing platforms, validate data synchronization between systems; 3) Performance tests - load testing with multiple concurrent requests, response time benchmarks, database query optimization validation, memory usage profiling; 4) End-to-end workflow tests - complete campaign plan lifecycle from creation through external platform integration, test data consistency across all systems, validate rollback scenarios for failed integrations; 5) Security tests - authentication bypass attempts, SQL injection prevention, XSS protection, rate limiting effectiveness, API key validation.",
+        "status": "pending",
+        "dependencies": [
+          23,
+          22,
+          3,
+          7
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-07-22T14:53:58.395Z",
-      "updated": "2025-08-16T05:32:54.542Z",
+      "updated": "2025-08-16T12:01:18.299Z",
       "description": "Tasks for master context"
     }
   }

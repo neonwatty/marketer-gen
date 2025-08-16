@@ -3,6 +3,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :journeys, dependent: :destroy
   has_many :brand_identities, dependent: :destroy
+  has_many :campaign_plans, dependent: :destroy
   has_one_attached :avatar
 
   ROLES = %w[marketer team_member admin].freeze

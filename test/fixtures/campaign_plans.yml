@@ -1,0 +1,66 @@
+# Campaign Plans test fixtures
+
+draft_plan:
+  user: marketer_user
+  name: "Q1 Product Launch"
+  description: "Launch our new product with comprehensive marketing strategy"
+  campaign_type: "product_launch"
+  objective: "brand_awareness"
+  target_audience: "Tech-savvy professionals aged 25-45"
+  budget_constraints: "Budget: $50,000 over 3 months"
+  timeline_constraints: "Launch date: March 15th"
+  status: "draft"
+  metadata: '{"version": "1.0"}'
+
+completed_plan:
+  user: marketer_user
+  name: "Brand Awareness Campaign"
+  description: "Increase brand recognition in target market"
+  campaign_type: "brand_awareness"
+  objective: "customer_acquisition"
+  target_audience: "Small business owners"
+  status: "completed"
+  generated_summary: "Comprehensive brand awareness campaign targeting small business owners through multiple digital channels."
+  generated_strategy: '{"phases": ["Discovery", "Launch", "Optimization"], "channels": ["Social Media", "Email", "Content Marketing"]}'
+  generated_timeline: '[{"week": 1, "activity": "Campaign setup"}, {"week": 2, "activity": "Content creation"}]'
+  generated_assets: '["Social media graphics", "Email templates", "Landing page copy"]'
+  metadata: '{"generated_at": "2025-01-15T10:00:00Z"}'
+
+generating_plan:
+  user: marketer_user
+  name: "Lead Generation Campaign"
+  description: "Generate qualified leads for sales team"
+  campaign_type: "lead_generation"
+  objective: "lead_generation"
+  target_audience: "Enterprise decision makers"
+  status: "generating"
+  metadata: '{"generation_started_at": "2025-01-15T09:00:00Z"}'
+
+failed_plan:
+  user: marketer_user
+  name: "Failed Campaign"
+  description: "This campaign failed to generate"
+  campaign_type: "sales_promotion"
+  objective: "sales_growth"
+  target_audience: "Existing customers"
+  status: "failed"
+  metadata: '{"error_message": "Service temporarily unavailable"}'
+
+archived_plan:
+  user: marketer_user
+  name: "Old Campaign"
+  description: "This campaign has been archived"
+  campaign_type: "customer_retention"
+  objective: "customer_retention"
+  target_audience: "Long-term customers"
+  status: "archived"
+  generated_summary: "Customer retention campaign focusing on loyalty programs."
+
+other_user_plan:
+  user: team_member_user
+  name: "Other User's Campaign"
+  description: "This belongs to a different user"
+  campaign_type: "event_marketing"
+  objective: "brand_awareness"
+  target_audience: "Event attendees"
+  status: "draft"

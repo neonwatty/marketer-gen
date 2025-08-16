@@ -6,6 +6,14 @@ Rails.application.routes.draw do
       post :process_materials
     end
   end
+  
+  resources :campaign_plans do
+    member do
+      post :generate
+      post :regenerate
+      patch :archive
+    end
+  end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root "home#index"
   
