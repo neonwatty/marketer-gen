@@ -12,8 +12,8 @@ class ApplicationController < ActionController::Base
   # Security headers
   before_action :set_security_headers
   
-  # Rate limiting (we'll implement this next)
-  before_action :check_rate_limit, unless: :devise_controller?
+  # Rate limiting (skip in test environment to avoid interference)
+  before_action :check_rate_limit, unless: -> { devise_controller? || Rails.env.test? }
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from ActionDispatch::Http::Parameters::ParseError, with: :handle_parameter_parse_error

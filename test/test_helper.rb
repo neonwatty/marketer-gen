@@ -17,6 +17,12 @@ module ActiveSupport
       # Clear Current state before each test
       Current.reset
       
+      # Clear all cached rate limiting and security monitoring data
+      Rails.cache.clear
+      
+      # Clean up sessions to avoid test interference
+      Session.destroy_all
+      
       # Set up test logging
       @log_output = StringIO.new
       @old_logger = Rails.logger
@@ -52,14 +58,14 @@ end
 
 class ActionDispatch::IntegrationTest
   def sign_in_as(user)
-    # Create a session for the user
-    user_session = user.sessions.create!(
-      user_agent: 'test',
-      ip_address: '127.0.0.1'
-    )
+    # Perform authentication via standard login flow
+    post session_path, params: { 
+      email_address: user.email_address, 
+      password: "password" 
+    }
     
-    # Use simple POST to authenticate and let Rails handle the session
-    post session_path, params: { email_address: user.email_address, password: "password" }
+    # The response should be a redirect on successful authentication
+    # This ensures the session cookie is set properly
     follow_redirect! if response.redirect?
   end
 end

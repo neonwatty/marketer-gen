@@ -33,12 +33,14 @@ class JourneysMultiManagementTest < ActionDispatch::IntegrationTest
     )
   end
 
+
   test "should display analytics dashboard on journey index" do
+    sign_in_as @user
     get journeys_url
     assert_response :success
     
     # Check for analytics cards in the dashboard section
-    assert_select ".grid .bg-white .rounded-lg", minimum: 4
+    assert_select ".grid .bg-white.rounded-lg", minimum: 4
     assert_select "p", text: /Total Journeys/
     assert_select "p", text: /Active/
     assert_select "p", text: /Completed/
@@ -46,6 +48,7 @@ class JourneysMultiManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "should search journeys by name and description" do
+    sign_in_as @user
     # Test search by name
     get journeys_url, params: { search: "email" }
     assert_response :success
@@ -58,6 +61,7 @@ class JourneysMultiManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "should duplicate journey successfully" do
+    sign_in_as @user
     assert_difference('Journey.count', 1) do
       post duplicate_journey_url(@journey1)
     end
@@ -75,6 +79,7 @@ class JourneysMultiManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "should duplicate journey steps when duplicating journey" do
+    sign_in_as @user
     initial_steps_count = @journey1.journey_steps.count
     
     post duplicate_journey_url(@journey1)
@@ -89,6 +94,7 @@ class JourneysMultiManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "should archive journey when conditions are met" do
+    sign_in_as @user
     # Set journey to completed status (archivable)
     @journey1.update!(status: 'completed')
     
@@ -101,6 +107,7 @@ class JourneysMultiManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "should not archive journey when conditions are not met" do
+    sign_in_as @user
     # Set journey to active status (not archivable)
     @journey1.update!(status: 'active')
     
@@ -113,28 +120,32 @@ class JourneysMultiManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "should show journey comparison page with valid journey ids" do
+    sign_in_as @user
     get compare_journeys_url, params: { journey_ids: [@journey1.id, @journey2.id] }
     assert_response :success
     
     assert_select "h1", text: "Journey Comparison"
     assert_select "table tbody tr", count: 2
-    assert_select "td", text: @journey1.name
-    assert_select "td", text: @journey2.name
+    assert_select "td .text-sm.font-medium.text-gray-900", text: @journey1.name
+    assert_select "td .text-sm.font-medium.text-gray-900", text: @journey2.name
   end
 
   test "should redirect when no journeys selected for comparison" do
+    sign_in_as @user
     get compare_journeys_url, params: { journey_ids: [] }
     assert_redirected_to journeys_url
     assert_match(/Please select journeys to compare/, flash[:alert])
   end
 
   test "should redirect when only one journey selected for comparison" do
+    sign_in_as @user
     get compare_journeys_url, params: { journey_ids: [@journey1.id] }
     assert_redirected_to journeys_url
     assert_match(/Please select at least 2 journeys/, flash[:alert])
   end
 
   test "should redirect when too many journeys selected for comparison" do
+    sign_in_as @user
     # Create additional journeys to exceed the limit
     journey3 = @user.journeys.create!(name: "Journey 3", campaign_type: "awareness")
     journey4 = @user.journeys.create!(name: "Journey 4", campaign_type: "awareness") 
@@ -173,6 +184,7 @@ class JourneysMultiManagementTest < ActionDispatch::IntegrationTest
   end
 
   test "comparison should include correct analytics data" do
+    sign_in_as @user
     get compare_journeys_url, params: { journey_ids: [@journey1.id, @journey2.id] }
     assert_response :success
     

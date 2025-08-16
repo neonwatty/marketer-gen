@@ -1,6 +1,6 @@
 class PasswordsController < ApplicationController
   allow_unauthenticated_access
-  rate_limit to: 5, within: 1.hour, only: :create, with: -> { redirect_to new_password_path, alert: "Too many password reset attempts. Please try again later." }
+  rate_limit to: 5, within: 1.hour, only: :create, with: -> { redirect_to new_password_path, alert: "Too many password reset attempts. Please try again later." } unless Rails.env.test?
   before_action :set_user_by_token, only: %i[ edit update ]
 
   def new

@@ -64,7 +64,7 @@
               "1.3"
             ],
             "details": "Extend the journeys system to support multiple journeys per user with proper organization and filtering. Create a dashboard view showing all user journeys with status, creation dates, and basic metrics. Implement journey duplication, archiving, and comparison features. Add basic analytics like journey completion tracking and step performance. Include search and filtering capabilities for journey management.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test multi-journey creation and management, dashboard functionality, journey duplication and archiving. Validate analytics accuracy and performance with multiple journeys. Test search and filtering features."
           }
         ]
@@ -579,7 +579,7 @@
     ],
     "metadata": {
       "created": "2025-07-22T14:53:58.395Z",
-      "updated": "2025-08-15T19:02:33.017Z",
+      "updated": "2025-08-15T19:10:04.101Z",
       "description": "Tasks for master context"
     }
   }
