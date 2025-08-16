@@ -173,8 +173,87 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and implement main dashboard layout with routing",
+            "description": "Create the foundational dashboard structure with Next.js routing, navigation components, and responsive layout using Shadcn UI",
+            "dependencies": [],
+            "details": "Set up dashboard route structure (/dashboard, /dashboard/campaigns, /dashboard/campaigns/[id]). Implement responsive sidebar navigation with Shadcn Sheet component for mobile. Create dashboard header with user info placeholder and global actions. Build main content area with proper spacing and container components. Implement breadcrumb navigation using Shadcn Breadcrumb. Set up route protection structure (disabled but ready for auth activation).\n<info added on 2025-08-16T03:46:10.788Z>\nImplementation completed successfully. Main dashboard structure established with proper Next.js routing including /dashboard, /dashboard/campaigns, and /dashboard/campaigns/[id] routes. Responsive sidebar navigation implemented using shadcn/ui Sidebar component featuring navigation items for Overview, Campaigns, Analytics, Audience, Templates, and Settings. Dashboard header created with search functionality, notifications, and user menu using shadcn/ui components. Breadcrumb navigation component integrated for route context. Route protection structure established with ProtectedRoute wrapper component (currently set to requireAuth=false for MVP accessibility). All pages successfully build and development server starts without errors. Foundation ready for implementing campaign overview cards in subtask 4.2.\n</info added on 2025-08-16T03:46:10.788Z>",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Build campaign overview cards with metrics display",
+            "description": "Create reusable campaign card components showing key metrics, status indicators, and quick actions using Shadcn Card components",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Design campaign card layout with title, description, status badge, and key metrics (engagement rate, conversion rate, content pieces). Implement status indicators using Shadcn Badge component with color coding. Add quick action buttons (View, Edit, Duplicate, Archive) with Shadcn DropdownMenu. Create skeleton loading states for cards. Build responsive grid layout for multiple cards. Include progress indicators for journey completion.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement campaign listing with DataTable and filters",
+            "description": "Build comprehensive campaign list view using Shadcn DataTable with sorting, filtering, pagination, and search capabilities",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Set up Shadcn DataTable with columns for name, status, journey type, created date, last modified, and actions. Implement column sorting and visibility toggles. Add search functionality with debounced input using Shadcn Input. Create filter dropdowns for status, journey type, and date range using Shadcn Select and DatePicker. Implement pagination with configurable page sizes. Add bulk actions toolbar for selected campaigns.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Create multi-step campaign creation wizard",
+            "description": "Build campaign creation flow with multi-step form validation, journey template selection, and configuration using Shadcn form components",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Design wizard steps: Basic Info, Journey Template Selection, Target Audience, Goals & KPIs, Review. Implement form validation using React Hook Form and Zod schemas. Create template selection interface with preview cards showing Product Launch, Lead Gen Funnel, Re-Engagement templates. Build step navigation with progress indicator using Shadcn Progress. Add form persistence between steps using local state or session storage. Implement save as draft functionality.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Build journey visualization component with React Flow",
+            "description": "Implement interactive journey builder using React Flow library with drag-and-drop functionality and stage configuration",
+            "dependencies": [
+              "4.4"
+            ],
+            "details": "Install and configure React Flow with custom node types for journey stages (Awareness, Consideration, Conversion, Retention). Create custom node components with Shadcn styling for consistency. Implement drag-and-drop for adding/reordering stages. Build stage configuration panel with Shadcn Sheet for content type selection and messaging suggestions. Add connection lines between stages with labels. Include zoom controls and minimap for large journeys. Create toolbar for adding stages and elements.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement campaign CRUD operations with Prisma",
+            "description": "Create API routes and database operations for campaign creation, reading, updating, and deletion with proper error handling",
+            "dependencies": [
+              "4.4",
+              "4.5"
+            ],
+            "details": "Build Next.js API routes for /api/campaigns with GET, POST, PUT, DELETE methods. Implement Prisma queries for campaign CRUD operations including related journey data. Create journey template seeding function for predefined templates. Add transaction support for complex operations involving campaigns and journeys. Implement soft delete for campaigns with status updates. Build campaign duplication functionality preserving journey structure. Add validation middleware for request data.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Add optimistic updates and loading states",
+            "description": "Implement optimistic UI updates, loading states, and error handling throughout the dashboard for improved user experience",
+            "dependencies": [
+              "4.2",
+              "4.3",
+              "4.6"
+            ],
+            "details": "Implement optimistic updates for campaign status changes and quick actions using React Query or SWR. Add skeleton loaders for all data-fetching components using Shadcn Skeleton. Create error boundaries with fallback UI for component failures. Implement toast notifications for success/error states using Shadcn Toast. Add loading spinners for form submissions and API calls. Create empty states with call-to-action for no campaigns. Implement automatic retry logic for failed API requests.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 5,
@@ -258,7 +337,7 @@
     ],
     "metadata": {
       "created": "2025-08-14T21:12:18.479Z",
-      "updated": "2025-08-15T16:34:02.157Z",
+      "updated": "2025-08-16T03:45:52.433Z",
       "description": "Tasks for master context"
     }
   }
