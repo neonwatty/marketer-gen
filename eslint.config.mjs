@@ -93,6 +93,9 @@ const eslintConfig = [
     },
   },
   {
+    ignores: ['src/generated/**/*'],
+  },
+  {
     files: ['**/*.test.{js,jsx,ts,tsx}', '**/__tests__/**/*'],
     rules: {
       'no-console': 'off',

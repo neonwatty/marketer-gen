@@ -3,6 +3,7 @@
  * Export all layout components from this index file
  */
 
+export { AppLayout } from './AppLayout'
 export { AuthLayout } from './AuthLayout'
 export { DashboardLayout } from './DashboardLayout'
 export { MainLayout } from './MainLayout'

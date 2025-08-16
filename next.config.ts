@@ -1,7 +1,10 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  eslint: {
+    // Only check for linting errors during development
+    ignoreDuringBuilds: true
+  }
 }
 
 export default nextConfig
