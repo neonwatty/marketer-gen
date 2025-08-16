@@ -29,6 +29,24 @@ Rails.application.routes.draw do
     end
     resources :journey_steps, except: [:show]
   end
+
+  # API routes
+  namespace :api do
+    namespace :v1 do
+      scope :content_generation do
+        post :social_media, to: 'content_generation#social_media'
+        post :email, to: 'content_generation#email'
+        post :ad_copy, to: 'content_generation#ad_copy'
+        post :landing_page, to: 'content_generation#landing_page'
+        post :campaign_plan, to: 'content_generation#campaign_plan'
+        post :variations, to: 'content_generation#variations'
+        post :optimize, to: 'content_generation#optimize'
+        post :brand_compliance, to: 'content_generation#brand_compliance'
+        post :analytics_insights, to: 'content_generation#analytics_insights'
+        get :health, to: 'content_generation#health'
+      end
+    end
+  end
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
