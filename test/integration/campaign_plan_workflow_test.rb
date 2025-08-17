@@ -277,19 +277,19 @@ class CampaignPlanWorkflowTest < ActionDispatch::IntegrationTest
     # Try to access other user's campaign plan
     get campaign_plan_path(other_plan)
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
 
     # Try to edit other user's campaign plan
     get edit_campaign_plan_path(other_plan)
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
 
     # Try to update other user's campaign plan
     patch campaign_plan_path(other_plan), params: {
       campaign_plan: { name: "Hacked Name" }
     }
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
 
     other_plan.reload
     assert_not_equal "Hacked Name", other_plan.name
@@ -299,7 +299,7 @@ class CampaignPlanWorkflowTest < ActionDispatch::IntegrationTest
       delete campaign_plan_path(other_plan)
     end
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
   end
 
   test "campaign plan with brand identity integration workflow" do

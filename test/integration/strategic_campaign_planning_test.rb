@@ -230,7 +230,7 @@ class StrategicCampaignPlanningTest < ActionDispatch::IntegrationTest
     # Try to access other user's plan
     get campaign_plan_url(other_campaign)
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
   end
 
   test "strategic campaign planning analytics display workflow" do

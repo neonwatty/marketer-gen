@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_204132) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_211239) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -89,11 +89,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_204132) do
     t.integer "current_version_id"
     t.text "rejection_reason"
     t.text "stakeholder_notes"
+    t.text "engagement_metrics"
+    t.text "performance_data"
+    t.text "roi_tracking"
+    t.boolean "analytics_enabled", default: true, null: false
+    t.datetime "analytics_last_updated_at"
+    t.datetime "plan_execution_started_at"
+    t.datetime "plan_execution_completed_at"
+    t.index ["analytics_enabled"], name: "index_campaign_plans_on_analytics_enabled"
+    t.index ["analytics_last_updated_at"], name: "index_campaign_plans_on_analytics_last_updated_at"
     t.index ["approval_status"], name: "index_campaign_plans_on_approval_status"
     t.index ["approved_by_id"], name: "index_campaign_plans_on_approved_by_id"
     t.index ["campaign_type"], name: "index_campaign_plans_on_campaign_type"
     t.index ["current_version_id"], name: "index_campaign_plans_on_current_version_id"
     t.index ["objective"], name: "index_campaign_plans_on_objective"
+    t.index ["plan_execution_started_at"], name: "index_campaign_plans_on_plan_execution_started_at"
     t.index ["rejected_by_id"], name: "index_campaign_plans_on_rejected_by_id"
     t.index ["status"], name: "index_campaign_plans_on_status"
     t.index ["submitted_for_approval_at"], name: "index_campaign_plans_on_submitted_for_approval_at"

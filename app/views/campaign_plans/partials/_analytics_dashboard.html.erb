@@ -1,0 +1,334 @@
+<% if @campaign_plan.analytics_enabled? %>
+  <div class="analytics-dashboard bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+        <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        Plan Analytics & Performance
+      </h2>
+      
+      <div class="flex items-center gap-3">
+        <% if @campaign_plan.analytics_stale? %>
+          <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+            Data may be outdated
+          </span>
+        <% end %>
+        
+        <%= link_to refresh_analytics_campaign_plan_path(@campaign_plan), method: :post,
+            class: "text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1",
+            title: "Refresh analytics data" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh Data
+        <% end %>
+      </div>
+    </div>
+
+    <% analytics_data = @campaign_plan.analytics_summary %>
+    <% if analytics_data.present? && @campaign_plan.has_analytics_data? %>
+      
+      <!-- Key Performance Indicators -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- ROI Metric -->
+        <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-green-600">Current ROI</p>
+              <p class="text-2xl font-bold text-green-900">
+                <%= number_to_percentage(@campaign_plan.current_roi, precision: 1) %>
+              </p>
+              <% projected = @campaign_plan.projected_roi %>
+              <% if projected > 0 %>
+                <p class="text-xs text-green-600">
+                  Target: <%= number_to_percentage(projected, precision: 1) %>
+                </p>
+              <% end %>
+            </div>
+            <div class="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engagement Score -->
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-blue-600">Engagement Score</p>
+              <p class="text-2xl font-bold text-blue-900">
+                <%= @campaign_plan.engagement_score %><span class="text-sm">/100</span>
+              </p>
+              <p class="text-xs text-blue-600">
+                <%= @campaign_plan.feedback_comments.count %> comments
+              </p>
+            </div>
+            <div class="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Score -->
+        <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-purple-600">Performance Score</p>
+              <p class="text-2xl font-bold text-purple-900">
+                <%= @campaign_plan.performance_score.round(1) %><span class="text-sm">%</span>
+              </p>
+              <p class="text-xs text-purple-600">
+                Content completeness
+              </p>
+            </div>
+            <div class="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Execution Progress -->
+        <div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-orange-600">Execution Progress</p>
+              <% execution_summary = analytics_data[:execution_status] || {} %>
+              <p class="text-2xl font-bold text-orange-900">
+                <%= execution_summary[:execution_progress_percentage] || 0 %><span class="text-sm">%</span>
+              </p>
+              <% if execution_summary[:execution_started] %>
+                <p class="text-xs text-orange-600">
+                  <%= pluralize(execution_summary[:execution_duration_days] || 0, 'day') %> active
+                </p>
+              <% else %>
+                <p class="text-xs text-orange-600">Not started</p>
+              <% end %>
+            </div>
+            <div class="w-8 h-8 bg-orange-200 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Execution Status Section -->
+      <% execution_summary = analytics_data[:execution_status] || {} %>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Execution Timeline -->
+        <div class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Execution Timeline
+          </h3>
+          
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Plan Created</span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= @campaign_plan.created_at.strftime("%b %d, %Y") %>
+              </span>
+            </div>
+            
+            <% if execution_summary[:execution_started] %>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">Execution Started</span>
+                <span class="text-sm font-medium text-green-600">
+                  <%= @campaign_plan.plan_execution_started_at&.strftime("%b %d, %Y") %>
+                </span>
+              </div>
+            <% end %>
+            
+            <% if execution_summary[:execution_completed] %>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">Execution Completed</span>
+                <span class="text-sm font-medium text-green-600">
+                  <%= @campaign_plan.plan_execution_completed_at&.strftime("%b %d, %Y") %>
+                </span>
+              </div>
+            <% else %>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-600">Status</span>
+                <% if execution_summary[:execution_started] %>
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                    In Progress
+                  </span>
+                <% else %>
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                    Not Started
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Execution Action Buttons -->
+          <div class="mt-6 flex gap-2">
+            <% unless execution_summary[:execution_started] %>
+              <%= link_to start_execution_campaign_plan_path(@campaign_plan), method: :post,
+                  class: "bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-200",
+                  data: { confirm: "Start tracking execution of this campaign plan?" } do %>
+                Start Execution
+              <% end %>
+            <% end %>
+            
+            <% if execution_summary[:execution_started] && !execution_summary[:execution_completed] %>
+              <%= link_to complete_execution_campaign_plan_path(@campaign_plan), method: :post,
+                  class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-200",
+                  data: { confirm: "Mark this campaign plan as completed?" } do %>
+                Complete Execution
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Performance Breakdown -->
+        <div class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Performance Breakdown
+          </h3>
+          
+          <div class="space-y-4">
+            <!-- Content Performance -->
+            <% content_performance = @campaign_plan.content_performance_summary %>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Content Pieces</span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= content_performance[:total_content_pieces] %>
+              </span>
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Content Completion</span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= content_performance[:content_completion_rate] %>%
+              </span>
+            </div>
+
+            <!-- Timeline Performance -->
+            <% timeline_performance = @campaign_plan.timeline_performance_summary %>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Timeline Adherence</span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= timeline_performance[:timeline_adherence] %>%
+              </span>
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Overall Progress</span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= timeline_performance[:overall_progress] %>%
+              </span>
+            </div>
+
+            <!-- Collaboration Metrics -->
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Plan Versions</span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= @campaign_plan.plan_versions.count %>
+              </span>
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-gray-600">Active Feedback</span>
+              <span class="text-sm font-medium text-gray-900">
+                <%= @campaign_plan.feedback_comments.open.count %>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- ROI Trend Chart -->
+        <div class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">ROI Performance</h3>
+          <div class="h-64 flex items-center justify-center text-gray-500">
+            <div class="text-center">
+              <svg class="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <p class="text-sm">ROI trend visualization</p>
+              <p class="text-xs text-gray-400">Chart.js integration pending</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engagement Metrics Chart -->
+        <div class="bg-gray-50 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Engagement Timeline</h3>
+          <div class="h-64 flex items-center justify-center text-gray-500">
+            <div class="text-center">
+              <svg class="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              <p class="text-sm">Engagement trend visualization</p>
+              <p class="text-xs text-gray-400">Chart.js integration pending</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Actions -->
+      <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-200">
+        <%= link_to analytics_report_campaign_plan_path(@campaign_plan),
+            class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-200 flex items-center gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Generate Report
+        <% end %>
+
+        <%= link_to sync_external_analytics_campaign_plan_path(@campaign_plan), method: :post,
+            class: "bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium py-2 px-4 rounded-md transition duration-200 flex items-center gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Sync External Data
+        <% end %>
+
+        <% if @campaign_plan.analytics_last_updated_at %>
+          <span class="text-xs text-gray-500 ml-auto">
+            Last updated: <%= time_ago_in_words(@campaign_plan.analytics_last_updated_at) %> ago
+          </span>
+        <% end %>
+      </div>
+
+    <% else %>
+      <!-- No Analytics Data State -->
+      <div class="text-center py-12">
+        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Analytics Data Available</h3>
+        <p class="text-gray-600 mb-6">
+          Analytics data will be available once the campaign plan is completed and execution begins.
+        </p>
+        
+        <% if @campaign_plan.completed? %>
+          <%= link_to refresh_analytics_campaign_plan_path(@campaign_plan), method: :post,
+              class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200" do %>
+            Initialize Analytics
+          <% end %>
+        <% else %>
+          <p class="text-sm text-gray-500">Complete the plan generation to enable analytics.</p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

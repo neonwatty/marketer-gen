@@ -33,6 +33,9 @@ class CampaignPlan < ApplicationRecord
   serialize :creative_approach, coder: JSON
   serialize :strategic_rationale, coder: JSON
   serialize :content_mapping, coder: JSON
+  serialize :engagement_metrics, coder: JSON
+  serialize :performance_data, coder: JSON
+  serialize :roi_tracking, coder: JSON
   
   scope :by_campaign_type, ->(type) { where(campaign_type: type) }
   scope :by_objective, ->(objective) { where(objective: objective) }
@@ -43,6 +46,10 @@ class CampaignPlan < ApplicationRecord
   scope :pending_approval, -> { where(approval_status: 'pending_approval') }
   scope :needs_changes, -> { where(approval_status: 'changes_requested') }
   scope :recent, -> { order(created_at: :desc) }
+  scope :analytics_enabled, -> { where(analytics_enabled: true) }
+  scope :with_analytics_data, -> { where.not(engagement_metrics: nil).or(where.not(performance_data: nil)) }
+  scope :execution_started, -> { where.not(plan_execution_started_at: nil) }
+  scope :execution_completed, -> { where.not(plan_execution_completed_at: nil) }
   
   before_validation :set_default_metadata, on: :create
   before_validation :set_default_approval_status, on: :create
@@ -157,6 +164,183 @@ class CampaignPlan < ApplicationRecord
         content_mapping: safe_field_present?(:content_mapping)
       }
     }
+  end
+
+  # Enhanced analytics methods
+  def analytics_summary
+    return {} unless analytics_enabled?
+
+    {
+      basic_analytics: plan_analytics,
+      engagement_data: parsed_engagement_metrics,
+      performance_data: parsed_performance_data,
+      roi_data: parsed_roi_tracking,
+      analytics_last_updated: analytics_last_updated_at,
+      execution_status: execution_analytics_summary
+    }
+  end
+
+  def parsed_engagement_metrics
+    return {} unless engagement_metrics.present?
+    safe_parse_json_field(:engagement_metrics)
+  end
+
+  def parsed_performance_data
+    return {} unless performance_data.present?
+    safe_parse_json_field(:performance_data)
+  end
+
+  def parsed_roi_tracking
+    return {} unless roi_tracking.present?
+    safe_parse_json_field(:roi_tracking)
+  end
+
+  def execution_analytics_summary
+    {
+      execution_started: plan_execution_started_at.present?,
+      execution_completed: plan_execution_completed_at.present?,
+      execution_duration_days: calculate_execution_duration_days,
+      execution_progress_percentage: calculate_execution_progress_percentage
+    }
+  end
+
+  def calculate_execution_duration_days
+    return 0 unless plan_execution_started_at
+
+    end_time = plan_execution_completed_at || Time.current
+    ((end_time - plan_execution_started_at) / 1.day).round(1)
+  end
+
+  def calculate_execution_progress_percentage
+    return 0 unless plan_execution_started_at
+    return 100 if plan_execution_completed_at
+
+    # Calculate based on timeline if available
+    timeline_data = safe_parse_json_field(:generated_timeline)
+    return 50 if timeline_data.blank? # Default progress if no timeline
+
+    # Mock calculation based on elapsed time vs planned duration
+    planned_duration = extract_planned_duration(timeline_data)
+    return 50 if planned_duration.zero?
+
+    elapsed_days = calculate_execution_duration_days
+    progress = (elapsed_days / planned_duration * 100).round(1)
+    [progress, 100].min
+  end
+
+  def has_analytics_data?
+    engagement_metrics.present? || performance_data.present? || roi_tracking.present?
+  end
+
+  def refresh_analytics!
+    return false unless analytics_enabled?
+
+    service = PlanAnalyticsService.new(self)
+    result = service.call
+    
+    if result[:success]
+      touch(:analytics_last_updated_at)
+      true
+    else
+      Rails.logger.error "Failed to refresh analytics for plan #{id}: #{result[:error]}"
+      false
+    end
+  end
+
+  def analytics_stale?
+    return false unless analytics_enabled?
+    return true unless analytics_last_updated_at
+
+    # Consider analytics stale if not updated in 24 hours
+    analytics_last_updated_at < 24.hours.ago
+  end
+
+  # Plan execution tracking methods
+  def start_execution!
+    return false if plan_execution_started_at.present?
+    
+    update!(plan_execution_started_at: Time.current)
+    refresh_analytics! if analytics_enabled?
+    true
+  end
+
+  def complete_execution!
+    return false unless plan_execution_started_at.present?
+    return false if plan_execution_completed_at.present?
+    
+    update!(plan_execution_completed_at: Time.current)
+    refresh_analytics! if analytics_enabled?
+    true
+  end
+
+  def execution_in_progress?
+    plan_execution_started_at.present? && plan_execution_completed_at.blank?
+  end
+
+  def execution_completed?
+    plan_execution_started_at.present? && plan_execution_completed_at.present?
+  end
+
+  # ROI and performance metrics
+  def current_roi
+    roi_data = parsed_roi_tracking
+    roi_data.dig('actual_roi') || 0
+  end
+
+  def projected_roi
+    roi_data = parsed_roi_tracking
+    roi_data.dig('projected_roi') || 0
+  end
+
+  def engagement_score
+    engagement_data = parsed_engagement_metrics
+    engagement_data.dig('collaboration_score') || 0
+  end
+
+  def performance_score
+    performance_data = parsed_performance_data
+    quality_metrics = performance_data.dig('quality_metrics') || {}
+    quality_metrics.dig('content_completeness') || generation_progress
+  end
+
+  # Content performance analytics
+  def content_performance_summary
+    content_data = parsed_performance_data.dig('content_performance') || {}
+    
+    {
+      total_content_pieces: content_data.dig('content_pieces_count') || 0,
+      channel_performance: content_data.dig('channel_performance') || [],
+      best_performing_content: content_data.dig('best_performing_content') || {},
+      content_completion_rate: content_data.dig('content_completion_rate') || 0
+    }
+  end
+
+  # Timeline performance analytics
+  def timeline_performance_summary
+    execution_data = parsed_performance_data.dig('execution_progress') || {}
+    
+    {
+      overall_progress: execution_data.dig('overall_progress') || 0,
+      timeline_adherence: execution_data.dig('timeline_adherence') || 0,
+      milestone_completion: execution_data.dig('milestone_completion') || {},
+      upcoming_milestones: execution_data.dig('upcoming_milestones') || [],
+      overdue_items: execution_data.dig('overdue_items') || []
+    }
+  end
+
+  # Analytics reporting
+  def generate_analytics_report
+    return { success: false, error: 'Analytics not enabled' } unless analytics_enabled?
+
+    service = PlanAnalyticsService.new(self)
+    service.generate_analytics_report
+  end
+
+  def sync_external_analytics
+    return { success: false, error: 'Analytics not enabled' } unless analytics_enabled?
+
+    service = PlanAnalyticsService.new(self)
+    service.sync_with_external_platforms
   end
   
   def can_be_archived?
@@ -468,6 +652,51 @@ class CampaignPlan < ApplicationRecord
     rescue JSON::ParserError
       false
     end
+  end
+
+  # Analytics helper methods
+  def safe_parse_json_field(field_name)
+    field_value = send(field_name)
+    return {} if field_value.blank?
+    
+    if field_value.is_a?(String)
+      JSON.parse(field_value)
+    else
+      field_value
+    end
+  rescue JSON::ParserError
+    {}
+  end
+
+  def extract_planned_duration(timeline_data)
+    # Mock implementation - extract planned duration from timeline
+    return 30 if timeline_data.blank? # Default 30 days
+    
+    # Look for duration in various timeline formats
+    if timeline_data.is_a?(Hash)
+      timeline_data.dig('duration_days') || timeline_data.dig(:duration_days) ||
+      timeline_data.dig('total_duration') || timeline_data.dig(:total_duration) ||
+      calculate_timeline_duration_from_phases(timeline_data) ||
+      30
+    else
+      30
+    end
+  end
+
+  def calculate_timeline_duration_from_phases(timeline_data)
+    phases = timeline_data['phases'] || timeline_data[:phases] || timeline_data['timeline'] || timeline_data[:timeline] || []
+    return 0 if phases.empty?
+    
+    # Sum up phase durations if available
+    total_duration = 0
+    phases.each do |phase|
+      if phase.is_a?(Hash)
+        duration = phase['duration'] || phase[:duration] || phase['days'] || phase[:days] || 7
+        total_duration += duration.to_i
+      end
+    end
+    
+    total_duration > 0 ? total_duration : nil
   end
   
   def create_audit_log_for_creation

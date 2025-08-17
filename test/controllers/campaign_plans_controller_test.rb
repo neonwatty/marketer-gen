@@ -55,7 +55,7 @@ class CampaignPlansControllerTest < ActionDispatch::IntegrationTest
     other_plan = campaign_plans(:other_user_plan)
     get campaign_plan_url(other_plan)
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
   end
 
   test "should get new" do
@@ -112,7 +112,7 @@ class CampaignPlansControllerTest < ActionDispatch::IntegrationTest
     other_plan = campaign_plans(:other_user_plan)
     get edit_campaign_plan_url(other_plan)
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
   end
 
   test "should update campaign plan with valid parameters" do
@@ -153,7 +153,7 @@ class CampaignPlansControllerTest < ActionDispatch::IntegrationTest
       campaign_plan: { name: "Hacked Name" }
     }
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
   end
 
   test "should destroy campaign plan" do
@@ -171,7 +171,7 @@ class CampaignPlansControllerTest < ActionDispatch::IntegrationTest
       delete campaign_plan_url(other_plan)
     end
     assert_redirected_to campaign_plans_path
-    assert_equal "Campaign plan not found.", flash[:alert]
+    assert_equal "You can only access your own campaign plans.", flash[:alert]
   end
 
   test "should generate campaign plan" do

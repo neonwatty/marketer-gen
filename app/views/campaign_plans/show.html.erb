@@ -148,6 +148,9 @@
     <!-- Generated Content -->
     <% if @campaign_plan.has_generated_content? %>
       <div class="space-y-6">
+        <!-- Analytics Dashboard Section -->
+        <%= render 'campaign_plans/partials/analytics_dashboard', campaign_plan: @campaign_plan %>
+        
         <!-- Strategic Overview Section -->
         <%= render 'campaign_plans/partials/strategic_overview', campaign_plan: @campaign_plan %>
         

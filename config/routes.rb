@@ -16,6 +16,11 @@ Rails.application.routes.draw do
       get :export_pdf
       get :export_presentation
       post :share_plan
+      post :refresh_analytics
+      get :analytics_report
+      post :sync_external_analytics
+      post :start_execution
+      post :complete_execution
     end
   end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'

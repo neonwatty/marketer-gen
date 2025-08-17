@@ -67,6 +67,14 @@ module ActiveSupport
       # Clean up sessions to avoid test interference
       # Session.destroy_all  # Commented out to allow API tests to work
       
+      # Clear LLM service container state to avoid test interference
+      LlmServiceContainer.clear! if defined?(LlmServiceContainer)
+      
+      # Re-register the mock service after clearing
+      if defined?(LlmServiceContainer) && defined?(MockLlmService)
+        LlmServiceContainer.register(:mock, MockLlmService)
+      end
+      
       # Set up test logging
       @log_output = StringIO.new
       @old_logger = Rails.logger
@@ -111,6 +119,12 @@ class ActionDispatch::IntegrationTest
     
     # The response should be a redirect on successful authentication
     # This ensures the session cookie is set properly
+    follow_redirect! if response.redirect?
+  end
+
+  def sign_out
+    # Clear the session by making a DELETE request to the session path
+    delete session_path
     follow_redirect! if response.redirect?
   end
 

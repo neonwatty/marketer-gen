@@ -47,19 +47,19 @@ class CampaignPlansSecurityTest < ActionDispatch::IntegrationTest
     # Try to access another user's campaign plan
     get campaign_plan_path(@other_plan)
     assert_redirected_to campaign_plans_path
-    assert_match /Campaign plan not found/, flash[:alert]
+    assert_match /You can only access your own campaign plans/, flash[:alert]
     
     # Try to edit another user's campaign plan  
     get edit_campaign_plan_path(@other_plan)
     assert_redirected_to campaign_plans_path
-    assert_match /Campaign plan not found/, flash[:alert]
+    assert_match /You can only access your own campaign plans/, flash[:alert]
     
     # Try to update another user's campaign plan
     patch campaign_plan_path(@other_plan), params: {
       campaign_plan: { name: "Hacked Name" }
     }
     assert_redirected_to campaign_plans_path
-    assert_match /Campaign plan not found/, flash[:alert]
+    assert_match /You can only access your own campaign plans/, flash[:alert]
     
     # Verify data wasn't changed
     @other_plan.reload
@@ -72,7 +72,7 @@ class CampaignPlansSecurityTest < ActionDispatch::IntegrationTest
     # Try to generate another user's campaign plan
     post generate_campaign_plan_path(@other_plan)
     assert_redirected_to campaign_plans_path
-    assert_match /Campaign plan not found/, flash[:alert]
+    assert_match /You can only access your own campaign plans/, flash[:alert]
     
     # Verify plan status wasn't changed
     @other_plan.reload
@@ -88,7 +88,7 @@ class CampaignPlansSecurityTest < ActionDispatch::IntegrationTest
     # Try to delete another user's campaign plan
     delete campaign_plan_path(@other_plan)
     assert_redirected_to campaign_plans_path
-    assert_match /Campaign plan not found/, flash[:alert]
+    assert_match /You can only access your own campaign plans/, flash[:alert]
     
     # Verify plan wasn't deleted
     assert_equal original_count, CampaignPlan.count

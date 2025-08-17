@@ -1,0 +1,358 @@
+<% content_for :title, "Analytics Report - #{@campaign_plan.name}" %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Analytics Report</h1>
+        <p class="text-gray-600">
+          Comprehensive performance analysis for <strong><%= @campaign_plan.name %></strong>
+        </p>
+        <p class="text-sm text-gray-500 mt-1">
+          Generated on <%= @analytics_report[:generated_at]&.strftime("%B %d, %Y at %I:%M %p") %>
+        </p>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <%= link_to @campaign_plan, 
+            class: "text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m0 7h18" />
+          </svg>
+          Back to Plan
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <% if @analytics_report[:plan_overview].present? %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+          <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Executive Summary
+        </h2>
+        
+        <% overview = @analytics_report[:plan_overview] %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="text-center">
+            <p class="text-3xl font-bold text-blue-600"><%= overview[:completion_percentage] %>%</p>
+            <p class="text-sm text-gray-600">Plan Completion</p>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-3xl font-bold text-green-600"><%= overview[:days_active] %></p>
+            <p class="text-sm text-gray-600">Days Active</p>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-3xl font-bold text-purple-600"><%= overview[:campaign_type].humanize %></p>
+            <p class="text-sm text-gray-600">Campaign Type</p>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-3xl font-bold text-orange-600"><%= overview[:status].humanize %></p>
+            <p class="text-sm text-gray-600">Current Status</p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Performance Summary -->
+    <% if @analytics_report[:performance_summary].present? %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+          <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          Performance Summary
+        </h2>
+        
+        <% performance = @analytics_report[:performance_summary] %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <% if performance[:key_metrics].present? %>
+            <% performance[:key_metrics].each do |metric, value| %>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-2xl font-bold text-gray-900"><%= value %>
+                  <% if metric.to_s.include?('score') || metric.to_s.include?('rate') %>
+                    <span class="text-sm text-gray-600">%</span>
+                  <% end %>
+                </p>
+                <p class="text-sm text-gray-600"><%= metric.to_s.humanize %></p>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+        
+        <% if performance[:overall_score].present? %>
+          <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-6">
+            <div class="text-center">
+              <p class="text-4xl font-bold text-green-900 mb-2"><%= performance[:overall_score] %></p>
+              <p class="text-lg font-medium text-green-700">Overall Performance Score</p>
+              <p class="text-sm text-green-600 mt-2">
+                <% if performance[:overall_score] >= 80 %>
+                  Excellent performance across all metrics
+                <% elsif performance[:overall_score] >= 60 %>
+                  Good performance with room for improvement
+                <% else %>
+                  Needs attention and optimization
+                <% end %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- ROI Analysis -->
+    <% if @analytics_report[:roi_analysis].present? %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+          <svg class="w-6 h-6 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd" />
+          </svg>
+          ROI Analysis
+        </h2>
+        
+        <% roi = @analytics_report[:roi_analysis] %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Current ROI</span>
+              <span class="text-xl font-bold text-green-600">
+                <%= number_to_percentage(roi[:current_roi], precision: 1) %>
+              </span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Projected ROI</span>
+              <span class="text-xl font-bold text-blue-600">
+                <%= number_to_percentage(roi[:projected_roi], precision: 1) %>
+              </span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Performance vs Target</span>
+              <% variance = roi[:current_roi] - roi[:projected_roi] %>
+              <span class="text-lg font-semibold <%= variance >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                <%= variance >= 0 ? '+' : '' %><%= number_to_percentage(variance, precision: 1) %>
+              </span>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-semibold text-gray-900 mb-3">Cost Analysis</h4>
+            <% if roi[:cost_analysis].present? %>
+              <% roi[:cost_analysis].each do |cost_item, value| %>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm text-gray-600"><%= cost_item.to_s.humanize %></span>
+                  <span class="text-sm font-medium text-gray-900">
+                    <%= number_to_currency(value) if value.is_a?(Numeric) %>
+                  </span>
+                </div>
+              <% end %>
+            <% else %>
+              <p class="text-sm text-gray-500">Cost analysis data not available</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Engagement Analysis -->
+    <% if @analytics_report[:engagement_analysis].present? %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+          <svg class="w-6 h-6 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+          </svg>
+          Engagement Analysis
+        </h2>
+        
+        <% engagement = @analytics_report[:engagement_analysis] %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="text-center bg-purple-50 rounded-lg p-4">
+            <p class="text-3xl font-bold text-purple-600"><%= engagement[:total_engagement] || 0 %></p>
+            <p class="text-sm text-purple-700">Total Engagement Score</p>
+          </div>
+          
+          <div class="text-center bg-blue-50 rounded-lg p-4">
+            <p class="text-3xl font-bold text-blue-600">
+              <%= (engagement[:engagement_breakdown]&.keys&.length || 0) %>
+            </p>
+            <p class="text-sm text-blue-700">Engagement Sources</p>
+          </div>
+          
+          <div class="text-center bg-green-50 rounded-lg p-4">
+            <p class="text-3xl font-bold text-green-600">
+              <%= (engagement[:top_engagement_drivers]&.length || 0) %>
+            </p>
+            <p class="text-sm text-green-700">Top Drivers</p>
+          </div>
+        </div>
+        
+        <% if engagement[:engagement_breakdown].present? %>
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-semibold text-gray-900 mb-3">Engagement Breakdown</h4>
+            <div class="space-y-2">
+              <% engagement[:engagement_breakdown].each do |source, value| %>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600"><%= source.to_s.humanize %></span>
+                  <span class="text-sm font-medium text-gray-900"><%= value %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Content Analysis -->
+    <% if @analytics_report[:content_analysis].present? %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+          <svg class="w-6 h-6 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Content Analysis
+        </h2>
+        
+        <% content = @analytics_report[:content_analysis] %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-3">Content Effectiveness</h4>
+            <div class="text-center bg-indigo-50 rounded-lg p-6">
+              <p class="text-4xl font-bold text-indigo-600">
+                <%= content[:content_effectiveness] || 0 %>%
+              </p>
+              <p class="text-sm text-indigo-700 mt-2">Overall Content Score</p>
+            </div>
+          </div>
+          
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-3">Channel Performance</h4>
+            <% if content[:channel_performance].present? && content[:channel_performance].any? %>
+              <div class="space-y-2">
+                <% content[:channel_performance].first(5).each do |channel| %>
+                  <div class="flex justify-between items-center bg-gray-50 rounded p-2">
+                    <span class="text-sm text-gray-700"><%= channel[:channel_name] %></span>
+                    <span class="text-sm font-medium text-gray-900">
+                      <%= channel[:performance_score] %>%
+                    </span>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="text-sm text-gray-500">Channel performance data not available</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Timeline Analysis -->
+    <% if @analytics_report[:timeline_analysis].present? %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+          <svg class="w-6 h-6 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Timeline Analysis
+        </h2>
+        
+        <% timeline = @analytics_report[:timeline_analysis] %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <p class="text-3xl font-bold text-orange-600">
+              <%= timeline[:schedule_adherence] || 0 %>%
+            </p>
+            <p class="text-sm text-orange-700">Schedule Adherence</p>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-3xl font-bold text-blue-600">
+              <%= timeline[:milestone_progress]&.keys&.length || 0 %>
+            </p>
+            <p class="text-sm text-blue-700">Active Milestones</p>
+          </div>
+          
+          <div class="text-center">
+            <p class="text-3xl font-bold text-green-600">
+              <%= timeline[:critical_path_analysis]&.length || 0 %>
+            </p>
+            <p class="text-sm text-green-700">Critical Path Items</p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Recommendations -->
+    <% if @analytics_report[:recommendations].present? && @analytics_report[:recommendations].any? %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+          <svg class="w-6 h-6 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          Recommendations
+        </h2>
+        
+        <div class="space-y-4">
+          <% @analytics_report[:recommendations].each do |recommendation| %>
+            <div class="border-l-4 <%= case recommendation[:priority]
+                                     when 'high' then 'border-red-400 bg-red-50'
+                                     when 'medium' then 'border-yellow-400 bg-yellow-50'
+                                     else 'border-blue-400 bg-blue-50'
+                                     end %> p-4 rounded-r-lg">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <h4 class="font-semibold text-gray-900 mb-1">
+                    <%= recommendation[:title] %>
+                    <span class="ml-2 px-2 py-1 text-xs font-medium rounded-full <%= case recommendation[:priority]
+                                                                                   when 'high' then 'bg-red-100 text-red-800'
+                                                                                   when 'medium' then 'bg-yellow-100 text-yellow-800'
+                                                                                   else 'bg-blue-100 text-blue-800'
+                                                                                   end %>">
+                      <%= recommendation[:priority]&.humanize %>
+                    </span>
+                  </h4>
+                  <p class="text-sm text-gray-700"><%= recommendation[:description] %></p>
+                </div>
+                
+                <div class="ml-4">
+                  <span class="text-xs text-gray-500">
+                    <%= recommendation[:impact]&.humanize %> impact
+                  </span>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Export Options -->
+    <div class="bg-gray-50 rounded-lg p-6 text-center">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Export Report</h3>
+      <div class="flex justify-center gap-4">
+        <%= link_to analytics_report_campaign_plan_path(@campaign_plan, format: :json),
+            class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export JSON
+        <% end %>
+
+        <%= link_to analytics_report_campaign_plan_path(@campaign_plan, format: :pdf),
+            class: "bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center gap-2" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export PDF
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

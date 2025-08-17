@@ -7,8 +7,22 @@ one:
   first_name: Test
   last_name: User
 
+user_one:
+  email_address: user_one@example.com
+  password_digest: <%= password_digest %>
+  role: marketer
+  first_name: Test
+  last_name: User
+
 two:
   email_address: user2@example.com
+  password_digest: <%= password_digest %>
+  role: team_member
+  first_name: Second
+  last_name: User
+
+user_two:
+  email_address: user_two@example.com
   password_digest: <%= password_digest %>
   role: team_member
   first_name: Second

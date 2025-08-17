@@ -2,8 +2,8 @@ class CampaignPlansController < ApplicationController
   include Authentication
   
   before_action :require_authentication
-  before_action :set_campaign_plan, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan]
-  before_action :ensure_owner, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan]
+  before_action :set_campaign_plan, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan, :refresh_analytics, :analytics_report, :sync_external_analytics, :start_execution, :complete_execution]
+  before_action :ensure_owner, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan, :refresh_analytics, :analytics_report, :sync_external_analytics, :start_execution, :complete_execution]
   
   def index
     @campaign_plans = Current.user.campaign_plans
@@ -156,11 +156,85 @@ class CampaignPlansController < ApplicationController
       redirect_to @campaign_plan, alert: 'Failed to share campaign plan. Please try again.'
     end
   end
+
+  # Analytics Actions
+  def refresh_analytics
+    unless @campaign_plan.analytics_enabled?
+      return redirect_to @campaign_plan, alert: 'Analytics is not enabled for this campaign plan.'
+    end
+
+    if @campaign_plan.refresh_analytics!
+      redirect_to @campaign_plan, notice: 'Analytics data refreshed successfully.'
+    else
+      redirect_to @campaign_plan, alert: 'Failed to refresh analytics data. Please try again.'
+    end
+  end
+
+  def analytics_report
+    unless @campaign_plan.analytics_enabled?
+      return redirect_to @campaign_plan, alert: 'Analytics is not enabled for this campaign plan.'
+    end
+
+    result = @campaign_plan.generate_analytics_report
+    
+    if result[:success]
+      @analytics_report = result[:data]
+      
+      respond_to do |format|
+        format.html { render :analytics_report }
+        format.json { render json: @analytics_report }
+        format.pdf do
+          # Future: PDF export of analytics report
+          redirect_to @campaign_plan, alert: 'PDF export of analytics reports is coming soon!'
+        end
+      end
+    else
+      redirect_to @campaign_plan, alert: "Failed to generate analytics report: #{result[:error]}"
+    end
+  end
+
+  def sync_external_analytics
+    unless @campaign_plan.analytics_enabled?
+      return redirect_to @campaign_plan, alert: 'Analytics is not enabled for this campaign plan.'
+    end
+
+    result = @campaign_plan.sync_external_analytics
+    
+    if result[:success]
+      redirect_to @campaign_plan, notice: 'External analytics data synchronized successfully.'
+    else
+      redirect_to @campaign_plan, alert: "Failed to sync external analytics: #{result[:error]}"
+    end
+  end
+
+  def start_execution
+    unless @campaign_plan.completed?
+      return redirect_to @campaign_plan, alert: 'Campaign plan must be completed before starting execution.'
+    end
+
+    if @campaign_plan.start_execution!
+      redirect_to @campaign_plan, notice: 'Campaign execution started! Analytics tracking is now active.'
+    else
+      redirect_to @campaign_plan, alert: 'Failed to start execution. Execution may have already started.'
+    end
+  end
+
+  def complete_execution
+    unless @campaign_plan.plan_execution_started_at.present?
+      return redirect_to @campaign_plan, alert: 'Campaign execution must be started before it can be completed.'
+    end
+
+    if @campaign_plan.complete_execution!
+      redirect_to @campaign_plan, notice: 'Campaign execution completed! Final analytics have been recorded.'
+    else
+      redirect_to @campaign_plan, alert: 'Failed to complete execution. It may have already been completed.'
+    end
+  end
   
   private
   
   def set_campaign_plan
-    @campaign_plan = Current.user.campaign_plans.find(params[:id])
+    @campaign_plan = CampaignPlan.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to campaign_plans_path, alert: 'Campaign plan not found.'
   end
