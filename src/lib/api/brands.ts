@@ -5,7 +5,9 @@ import {
   UpdateBrandData,
   CreateBrandAssetData,
   UpdateBrandAssetData,
-  BrandAsset 
+  BrandAsset,
+  DocumentParseRequest,
+  DocumentParseResult
 } from "@/lib/types/brand"
 
 const API_BASE = "/api/brands"
@@ -209,6 +211,41 @@ export class BrandService {
       const error = await response.json()
       throw new Error(error.error || `Failed to track asset usage: ${response.statusText}`)
     }
+  }
+
+  // Parse document and extract brand elements
+  static async parseDocument(
+    brandId: string,
+    data: DocumentParseRequest
+  ): Promise<DocumentParseResult> {
+    const response = await fetch(`${API_BASE}/${brandId}/assets/parse`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || `Failed to parse document: ${response.statusText}`)
+    }
+
+    return response.json()
+  }
+
+  // Check if an asset can be parsed
+  static canParseAsset(asset: BrandAsset): boolean {
+    const supportedTypes = ['BRAND_GUIDELINES', 'DOCUMENT']
+    const supportedMimeTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword',
+      'text/plain'
+    ]
+
+    return supportedTypes.includes(asset.type) || 
+           (asset.mimeType ? supportedMimeTypes.includes(asset.mimeType) : false)
   }
 }
 

@@ -196,6 +196,57 @@ export const INDUSTRIES = [
 export type Industry = typeof INDUSTRIES[number]
 
 // Brand validation helpers
+// Document parsing types
+export type DocumentParseSettings = {
+  extractColors?: boolean
+  extractFonts?: boolean
+  extractVoice?: boolean
+  extractGuidelines?: boolean
+}
+
+export type ExtractedVoiceData = {
+  voiceDescription: string | null
+  toneAttributes: Record<string, number>
+  communicationStyle: string | null
+}
+
+export type ExtractedGuidelinesData = {
+  sections: string[]
+  keyPhrases: string[]
+}
+
+export type DocumentParseResult = {
+  success: boolean
+  extractedData: {
+    rawText: string
+    extractedAt: string
+    assetId: string
+    brandId: string
+    colors?: string[]
+    fonts?: string[]
+    voice?: ExtractedVoiceData
+    guidelines?: ExtractedGuidelinesData
+  }
+  message: string
+}
+
+export type DocumentParseRequest = {
+  assetId: string
+  parseSettings?: DocumentParseSettings
+}
+
+// Supported document types for parsing
+export const PARSEABLE_ASSET_TYPES = ['BRAND_GUIDELINES', 'DOCUMENT'] as const
+export const PARSEABLE_MIME_TYPES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/msword',
+  'text/plain'
+] as const
+
+export type ParseableAssetType = typeof PARSEABLE_ASSET_TYPES[number]
+export type ParseableMimeType = typeof PARSEABLE_MIME_TYPES[number]
+
 export const validateBrandData = (data: Partial<CreateBrandData>): string[] => {
   const errors: string[] = []
 
