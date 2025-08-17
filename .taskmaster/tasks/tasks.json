@@ -228,7 +228,64 @@
         "dependencies": [
           "3"
         ],
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create GeneratedContent Model and Database Schema",
+            "description": "Design and implement the GeneratedContent model to store all content pieces with version control capabilities, content type classification, format variants, and relationships to campaign plans.",
+            "dependencies": [],
+            "details": "Create GeneratedContent model with fields for content_type (email, social_post, blog_article, ad_copy, etc.), title, body_content, format_variant (short, medium, long), status (draft, approved, published, archived), version_number, original_content_id (for tracking version history), campaign_plan_id (foreign key), created_by_user_id, approved_by_user_id, and metadata (JSON field for platform-specific settings). Include database migration with proper indexes on frequently queried fields (content_type, status, campaign_plan_id, version_number). Set up ActiveRecord associations: belongs_to :campaign_plan, belongs_to :creator (User), belongs_to :approver (User, optional), has_many :content_versions (self-referential for version history). Implement model validations for required fields and content length constraints. Add scope methods for filtering by type, status, and campaign. Include soft delete functionality with deleted_at timestamp.",
+            "status": "in-progress",
+            "testStrategy": "Model Tests using ActiveSupport::TestCase: Test validations for all required fields (content_type, title, body_content) using assert_valid and refute_valid. Test associations with campaign_plan and user models using assert_respond_to and assert_instance_of. Test scope methods for filtering (by_content_type, by_status, by_campaign) using assert_equal for result counts. Test version tracking methods with assert_changes for version increments. Migration Tests: Test database schema creation with assert_difference for table existence, verify index creation for performance optimization, test foreign key constraints with assert_raises for invalid references. Validation Tests: Test content length constraints, format validation for content_type enum values, uniqueness constraints where applicable. Factory/Fixture Tests: Create comprehensive test data covering all content types and statuses for reliable test scenarios."
+          },
+          {
+            "id": 2,
+            "title": "Implement Content Generation Service with Version Control",
+            "description": "Create ContentGenerationService that integrates with the LLM service to generate content and automatically manages versioning, format variants, and content relationships.",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Build ContentGenerationService class that coordinates content creation workflow: accept content generation requests with campaign_plan_id, content_type, and format_variant parameters; integrate with existing LLM service through dependency injection; process LLM responses to create GeneratedContent records; implement automatic version management when regenerating existing content (increment version_number, link to original_content_id); handle format variant generation (create short, medium, long versions in single request); implement content approval workflow state management; add error handling for LLM service failures with fallback content options; include content validation and quality checks before saving. Service should follow single responsibility principle with clear method interfaces: generate_content(campaign_plan, content_type, options), regenerate_content(existing_content_id, options), create_format_variants(content_id, variants), and approve_content(content_id, approver_user). Implement proper transaction handling to ensure data consistency during multi-step content generation.",
+            "status": "pending",
+            "testStrategy": "Service Tests using ActiveSupport::TestCase: Test content generation flow with mock LLM responses using Minitest::Mock for external service calls. Test version increment logic with assert_changes for version_number when regenerating content. Test format variant creation with assert_difference for multiple content records. Test error handling scenarios with assert_raises for LLM service failures. Test transaction rollback on partial failures using assert_no_changes. Integration Tests using ActionDispatch::IntegrationTest: Test complete content generation workflow from request to database persistence. Test LLM service integration through dependency injection with proper mocking. Model Interaction Tests: Test GeneratedContent creation with proper associations and validations. Test version linking between original and regenerated content using assert_equal for original_content_id relationships."
+          },
+          {
+            "id": 3,
+            "title": "Build Content Management Controller and API Endpoints",
+            "description": "Implement ContentController with CRUD operations, content generation endpoints, version management actions, and approval workflow controls following Rails conventions.",
+            "dependencies": [
+              "5.1",
+              "5.2"
+            ],
+            "details": "Create ContentController with RESTful actions: index (list content with filtering by campaign, type, status), show (display content with version history), new/create (manual content creation form), edit/update (content editing with version creation), destroy (soft delete). Add custom actions: generate (trigger content generation via ContentGenerationService), regenerate (create new version of existing content), approve (mark content as approved), publish (change status to published), archive (soft delete with archival). Implement strong parameters for security (content_params, generation_params). Add authorization using Pundit policies for role-based access (creators can edit their content, approvers can approve content, admins can manage all content). Include AJAX endpoints for real-time content operations: POST /content/generate, PATCH /content/:id/approve, PATCH /content/:id/regenerate. Implement JSON API responses for frontend integration with proper error handling and status codes. Add pagination for content listing and search functionality for content discovery.",
+            "status": "pending",
+            "testStrategy": "Controller Tests using ActionDispatch::IntegrationTest: Test all CRUD actions with valid/invalid parameters using assert_response for proper HTTP status codes. Test authorization enforcement with assert_response :forbidden for unauthorized access attempts. Test content generation endpoints with post requests and assert_difference for content creation. Test approval workflow actions with patch requests and assert_equal for status changes. Test JSON API responses with assert_match for proper response formatting. Integration Tests: Test complete content management workflows including generation, editing, approval, and publishing flows. Test pagination and search functionality with assert_includes for filtered results. Security Tests: Test parameter validation with strong parameters, verify authorization policies prevent unauthorized actions, test CSRF protection for form submissions."
+          },
+          {
+            "id": 4,
+            "title": "Create Content Versioning and History Management System",
+            "description": "Implement comprehensive version control system including content comparison, version rollback, approval audit trails, and content lifecycle management with proper testing coverage.",
+            "dependencies": [
+              "5.1",
+              "5.3"
+            ],
+            "details": "Extend GeneratedContent model with version management methods: create_new_version (duplicate content with incremented version), get_version_history (retrieve all versions for content), compare_versions (show differences between versions), rollback_to_version (restore previous version as new version). Create ContentVersion model for audit trail with fields: content_id, version_number, action_type (created, edited, approved, published, archived), changed_by_user_id, changes_summary, timestamp. Implement ContentVersionService for version operations: track all content changes automatically through ActiveRecord callbacks (after_create, after_update, after_destroy), provide version comparison with diff highlighting, manage version cleanup for storage optimization, implement version retention policies. Add ContentAuditLog model for detailed change tracking with fields: content_id, user_id, action, old_values (JSON), new_values (JSON), ip_address, user_agent, timestamp. Include version control UI components: version history sidebar, comparison view with highlighted differences, rollback confirmation dialogs, audit trail display.",
+            "status": "pending",
+            "testStrategy": "Model Tests using ActiveSupport::TestCase: Test version creation with assert_difference for ContentVersion count on content updates. Test version comparison methods with assert_equal for difference detection. Test rollback functionality with assert_changes for content restoration. Test audit trail creation with assert_difference for ContentAuditLog entries on all content operations. Callback Tests: Test ActiveRecord callbacks for automatic version tracking using travel_to for timestamp testing. Test callback execution order and proper data capture. Service Tests: Test ContentVersionService methods for version management, comparison, and cleanup operations. Test version retention policy enforcement with assert_equal for cleanup results. Integration Tests: Test complete version workflow including creation, comparison, and rollback through UI. System Tests using ActionDispatch::SystemTestCase: Test version control UI components with click interactions and content verification using Capybara methods."
+          },
+          {
+            "id": 5,
+            "title": "Implement Content Approval Workflow and Collaboration Features",
+            "description": "Build comprehensive approval workflow system with stakeholder collaboration, feedback collection, approval routing, and notification system following Rails patterns and conventions.",
+            "dependencies": [
+              "5.3",
+              "5.4"
+            ],
+            "details": "Create ApprovalWorkflow model with fields: content_id, workflow_type (single_approver, multi_stage, consensus), required_approvers (JSON array of user_ids), current_stage, status (pending, in_review, approved, rejected), due_date, escalation_rules. Implement ContentFeedback model for stakeholder comments: content_id, reviewer_user_id, feedback_text, feedback_type (comment, suggestion, approval, rejection), created_at, resolved_at, resolved_by_user_id. Build ApprovalService for workflow management: initiate_approval(content_id, workflow_type, approvers), process_approval(content_id, user_id, decision, feedback), check_approval_status(content_id), send_notifications(content_id, notification_type). Create approval notification system using ActionMailer: send approval requests, approval reminders, approval confirmations, rejection notifications with feedback. Implement collaboration features: real-time feedback collection, approval status dashboard, approval routing based on content type and campaign importance, bulk approval capabilities for multiple content pieces. Add approval policy configuration: define approval requirements by content type, set up automatic approval for certain users/content types, implement approval delegation for absent approvers.",
+            "status": "pending",
+            "testStrategy": "Model Tests using ActiveSupport::TestCase: Test ApprovalWorkflow model validations and state management with assert_valid for proper workflow setup. Test ContentFeedback model associations and validations using assert_respond_to for user relationships. Service Tests: Test ApprovalService workflow initiation with assert_difference for workflow creation. Test approval processing logic with assert_changes for status updates. Test notification triggering with assert_emails for proper email delivery. Workflow Tests: Test multi-stage approval progression with assert_equal for stage transitions. Test approval completion detection with assert_predicate for workflow completion status. Mailer Tests using ActionMailer::TestCase: Test approval notification emails with assert_emails for delivery count and assert_includes for email content verification. Integration Tests: Test complete approval workflow from initiation through completion including feedback collection and status updates. System Tests: Test collaboration UI features including feedback submission, approval dashboards, and notification displays using Capybara for user interaction testing."
+          }
+        ]
       },
       {
         "id": 6,
@@ -241,7 +298,77 @@
         "dependencies": [
           "4"
         ],
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create A/B Test Models and Database Schema",
+            "description": "Design and implement the core data models for A/B testing including Test, TestVariant, TestParticipant, and TestResult models with comprehensive database schema and relationships.",
+            "dependencies": [],
+            "details": "Create AbTest model with fields for test_name, description, status (draft, running, completed, paused), hypothesis, start_date, end_date, confidence_level (default 95%), minimum_effect_size, created_by_user_id, traffic_allocation (percentage), and success_metrics (JSON). Create TestVariant model with fields for ab_test_id (foreign key), variant_name (control, variant_a, variant_b, etc.), content_id (foreign key to GeneratedContent), traffic_percentage, conversion_count, participant_count, and metadata (JSON for variant-specific settings). Create TestParticipant model to track user engagement with fields for ab_test_id, variant_id, user_id (or visitor_token for anonymous users), participated_at, converted_at, conversion_value. Create TestResult model for storing statistical analysis with fields for ab_test_id, statistical_significance, confidence_interval, p_value, effect_size, winner_variant_id, analysis_timestamp, and recommendations (JSON). Include proper database indexes on frequently queried fields (ab_test_id, user_id, status, start_date) for performance optimization. Set up ActiveRecord associations: AbTest has_many :test_variants, :test_participants, :test_results; TestVariant belongs_to :ab_test, belongs_to :content (GeneratedContent), has_many :test_participants. Implement model validations for required fields, status transitions, percentage allocations, and date constraints.",
+            "status": "pending",
+            "testStrategy": "Model Tests using ActiveSupport::TestCase: Test validations for all required fields (test_name, status, confidence_level, traffic_allocation) using assert_valid and refute_valid. Test associations between AbTest, TestVariant, TestParticipant, and TestResult models using assert_respond_to and assert_instance_of. Test scope methods for filtering tests by status, date ranges, and user using assert_equal for result counts. Test status transition validations with assert_changes for valid transitions and assert_raises for invalid ones. Migration Tests: Test database schema creation with assert_difference for table existence, verify index creation for performance optimization using database-specific queries, test foreign key constraints with assert_raises for invalid references. Validation Tests: Test traffic allocation percentage constraints (sum to 100%), date validation (end_date after start_date), confidence level range validation (90-99%), minimum effect size validation (positive numbers). Factory/Fixture Tests: Create comprehensive test data covering all test statuses, multiple variants per test, and edge cases for reliable test scenarios."
+          },
+          {
+            "id": 2,
+            "title": "Implement A/B Test Management Service Layer",
+            "description": "Create comprehensive service classes for managing A/B tests including TestCreationService, VariantAssignmentService, StatisticalAnalysisService, and TestRecommendationService with proper business logic separation.",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "Build TestCreationService class that handles A/B test setup workflow: accept test parameters (hypothesis, success metrics, traffic allocation, duration), validate test configuration (ensure traffic percentages sum to 100%, validate date ranges, check for overlapping tests on same content), create test variants from provided content pieces, implement test randomization algorithms for fair traffic splitting, and generate test tracking codes. Create VariantAssignmentService for runtime assignment: implement consistent user assignment algorithms (hash-based assignment using user_id or visitor_token), handle traffic allocation percentages accurately, support test exclusion rules (returning users, specific user segments), implement sticky assignment (users see same variant throughout test), and provide fallback mechanisms for assignment failures. Develop StatisticalAnalysisService for ongoing analysis: calculate conversion rates for each variant, perform chi-square tests for statistical significance, compute confidence intervals using Wilson score interval, calculate effect sizes (Cohen's d for continuous metrics, odds ratio for binary), implement sequential testing capabilities for early stopping, detect statistical significance with proper multiple comparison corrections. Create TestRecommendationService for actionable insights: analyze performance trends across variants, generate optimization recommendations using AI integration, provide early stopping recommendations based on statistical power, suggest follow-up test ideas based on results, and format recommendations for stakeholder presentation. Each service should follow single responsibility principle with clear method interfaces, implement proper transaction handling for data consistency, include comprehensive error handling and logging, and support dependency injection for testability.",
+            "status": "pending",
+            "testStrategy": "Service Tests using ActiveSupport::TestCase: Test TestCreationService with mock AbTest creation using Minitest::Mock for model interactions, test traffic allocation validation with assert_equal for percentage calculations, test variant creation logic with assert_difference for TestVariant count. Test VariantAssignmentService with deterministic assignment algorithms using assert_equal for consistent user-variant mapping, test traffic splitting accuracy with statistical sampling, test sticky assignment with assert_equal for repeated user assignments. Test StatisticalAnalysisService with known statistical scenarios using assert_in_delta for floating-point comparisons, test confidence interval calculations with mathematical verification, test significance detection with controlled conversion data. Test TestRecommendationService with mock AI service responses, test recommendation generation logic with assert_includes for expected insights. Integration Tests using ActionDispatch::IntegrationTest: Test complete A/B test lifecycle from creation through analysis, test service interactions and data flow, test error handling scenarios with assert_raises. Performance Tests: Test statistical calculations with large datasets using Minitest::Benchmark, verify service response times with assert_performance_constant for acceptable latency."
+          },
+          {
+            "id": 3,
+            "title": "Build A/B Test Analytics Integration with Ahoy",
+            "description": "Integrate with Ahoy gem for comprehensive event tracking, participant identification, conversion tracking, and analytics data collection to support A/B test measurement and analysis.",
+            "dependencies": [
+              "6.1",
+              "6.2"
+            ],
+            "details": "Integrate Ahoy gem for robust analytics tracking: configure Ahoy for A/B test event tracking with custom properties, implement participant identification using both authenticated users (user_id) and anonymous visitors (visitor_token from Ahoy), create custom Ahoy events for A/B test interactions (test_view, variant_assignment, conversion_event, test_completion). Develop A/B test event tracking system: create AbTestTrackingService that wraps Ahoy functionality, implement automatic variant assignment tracking when users see content, track conversion events with customizable success metrics (button clicks, form submissions, purchases, time on page), support funnel analysis for multi-step conversions, implement cohort analysis for participant segmentation. Build comprehensive analytics data collection: track participant behavior across sessions using Ahoy's visit tracking, collect demographic and behavioral data for test analysis, implement custom properties for A/B test events (variant_name, test_id, conversion_value, engagement_metrics), support real-time event streaming for live test monitoring. Create analytics dashboard integration: develop dashboard queries using Ahoy's event data, implement conversion funnel visualization, create participant flow analysis, build engagement heatmaps for variant comparison, support custom metric definitions (revenue per visitor, engagement rate, time to conversion). Implement privacy-compliant tracking: support GDPR compliance with user consent management, implement data retention policies for test data, provide data anonymization options, support opt-out mechanisms for test participation. Include performance optimization: implement efficient event batching for high-traffic tests, optimize database queries for real-time analytics, create data aggregation strategies for large datasets, implement caching for frequently accessed analytics.",
+            "status": "pending",
+            "testStrategy": "Integration Tests using ActionDispatch::IntegrationTest: Test Ahoy event tracking with assert_difference for event creation on test interactions, test participant identification across sessions using visitor tokens, test conversion event tracking with custom properties using assert_includes for event data. Service Tests: Test AbTestTrackingService with mock Ahoy responses using Minitest::Mock, test event batching logic with assert_equal for batch sizes, test conversion tracking accuracy with known conversion scenarios. Analytics Tests: Test dashboard queries with known test data using assert_equal for conversion calculations, test funnel analysis with multi-step conversion scenarios, test real-time analytics with time-sensitive assertions using travel_to for timestamp control. Privacy Tests: Test GDPR compliance features with consent management, test data anonymization with assert_not_includes for sensitive data removal, test opt-out functionality with assert_no_difference for event tracking after opt-out. Performance Tests using Minitest::Benchmark: Test event tracking performance with high-volume scenarios, test query performance for analytics dashboards with large datasets, test caching effectiveness with assert_performance_linear for cache hit improvements."
+          },
+          {
+            "id": 4,
+            "title": "Implement A/B Test Controller and API Endpoints",
+            "description": "Create comprehensive Rails controller and API endpoints for A/B test management including CRUD operations, test monitoring, participant assignment, and analytics reporting with proper authorization and security.",
+            "dependencies": [
+              "6.1",
+              "6.2",
+              "6.3"
+            ],
+            "details": "Create AbTestsController with full CRUD operations: index (list tests with filtering by status, creator, date range), show (detailed test view with variant performance), new/create (test setup form with variant configuration), edit/update (test modification with safety checks for running tests), destroy (test deletion with data retention checks). Implement specialized controller actions: start_test (begin test execution with validation checks), pause_test (temporarily stop test with participant handling), stop_test (end test early with statistical analysis), clone_test (duplicate test configuration for follow-up experiments), export_results (generate test reports in multiple formats). Build participant assignment API endpoints: POST /api/v1/ab_tests/:id/assign (assign variant to user/visitor), GET /api/v1/ab_tests/:id/variant (retrieve assigned variant for user), POST /api/v1/ab_tests/:id/convert (track conversion events), GET /api/v1/ab_tests/active (retrieve active tests for user). Create analytics and reporting endpoints: GET /api/v1/ab_tests/:id/analytics (real-time test performance data), GET /api/v1/ab_tests/:id/participants (participant details with filtering), POST /api/v1/ab_tests/:id/analysis (trigger statistical analysis), GET /api/v1/ab_tests/:id/recommendations (AI-powered optimization suggestions). Implement security and authorization: use Pundit policies for role-based access (test creators can edit their tests, analysts can view all tests, admins can manage any test), implement API authentication using token-based auth, add rate limiting for public endpoints using rack-throttle, validate request parameters with strong parameters, implement CSRF protection for form-based actions. Add comprehensive error handling: handle invalid test states with appropriate HTTP status codes, provide detailed error messages for API consumers, implement graceful degradation for statistical analysis failures, log security incidents and suspicious activities. Include monitoring and observability: implement request logging for audit trails, add performance monitoring for critical endpoints, create health check endpoints for test system status, implement alerting for test failures or anomalies.",
+            "status": "pending",
+            "testStrategy": "Controller Tests using ActionDispatch::IntegrationTest: Test all CRUD actions with valid/invalid parameters using assert_response for proper HTTP status codes (200, 201, 422, 404). Test authorization enforcement with assert_response :forbidden for unauthorized access attempts using different user roles. Test specialized actions like start_test and pause_test with assert_changes for test status updates. Test participant assignment endpoints with post requests and assert_equal for variant assignment consistency. API Tests: Test JSON API responses with assert_match for proper response formatting, test API authentication with token validation, test rate limiting with multiple rapid requests using assert_response :too_many_requests. Test conversion tracking endpoints with assert_difference for conversion count updates. Security Tests: Test parameter validation with strong parameters using malformed requests, verify authorization policies prevent unauthorized actions with assert_raises Pundit::NotAuthorizedError, test CSRF protection for form submissions. Test API rate limiting effectiveness with stress testing scenarios. Integration Tests: Test complete A/B test workflows including creation, participant assignment, conversion tracking, and analysis through controller actions. Test error handling scenarios with invalid test configurations and edge cases. Performance Tests: Test controller response times under load using Minitest::Benchmark, verify database query efficiency for analytics endpoints with assert_queries for query count optimization."
+          },
+          {
+            "id": 5,
+            "title": "Create A/B Test User Interface and Dashboard",
+            "description": "Build comprehensive user interface for A/B test management including test creation wizard, real-time analytics dashboard, variant comparison views, and participant management with responsive design and accessibility features.",
+            "dependencies": [
+              "6.3",
+              "6.4"
+            ],
+            "details": "Develop A/B test creation wizard: multi-step form for test configuration with hypothesis input, success metrics definition, variant setup with content selection, traffic allocation controls with visual percentage sliders, test duration planning with calendar integration, participant targeting options (user segments, geographic restrictions, device types). Build comprehensive test management dashboard: test listing with status indicators (draft, running, completed), quick action buttons (start, pause, stop, view results), search and filtering capabilities (by status, creator, date range, performance), bulk operations for multiple test management, test performance overview cards with key metrics summary. Create real-time analytics dashboard: live conversion tracking with automatic updates, statistical significance indicators with confidence levels, variant performance comparison with charts and graphs, participant flow visualization, conversion funnel analysis with step-by-step breakdowns, cohort analysis for participant segments. Implement variant comparison interface: side-by-side content comparison for visual assessment, performance metrics comparison tables, statistical significance testing results display, confidence interval visualization, effect size indicators with practical significance context. Design participant management views: participant list with filtering and search capabilities, individual participant journey tracking, segment analysis and demographic breakdowns, conversion attribution tracking, participant exclusion/inclusion management. Add responsive design and accessibility: mobile-optimized layouts for dashboard viewing, touch-friendly controls for test management, keyboard navigation support for all interactive elements, screen reader compatibility with proper ARIA labels, high contrast mode support for accessibility compliance, progressive web app features for offline access. Implement real-time updates: WebSocket integration for live dashboard updates, real-time notification system for test events (significance reached, completion milestones), background job integration for data refresh, optimistic UI updates for immediate feedback. Include advanced visualization: interactive charts using Chart.js or D3.js libraries, heatmaps for variant performance comparison, timeline views for test progression, export capabilities for charts and data (PDF, PNG, CSV formats).",
+            "status": "pending",
+            "testStrategy": "View Tests using ActionView::TestCase: Test form rendering for test creation wizard with assert_select for proper form elements, test dashboard layout with assert_includes for required dashboard components, test responsive design elements with CSS class validation. Test accessibility features with assert_selector for ARIA labels and keyboard navigation elements. System Tests using ActionDispatch::SystemTestCase with Capybara: Test complete test creation workflow with fill_in, select, and click_on interactions, test dashboard navigation and filtering functionality, test real-time updates with JavaScript interactions using page.has_content? for dynamic content updates. Test variant comparison interface with click interactions and content verification. Test mobile responsiveness with different viewport sizes using resize_window. Integration Tests: Test dashboard data loading with assert_equal for displayed metrics, test chart rendering with JavaScript execution, test export functionality with file download verification. Test WebSocket connections for real-time updates with connection establishment assertions. Accessibility Tests: Test keyboard navigation with tab key simulation, test screen reader compatibility with text content verification, test high contrast mode with CSS property validation. Performance Tests: Test dashboard loading performance with large datasets using assert_performance_constant, test chart rendering performance with complex visualizations, test real-time update efficiency with WebSocket message frequency analysis."
+          },
+          {
+            "id": 6,
+            "title": "Implement Statistical Analysis and Reporting Engine",
+            "description": "Build comprehensive statistical analysis engine for A/B test evaluation including Bayesian and frequentist methods, effect size calculations, confidence intervals, sequential testing, and automated report generation.",
+            "dependencies": [
+              "6.2",
+              "6.3"
+            ],
+            "details": "Develop statistical analysis engine: implement chi-square tests for categorical conversion data, t-tests for continuous metrics (revenue, time on page), Mann-Whitney U tests for non-parametric data, Bayesian A/B testing with Beta-Binomial models, confidence interval calculations using Wilson score interval method, effect size computations (Cohen's d, Cramer's V, odds ratios). Create sequential testing capabilities: implement Group Sequential Design for early stopping, calculate alpha spending functions for multiple interim analyses, determine optimal stopping boundaries using O'Brien-Fleming boundaries, implement futility analysis for early termination of unsuccessful tests, provide sample size recommendations for achieving desired statistical power. Build comprehensive reporting system: generate automated statistical reports with interpretation, create executive summaries with key findings and recommendations, implement confidence interval visualization with margin of error displays, provide practical significance assessments beyond statistical significance, generate follow-up test recommendations based on results. Develop advanced analysis features: implement multi-variate testing analysis for complex experiments, create segment-based analysis for different user cohorts, build attribution analysis for multi-touch conversions, implement survival analysis for time-to-conversion metrics, support custom metrics calculation with user-defined formulas. Create statistical validation framework: implement minimum sample size calculations based on effect size and power requirements, validate test results for statistical assumptions (normality, independence), detect and correct for multiple comparison problems using Bonferroni or FDR corrections, implement outlier detection and handling procedures, validate data quality and completeness before analysis. Add AI-powered insights generation: integrate with LLM service for natural language interpretation of results, generate actionable recommendations based on statistical findings, provide hypothesis generation for follow-up experiments, create comparative analysis with historical test results, implement trend analysis across multiple tests. Include export and sharing capabilities: generate PDF reports with professional formatting, create PowerPoint presentations with key findings, export raw data in multiple formats (CSV, JSON, Excel), implement secure sharing with stakeholder access controls, provide API access for programmatic report generation.",
+            "status": "pending",
+            "testStrategy": "Statistical Tests using ActiveSupport::TestCase: Test chi-square calculations with known datasets using assert_in_delta for floating-point precision, test confidence interval calculations with mathematical verification, test effect size computations with controlled scenarios using assert_equal for expected values. Test Bayesian analysis with mock prior distributions and assert_includes for credible intervals. Sequential Testing Tests: Test early stopping criteria with simulated test progression, test alpha spending function calculations with assert_in_delta for boundary values, test sample size calculations with power analysis verification. Test futility analysis with predetermined stopping rules. Service Tests: Test statistical analysis service with comprehensive mock data scenarios, test report generation logic with assert_includes for required report sections, test AI integration for insights generation using mocked LLM responses. Test data validation procedures with various data quality scenarios. Integration Tests: Test complete analysis workflow from raw data through final reports, test statistical assumption validation with edge cases, test multi-variate analysis with complex experimental designs. Performance Tests using Minitest::Benchmark: Test statistical calculation performance with large datasets, test report generation speed with complex analyses, verify memory usage during intensive calculations with assert_performance_linear for scalability. Validation Tests: Test statistical accuracy with known benchmark problems, test edge case handling with extreme data distributions, test error handling for insufficient sample sizes or invalid data."
+          }
+        ]
       },
       {
         "id": 7,
@@ -257,67 +384,70 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Social Media Platform Integrations",
-            "description": "Integrate with major social media platforms for data collection and campaign management.",
-            "details": "Connect to Facebook Ads, Instagram, LinkedIn, Twitter, and TikTok APIs. Implement data collection for impressions, engagement, clicks, and conversions. Documentation: https://developers.facebook.com/docs/marketing-api/, https://developer.linkedin.com/docs, https://developer.twitter.com/en/docs",
+            "title": "Create Performance Metrics Models and Instrumentation Framework",
+            "description": "Build core performance monitoring models and implement Rails ActiveSupport::Notifications instrumentation for campaign metrics tracking.",
             "status": "pending",
-            "priority": "high"
+            "dependencies": [],
+            "details": "Create models for storing performance metrics (impressions, clicks, conversions, engagement rates), implement ActiveSupport::Notifications instrumentation throughout the application to track campaign events, build performance data collection service using Rails instrumentation patterns. Include metrics for content generation timing, API call performance, and user interaction events.",
+            "testStrategy": "Use ActiveSupport::TestCase for model validations and associations. Test instrumentation with ActiveSupport::LogSubscriber and assert_difference for metric counters. Mock time-based scenarios for performance tracking. Test data integrity and metric accuracy with ActionDispatch::IntegrationTest for end-to-end metric collection."
           },
           {
             "id": 2,
-            "title": "Google Ads & Search Integration",
-            "description": "Integrate with Google Ads and Google Analytics for comprehensive campaign tracking.",
-            "details": "Connect to Google Ads API for campaign data, Google Analytics for website tracking, and Google Search Console for SEO metrics. Documentation: https://developers.google.com/google-ads/api/docs/start, https://developers.google.com/analytics/devguides/reporting/data/v1",
+            "title": "Implement Marketing Platform Integration Services",
+            "description": "Create service layer for integrating with Meta Ads, Google Ads, LinkedIn Ads, and other marketing platforms with proper authentication and data synchronization.",
             "status": "pending",
-            "priority": "high"
+            "dependencies": [
+              1
+            ],
+            "details": "Build platform integration services using Rails service objects pattern, implement OAuth2 authentication flows for each platform, create data mapping services for normalizing metrics across platforms, implement retry logic and error handling for API failures, set up webhook receivers for real-time data updates from external platforms.",
+            "testStrategy": "Use ActionDispatch::IntegrationTest for OAuth flows and API integrations. Mock external API calls with webmock gem and test error scenarios. Test webhook processing with ActionController::TestCase. Verify data mapping accuracy and handle rate limiting scenarios. Use VCR for recording real API interactions in test suite."
           },
           {
             "id": 3,
-            "title": "Email Marketing Platform Integration",
-            "description": "Integrate with email marketing platforms for campaign performance tracking.",
-            "details": "Connect to Mailchimp, Constant Contact, SendGrid, and other email platforms. Track open rates, click rates, and conversion metrics. Documentation: https://mailchimp.com/developer/, https://sendgrid.com/docs/for-developers/",
+            "title": "Build Real-Time Analytics Dashboard with ActionCable",
+            "description": "Create dynamic analytics dashboard with real-time updates using ActionCable for live campaign performance monitoring.",
             "status": "pending",
-            "priority": "medium"
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement ActionCable channels for real-time metric streaming, create dashboard interface with live charts and metric updates, build notification system for performance alerts, implement dashboard filtering and date range selection, create export functionality for reports and visualizations.",
+            "testStrategy": "Use ActionCable::TestCase for WebSocket connections and real-time updates. Test channel authorization and message broadcasting. Use ActionDispatch::IntegrationTest for dashboard functionality and filtering. Test chart updates and alert notifications. Verify export functionality with different data formats."
           },
           {
             "id": 4,
-            "title": "CRM & Marketing Automation Integration",
-            "description": "Integrate with CRM and marketing automation platforms for lead tracking.",
-            "details": "Connect to Salesforce, HubSpot, Marketo, and Pardot. Track lead generation, conversion rates, and customer journey analytics. Documentation: https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/, https://developers.hubspot.com/docs/api",
+            "title": "Create CRM and Email Platform Integration Layer",
+            "description": "Build integration services for Salesforce, HubSpot, Marketo, and email marketing platforms to sync campaign data and track conversion attribution.",
             "status": "pending",
-            "priority": "medium"
+            "dependencies": [
+              1
+            ],
+            "details": "Implement CRM API integrations using Rails service objects, create lead attribution tracking from campaigns to CRM contacts, build email platform integrations for campaign synchronization, implement contact synchronization and campaign tagging, create conversion tracking pipeline from marketing touchpoints to sales outcomes.",
+            "testStrategy": "Test CRM API integrations with ActionDispatch::IntegrationTest and mock API responses. Verify lead attribution logic with unit tests using ActiveSupport::TestCase. Test email platform synchronization and contact mapping. Use ActionMailer::TestCase for email integration testing and delivery confirmation."
           },
           {
             "id": 5,
-            "title": "Real-Time Analytics Dashboard",
-            "description": "Build real-time analytics dashboard with interactive charts and metrics.",
-            "details": "Create dashboard with real-time data visualization, interactive charts, and drill-down capabilities. Implement data aggregation and performance alerts using shadcn/ui components via the shadcn MCP server for consistent UI design.",
+            "title": "Implement Data Pipeline and ETL Processing System",
+            "description": "Create robust data processing pipeline for aggregating metrics from multiple sources and generating insights using Rails background jobs.",
             "status": "pending",
-            "priority": "high"
+            "dependencies": [
+              2,
+              4
+            ],
+            "details": "Build ETL pipeline using ActiveJob for processing marketing data, implement data aggregation jobs for generating daily/weekly/monthly reports, create data quality validation and cleansing processes, build cross-platform attribution modeling, implement data warehouse-style reporting with ActiveRecord query optimization.",
+            "testStrategy": "Test background jobs with ActiveJob::TestCase and job queue processing. Use ActiveSupport::TestCase for data validation and cleansing logic. Test ETL pipeline with sample data and verify aggregation accuracy. Test job scheduling and error handling scenarios. Validate query performance with database fixtures."
           },
           {
             "id": 6,
-            "title": "Data Pipeline & ETL Processing",
-            "description": "Implement data pipeline for processing and storing analytics data.",
-            "details": "Create ETL processes for data transformation, data warehousing, and real-time streaming. Implement data validation and error handling. Documentation: https://www.getdbt.com/, https://airflow.apache.org/, https://kafka.apache.org/",
+            "title": "Build Performance Alerting and Notification System",
+            "description": "Create intelligent alerting system for campaign performance anomalies and automated notification delivery using ActionMailer and webhooks.",
             "status": "pending",
-            "priority": "medium"
-          },
-          {
-            "id": 7,
-            "title": "Performance Alerts & Notifications",
-            "description": "Implement automated alerts and notifications for campaign performance.",
-            "details": "Create alert system for performance thresholds, anomaly detection, and automated reporting. Implement email and in-app notifications. Documentation: https://nodemailer.com/about/, https://sendgrid.com/docs/for-developers/sending-email/",
-            "status": "pending",
-            "priority": "medium"
-          },
-          {
-            "id": 8,
-            "title": "Custom Reporting & Export",
-            "description": "Build custom reporting system with export capabilities.",
-            "details": "Create custom report builder, scheduled reports, and export functionality for PDF, Excel, and CSV formats. Documentation: https://www.npmjs.com/package/jspdf, https://www.npmjs.com/package/xlsx",
-            "status": "pending",
-            "priority": "low"
+            "dependencies": [
+              3,
+              5
+            ],
+            "details": "Implement alert rules engine for performance thresholds and anomaly detection, create notification delivery system using ActionMailer and external webhooks, build alert escalation workflows and team notification routing, implement dashboard alert management interface, create mobile push notification integration for critical alerts.",
+            "testStrategy": "Test alert rules with unit tests using ActiveSupport::TestCase for threshold logic. Use ActionMailer::TestCase for email notifications and delivery testing. Test webhook delivery with ActionDispatch::IntegrationTest and external service mocking. Verify alert escalation workflows and team routing logic."
           }
         ]
       },
@@ -740,7 +870,7 @@
     ],
     "metadata": {
       "created": "2025-07-22T14:53:58.395Z",
-      "updated": "2025-08-17T00:39:23.606Z",
+      "updated": "2025-08-17T12:40:20.782Z",
       "description": "Tasks for master context"
     }
   }

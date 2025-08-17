@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_211239) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_17_124042) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -130,6 +130,36 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_211239) do
     t.index ["priority"], name: "index_feedback_comments_on_priority"
     t.index ["user_id", "created_at"], name: "index_feedback_comments_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_feedback_comments_on_user_id"
+  end
+
+  create_table "generated_contents", force: :cascade do |t|
+    t.string "content_type", null: false
+    t.string "title", null: false
+    t.text "body_content", null: false
+    t.string "format_variant", default: "standard"
+    t.string "status", default: "draft", null: false
+    t.integer "version_number", default: 1, null: false
+    t.integer "original_content_id"
+    t.integer "campaign_plan_id", null: false
+    t.integer "created_by_id", null: false
+    t.integer "approved_by_id"
+    t.text "metadata"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_id"], name: "index_generated_contents_on_approved_by_id"
+    t.index ["campaign_plan_id", "content_type"], name: "index_generated_contents_on_campaign_plan_id_and_content_type"
+    t.index ["campaign_plan_id", "status"], name: "index_generated_contents_on_campaign_plan_id_and_status"
+    t.index ["campaign_plan_id"], name: "index_generated_contents_on_campaign_plan_id"
+    t.index ["content_type"], name: "index_generated_contents_on_content_type"
+    t.index ["created_by_id", "created_at"], name: "index_generated_contents_on_created_by_id_and_created_at"
+    t.index ["created_by_id"], name: "index_generated_contents_on_created_by_id"
+    t.index ["deleted_at"], name: "index_generated_contents_on_deleted_at"
+    t.index ["format_variant"], name: "index_generated_contents_on_format_variant"
+    t.index ["original_content_id", "version_number"], name: "idx_on_original_content_id_version_number_b94c5ed42a"
+    t.index ["original_content_id"], name: "index_generated_contents_on_original_content_id"
+    t.index ["status"], name: "index_generated_contents_on_status"
+    t.index ["version_number"], name: "index_generated_contents_on_version_number"
   end
 
   create_table "journey_steps", force: :cascade do |t|
@@ -266,6 +296,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_211239) do
   add_foreign_key "feedback_comments", "feedback_comments", column: "parent_comment_id"
   add_foreign_key "feedback_comments", "plan_versions"
   add_foreign_key "feedback_comments", "users"
+  add_foreign_key "generated_contents", "campaign_plans"
+  add_foreign_key "generated_contents", "generated_contents", column: "original_content_id"
+  add_foreign_key "generated_contents", "users", column: "approved_by_id"
+  add_foreign_key "generated_contents", "users", column: "created_by_id"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journeys", "users"
   add_foreign_key "plan_audit_logs", "campaign_plans"

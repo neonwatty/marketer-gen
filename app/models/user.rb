@@ -4,6 +4,8 @@ class User < ApplicationRecord
   has_many :journeys, dependent: :destroy
   has_many :brand_identities, dependent: :destroy
   has_many :campaign_plans, dependent: :destroy
+  has_many :created_contents, class_name: 'GeneratedContent', foreign_key: 'created_by_id', dependent: :destroy
+  has_many :approved_contents, class_name: 'GeneratedContent', foreign_key: 'approved_by_id', dependent: :nullify
   has_one_attached :avatar
 
   ROLES = %w[marketer team_member admin].freeze
