@@ -1,12 +1,12 @@
+import '@/lib/types/auth'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/lib/db'
+
 import { authOptions } from '@/lib/auth'
-import { 
-  updateCampaignSchema,
-  type UpdateCampaignData
-} from '@/lib/validation/campaigns'
-import '@/lib/types/auth'
+import { prisma } from '@/lib/db'
+import {
+  updateCampaignSchema} from '@/lib/validation/campaigns'
 
 export async function GET(
   request: NextRequest,
@@ -31,9 +31,10 @@ export async function GET(
           select: {
             id: true,
             name: true,
-            guidelines: true,
-            assets: true,
-            messaging: true
+            description: true,
+            tagline: true,
+            mission: true,
+            vision: true
           }
         },
         journeys: {

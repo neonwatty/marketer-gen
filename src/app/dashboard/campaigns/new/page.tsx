@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Metadata } from 'next'
 
-import { CampaignWizard, type CampaignFormData } from '@/components/features/campaigns/CampaignWizard'
+import { ArrowLeft } from 'lucide-react'
+
+import { type CampaignFormData,CampaignWizard } from '@/components/features/campaigns/CampaignWizard'
 import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
 
 // Note: This would normally be generated on the server side
 // export const metadata: Metadata = {

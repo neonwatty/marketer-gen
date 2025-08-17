@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
+
 import { Plus } from 'lucide-react'
 
 import { CampaignExample } from '@/components/features/dashboard/CampaignExample'

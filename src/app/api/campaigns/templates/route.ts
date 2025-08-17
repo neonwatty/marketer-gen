@@ -1,12 +1,12 @@
+import '@/lib/types/auth'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/lib/db'
+
 import { authOptions } from '@/lib/auth'
-import { 
-  journeyTemplateRequestSchema,
-  type JourneyTemplateRequest
-} from '@/lib/validation/campaigns'
-import '@/lib/types/auth'
+import { prisma } from '@/lib/db'
+import {
+  journeyTemplateRequestSchema} from '@/lib/validation/campaigns'
 
 const JOURNEY_TEMPLATES = {
   'welcome-series': {

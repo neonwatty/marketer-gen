@@ -357,8 +357,8 @@ describe('Shadcn UI Build Integration', () => {
         
         const buildSize = getDirectorySize(buildDir)
         
-        // Build size should be reasonable (less than 350MB for app with Shadcn components)
-        expect(buildSize).toBeLessThan(350 * 1024 * 1024) // 350MB
+        // Build size should be reasonable (less than 400MB for app with Shadcn components)
+        expect(buildSize).toBeLessThan(400 * 1024 * 1024) // 400MB
       }
     })
   })

@@ -1,8 +1,11 @@
 'use client'
 
 import { useFormContext } from 'react-hook-form'
-import { Target, DollarSign, TrendingUp, Users, ShoppingCart, Mail, Eye } from 'lucide-react'
 
+import { DollarSign, Eye,Mail, ShoppingCart, Target, TrendingUp, Users } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   FormControl,
   FormDescription,
@@ -12,11 +15,8 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { type CampaignFormData } from '../CampaignWizard'
+
 
 const primaryGoalOptions = [
   {

@@ -2,10 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import {
-  campaignApi,
   type Campaign,
+  campaignApi,
   type CampaignQueryParams,
-  type CreateCampaignData,
   type UpdateCampaignData,
 } from '@/lib/api/campaigns'
 

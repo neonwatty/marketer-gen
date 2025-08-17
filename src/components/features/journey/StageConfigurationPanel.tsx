@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 
 import { Plus, Trash2, X } from 'lucide-react'
-import type { Node } from 'reactflow'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -27,6 +26,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 
 import type { JourneyStage } from './JourneyBuilder'
+import type { Node } from 'reactflow'
 
 interface StageConfigurationPanelProps {
   isOpen: boolean

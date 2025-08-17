@@ -1,8 +1,12 @@
 'use client'
 
 import { useFormContext } from 'react-hook-form'
-import { Users, MapPin, Calendar, Briefcase } from 'lucide-react'
 
+import { Briefcase,Calendar, MapPin, Users } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   FormControl,
   FormDescription,
@@ -13,10 +17,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { type CampaignFormData } from '../CampaignWizard'
+
 
 const ageRanges = [
   { value: '18-24', label: '18-24 years' },

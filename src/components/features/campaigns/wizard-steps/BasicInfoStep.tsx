@@ -1,6 +1,7 @@
 'use client'
 
 import { useFormContext } from 'react-hook-form'
+
 import { CalendarIcon } from 'lucide-react'
 
 import {
@@ -13,7 +14,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { type CampaignFormData } from '../CampaignWizard'
+
 
 export function BasicInfoStep() {
   const { control } = useFormContext()

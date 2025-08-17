@@ -1,18 +1,19 @@
 'use client'
 
 import { useFormContext } from 'react-hook-form'
-import { CheckCircle2, Rocket, Target, RefreshCw, Users, TrendingUp, Mail } from 'lucide-react'
 
+import { CheckCircle2, Mail,RefreshCw, Rocket, Target, TrendingUp, Users } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   FormControl,
   FormField,
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { type CampaignFormData } from '../CampaignWizard'
+
 
 interface JourneyTemplate {
   id: string

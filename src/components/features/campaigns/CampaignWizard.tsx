@@ -1,18 +1,19 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback,useState } from 'react'
 import * as React from 'react'
-import { useForm, FormProvider } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { FormProvider,useForm } from 'react-hook-form'
+
 import * as z from 'zod'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CampaignWizardNav, type WizardStep } from './CampaignWizardNav'
+
 import { BasicInfoStep } from './wizard-steps/BasicInfoStep'
-import { TemplateSelectionStep } from './wizard-steps/TemplateSelectionStep'
-import { TargetAudienceStep } from './wizard-steps/TargetAudienceStep'
 import { GoalsKPIsStep } from './wizard-steps/GoalsKPIsStep'
 import { ReviewStep } from './wizard-steps/ReviewStep'
+import { TargetAudienceStep } from './wizard-steps/TargetAudienceStep'
+import { TemplateSelectionStep } from './wizard-steps/TemplateSelectionStep'
+import { CampaignWizardNav, type WizardStep } from './CampaignWizardNav'
 
 // Define the complete form schema
 const campaignFormSchema = z.object({

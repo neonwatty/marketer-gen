@@ -1,5 +1,6 @@
+import { getSession as nextAuthGetSession,signIn as nextAuthSignIn, signOut as nextAuthSignOut } from 'next-auth/react'
+
 import { AUTH_CONFIG } from '@/lib/constants'
-import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, getSession as nextAuthGetSession } from 'next-auth/react'
 
 import { apiClient } from './api'
 

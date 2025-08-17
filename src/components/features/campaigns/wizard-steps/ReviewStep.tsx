@@ -1,22 +1,20 @@
 'use client'
 
 import { useFormContext } from 'react-hook-form'
+
 import { 
   Calendar, 
-  Target, 
-  Users, 
-  DollarSign, 
-  FileText, 
   CheckCircle2, 
-  Edit,
-  Save
-} from 'lucide-react'
+  DollarSign,
+  FileText, 
+  Save,
+  Target, 
+  Users} from 'lucide-react'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { type CampaignFormData } from '../CampaignWizard'
+
 
 interface ReviewStepProps {
   onSaveDraft?: () => Promise<void> | void

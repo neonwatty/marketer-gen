@@ -1,14 +1,13 @@
+import '@/lib/types/auth'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/lib/db'
+
 import { authOptions } from '@/lib/auth'
-import { 
-  createCampaignSchema, 
+import { prisma } from '@/lib/db'
+import {
   campaignQuerySchema,
-  type CreateCampaignData,
-  type CampaignQueryParams
-} from '@/lib/validation/campaigns'
-import '@/lib/types/auth'
+  createCampaignSchema} from '@/lib/validation/campaigns'
 
 export async function GET(request: NextRequest) {
   try {

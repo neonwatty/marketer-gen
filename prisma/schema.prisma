@@ -77,13 +77,39 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-// Brand model with flexible JSON fields for guidelines, assets, and messaging
+// Enhanced Brand model with structured fields for comprehensive brand management
 model Brand {
-  id         String   @id @default(cuid())
-  name       String
-  guidelines Json?    // Brand guidelines as JSON
-  assets     Json?    // Brand assets (logos, colors, fonts) as JSON
-  messaging  Json?    // Brand messaging (tone, voice, values) as JSON
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  industry    String?
+  website     String?
+  
+  // Brand Identity
+  tagline     String?
+  mission     String?
+  vision      String?
+  values      Json?    // Array of brand values
+  personality Json?    // Brand personality traits
+  
+  // Brand Voice & Tone
+  voiceDescription String?
+  toneAttributes   Json?    // Tone characteristics
+  communicationStyle String?
+  messagingFramework Json?  // Key messaging pillars
+  
+  // Brand Guidelines
+  brandPillars    Json?    // Core brand pillars
+  targetAudience  Json?    // Target audience segments
+  competitivePosition String?
+  brandPromise    String?
+  
+  // Compliance & Usage
+  complianceRules Json?    // Brand compliance guidelines
+  usageGuidelines Json?    // How to use brand assets
+  restrictedTerms Json?    // Terms to avoid
+  
+  // Metadata
   userId     String   // Foreign key to User
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -92,10 +118,107 @@ model Brand {
   updatedBy  String?   // User who last updated this brand
 
   // Relationships
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  campaigns Campaign[]
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaigns    Campaign[]
+  brandAssets  BrandAsset[]
+  colorPalette ColorPalette[]
+  typography   Typography[]
 
   @@map("brands")
+}
+
+// Brand Asset model for managing uploaded brand files
+model BrandAsset {
+  id          String          @id @default(cuid())
+  brandId     String          // Foreign key to Brand
+  name        String
+  description String?
+  type        BrandAssetType
+  category    String?         // Custom category for organization
+  fileUrl     String          // URL or path to the file
+  fileName    String          // Original file name
+  fileSize    Int?            // File size in bytes
+  mimeType    String?         // MIME type of the file
+  metadata    Json?           // Additional file metadata
+  tags        Json?           // Tags for searchability
+  version     String?         // Version of the asset
+  isActive    Boolean         @default(true)
+  
+  // Usage tracking
+  downloadCount Int           @default(0)
+  lastUsed      DateTime?
+  
+  // Metadata
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?       // Soft delete functionality
+  createdBy   String?         // User who created this asset
+  updatedBy   String?         // User who last updated this asset
+
+  // Relationships
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+  @@index([type])
+  @@index([category])
+  @@map("brand_assets")
+}
+
+// Color Palette model for managing brand colors
+model ColorPalette {
+  id          String   @id @default(cuid())
+  brandId     String   // Foreign key to Brand
+  name        String
+  description String?
+  colors      Json     // Array of color objects with hex, rgb, name, usage
+  isPrimary   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime? // Soft delete functionality
+  createdBy   String?  // User who created this palette
+  updatedBy   String?  // User who last updated this palette
+
+  // Relationships
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+  @@map("color_palettes")
+}
+
+// Typography model for managing brand fonts and text styles
+model Typography {
+  id            String   @id @default(cuid())
+  brandId       String   // Foreign key to Brand
+  name          String
+  description   String?
+  fontFamily    String
+  fontWeight    String?
+  fontSize      String?
+  lineHeight    String?
+  letterSpacing String?
+  usage         String?  // Where this typography should be used
+  isPrimary     Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  
+  // Font file information
+  fontFileUrl   String?  // URL to font file if custom
+  fallbackFonts Json?    // Array of fallback fonts
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime? // Soft delete functionality
+  createdBy     String?  // User who created this typography
+  updatedBy     String?  // User who last updated this typography
+
+  // Relationships
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+  @@map("typography")
 }
 
 // Campaign model with flexible goals and status tracking
@@ -271,4 +394,20 @@ enum EventType {
   VIEW
   BOUNCE
   UNSUBSCRIBE
+}
+
+enum BrandAssetType {
+  LOGO
+  BRAND_MARK
+  COLOR_PALETTE
+  TYPOGRAPHY
+  BRAND_GUIDELINES
+  IMAGERY
+  ICON
+  PATTERN
+  TEMPLATE
+  DOCUMENT
+  VIDEO
+  AUDIO
+  OTHER
 }

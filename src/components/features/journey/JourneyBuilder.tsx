@@ -1,18 +1,19 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import 'reactflow/dist/style.css'
 
+import { useCallback, useState } from 'react'
 import {
-  Background,
-  Controls,
-  MiniMap,
-  ReactFlow,
   addEdge,
+  Background,
+  type Connection,
+  Controls,
+  type Edge,
+  MiniMap,
+  type Node,
+  ReactFlow,
   useEdgesState,
   useNodesState,
-  type Connection,
-  type Edge,
-  type Node,
 } from 'reactflow'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,8 +21,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { JourneyStageNode } from './JourneyStageNode'
 import { JourneyToolbar } from './JourneyToolbar'
 import { StageConfigurationPanel } from './StageConfigurationPanel'
-
-import 'reactflow/dist/style.css'
 
 export interface JourneyStage {
   id: string

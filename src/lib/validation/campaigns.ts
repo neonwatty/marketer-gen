@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { CampaignStatus } from '@/generated/prisma'
 
 export const createCampaignSchema = z.object({

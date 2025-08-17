@@ -1,9 +1,9 @@
 'use client'
 
 import { memo } from 'react'
+import { Handle, type NodeProps,Position } from 'reactflow'
 
 import { Eye, Target, TrendingUp, Users } from 'lucide-react'
-import { Handle, Position, type NodeProps } from 'reactflow'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'

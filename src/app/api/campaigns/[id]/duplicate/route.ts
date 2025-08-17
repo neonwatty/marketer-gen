@@ -1,13 +1,13 @@
+import '@/lib/types/auth'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
-import { prisma } from '@/lib/db'
-import { authOptions } from '@/lib/auth'
-import { 
-  duplicateCampaignSchema,
-  type DuplicateCampaignData
-} from '@/lib/validation/campaigns'
-import '@/lib/types/auth'
+
 import { Prisma } from '@/generated/prisma'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/db'
+import {
+  duplicateCampaignSchema} from '@/lib/validation/campaigns'
 
 export async function POST(
   request: NextRequest,

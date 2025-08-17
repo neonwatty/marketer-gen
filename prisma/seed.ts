@@ -23,113 +23,305 @@ async function main() {
     },
   })
 
-  // Create brands with comprehensive guidelines
+  // Create brands with comprehensive brand profiles
   console.log('🏢 Creating brands...')
   const brand1 = await prisma.brand.create({
     data: {
       name: 'ACME Corporation',
+      description: 'Leading provider of enterprise software solutions',
+      industry: 'Technology',
+      website: 'https://acmecorp.com',
+      tagline: 'Excellence in Every Solution',
+      mission: 'Innovating for tomorrow, delivering today',
+      vision: 'To be the world\'s most trusted technology partner',
+      values: ['Innovation', 'Quality', 'Customer Success', 'Integrity'],
+      personality: ['Professional', 'Trustworthy', 'Innovative', 'Results-oriented'],
+      voiceDescription: 'Confident and knowledgeable with a professional yet approachable tone',
+      toneAttributes: {
+        formal: 7,
+        friendly: 6,
+        authoritative: 8,
+        innovative: 9,
+        trustworthy: 9
+      },
+      communicationStyle: 'Clear, direct, and solution-focused',
+      messagingFramework: {
+        primary: 'Trusted by industry leaders',
+        secondary: ['Innovative solutions that scale', 'Your success is our priority'],
+        support: ['Proven track record', 'Expert team', 'Comprehensive support']
+      },
+      brandPillars: ['Innovation', 'Reliability', 'Excellence', 'Partnership'],
+      targetAudience: {
+        primary: 'Enterprise decision makers aged 35-55',
+        secondary: 'IT professionals and technology leaders',
+        demographics: {
+          age_range: '35-55',
+          job_titles: ['CTO', 'IT Director', 'VP Technology', 'Enterprise Architect'],
+          company_size: '500+ employees',
+          industry: ['Technology', 'Finance', 'Healthcare', 'Manufacturing']
+        }
+      },
+      competitivePosition: 'Premium B2B solutions provider with unmatched reliability',
+      brandPromise: 'Delivering enterprise-grade solutions that scale with your business',
+      complianceRules: {
+        'logo_usage': 'Minimum clear space must be maintained around logo',
+        'color_usage': 'Primary colors only for brand identity, secondary for accents',
+        'tone_guidelines': 'Always maintain professional, confident tone'
+      },
+      usageGuidelines: {
+        'do': ['Use primary logo on white backgrounds', 'Maintain consistent spacing', 'Use approved color palette'],
+        'dont': ['Stretch or distort logo', 'Use unapproved colors', 'Alter typography']
+      },
+      restrictedTerms: ['cheap', 'basic', 'simple', 'easy'],
       userId: user1.id,
       createdBy: user1.id,
-      guidelines: {
-        mission: 'Innovating for tomorrow, delivering today',
-        values: ['Innovation', 'Quality', 'Customer Success'],
-        positioning: 'Premium B2B solutions provider',
-        target_audience: 'Enterprise customers aged 25-55',
-        brand_personality: ['Professional', 'Trustworthy', 'Innovative']
-      },
-      assets: {
-        primary_colors: ['#1E40AF', '#3B82F6', '#93C5FD'],
-        secondary_colors: ['#1F2937', '#6B7280', '#D1D5DB'],
-        fonts: {
-          primary: 'Inter',
-          secondary: 'Roboto',
-          headings: 'Poppins'
-        },
-        logo_variants: ['horizontal', 'stacked', 'icon-only'],
-        image_style: 'Clean, professional photography with natural lighting'
-      },
-      messaging: {
-        tone: 'Professional yet approachable',
-        voice: 'Confident and knowledgeable',
-        key_messages: [
-          'Trusted by industry leaders',
-          'Innovative solutions that scale',
-          'Your success is our priority'
-        ],
-        tagline: 'Excellence in Every Solution'
-      }
     },
   })
 
   const brand2 = await prisma.brand.create({
     data: {
       name: 'TechFlow Startup',
+      description: 'Democratizing technology for small businesses',
+      industry: 'Technology',
+      website: 'https://techflowstartup.com',
+      tagline: 'Simplifying Success',
+      mission: 'Democratizing technology for small businesses',
+      vision: 'Every small business should have access to enterprise-level technology',
+      values: ['Accessibility', 'Innovation', 'Community', 'Empowerment'],
+      personality: ['Friendly', 'Approachable', 'Helpful', 'Energetic'],
+      voiceDescription: 'Supportive and understanding with a friendly, encouraging tone',
+      toneAttributes: {
+        formal: 4,
+        friendly: 9,
+        authoritative: 6,
+        innovative: 8,
+        trustworthy: 8
+      },
+      communicationStyle: 'Conversational, supportive, and action-oriented',
+      messagingFramework: {
+        primary: 'Technology made simple',
+        secondary: ['Growing together', 'Your partner in success'],
+        support: ['Affordable solutions', 'Easy to use', 'Always here to help']
+      },
+      brandPillars: ['Simplicity', 'Affordability', 'Support', 'Growth'],
+      targetAudience: {
+        primary: 'Small business owners aged 30-50',
+        secondary: 'Entrepreneurs and solopreneurs',
+        demographics: {
+          age_range: '30-50',
+          job_titles: ['Business Owner', 'Entrepreneur', 'Founder', 'Manager'],
+          company_size: '1-50 employees',
+          industry: ['Retail', 'Services', 'Consulting', 'E-commerce']
+        }
+      },
+      competitivePosition: 'Affordable tech solutions for SMBs',
+      brandPromise: 'Making enterprise technology accessible and affordable for every small business',
+      complianceRules: {
+        'tone_guidelines': 'Always maintain friendly, supportive tone - never condescending',
+        'imagery_guidelines': 'Use diverse, authentic imagery showing real small business scenarios'
+      },
+      usageGuidelines: {
+        'do': ['Use warm, approachable language', 'Show real business scenarios', 'Emphasize simplicity'],
+        'dont': ['Use technical jargon', 'Appear corporate or cold', 'Overwhelm with features']
+      },
+      restrictedTerms: ['enterprise', 'complex', 'advanced', 'sophisticated'],
       userId: user2.id,
       createdBy: user2.id,
-      guidelines: {
-        mission: 'Democratizing technology for small businesses',
-        values: ['Accessibility', 'Innovation', 'Community'],
-        positioning: 'Affordable tech solutions for SMBs',
-        target_audience: 'Small business owners aged 30-50',
-        brand_personality: ['Friendly', 'Approachable', 'Helpful']
-      },
-      assets: {
-        primary_colors: ['#10B981', '#34D399', '#A7F3D0'],
-        secondary_colors: ['#374151', '#9CA3AF', '#F3F4F6'],
-        fonts: {
-          primary: 'Nunito Sans',
-          secondary: 'Open Sans',
-          headings: 'Montserrat'
-        },
-        logo_variants: ['horizontal', 'icon-only'],
-        image_style: 'Vibrant, energetic imagery with diverse people'
-      },
-      messaging: {
-        tone: 'Friendly and encouraging',
-        voice: 'Supportive and understanding',
-        key_messages: [
-          'Technology made simple',
-          'Growing together',
-          'Your partner in success'
-        ],
-        tagline: 'Simplifying Success'
-      }
     },
   })
 
   const brand3 = await prisma.brand.create({
     data: {
       name: 'EcoGreen Solutions',
+      description: 'Premium eco-friendly products for conscious consumers',
+      industry: 'Consumer Goods',
+      website: 'https://ecogreensolutions.com',
+      tagline: 'Naturally Better',
+      mission: 'Creating sustainable solutions for a better planet',
+      vision: 'A world where every choice contributes to environmental healing',
+      values: ['Sustainability', 'Transparency', 'Impact', 'Authenticity'],
+      personality: ['Authentic', 'Responsible', 'Forward-thinking', 'Inspiring'],
+      voiceDescription: 'Passionate and knowledgeable with an inspiring, authentic tone',
+      toneAttributes: {
+        formal: 5,
+        friendly: 7,
+        authoritative: 7,
+        innovative: 8,
+        trustworthy: 9
+      },
+      communicationStyle: 'Inspiring, educational, and action-oriented',
+      messagingFramework: {
+        primary: 'Sustainability without compromise',
+        secondary: ['Every choice makes a difference', 'Building a better tomorrow'],
+        support: ['Science-backed solutions', 'Transparent practices', 'Proven impact']
+      },
+      brandPillars: ['Sustainability', 'Quality', 'Transparency', 'Impact'],
+      targetAudience: {
+        primary: 'Environmentally conscious consumers aged 25-45',
+        secondary: 'Eco-minded families and professionals',
+        demographics: {
+          age_range: '25-45',
+          job_titles: ['Professional', 'Parent', 'Educator', 'Healthcare Worker'],
+          company_size: 'Individual consumers',
+          industry: ['Any - environmental focus']
+        }
+      },
+      competitivePosition: 'Premium eco-friendly product leader with proven environmental impact',
+      brandPromise: 'Products that are better for you and better for the planet',
+      complianceRules: {
+        'sustainability_claims': 'All environmental claims must be verified and documented',
+        'imagery_guidelines': 'Use only authentic, natural imagery - no greenwashing'
+      },
+      usageGuidelines: {
+        'do': ['Use natural, authentic imagery', 'Back up claims with data', 'Show real environmental impact'],
+        'dont': ['Make unsubstantiated claims', 'Use artificial or fake imagery', 'Greenwash messaging']
+      },
+      restrictedTerms: ['artificial', 'synthetic', 'chemical', 'wasteful'],
       userId: user1.id,
       createdBy: user1.id,
-      guidelines: {
-        mission: 'Creating sustainable solutions for a better planet',
-        values: ['Sustainability', 'Transparency', 'Impact'],
-        positioning: 'Premium eco-friendly product leader',
-        target_audience: 'Environmentally conscious consumers aged 25-45',
-        brand_personality: ['Authentic', 'Responsible', 'Forward-thinking']
+    },
+  })
+
+  // Create brand assets for the brands
+  console.log('🎨 Creating brand assets...')
+  
+  // ACME Corporation Assets
+  const acmeLogoAsset = await prisma.brandAsset.create({
+    data: {
+      brandId: brand1.id,
+      name: 'ACME Corporation Primary Logo',
+      description: 'Main horizontal logo for ACME Corporation',
+      type: 'LOGO',
+      category: 'Primary Identity',
+      fileUrl: '/assets/brands/acme/logo-primary.svg',
+      fileName: 'acme-logo-primary.svg',
+      fileSize: 15420,
+      mimeType: 'image/svg+xml',
+      metadata: {
+        dimensions: '400x120',
+        colorMode: 'RGB',
+        hasTransparency: true
       },
-      assets: {
-        primary_colors: ['#059669', '#34D399', '#D1FAE5'],
-        secondary_colors: ['#92400E', '#F59E0B', '#FDE68A'],
-        fonts: {
-          primary: 'Source Sans Pro',
-          secondary: 'Lato',
-          headings: 'Merriweather'
-        },
-        logo_variants: ['horizontal', 'stacked', 'icon-only', 'reverse'],
-        image_style: 'Natural, outdoor imagery showcasing sustainability'
+      tags: ['logo', 'primary', 'horizontal', 'svg'],
+      version: '1.0',
+      createdBy: user1.id,
+    },
+  })
+
+  const acmeColorPalette = await prisma.colorPalette.create({
+    data: {
+      brandId: brand1.id,
+      name: 'ACME Primary Color Palette',
+      description: 'Main brand colors for ACME Corporation',
+      colors: [
+        { name: 'ACME Blue', hex: '#1E40AF', rgb: '30, 64, 175', usage: 'Primary brand color' },
+        { name: 'Light Blue', hex: '#3B82F6', rgb: '59, 130, 246', usage: 'Secondary actions' },
+        { name: 'Accent Blue', hex: '#93C5FD', rgb: '147, 197, 253', usage: 'Backgrounds and accents' },
+        { name: 'Dark Gray', hex: '#1F2937', rgb: '31, 41, 55', usage: 'Text and headers' },
+        { name: 'Medium Gray', hex: '#6B7280', rgb: '107, 114, 128', usage: 'Body text' },
+        { name: 'Light Gray', hex: '#D1D5DB', rgb: '209, 213, 219', usage: 'Borders and dividers' }
+      ],
+      isPrimary: true,
+      createdBy: user1.id,
+    },
+  })
+
+  const acmeTypography = await prisma.typography.create({
+    data: {
+      brandId: brand1.id,
+      name: 'ACME Primary Font - Inter',
+      description: 'Primary typeface for ACME Corporation',
+      fontFamily: 'Inter',
+      fontWeight: '400',
+      fontSize: '16px',
+      lineHeight: '1.5',
+      letterSpacing: '0',
+      usage: 'Primary font for all text content',
+      isPrimary: true,
+      fallbackFonts: ['system-ui', 'sans-serif'],
+      createdBy: user1.id,
+    },
+  })
+
+  // TechFlow Startup Assets
+  const techflowBrandAsset = await prisma.brandAsset.create({
+    data: {
+      brandId: brand2.id,
+      name: 'TechFlow Brand Guidelines',
+      description: 'Complete brand guidelines document',
+      type: 'BRAND_GUIDELINES',
+      category: 'Documentation',
+      fileUrl: '/assets/brands/techflow/brand-guidelines.pdf',
+      fileName: 'techflow-brand-guidelines.pdf',
+      fileSize: 2845600,
+      mimeType: 'application/pdf',
+      metadata: {
+        pages: 24,
+        version: '2.1'
       },
-      messaging: {
-        tone: 'Inspiring and authentic',
-        voice: 'Passionate and knowledgeable',
-        key_messages: [
-          'Sustainability without compromise',
-          'Every choice makes a difference',
-          'Building a better tomorrow'
-        ],
-        tagline: 'Naturally Better'
-      }
+      tags: ['guidelines', 'documentation', 'brand'],
+      version: '2.1',
+      createdBy: user2.id,
+    },
+  })
+
+  const techflowColorPalette = await prisma.colorPalette.create({
+    data: {
+      brandId: brand2.id,
+      name: 'TechFlow Energetic Palette',
+      description: 'Vibrant color palette reflecting innovation and energy',
+      colors: [
+        { name: 'TechFlow Green', hex: '#10B981', rgb: '16, 185, 129', usage: 'Primary brand color' },
+        { name: 'Light Green', hex: '#34D399', rgb: '52, 211, 153', usage: 'Call-to-action buttons' },
+        { name: 'Mint Green', hex: '#A7F3D0', rgb: '167, 243, 208', usage: 'Backgrounds and highlights' },
+        { name: 'Charcoal', hex: '#374151', rgb: '55, 65, 81', usage: 'Headers and important text' },
+        { name: 'Gray', hex: '#9CA3AF', rgb: '156, 163, 175', usage: 'Supporting text' },
+        { name: 'Off White', hex: '#F3F4F6', rgb: '243, 244, 246', usage: 'Backgrounds' }
+      ],
+      isPrimary: true,
+      createdBy: user2.id,
+    },
+  })
+
+  // EcoGreen Solutions Assets
+  const ecoLogo = await prisma.brandAsset.create({
+    data: {
+      brandId: brand3.id,
+      name: 'EcoGreen Leaf Logo',
+      description: 'Iconic leaf logo representing natural solutions',
+      type: 'LOGO',
+      category: 'Primary Identity',
+      fileUrl: '/assets/brands/ecogreen/logo-leaf.svg',
+      fileName: 'ecogreen-logo-leaf.svg',
+      fileSize: 8950,
+      mimeType: 'image/svg+xml',
+      metadata: {
+        dimensions: '300x300',
+        colorMode: 'RGB',
+        hasTransparency: true,
+        symbolism: 'Leaf represents growth and sustainability'
+      },
+      tags: ['logo', 'leaf', 'nature', 'sustainable'],
+      version: '1.0',
+      createdBy: user1.id,
+    },
+  })
+
+  const ecoColorPalette = await prisma.colorPalette.create({
+    data: {
+      brandId: brand3.id,
+      name: 'EcoGreen Natural Palette',
+      description: 'Earth-inspired colors reflecting sustainability',
+      colors: [
+        { name: 'Forest Green', hex: '#059669', rgb: '5, 150, 105', usage: 'Primary brand color' },
+        { name: 'Bright Green', hex: '#34D399', rgb: '52, 211, 153', usage: 'Accents and highlights' },
+        { name: 'Mint', hex: '#D1FAE5', rgb: '209, 250, 229', usage: 'Soft backgrounds' },
+        { name: 'Earth Brown', hex: '#92400E', rgb: '146, 64, 14', usage: 'Natural contrast' },
+        { name: 'Warm Yellow', hex: '#F59E0B', rgb: '245, 158, 11', usage: 'Energy and optimism' },
+        { name: 'Light Cream', hex: '#FDE68A', rgb: '253, 230, 138', usage: 'Warm backgrounds' }
+      ],
+      isPrimary: true,
+      createdBy: user1.id,
     },
   })
 
@@ -747,7 +939,10 @@ async function main() {
   console.log(`
 📊 Seeding Summary:
 - 👤 Users: 2
-- 🏢 Brands: 3
+- 🏢 Brands: 3 (with comprehensive profiles)
+- 🎨 Brand Assets: 4
+- 🎨 Color Palettes: 3
+- 📝 Typography: 1
 - 📈 Campaigns: 5
 - 🗺️ Journeys: 3
 - 📝 Content: 3
