@@ -14,11 +14,14 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    platform = params[:platform]&.to_s || 'general'
-    tone = params[:tone]&.to_s || 'professional'
-    topic = params[:topic] || 'marketing campaign'
-    character_limit = params[:character_limit] || platform_character_limits[platform] || platform_character_limits['general']
-    brand_context = params[:brand_context] || {}
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    platform = (params[:platform] || params['platform'])&.to_s || 'general'
+    tone = (params[:tone] || params['tone'])&.to_s || 'professional'
+    topic = params[:topic] || params['topic'] || 'marketing campaign'
+    character_limit = params[:character_limit] || params['character_limit'] || platform_character_limits[platform] || platform_character_limits['general']
+    brand_context = params[:brand_context] || params['brand_context'] || {}
 
     # Apply brand context to tone and content
     effective_tone = apply_brand_voice(tone, brand_context)
@@ -42,10 +45,13 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    email_type = params[:email_type] || 'promotional'
-    subject_topic = params[:subject] || 'marketing campaign'
-    tone = params[:tone] || 'professional'
-    brand_context = params[:brand_context] || {}
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    email_type = params[:email_type] || params['email_type'] || 'promotional'
+    subject_topic = params[:subject] || params['subject'] || 'marketing campaign'
+    tone = params[:tone] || params['tone'] || 'professional'
+    brand_context = params[:brand_context] || params['brand_context'] || {}
 
     # Apply brand context to tone and content
     effective_tone = apply_brand_voice(tone, brand_context)
@@ -69,10 +75,13 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    ad_type = params[:ad_type] || 'search'
-    platform = params[:platform] || 'google'
-    objective = params[:objective] || 'conversions'
-    brand_context = params[:brand_context] || {}
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    ad_type = params[:ad_type] || params['ad_type'] || 'search'
+    platform = params[:platform] || params['platform'] || 'google'
+    objective = params[:objective] || params['objective'] || 'conversions'
+    brand_context = params[:brand_context] || params['brand_context'] || {}
 
     # Apply brand context to content generation
     headline, description, cta = generate_ad_parts(ad_type, platform, objective, brand_context)
@@ -96,10 +105,13 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    page_type = params[:page_type] || 'product'
-    objective = params[:objective] || 'conversion'
-    key_features = params[:key_features] || []
-    brand_context = params[:brand_context] || {}
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    page_type = params[:page_type] || params['page_type'] || 'product'
+    objective = params[:objective] || params['objective'] || 'conversion'
+    key_features = params[:key_features] || params['key_features'] || []
+    brand_context = params[:brand_context] || params['brand_context'] || {}
 
     # Apply brand context to content generation
     headline, subheadline, body, cta = generate_landing_page_parts(page_type, objective, key_features, brand_context)
@@ -124,9 +136,12 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    campaign_type = params[:campaign_type] || 'product_launch'
-    objective = params[:objective] || 'brand_awareness'
-    brand_context = params[:brand_context] || {}
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    campaign_type = params[:campaign_type] || params['campaign_type'] || 'product_launch'
+    objective = params[:objective] || params['objective'] || 'brand_awareness'
+    brand_context = params[:brand_context] || params['brand_context'] || {}
 
     # Apply brand context to campaign planning
     summary, strategy, timeline, assets = generate_campaign_parts(campaign_type, objective, brand_context)
@@ -150,9 +165,12 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    original_content = params[:original_content] || 'Original content'
-    content_type = params[:content_type] || 'social_media'
-    variant_count = [params[:variant_count] || 3, 10].min # Max 10 variants
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    original_content = params[:original_content] || params['original_content'] || 'Original content'
+    content_type = params[:content_type] || params['content_type'] || 'social_media'
+    variant_count = [params[:variant_count] || params['variant_count'] || 3, 10].min # Max 10 variants
 
     variations = generate_variations(original_content, content_type, variant_count)
 
@@ -174,8 +192,11 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    content = params[:content] || 'Sample content'
-    content_type = params[:content_type] || 'general'
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    content = params[:content] || params['content'] || 'Sample content'
+    content_type = params[:content_type] || params['content_type'] || 'general'
     
     optimized_content, changes = generate_optimizations(content, content_type)
 
@@ -195,7 +216,10 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    content = params[:content] || ''
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    content = params[:content] || params['content'] || ''
     
     # Simulate brand compliance checking
     issues = simulate_brand_issues(content)
@@ -218,8 +242,11 @@ class MockLlmService
     simulate_delay
     simulate_error if should_simulate_error?
 
-    time_period = params[:time_period] || '30_days'
-    metrics = params[:metrics] || ['impressions', 'clicks', 'conversions']
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    time_period = params[:time_period] || params['time_period'] || '30_days'
+    metrics = params[:metrics] || params['metrics'] || ['impressions', 'clicks', 'conversions']
 
     insights, recommendations = generate_mock_insights(time_period, metrics)
 

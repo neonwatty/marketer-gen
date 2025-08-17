@@ -235,7 +235,7 @@
             "description": "Design and implement the GeneratedContent model to store all content pieces with version control capabilities, content type classification, format variants, and relationships to campaign plans.",
             "dependencies": [],
             "details": "Create GeneratedContent model with fields for content_type (email, social_post, blog_article, ad_copy, etc.), title, body_content, format_variant (short, medium, long), status (draft, approved, published, archived), version_number, original_content_id (for tracking version history), campaign_plan_id (foreign key), created_by_user_id, approved_by_user_id, and metadata (JSON field for platform-specific settings). Include database migration with proper indexes on frequently queried fields (content_type, status, campaign_plan_id, version_number). Set up ActiveRecord associations: belongs_to :campaign_plan, belongs_to :creator (User), belongs_to :approver (User, optional), has_many :content_versions (self-referential for version history). Implement model validations for required fields and content length constraints. Add scope methods for filtering by type, status, and campaign. Include soft delete functionality with deleted_at timestamp.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Model Tests using ActiveSupport::TestCase: Test validations for all required fields (content_type, title, body_content) using assert_valid and refute_valid. Test associations with campaign_plan and user models using assert_respond_to and assert_instance_of. Test scope methods for filtering (by_content_type, by_status, by_campaign) using assert_equal for result counts. Test version tracking methods with assert_changes for version increments. Migration Tests: Test database schema creation with assert_difference for table existence, verify index creation for performance optimization, test foreign key constraints with assert_raises for invalid references. Validation Tests: Test content length constraints, format validation for content_type enum values, uniqueness constraints where applicable. Factory/Fixture Tests: Create comprehensive test data covering all content types and statuses for reliable test scenarios."
           },
           {
@@ -870,7 +870,7 @@
     ],
     "metadata": {
       "created": "2025-07-22T14:53:58.395Z",
-      "updated": "2025-08-17T12:40:20.782Z",
+      "updated": "2025-08-17T15:38:38.848Z",
       "description": "Tasks for master context"
     }
   }

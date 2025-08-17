@@ -96,8 +96,8 @@ class GeneratedContentTest < ActiveSupport::TestCase
   end
 
   test "should calculate word count" do
-    @generated_content.body_content = "This is a test with ten words exactly here."
-    assert_equal 10, @generated_content.word_count
+    @generated_content.body_content = "This is a test with exactly ten words total."
+    assert_equal 9, @generated_content.word_count
   end
 
   test "should calculate character count" do
@@ -149,7 +149,7 @@ class GeneratedContentTest < ActiveSupport::TestCase
     
     assert result
     assert @generated_content.approved?
-    assert_equal @user, @generated_content.approver
+    assert_equal @user.id, @generated_content.approved_by_id
   end
 
   test "should reject content with reason" do
@@ -216,7 +216,7 @@ class GeneratedContentTest < ActiveSupport::TestCase
 
   test "should search content by title and body" do
     @generated_content.title = "Unique Email Title"
-    @generated_content.body_content = "This contains unique keyword somewhere in the text."
+    @generated_content.body_content = "This contains unique keyword somewhere in the text with enough characters to meet the standard format validation requirements which need at least 100 characters total."
     @generated_content.save!
     
     results = GeneratedContent.search_content("unique")
@@ -237,7 +237,7 @@ class GeneratedContentTest < ActiveSupport::TestCase
   test "should set platform settings" do
     @generated_content.save!
     
-    twitter_settings = { character_limit: 280, hashtags: ['#marketing'] }
+    twitter_settings = { 'character_limit' => 280, 'hashtags' => ['#marketing'] }
     @generated_content.set_platform_settings('twitter', twitter_settings)
     
     assert_equal twitter_settings, @generated_content.platform_settings('twitter')

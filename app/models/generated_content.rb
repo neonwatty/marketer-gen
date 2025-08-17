@@ -169,9 +169,14 @@ class GeneratedContent < ApplicationRecord
   
   def next_version_number
     if original_version?
-      content_versions.maximum(:version_number).to_i + 1
+      # For original content, the next version should be current version + 1
+      # If no versions exist yet, start from 2 (since original is 1)
+      max_version = content_versions.maximum(:version_number) || 1
+      max_version + 1
     else
-      original_content.content_versions.maximum(:version_number).to_i + 1
+      # For version content, get the max from all versions of the original
+      max_version = original_content.content_versions.maximum(:version_number) || original_content.version_number
+      max_version + 1
     end
   end
   
@@ -196,7 +201,7 @@ class GeneratedContent < ApplicationRecord
     return false unless in_review?
     update!(
       status: 'approved',
-      approved_by: user,
+      approved_by_id: user.id,
       metadata: (metadata || {}).merge(approved_at: Time.current)
     )
   end
@@ -283,8 +288,9 @@ class GeneratedContent < ApplicationRecord
   def self.search_content(query)
     return all if query.blank?
     
+    # Use LIKE for SQLite compatibility (case-insensitive search will work)
     where(
-      'title ILIKE ? OR body_content ILIKE ?',
+      'LOWER(title) LIKE LOWER(?) OR LOWER(body_content) LIKE LOWER(?)',
       "%#{query}%", "%#{query}%"
     )
   end
