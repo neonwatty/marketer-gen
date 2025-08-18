@@ -337,16 +337,19 @@ describe('Shadcn UI Build Integration', () => {
       const buildDir = path.join(process.cwd(), '.next')
       
       if (fs.existsSync(buildDir)) {
-        const getDirectorySize = (dirPath: string): number => {
+        const getDirectorySize = (dirPath: string, excludeDirs: string[] = []): number => {
           let totalSize = 0
           
           if (!fs.existsSync(dirPath)) return 0
           
           const items = fs.readdirSync(dirPath, { withFileTypes: true })
           for (const item of items) {
+            // Skip excluded directories (like cache)
+            if (excludeDirs.includes(item.name)) continue
+            
             const fullPath = path.join(dirPath, item.name)
             if (item.isDirectory()) {
-              totalSize += getDirectorySize(fullPath)
+              totalSize += getDirectorySize(fullPath, excludeDirs)
             } else if (item.isFile()) {
               totalSize += fs.statSync(fullPath).size
             }
@@ -355,10 +358,11 @@ describe('Shadcn UI Build Integration', () => {
           return totalSize
         }
         
-        const buildSize = getDirectorySize(buildDir)
+        // Exclude cache directory from size calculation as it's only for development
+        const buildSize = getDirectorySize(buildDir, ['cache'])
         
-        // Build size should be reasonable (less than 400MB for app with Shadcn components)
-        expect(buildSize).toBeLessThan(400 * 1024 * 1024) // 400MB
+        // Build size should be reasonable (less than 50MB for production bundle with Shadcn components)
+        expect(buildSize).toBeLessThan(50 * 1024 * 1024) // 50MB
       }
     })
   })

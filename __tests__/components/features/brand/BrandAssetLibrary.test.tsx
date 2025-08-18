@@ -114,9 +114,9 @@ describe('BrandAssetLibrary', () => {
     it('should render all assets in grid view by default', () => {
       render(<BrandAssetLibrary {...defaultProps} />)
       
-      expect(screen.getByText('Primary Logo')).toBeInTheDocument()
-      expect(screen.getByText('Brand Colors')).toBeInTheDocument()
-      expect(screen.getByText('Social Icons')).toBeInTheDocument()
+      expect(screen.getAllByText('Primary Logo')[0]).toBeInTheDocument()
+      expect(screen.getAllByText('Brand Colors')[0]).toBeInTheDocument()
+      expect(screen.getAllByText('Social Icons')[0]).toBeInTheDocument()
       
       // Should show asset count
       expect(screen.getByText('3 of 3 assets')).toBeInTheDocument()
@@ -175,7 +175,7 @@ describe('BrandAssetLibrary', () => {
       await user.type(searchInput, 'logo')
       
       await waitFor(() => {
-        expect(screen.getByText('Primary Logo')).toBeInTheDocument()
+        expect(screen.getAllByText('Primary Logo')[0]).toBeInTheDocument()
         expect(screen.queryByText('Brand Colors')).not.toBeInTheDocument()
         expect(screen.queryByText('Social Icons')).not.toBeInTheDocument()
         expect(screen.getByText('1 of 3 assets')).toBeInTheDocument()
@@ -192,7 +192,7 @@ describe('BrandAssetLibrary', () => {
       await user.type(searchInput, 'social media')
       
       await waitFor(() => {
-        expect(screen.getByText('Social Icons')).toBeInTheDocument()
+        expect(screen.getAllByText('Social Icons')[0]).toBeInTheDocument()
         expect(screen.queryByText('Primary Logo')).not.toBeInTheDocument()
         expect(screen.queryByText('Brand Colors')).not.toBeInTheDocument()
       })
@@ -204,12 +204,12 @@ describe('BrandAssetLibrary', () => {
       
       const searchInput = screen.getByPlaceholderText('Search assets...')
       
-      // Search for tag
-      await user.type(searchInput, 'primary')
+      // Search for a tag that's unique to the Brand Colors asset
+      await user.type(searchInput, 'palette')
       
       await waitFor(() => {
-        expect(screen.getByText('Primary Logo')).toBeInTheDocument()
-        expect(screen.queryByText('Brand Colors')).not.toBeInTheDocument()
+        expect(screen.getAllByText('Brand Colors')[0]).toBeInTheDocument()
+        expect(screen.queryByText('Primary Logo')).not.toBeInTheDocument()
         expect(screen.queryByText('Social Icons')).not.toBeInTheDocument()
       })
     })
@@ -236,15 +236,16 @@ describe('BrandAssetLibrary', () => {
       render(<BrandAssetLibrary {...defaultProps} />)
       
       // Find and click the type filter dropdown
-      const typeFilter = screen.getByDisplayValue('All Types')
+      const typeFilter = screen.getByRole('combobox', { name: 'Filter by asset type' })
       await user.click(typeFilter)
       
-      // Select LOGO type
-      const logoOption = screen.getByText('Logo')
-      await user.click(logoOption)
+      // Select LOGO type from the dropdown (not the badge)
+      const logoOptions = screen.getAllByText('Logo')
+      const logoDropdownOption = logoOptions.find(option => option.id?.includes('radix-'))
+      await user.click(logoDropdownOption!)
       
       await waitFor(() => {
-        expect(screen.getByText('Primary Logo')).toBeInTheDocument()
+        expect(screen.getAllByText('Primary Logo')[0]).toBeInTheDocument()
         expect(screen.queryByText('Brand Colors')).not.toBeInTheDocument()
         expect(screen.queryByText('Social Icons')).not.toBeInTheDocument()
         expect(screen.getByText('1 of 3 assets')).toBeInTheDocument()
@@ -257,7 +258,7 @@ describe('BrandAssetLibrary', () => {
       render(<BrandAssetLibrary {...defaultProps} />)
       
       // Should show category filter dropdown
-      expect(screen.getByDisplayValue('All Categories')).toBeInTheDocument()
+      expect(screen.getByRole('combobox', { name: 'Filter by category' })).toBeInTheDocument()
     })
 
     it('should filter assets by category', async () => {
@@ -265,15 +266,16 @@ describe('BrandAssetLibrary', () => {
       render(<BrandAssetLibrary {...defaultProps} />)
       
       // Find and click the category filter dropdown
-      const categoryFilter = screen.getByDisplayValue('All Categories')
+      const categoryFilter = screen.getByRole('combobox', { name: 'Filter by category' })
       await user.click(categoryFilter)
       
-      // Select Primary Colors category
-      const primaryColorsOption = screen.getByText('Primary Colors')
-      await user.click(primaryColorsOption)
+      // Select Primary Colors category from the dropdown
+      const primaryColorsOptions = screen.getAllByText('Primary Colors')
+      const primaryColorsDropdownOption = primaryColorsOptions.find(option => option.id?.includes('radix-'))
+      await user.click(primaryColorsDropdownOption!)
       
       await waitFor(() => {
-        expect(screen.getByText('Brand Colors')).toBeInTheDocument()
+        expect(screen.getAllByText('Brand Colors')[0]).toBeInTheDocument()
         expect(screen.queryByText('Primary Logo')).not.toBeInTheDocument()
         expect(screen.queryByText('Social Icons')).not.toBeInTheDocument()
         expect(screen.getByText('1 of 3 assets')).toBeInTheDocument()

@@ -173,12 +173,16 @@ describe("/api/brands/[id]/assets/parse", () => {
       expect(body.extractedData.guidelines).toBeDefined()
       
       // Check that colors were extracted
-      expect(body.extractedData.colors).toContain("#007bff")
-      expect(body.extractedData.colors).toContain("#28a745")
+      expect(body.extractedData.colors.some((color: any) => 
+        color.hex === "#007BFF"
+      )).toBe(true)
+      expect(body.extractedData.colors.some((color: any) => 
+        color.hex === "#28A745"
+      )).toBe(true)
       
       // Check that fonts were extracted
-      expect(body.extractedData.fonts.some((font: string) => 
-        font.toLowerCase().includes("helvetica")
+      expect(body.extractedData.fonts.some((font: any) => 
+        font.family.toLowerCase().includes("helvetica")
       )).toBe(true)
       
       // Check that voice data was extracted
@@ -202,7 +206,13 @@ describe("/api/brands/[id]/assets/parse", () => {
       const body = await response.json()
       
       expect(body.extractedData.colors).toEqual(
-        expect.arrayContaining(["#007bff", "#28a745", "#dc3545", "#6c757d", "#f8f9fa"])
+        expect.arrayContaining([
+          expect.objectContaining({ hex: "#007BFF" }),
+          expect.objectContaining({ hex: "#28A745" }),
+          expect.objectContaining({ hex: "#DC3545" }),
+          expect.objectContaining({ hex: "#6C757D" }),
+          expect.objectContaining({ hex: "#F8F9FA" })
+        ])
       )
     })
 
@@ -221,11 +231,11 @@ describe("/api/brands/[id]/assets/parse", () => {
       const response = await POST(request, { params: Promise.resolve({ id: "brand-1" }) })
       const body = await response.json()
       
-      expect(body.extractedData.fonts.some((font: string) => 
-        font.toLowerCase().includes("helvetica")
+      expect(body.extractedData.fonts.some((font: any) => 
+        font.family.toLowerCase().includes("helvetica")
       )).toBe(true)
-      expect(body.extractedData.fonts.some((font: string) => 
-        font.toLowerCase().includes("source sans")
+      expect(body.extractedData.fonts.some((font: any) => 
+        font.family.toLowerCase().includes("source sans")
       )).toBe(true)
     })
 

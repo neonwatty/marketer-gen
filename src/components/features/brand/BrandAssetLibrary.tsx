@@ -193,7 +193,7 @@ export function BrandAssetLibrary({
           <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-48 bg-gray-200 rounded"></div>
+              <div key={i} className="h-48 bg-gray-200 rounded" data-testid="loading-skeleton"></div>
             ))}
           </div>
         </div>
@@ -237,7 +237,7 @@ export function BrandAssetLibrary({
             <div className="flex items-center gap-2">
               {/* Type Filter */}
               <Select value={selectedType} onValueChange={(value) => setSelectedType(value as BrandAssetType | "all")}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40" aria-label="Filter by asset type">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
@@ -253,7 +253,7 @@ export function BrandAssetLibrary({
               {/* Category Filter */}
               {categories.length > 0 && (
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="w-40" aria-label="Filter by category">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
@@ -274,16 +274,24 @@ export function BrandAssetLibrary({
                   size="sm"
                   onClick={() => setViewMode("grid")}
                   className="rounded-r-none"
+                  aria-label="grid-view"
+                  aria-pressed={viewMode === "grid"}
+                  title="Grid View"
                 >
                   <Grid className="h-4 w-4" />
+                  <span className="sr-only">Grid View</span>
                 </Button>
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("list")}
                   className="rounded-l-none"
+                  aria-label="list-view"
+                  aria-pressed={viewMode === "list"}
+                  title="List View"
                 >
                   <List className="h-4 w-4" />
+                  <span className="sr-only">List View</span>
                 </Button>
               </div>
             </div>
@@ -398,7 +406,7 @@ function AssetCard({
   }
 
   return (
-    <Card className="group hover:shadow-md transition-shadow">
+    <Card className="group hover:shadow-md transition-shadow" role="article">
       <CardContent className="p-4">
         <div className="space-y-3">
           {/* Preview Area */}

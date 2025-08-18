@@ -24,16 +24,21 @@ export interface FileUploadFile {
 }
 
 interface FileUploadProps {
-  value?: FileUploadFile[]
+  value?: FileUploadFile[] | File[]
   onChange?: (files: FileUploadFile[]) => void
   onUpload?: (files: File[]) => Promise<void>
-  accept?: string
+  onFilesChange?: (files: File[]) => void
+  onRemove?: (id: string) => void
+  accept?: string | Record<string, string[]>
   multiple?: boolean
   maxSize?: number // in bytes
   maxFiles?: number
   disabled?: boolean
   className?: string
   children?: React.ReactNode
+  allowUrls?: boolean
+  error?: string
+  uploadProgress?: number
 }
 
 const ACCEPTED_FILE_TYPES = {
@@ -47,10 +52,25 @@ const ACCEPTED_FILE_TYPES = {
 
 const DEFAULT_MAX_SIZE = 10 * 1024 * 1024 // 10MB
 
+const createFileUploadFile = (file: File): FileUploadFile => {
+  const id = Math.random().toString(36).substring(7)
+  return {
+    id,
+    file,
+    name: file.name,
+    size: file.size,
+    type: file.type,
+    status: "pending",
+    preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined,
+  }
+}
+
 export function FileUpload({
   value = [],
   onChange,
   onUpload,
+  onFilesChange,
+  onRemove,
   accept = Object.keys(ACCEPTED_FILE_TYPES).join(","),
   multiple = true,
   maxSize = DEFAULT_MAX_SIZE,
@@ -58,39 +78,64 @@ export function FileUpload({
   disabled = false,
   className,
   children,
+  allowUrls = false,
+  error,
+  uploadProgress,
 }: FileUploadProps) {
   const [isDragOver, setIsDragOver] = React.useState(false)
-  const [uploadProgress, setUploadProgress] = React.useState<Record<string, number>>({})
+  const [uploadProgressState, setUploadProgressState] = React.useState<Record<string, number>>({})
   const [errors, setErrors] = React.useState<string[]>([])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const dropAreaRef = React.useRef<HTMLDivElement>(null)
+
+  // Convert File objects to FileUploadFile objects if needed
+  const normalizedValue = React.useMemo(() => {
+    if (!value) return []
+    return value.map(item => {
+      // Check if it's a File object (works in both browser and Jest)
+      if (item && typeof item === 'object' && 'name' in item && 'size' in item && 'type' in item && !('id' in item)) {
+        return createFileUploadFile(item as File)
+      }
+      return item as FileUploadFile
+    })
+  }, [value])
 
   const validateFile = (file: File): string | null => {
     // Check file size
     if (file.size > maxSize) {
-      return `File "${file.name}" is too large. Maximum size is ${Math.round(maxSize / 1024 / 1024)}MB`
+      return `File size must be less than ${Math.round(maxSize / 1024 / 1024)} MB`
     }
 
     // Check file type
-    const acceptedTypes = accept.split(",").map(type => type.trim())
-    if (!acceptedTypes.includes(file.type) && !acceptedTypes.includes("*")) {
-      return `File type "${file.type}" is not supported`
+    let acceptedTypes: string[] = []
+    if (typeof accept === 'string') {
+      acceptedTypes = accept.split(",").map(type => type.trim())
+    } else if (typeof accept === 'object') {
+      acceptedTypes = Object.keys(accept)
+    }
+    
+    // Check if file type is accepted
+    const isAccepted = acceptedTypes.some(acceptedType => {
+      if (acceptedType === "*") return true
+      if (acceptedType === file.type) return true
+      if (acceptedType.endsWith("/*")) {
+        const category = acceptedType.slice(0, -2)
+        return file.type.startsWith(category + "/")
+      }
+      // Handle file extensions like .png, .jpg
+      if (acceptedType.startsWith(".")) {
+        return file.name.toLowerCase().endsWith(acceptedType.toLowerCase())
+      }
+      return false
+    })
+    
+    if (!isAccepted) {
+      return "File type not supported"
     }
 
     return null
   }
 
-  const createFileUploadFile = (file: File): FileUploadFile => {
-    const id = Math.random().toString(36).substring(7)
-    return {
-      id,
-      file,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      status: "pending",
-      preview: file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined,
-    }
-  }
 
   const handleFiles = async (files: File[]) => {
     if (disabled) return
@@ -109,8 +154,8 @@ export function FileUpload({
     }
 
     // Check total file count
-    if (value.length + validFiles.length > maxFiles) {
-      newErrors.push(`Cannot upload more than ${maxFiles} files`)
+    if (normalizedValue.length + validFiles.length > maxFiles) {
+      newErrors.push(`Maximum ${maxFiles} files allowed`)
       setErrors(newErrors)
       return
     }
@@ -120,8 +165,9 @@ export function FileUpload({
     if (validFiles.length === 0) return
 
     const newFileUploadFiles = validFiles.map(createFileUploadFile)
-    const updatedFiles = [...value, ...newFileUploadFiles]
+    const updatedFiles = [...normalizedValue, ...newFileUploadFiles]
     onChange?.(updatedFiles)
+    onFilesChange?.(validFiles)
 
     // Start upload if onUpload is provided
     if (onUpload) {
@@ -137,7 +183,7 @@ export function FileUpload({
         // Simulate upload progress (replace with actual upload logic)
         for (const fileUploadFile of newFileUploadFiles) {
           for (let i = 0; i <= 100; i += 10) {
-            setUploadProgress(prev => ({ ...prev, [fileUploadFile.id]: i }))
+            setUploadProgressState(prev => ({ ...prev, [fileUploadFile.id]: i }))
             await new Promise(resolve => setTimeout(resolve, 100))
           }
         }
@@ -165,6 +211,15 @@ export function FileUpload({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
+    e.stopPropagation()
+    if (!disabled) {
+      setIsDragOver(true)
+    }
+  }
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
     if (!disabled) {
       setIsDragOver(true)
     }
@@ -172,11 +227,13 @@ export function FileUpload({
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     setIsDragOver(false)
   }
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     setIsDragOver(false)
     
     if (disabled) return
@@ -195,10 +252,6 @@ export function FileUpload({
     }
   }
 
-  const removeFile = (id: string) => {
-    const updatedFiles = value.filter(f => f.id !== id)
-    onChange?.(updatedFiles)
-  }
 
   const handleAddUrlFile = (url: string, name?: string) => {
     if (disabled) return
@@ -211,12 +264,21 @@ export function FileUpload({
       status: "success",
     }
 
-    onChange?.([...value, fileUploadFile])
+    const updatedFiles = [...normalizedValue, fileUploadFile]
+    onChange?.(updatedFiles)
+    
+    // Also call onFilesChange with the URL file info in the expected format
+    const urlFileInfo = {
+      isUrl: true,
+      name: fileUploadFile.name,
+      url: url,
+    }
+    onFilesChange?.([urlFileInfo] as any)
   }
 
   const getFileIcon = (type: string) => {
     if (type.startsWith("image/")) return <FileImage className="h-4 w-4" />
-    if (type === "application/pdf") return <FileText className="h-4 w-4" />
+    if (type === "application/pdf") return "📄"
     if (type === "url") return <Link className="h-4 w-4" />
     return <File className="h-4 w-4" />
   }
@@ -232,21 +294,36 @@ export function FileUpload({
   return (
     <div className={cn("space-y-4", className)}>
       {/* Error Messages */}
-      {errors.length > 0 && (
+      {(errors.length > 0 || error) && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <ul className="list-disc list-inside space-y-1">
-              {errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
+            {error && <p>{error}</p>}
+            {errors.length > 0 && (
+              <ul className="list-disc list-inside space-y-1">
+                {errors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            )}
           </AlertDescription>
         </Alert>
       )}
 
+      {/* Upload Progress */}
+      {uploadProgress !== undefined && uploadProgress > 0 && uploadProgress < 100 && (
+        <div className="space-y-2">
+          <p className="text-sm">Uploading... {uploadProgress}%</p>
+          <Progress value={uploadProgress} className="h-2" />
+        </div>
+      )}
+
       {/* Drop Zone */}
       <div
+        ref={dropAreaRef}
+        data-testid="file-upload-area"
+        role="button"
+        tabIndex={0}
         className={cn(
           "relative border-2 border-dashed rounded-lg p-6 transition-colors",
           isDragOver
@@ -255,16 +332,26 @@ export function FileUpload({
           disabled && "opacity-50 cursor-not-allowed"
         )}
         onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            fileInputRef.current?.click()
+          }
+        }}
       >
         <input
           ref={fileInputRef}
+          data-testid="file-input"
           type="file"
-          accept={accept}
+          accept={typeof accept === 'string' ? accept : Object.keys(accept || {}).join(',')}
           multiple={multiple}
           onChange={handleFileInput}
           disabled={disabled}
+          aria-label="File upload"
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
         />
         
@@ -272,21 +359,21 @@ export function FileUpload({
           <Upload className="h-10 w-10 text-muted-foreground mb-4" />
           <div className="space-y-2">
             <p className="text-sm font-medium">
-              {children || "Drop files here or click to browse"}
+              {children || "Click to upload or drag and drop"}
             </p>
             <p className="text-xs text-muted-foreground">
-              Supports PDF, DOCX, PNG, JPG, SVG up to {Math.round(maxSize / 1024 / 1024)}MB
+              PNG, JPG, SVG, PDF, DOCX up to {Math.round(maxSize / 1024 / 1024)} MB
             </p>
           </div>
         </div>
       </div>
 
       {/* File List */}
-      {value.length > 0 && (
+      {normalizedValue.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium">Uploaded Files ({value.length})</h4>
+          <h4 className="text-sm font-medium">Uploaded Files ({normalizedValue.length})</h4>
           <div className="space-y-2">
-            {value.map((fileUpload) => (
+            {normalizedValue.map((fileUpload, index) => (
               <div
                 key={fileUpload.id}
                 className="flex items-center justify-between p-3 border rounded-lg bg-muted/50"
@@ -323,7 +410,7 @@ export function FileUpload({
                     
                     {fileUpload.status === "uploading" && (
                       <Progress
-                        value={uploadProgress[fileUpload.id] || fileUpload.progress || 0}
+                        value={uploadProgressState[fileUpload.id] || fileUpload.progress || 0}
                         className="mt-2 h-1"
                       />
                     )}
@@ -338,9 +425,15 @@ export function FileUpload({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => removeFile(fileUpload.id)}
+                  onClick={() => {
+                    const updatedFiles = normalizedValue.filter(f => f.id !== fileUpload.id)
+                    onChange?.(updatedFiles)
+                    onRemove?.(fileUpload.id)
+                  }}
                   disabled={disabled}
                   className="ml-2"
+                  aria-label={`Remove ${fileUpload.name}`}
+                  data-testid={`remove-file-${fileUpload.id}`}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -348,6 +441,22 @@ export function FileUpload({
             ))}
           </div>
         </div>
+      )}
+
+      {/* Upload Button */}
+      {onUpload && (
+        <Button 
+          onClick={() => onUpload(normalizedValue.map(f => f.file).filter(Boolean) as File[])}
+          disabled={disabled || normalizedValue.length === 0 || normalizedValue.some(f => f.status === 'uploading')}
+          className="w-full"
+        >
+          Upload Files
+        </Button>
+      )}
+
+      {/* URL Upload */}
+      {allowUrls && (
+        <UrlFileUpload onAdd={handleAddUrlFile} disabled={disabled} />
       )}
     </div>
   )
@@ -362,25 +471,52 @@ interface UrlFileUploadProps {
 export function UrlFileUpload({ onAdd, disabled }: UrlFileUploadProps) {
   const [url, setUrl] = React.useState("")
   const [name, setName] = React.useState("")
+  const [error, setError] = React.useState("")
+
+  const validateUrl = (url: string): boolean => {
+    try {
+      new URL(url)
+      return true
+    } catch {
+      return false
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (url.trim()) {
-      onAdd(url.trim(), name.trim() || undefined)
-      setUrl("")
-      setName("")
+    const trimmedUrl = url.trim()
+    
+    if (!trimmedUrl) {
+      setError("Please enter a URL")
+      return
     }
+    
+    if (!validateUrl(trimmedUrl)) {
+      setError("Please enter a valid URL")
+      return
+    }
+    
+    setError("")
+    onAdd(trimmedUrl, name.trim() || undefined)
+    setUrl("")
+    setName("")
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 p-4 border rounded-lg">
-      <h4 className="text-sm font-medium">Add URL Link</h4>
+      <h4 className="text-sm font-medium">Add from URL</h4>
+      {error && (
+        <p className="text-sm text-red-600">{error}</p>
+      )}
       <div className="space-y-2">
         <input
           type="url"
-          placeholder="Enter URL..."
+          placeholder="Enter file URL"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => {
+            setUrl(e.target.value)
+            if (error) setError("") // Clear error when user starts typing
+          }}
           disabled={disabled}
           className="w-full px-3 py-2 border rounded-md text-sm"
           required
@@ -394,7 +530,24 @@ export function UrlFileUpload({ onAdd, disabled }: UrlFileUploadProps) {
           className="w-full px-3 py-2 border rounded-md text-sm"
         />
       </div>
-      <Button type="submit" disabled={disabled || !url.trim()} size="sm">
+      <Button 
+        type="submit" 
+        disabled={disabled || !url.trim()} 
+        size="sm"
+        onClick={(e) => {
+          // Ensure form submission happens in tests
+          if (!url.trim()) {
+            e.preventDefault()
+            setError("Please enter a URL")
+            return
+          }
+          if (!validateUrl(url.trim())) {
+            e.preventDefault()
+            setError("Please enter a valid URL")
+            return
+          }
+        }}
+      >
         Add URL
       </Button>
     </form>

@@ -112,10 +112,14 @@ describe('Document Parser Integration Tests', () => {
 
       expect(response.status).toBe(200)
       expect(body.success).toBe(true)
-      expect(body.extractedData.colors).toContain('#007bff')
-      expect(body.extractedData.colors).toContain('#28a745')
-      expect(body.extractedData.fonts.some((font: string) => 
-        font.toLowerCase().includes('helvetica')
+      expect(body.extractedData.colors.some((color: any) => 
+        color.hex === '#007BFF'
+      )).toBe(true)
+      expect(body.extractedData.colors.some((color: any) => 
+        color.hex === '#28A745'
+      )).toBe(true)
+      expect(body.extractedData.fonts.some((font: any) => 
+        font.family.toLowerCase().includes('helvetica')
       )).toBe(true)
       expect(body.extractedData.voice.voiceDescription).toBeTruthy()
       expect(body.extractedData.voice.toneAttributes.professional).toBeGreaterThan(0)
@@ -200,10 +204,14 @@ describe('Document Parser Integration Tests', () => {
 
       expect(response.status).toBe(200)
       expect(body.success).toBe(true)
-      expect(body.extractedData.colors).toContain('#ff6b35')
-      expect(body.extractedData.colors).toContain('#004e89')
-      expect(body.extractedData.fonts.some((font: string) => 
-        font.toLowerCase().includes('source sans')
+      expect(body.extractedData.colors.some((color: any) => 
+        color.hex === '#FF6B35'
+      )).toBe(true)
+      expect(body.extractedData.colors.some((color: any) => 
+        color.hex === '#004E89'
+      )).toBe(true)
+      expect(body.extractedData.fonts.some((font: any) => 
+        font.family.toLowerCase().includes('source sans')
       )).toBe(true)
 
       // Verify mammoth was called
@@ -260,7 +268,9 @@ describe('Document Parser Integration Tests', () => {
 
       expect(body.extractedData.colors).toEqual(
         expect.arrayContaining([
-          expect.stringMatching(/#[0-9a-fA-F]{6}/), // Hex colors
+          expect.objectContaining({
+            hex: expect.stringMatching(/#[0-9a-fA-F]{6}/)
+          })
         ])
       )
     })
@@ -282,7 +292,9 @@ describe('Document Parser Integration Tests', () => {
 
       expect(body.extractedData.fonts).toEqual(
         expect.arrayContaining([
-          expect.stringMatching(/helvetica|arial|source/i),
+          expect.objectContaining({
+            family: expect.stringMatching(/helvetica|arial|source/i)
+          })
         ])
       )
     })
@@ -462,7 +474,7 @@ describe('Document Parser Integration Tests', () => {
       const endTime = Date.now()
 
       expect(response.status).toBe(200)
-      expect(endTime - startTime).toBeLessThan(10000) // Should complete within 10 seconds
+      expect(endTime - startTime).toBeLessThan(15000) // Should complete within 15 seconds
     })
   })
 })

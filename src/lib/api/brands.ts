@@ -7,7 +7,8 @@ import {
   UpdateBrandAssetData,
   BrandAsset,
   DocumentParseRequest,
-  DocumentParseResult
+  DocumentParseResult,
+  EnhancedDocumentParseResult
 } from "@/lib/types/brand"
 
 const API_BASE = "/api/brands"
@@ -213,11 +214,11 @@ export class BrandService {
     }
   }
 
-  // Parse document and extract brand elements
+  // Parse document and extract brand elements (enhanced version)
   static async parseDocument(
     brandId: string,
     data: DocumentParseRequest
-  ): Promise<DocumentParseResult> {
+  ): Promise<EnhancedDocumentParseResult> {
     const response = await fetch(`${API_BASE}/${brandId}/assets/parse`, {
       method: "POST",
       headers: {

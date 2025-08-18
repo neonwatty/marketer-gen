@@ -230,6 +230,98 @@ export type DocumentParseResult = {
   message: string
 }
 
+// Enhanced processing result types
+export type EnhancedDocumentParseResult = {
+  success: boolean
+  extractedData: {
+    rawText: string
+    extractedAt: string
+    assetId: string
+    brandId: string
+    colors?: Array<{
+      hex?: string
+      rgb?: string
+      hsl?: string
+      pantone?: string
+      cmyk?: string
+      name?: string
+      usage?: string
+      category: 'primary' | 'secondary' | 'accent' | 'neutral' | 'warning' | 'success' | 'error'
+    }>
+    fonts?: Array<{
+      family: string
+      category: 'serif' | 'sans-serif' | 'display' | 'monospace' | 'script' | 'decorative'
+      usage: 'heading' | 'body' | 'caption' | 'button' | 'navigation' | 'accent'
+      weight?: string
+      fallbacks?: string[]
+    }>
+    voice?: {
+      voiceDescription: string | null
+      toneAttributes: Record<string, number>
+      communicationStyle: string | null
+      personality: string[]
+      messaging: {
+        primary?: string
+        secondary?: string[]
+        prohibited?: string[]
+      }
+    }
+    guidelines?: {
+      sections: Array<{
+        title: string
+        content: string
+        type: 'overview' | 'visual' | 'voice' | 'usage' | 'compliance' | 'other'
+      }>
+      keyPhrases: string[]
+      brandPillars: string[]
+      targetAudience?: {
+        primary: string
+        demographics: Record<string, any>
+      }
+    }
+    compliance?: {
+      usageRules: {
+        do: string[]
+        dont: string[]
+      }
+      restrictedTerms: string[]
+      legalRequirements: string[]
+      approvalProcess?: string
+    }
+    confidence: {
+      overall: number
+      colors: number
+      fonts: number
+      voice: number
+      guidelines: number
+      compliance: number
+    }
+    suggestions: string[]
+  }
+  message: string
+  processingInfo: {
+    engine: string
+    version: string
+    extractedAt: string
+    elementsFound: {
+      colors: number
+      fonts: number
+      voiceAttributes: number
+      guidelineSections: number
+      complianceRules: number
+    }
+    confidence: {
+      overall: number
+      colors: number
+      fonts: number
+      voice: number
+      guidelines: number
+      compliance: number
+    }
+    suggestions: string[]
+  }
+}
+
 export type DocumentParseRequest = {
   assetId: string
   parseSettings?: DocumentParseSettings
