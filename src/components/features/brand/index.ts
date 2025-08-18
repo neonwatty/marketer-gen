@@ -1,2 +1,6 @@
 export { BrandDocumentUpload } from "./BrandDocumentUpload"
 export { BrandAssetLibrary } from "./BrandAssetLibrary"
+export { BrandOverview } from "./BrandOverview"
+export { BrandAnalytics } from "./BrandAnalytics"
+export { BrandGuidelines } from "./BrandGuidelines"
+export { BrandComparison } from "./BrandComparison"
