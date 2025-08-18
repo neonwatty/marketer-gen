@@ -1,0 +1,22 @@
+CHANGES REQUESTED
+
+Hello <%= @recipient.first_name %>,
+
+Changes have been requested for the following content:
+
+Title: <%= @content.title %>
+Campaign: <%= @campaign.name %>
+Content Type: <%= @content.content_type.humanize %>
+Requested by: <%= @requester&.full_name || 'Unknown' %>
+<% if @requested_changes.present? %>
+Requested Changes:
+<%= @requested_changes %>
+<% end %>
+
+Please review and make the necessary changes, then resubmit for approval.
+
+Edit Content: <%= @content_url %>
+
+---
+This is an automated notification from MarketerGen.
+Please do not reply to this email.

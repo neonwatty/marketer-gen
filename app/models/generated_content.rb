@@ -8,6 +8,14 @@ class GeneratedContent < ApplicationRecord
   belongs_to :original_content, class_name: 'GeneratedContent', optional: true
   has_many :content_versions, class_name: 'GeneratedContent', foreign_key: 'original_content_id', dependent: :destroy
   
+  # New version control and audit associations
+  has_many :version_logs, class_name: 'ContentVersion', dependent: :destroy
+  has_many :audit_logs, class_name: 'ContentAuditLog', dependent: :destroy
+  
+  # Approval workflow associations
+  has_one :approval_workflow, dependent: :destroy
+  has_many :content_feedbacks, dependent: :destroy
+  
   # Constants
   CONTENT_TYPES = %w[
     email
@@ -139,32 +147,64 @@ class GeneratedContent < ApplicationRecord
   end
   
   def latest_version?
-    return true if original_version?
-    original_content.content_versions.where('version_number > ?', version_number).empty?
+    if original_version?
+      # Original is latest if no content versions exist
+      content_versions.empty?
+    else
+      # Version is latest if no versions have higher version number
+      original_content.content_versions.where('version_number > ?', version_number).empty?
+    end
   end
   
   def get_latest_version
-    return self if original_version?
-    original_content.content_versions.order(:version_number).last || original_content
+    if original_version?
+      # For original content, get latest version from content_versions or self if none exist
+      content_versions.order(:version_number).last || self
+    else
+      # For version content, get latest from original's content_versions
+      original_content.content_versions.order(:version_number).last || original_content
+    end
   end
   
   def create_new_version!(user, change_summary = nil)
-    new_version = self.dup
-    new_version.assign_attributes(
-      original_content_id: original_version? ? id : original_content_id,
-      version_number: next_version_number,
-      created_by: user,
-      approved_by_id: nil,
-      status: 'draft',
-      created_at: nil,
-      updated_at: nil,
-      metadata: (metadata || {}).merge(
-        change_summary: change_summary,
-        created_from_version: version_number
+    transaction do
+      new_version = self.dup
+      new_version.assign_attributes(
+        original_content_id: original_version? ? id : original_content_id,
+        version_number: next_version_number,
+        created_by: user,
+        approved_by_id: nil,
+        status: 'draft',
+        created_at: nil,
+        updated_at: nil,
+        metadata: (metadata || {}).merge(
+          change_summary: change_summary,
+          created_from_version: version_number
+        )
       )
-    )
-    new_version.save!
-    new_version
+      new_version.save!
+      
+      # Create version log entry
+      ContentVersion.create_version!(
+        new_version,
+        'created',
+        user,
+        change_summary || "New version created from version #{version_number}",
+        { original_version_id: id }
+      )
+      
+      # Create audit log entry
+      ContentAuditLog.log_action(
+        new_version,
+        user,
+        'create',
+        nil,
+        new_version.attributes.except('id', 'created_at', 'updated_at'),
+        { version_created_from: version_number }
+      )
+      
+      new_version
+    end
   end
   
   def next_version_number
@@ -188,55 +228,233 @@ class GeneratedContent < ApplicationRecord
     end
   end
   
-  # Content management methods
+  # Compare this version with another version
+  def compare_with_version(other_version)
+    return nil unless other_version.is_a?(GeneratedContent)
+    
+    {
+      title: {
+        old: other_version.title,
+        new: title,
+        changed: title != other_version.title
+      },
+      body_content: {
+        old: other_version.body_content,
+        new: body_content,
+        changed: body_content != other_version.body_content
+      },
+      content_type: {
+        old: other_version.content_type,
+        new: content_type,
+        changed: content_type != other_version.content_type
+      },
+      format_variant: {
+        old: other_version.format_variant,
+        new: format_variant,
+        changed: format_variant != other_version.format_variant
+      },
+      status: {
+        old: other_version.status,
+        new: status,
+        changed: status != other_version.status
+      },
+      version_number: {
+        old: other_version.version_number,
+        new: version_number,
+        changed: version_number != other_version.version_number
+      },
+      word_count_change: word_count - other_version.word_count,
+      character_count_change: character_count - other_version.character_count
+    }
+  end
+  
+  # Rollback to a previous version (creates a new version with old content)
+  def rollback_to_version!(target_version, user, reason = nil)
+    return false unless target_version.is_a?(GeneratedContent)
+    return false if target_version.version_number >= version_number
+    
+    transaction do
+      # Create new version with rolled back content
+      rollback_version = self.dup
+      rollback_version.assign_attributes(
+        title: target_version.title,
+        body_content: target_version.body_content,
+        content_type: target_version.content_type,
+        format_variant: target_version.format_variant,
+        version_number: next_version_number,
+        created_by: user,
+        approved_by_id: nil,
+        status: 'draft',
+        created_at: nil,
+        updated_at: nil,
+        metadata: (metadata || {}).merge(
+          rolled_back_from_version: version_number,
+          rolled_back_to_version: target_version.version_number,
+          rollback_reason: reason,
+          rollback_timestamp: Time.current
+        )
+      )
+      rollback_version.save!
+      
+      # Create version log entry
+      ContentVersion.create_version!(
+        rollback_version,
+        'rolled_back',
+        user,
+        reason || "Rolled back from version #{version_number} to version #{target_version.version_number}",
+        { 
+          target_version_id: target_version.id,
+          original_version_id: id
+        }
+      )
+      
+      # Create audit log entry
+      ContentAuditLog.log_action(
+        rollback_version,
+        user,
+        'rollback',
+        attributes.except('id', 'created_at', 'updated_at'),
+        rollback_version.attributes.except('id', 'created_at', 'updated_at'),
+        { 
+          rolled_back_from: version_number,
+          rolled_back_to: target_version.version_number,
+          reason: reason
+        }
+      )
+      
+      rollback_version
+    end
+  end
+  
+  # Get detailed version history with audit trail
+  def detailed_version_history
+    history = version_history_chain
+    
+    history.map do |version|
+      {
+        version: version,
+        version_logs: version.version_logs.recent.includes(:changed_by),
+        audit_logs: version.audit_logs.recent.limit(10).includes(:user)
+      }
+    end
+  end
+  
+  # Get content differences from previous version
+  def changes_from_previous_version
+    previous_version = get_previous_version
+    return nil unless previous_version
+    
+    compare_with_version(previous_version)
+  end
+  
+  # Get the previous version in the chain
+  def get_previous_version
+    all_versions = version_history_chain.sort_by(&:version_number)
+    current_index = all_versions.index { |v| v.id == id }
+    return nil unless current_index && current_index > 0
+    
+    all_versions[current_index - 1]
+  end
+  
+  # Get the next version in the chain
+  def get_next_version
+    all_versions = version_history_chain.sort_by(&:version_number)
+    current_index = all_versions.index { |v| v.id == id }
+    return nil unless current_index && current_index < all_versions.length - 1
+    
+    all_versions[current_index + 1]
+  end
+  
+  # Content management methods with audit logging
   def submit_for_review!(user = nil)
     return false unless draft?
-    update!(
-      status: 'in_review',
-      metadata: (metadata || {}).merge(submitted_for_review_at: Time.current, submitted_by: user&.id)
-    )
+    old_status = status
+    
+    transaction do
+      update!(
+        status: 'in_review',
+        metadata: (metadata || {}).merge(submitted_for_review_at: Time.current, submitted_by: user&.id)
+      )
+      
+      if user
+        ContentVersion.create_version!(self, 'updated', user, 'Submitted for review')
+        ContentAuditLog.log_action(self, user, 'update', { status: old_status }, { status: 'in_review' })
+      end
+    end
   end
   
   def approve!(user)
     return false unless in_review?
-    update!(
-      status: 'approved',
-      approved_by_id: user.id,
-      metadata: (metadata || {}).merge(approved_at: Time.current)
-    )
+    old_status = status
+    
+    transaction do
+      update!(
+        status: 'approved',
+        approved_by_id: user.id,
+        metadata: (metadata || {}).merge(approved_at: Time.current)
+      )
+      
+      ContentVersion.create_version!(self, 'approved', user, 'Content approved')
+      ContentAuditLog.log_action(self, user, 'approve', { status: old_status }, { status: 'approved', approved_by_id: user.id })
+    end
   end
   
   def reject!(user, reason = nil)
     return false unless in_review?
-    update!(
-      status: 'rejected',
-      metadata: (metadata || {}).merge(
-        rejected_at: Time.current,
-        rejected_by: user.id,
-        rejection_reason: reason
+    old_status = status
+    
+    transaction do
+      update!(
+        status: 'rejected',
+        metadata: (metadata || {}).merge(
+          rejected_at: Time.current,
+          rejected_by: user.id,
+          rejection_reason: reason
+        )
       )
-    )
+      
+      ContentVersion.create_version!(self, 'updated', user, reason || 'Content rejected')
+      ContentAuditLog.log_action(self, user, 'update', { status: old_status }, { status: 'rejected' }, { rejection_reason: reason })
+    end
   end
   
   def publish!(user = nil)
     return false unless approved?
-    update!(
-      status: 'published',
-      metadata: (metadata || {}).merge(
-        published_at: Time.current,
-        published_by: user&.id
+    old_status = status
+    
+    transaction do
+      update!(
+        status: 'published',
+        metadata: (metadata || {}).merge(
+          published_at: Time.current,
+          published_by: user&.id
+        )
       )
-    )
+      
+      if user
+        ContentVersion.create_version!(self, 'published', user, 'Content published')
+        ContentAuditLog.log_action(self, user, 'publish', { status: old_status }, { status: 'published' })
+      end
+    end
   end
   
   def archive!(user = nil)
-    update!(
-      status: 'archived',
-      metadata: (metadata || {}).merge(
-        archived_at: Time.current,
-        archived_by: user&.id
+    old_status = status
+    
+    transaction do
+      update!(
+        status: 'archived',
+        metadata: (metadata || {}).merge(
+          archived_at: Time.current,
+          archived_by: user&.id
+        )
       )
-    )
+      
+      if user
+        ContentVersion.create_version!(self, 'archived', user, 'Content archived')
+        ContentAuditLog.log_action(self, user, 'archive', { status: old_status }, { status: 'archived' })
+      end
+    end
   end
   
   # Content analysis methods
@@ -372,8 +590,62 @@ class GeneratedContent < ApplicationRecord
   end
   
   def create_audit_trail
-    # This would typically create an audit log entry
-    # For now, we'll just log the action
-    Rails.logger.info "GeneratedContent #{id} #{new_record? ? 'created' : 'updated'} by user #{created_by_id}"
+    return unless created_by.present?
+    
+    begin
+      if saved_change_to_id? # New record
+        ContentVersion.create_version!(self, 'created', created_by, 'Initial content creation')
+        ContentAuditLog.log_action(self, created_by, 'create', nil, attributes.except('id', 'created_at', 'updated_at'))
+      elsif saved_changes.any?
+        # Only log if there are actual changes (excluding timestamps)
+        significant_changes = saved_changes.except('updated_at', 'created_at')
+        if significant_changes.any?
+          old_values = {}
+          new_values = {}
+          
+          significant_changes.each do |key, change|
+            old_values[key] = change[0]
+            new_values[key] = change[1]
+          end
+          
+          ContentVersion.create_version!(self, 'updated', created_by, 'Content updated')
+          ContentAuditLog.log_action(self, created_by, 'update', old_values, new_values)
+        end
+      end
+    rescue => e
+      Rails.logger.error "Failed to create audit trail for GeneratedContent #{id}: #{e.message}"
+    end
+  end
+  
+  public
+  
+  # Check if content can be safely deleted
+  def can_be_deleted?
+    # Content cannot be deleted if:
+    # 1. It's published and actively being used
+    # 2. It has an active approval workflow in progress
+    # 3. It has dependent content versions that would be orphaned
+    # 4. It's currently being referenced by other systems
+    
+    return false if status == 'published'
+    return false if has_active_approval_workflow?
+    return false if has_dependent_versions?
+    
+    # Additional business rules can be added here
+    true
+  end
+  
+  private
+  
+  def has_active_approval_workflow?
+    # Check if there's an active approval workflow
+    approval_workflow&.status&.in?(['pending', 'in_progress'])
+  end
+  
+  def has_dependent_versions?
+    # Check if this content has versions that would be orphaned
+    # For original content, check if it has versions
+    # For version content, it can be deleted without affecting the original
+    original_version? && content_versions.exists?
   end
 end

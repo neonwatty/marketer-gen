@@ -1,0 +1,40 @@
+📊 FEEDBACK SUMMARY
+===================
+
+Content: <%= @content.title %>
+Campaign: <%= @campaign.name %>
+
+Hello <%= @recipient.first_name %>,
+
+Here's a summary of all feedback for "<%= @content.title %>" in the "<%= @campaign.name %>" campaign:
+
+SUMMARY STATISTICS
+------------------
+- Total Feedback: <%= @total_feedback_count %>
+- Pending: <%= @pending_count %>
+- Resolved: <%= @resolved_count %>
+
+<% if @feedbacks.any? %>
+RECENT FEEDBACK
+---------------
+<% @feedbacks.each do |feedback| %>
+
+From: <%= feedback.reviewer_user.first_name %> <%= feedback.reviewer_user.last_name %>
+Type: <%= feedback.feedback_type.humanize %>
+Priority: <%= feedback.priority_name %>
+Status: <%= feedback.status.humanize %>
+Submitted: <%= feedback.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+
+Feedback: <%= feedback.feedback_text %>
+
+---
+<% end %>
+<% else %>
+
+No feedback has been submitted for this content yet.
+<% end %>
+
+View Content: <%= @content_url %>
+
+Best regards,
+The MarketerGen Team

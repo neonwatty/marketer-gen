@@ -5,6 +5,9 @@ class CampaignPlan < ApplicationRecord
   belongs_to :current_version, class_name: 'PlanVersion', optional: true
   
   has_many :plan_versions, dependent: :destroy
+  
+  # Handle circular foreign key dependency between campaign_plan and plan_versions
+  before_destroy :nullify_current_version
   has_many :feedback_comments, through: :plan_versions
   has_many :plan_audit_logs, dependent: :destroy
   has_many :plan_share_tokens, dependent: :destroy
@@ -54,6 +57,7 @@ class CampaignPlan < ApplicationRecord
   
   before_validation :set_default_metadata, on: :create
   before_validation :set_default_approval_status, on: :create
+  before_destroy :nullify_current_version_reference
   after_create :create_audit_log_for_creation
   after_update :create_audit_log_for_update, if: :saved_changes?
   
@@ -635,6 +639,13 @@ class CampaignPlan < ApplicationRecord
   
   private
   
+  def nullify_current_version_reference
+    if current_version_id.present?
+      # Use update_columns to bypass callbacks and validations
+      update_columns(current_version_id: nil)
+    end
+  end
+  
   def set_default_metadata
     self.metadata ||= {
       created_via: 'campaign_plan_generator',
@@ -726,4 +737,18 @@ class CampaignPlan < ApplicationRecord
   alias_method :is_approved?, :approval_approved?
   alias_method :is_rejected?, :approval_rejected?
   alias_method :needs_approval?, :approval_required?
+
+private
+
+  # Handle circular foreign key dependency
+  def nullify_current_version
+    if current_version_id.present?
+      update_column(:current_version_id, nil)
+    end
+    
+    # Set flag on all plan versions to skip campaign plan updates during destruction
+    plan_versions.each do |version|
+      version.skip_campaign_plan_updates = true
+    end
+  end
 end

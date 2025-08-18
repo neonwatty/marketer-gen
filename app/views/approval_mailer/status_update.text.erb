@@ -1,0 +1,18 @@
+APPROVAL STATUS UPDATE
+
+Hello <%= @recipient.first_name %>,
+
+Here's an update on the approval workflow for:
+
+Title: <%= @content.title %>
+Campaign: <%= @campaign.name %>
+Content Type: <%= @content.content_type.humanize %>
+Status: <%= @workflow.status.humanize %>
+Progress: <%= @progress[:completed_approvals] %>/<%= @progress[:total_approvers] %> approvals (<%= @progress[:percentage] %>%)
+<% if @workflow.workflow_type == 'multi_stage' %>Current Stage: <%= @progress[:current_stage] %>/<%= @progress[:total_stages] %><% end %>
+
+View Content: <%= @content_url %>
+
+---
+This is an automated notification from MarketerGen.
+Please do not reply to this email.

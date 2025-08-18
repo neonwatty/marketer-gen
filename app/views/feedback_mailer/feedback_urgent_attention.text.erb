@@ -1,0 +1,33 @@
+⚠️ URGENT ATTENTION REQUIRED
+=============================
+
+Content: <%= @content.title %>
+Campaign: <%= @campaign.name %>
+
+Hello <%= @recipient.first_name %>,
+
+🚨 THIS FEEDBACK REQUIRES YOUR IMMEDIATE ATTENTION!
+
+<% if @days_overdue %>
+This feedback has been pending for <%= @days_overdue %> days.
+<% end %>
+
+The following feedback needs to be addressed urgently for the content "<%= @content.title %>" in the "<%= @campaign.name %>" campaign.
+
+FEEDBACK DETAILS
+----------------
+From: <%= @reviewer.first_name %> <%= @reviewer.last_name %> (<%= @reviewer.email_address %>)
+Type: <%= @feedback.feedback_type.humanize %>
+Priority: <%= @feedback.priority_name %>
+Status: <%= @feedback.status.humanize %>
+Submitted: <%= @feedback.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+
+FEEDBACK:
+<%= @feedback.feedback_text %>
+
+Review Content: <%= @content_url %>
+
+Please address this feedback as soon as possible to maintain project momentum and stakeholder satisfaction.
+
+Best regards,
+The MarketerGen Team

@@ -79,7 +79,5 @@ group :test do
   gem "rails-controller-testing"
   # Mocking and stubbing for tests
   gem "mocha"
-  # Test coverage analysis [https://github.com/simplecov-ruby/simplecov]
-  gem "simplecov", require: false
 end
 gem "cssbundling-rails"

@@ -126,6 +126,7 @@ class SecurityControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should log security events" do
+    skip "TODO: Fix during incremental development"
     # Skip logging test for now as assert_logged isn't available in this Rails version
     skip "Logging test skipped - assert_logged not available"
   end

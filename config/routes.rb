@@ -22,6 +22,28 @@ Rails.application.routes.draw do
       post :start_execution
       post :complete_execution
     end
+    
+    # Nested content management
+    resources :generated_contents, except: [:index, :show, :edit, :update, :destroy] do
+      collection do
+        post :generate
+      end
+    end
+  end
+  
+  # Content management (can be accessed independently)
+  resources :generated_contents do
+    member do
+      post :regenerate
+      patch :approve
+      patch :publish
+      patch :archive
+      post :create_variants
+    end
+    
+    collection do
+      get :search
+    end
   end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root "home#index"

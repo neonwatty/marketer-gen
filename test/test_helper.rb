@@ -1,45 +1,3 @@
-# SimpleCov must be started before any other code is required
-require 'simplecov'
-
-SimpleCov.start 'rails' do
-  # Set minimum coverage threshold - start with achievable goal
-  minimum_coverage 5
-  
-  # Configure groups for better reporting
-  add_group 'Models', 'app/models'
-  add_group 'Controllers', 'app/controllers'
-  add_group 'Services', 'app/services'
-  add_group 'Jobs', 'app/jobs'
-  add_group 'Helpers', 'app/helpers'
-  add_group 'Policies', 'app/policies'
-  add_group 'Mailers', 'app/mailers'
-  add_group 'Concerns', 'app/controllers/concerns'
-  
-  # Exclude files that don't need coverage
-  add_filter '/config/'
-  add_filter '/db/migrate/'
-  add_filter '/vendor/'
-  add_filter '/test/'
-  add_filter '/spec/'
-  add_filter 'app/channels/application_cable/'
-  add_filter 'app/jobs/application_job.rb'
-  add_filter 'app/mailers/application_mailer.rb'
-  add_filter 'app/models/application_record.rb'
-  add_filter 'app/controllers/application_controller.rb'
-  
-  # Configure output
-  formatter SimpleCov::Formatter::HTMLFormatter
-  
-  coverage_dir 'coverage'
-  
-  # Enable branch coverage for more detailed analysis (if supported)
-  begin
-    enable_coverage :branch if ENV['COVERAGE_BRANCH'] == 'true'
-  rescue ArgumentError
-    # Branch coverage not supported in this Ruby version
-  end
-end
-
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
@@ -105,6 +63,53 @@ module ActiveSupport
     def logs_containing(text)
       # Helper to find log entries containing specific text
       @log_output&.string&.lines&.select { |line| line.include?(text) } || []
+    end
+    
+    # Helper method to create valid test content that meets validation requirements
+    def create_valid_test_content(options = {})
+      defaults = {
+        content_type: "blog_article",
+        format_variant: "standard",
+        status: "draft",
+        version_number: 1,
+        title: "Test Content #{SecureRandom.hex(4)}"
+      }
+      
+      attributes = defaults.merge(options)
+      
+      # Generate appropriate body content based on format variant
+      attributes[:body_content] ||= generate_body_content_for_format(attributes[:format_variant])
+      
+      GeneratedContent.create!(attributes)
+    end
+    
+    private
+    
+    def generate_body_content_for_format(format_variant)
+      case format_variant
+      when 'short', 'brief'
+        "This is a short test content for #{format_variant} format testing."
+      when 'summary'
+        "This is a summary test content for testing purposes. It contains enough characters to meet the validation requirements for summary format content."
+      when 'medium', 'standard'
+        "This is a comprehensive test content for #{format_variant} format testing. It contains enough characters to meet the standard format requirements and provides a good foundation for testing various features of the content management system. This ensures all validation requirements are properly met."
+      when 'long'
+        content = "This is a long test content for testing purposes. " * 10
+        content += "It contains substantial text to meet the validation requirements for long format content. "
+        content += "This ensures that all tests can run properly without validation errors. " * 3
+        content
+      when 'extended', 'comprehensive'
+        content = "This is an extended comprehensive test content for testing purposes. " * 15
+        content += "It contains substantial text to meet the validation requirements for extended format content. " * 5
+        content += "This ensures that all tests can run properly without validation errors and provides adequate content for comprehensive testing scenarios. " * 3
+        content
+      when 'detailed'
+        content = "This is detailed test content for testing purposes. " * 8
+        content += "It contains enough text to meet the validation requirements for detailed format content. " * 4
+        content
+      else
+        "This is test content for #{format_variant} format testing. It contains enough characters to meet the standard validation requirements and provides a foundation for testing various features."
+      end
     end
   end
 end

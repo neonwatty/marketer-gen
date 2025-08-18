@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+      .header { background-color: #f4f4f4; padding: 20px; text-align: center; }
+      .content { padding: 20px; }
+      .status-update { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 15px; margin: 20px 0; border-radius: 5px; }
+      .feedback-details { background-color: #f9f9f9; padding: 15px; margin: 20px 0; border-radius: 5px; }
+      .button { background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 10px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>📢 Feedback Status Update</h1>
+      <h2><%= @content.title %></h2>
+    </div>
+    
+    <div class="content">
+      <p>Hello <%= @recipient.first_name %>,</p>
+      
+      <p>There has been a status update for feedback on the content "<%= @content.title %>" in the "<%= @campaign.name %>" campaign.</p>
+      
+      <% if @status_change %>
+        <div class="status-update">
+          <h3>Status Change</h3>
+          <p><%= @status_change %></p>
+        </div>
+      <% end %>
+      
+      <div class="feedback-details">
+        <h3>Feedback Details</h3>
+        <p><strong>From:</strong> <%= @reviewer.first_name %> <%= @reviewer.last_name %> (<%= @reviewer.email_address %>)</p>
+        <p><strong>Type:</strong> <%= @feedback.feedback_type.humanize %></p>
+        <p><strong>Priority:</strong> <%= @feedback.priority_name %></p>
+        <p><strong>Current Status:</strong> <%= @feedback.status.humanize %></p>
+        <p><strong>Originally Submitted:</strong> <%= @feedback.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+        <p><strong>Last Updated:</strong> <%= @feedback.updated_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+        
+        <h4>Original Feedback:</h4>
+        <p><%= simple_format(@feedback.feedback_text) %></p>
+      </div>
+      
+      <a href="<%= @content_url %>" class="button">View Content</a>
+      
+      <p>
+        Best regards,<br>
+        The MarketerGen Team
+      </p>
+    </div>
+  </body>
+</html>

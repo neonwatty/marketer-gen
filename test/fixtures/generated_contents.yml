@@ -1,3 +1,24 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# Empty fixtures to avoid foreign key issues
+one:
+  content_type: "blog_article"
+  title: "Sample Blog Post"
+  body_content: "This is a comprehensive sample blog post content for testing purposes. It contains enough content to meet the standard format requirements and provides a good foundation for testing various features of the content management system."
+  format_variant: "standard"
+  status: "draft"
+  version_number: 1
+  campaign_plan: completed_plan
+  created_by: marketer_user
+  metadata: '{"keywords": ["test", "blog"]}'
+
+two:
+  content_type: "social_post"
+  title: "Social Media Post"
+  body_content: "Engaging social media content for our campaign."
+  format_variant: "short"
+  status: "approved"
+  version_number: 1
+  campaign_plan: draft_plan
+  created_by: marketer_user
+  approver: admin_user
+  metadata: '{"platform": "twitter", "hashtags": ["marketing"]}'

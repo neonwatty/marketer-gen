@@ -1,0 +1,18 @@
+Hi <%= @approver.full_name %>,
+
+URGENT: The approval deadline for "<%= @content.title %>" is approaching!
+
+You have <%= @hours_remaining %> hours remaining to approve or reject this content.
+
+Campaign: <%= @campaign.name %>
+Content Type: <%= @content.content_type.humanize %>
+Created by: <%= @content.created_by.full_name %>
+
+Please review and take action:
+- Approve: <%= @approval_url %>
+- Reject: <%= @reject_url %>
+
+Time is running out - please respond as soon as possible.
+
+Best regards,
+MarketGen Approval System

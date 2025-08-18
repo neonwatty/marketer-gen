@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_17_124042) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_17_163900) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_124042) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "approval_workflows", force: :cascade do |t|
+    t.integer "generated_content_id", null: false
+    t.string "workflow_type", null: false
+    t.json "required_approvers", null: false
+    t.integer "current_stage", default: 1, null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "due_date"
+    t.json "escalation_rules"
+    t.integer "created_by_id", null: false
+    t.datetime "completed_at"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_approval_workflows_on_created_by_id"
+    t.index ["due_date"], name: "index_approval_workflows_on_due_date"
+    t.index ["generated_content_id"], name: "index_approval_workflows_on_generated_content_id"
+    t.index ["status"], name: "index_approval_workflows_on_status"
+    t.index ["workflow_type"], name: "index_approval_workflows_on_workflow_type"
   end
 
   create_table "brand_identities", force: :cascade do |t|
@@ -109,6 +129,65 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_124042) do
     t.index ["submitted_for_approval_at"], name: "index_campaign_plans_on_submitted_for_approval_at"
     t.index ["user_id", "name"], name: "index_campaign_plans_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_campaign_plans_on_user_id"
+  end
+
+  create_table "content_audit_logs", force: :cascade do |t|
+    t.integer "generated_content_id", null: false
+    t.integer "user_id", null: false
+    t.string "action", null: false
+    t.json "old_values"
+    t.json "new_values"
+    t.string "ip_address"
+    t.text "user_agent"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_content_audit_logs_on_action"
+    t.index ["created_at"], name: "index_content_audit_logs_on_created_at"
+    t.index ["generated_content_id", "created_at"], name: "idx_on_generated_content_id_created_at_2cdc80bf3b"
+    t.index ["generated_content_id"], name: "index_content_audit_logs_on_generated_content_id"
+    t.index ["user_id"], name: "index_content_audit_logs_on_user_id"
+  end
+
+  create_table "content_feedbacks", force: :cascade do |t|
+    t.integer "generated_content_id", null: false
+    t.integer "reviewer_user_id", null: false
+    t.text "feedback_text", null: false
+    t.string "feedback_type", null: false
+    t.datetime "resolved_at"
+    t.integer "resolved_by_user_id"
+    t.integer "approval_workflow_id"
+    t.integer "priority", default: 1
+    t.string "status", default: "pending", null: false
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approval_workflow_id"], name: "index_content_feedbacks_on_approval_workflow_id"
+    t.index ["created_at"], name: "index_content_feedbacks_on_created_at"
+    t.index ["feedback_type"], name: "index_content_feedbacks_on_feedback_type"
+    t.index ["generated_content_id", "status"], name: "index_content_feedbacks_on_generated_content_id_and_status"
+    t.index ["generated_content_id"], name: "index_content_feedbacks_on_generated_content_id"
+    t.index ["priority"], name: "index_content_feedbacks_on_priority"
+    t.index ["resolved_by_user_id"], name: "index_content_feedbacks_on_resolved_by_user_id"
+    t.index ["reviewer_user_id"], name: "index_content_feedbacks_on_reviewer_user_id"
+    t.index ["status"], name: "index_content_feedbacks_on_status"
+  end
+
+  create_table "content_versions", force: :cascade do |t|
+    t.integer "generated_content_id", null: false
+    t.integer "version_number", null: false
+    t.string "action_type", null: false
+    t.integer "changed_by_id", null: false
+    t.text "changes_summary"
+    t.datetime "timestamp", null: false
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action_type"], name: "index_content_versions_on_action_type"
+    t.index ["changed_by_id"], name: "index_content_versions_on_changed_by_id"
+    t.index ["generated_content_id", "version_number"], name: "idx_on_generated_content_id_version_number_7f2182d7fb", unique: true
+    t.index ["generated_content_id"], name: "index_content_versions_on_generated_content_id"
+    t.index ["timestamp"], name: "index_content_versions_on_timestamp"
   end
 
   create_table "feedback_comments", force: :cascade do |t|
@@ -289,10 +368,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_124042) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "approval_workflows", "generated_contents"
+  add_foreign_key "approval_workflows", "users", column: "created_by_id"
   add_foreign_key "brand_identities", "users"
   add_foreign_key "campaign_plans", "users"
   add_foreign_key "campaign_plans", "users", column: "approved_by_id"
   add_foreign_key "campaign_plans", "users", column: "rejected_by_id"
+  add_foreign_key "content_audit_logs", "generated_contents"
+  add_foreign_key "content_audit_logs", "users"
+  add_foreign_key "content_feedbacks", "approval_workflows"
+  add_foreign_key "content_feedbacks", "generated_contents"
+  add_foreign_key "content_feedbacks", "users", column: "resolved_by_user_id"
+  add_foreign_key "content_feedbacks", "users", column: "reviewer_user_id"
+  add_foreign_key "content_versions", "generated_contents"
+  add_foreign_key "content_versions", "users", column: "changed_by_id"
   add_foreign_key "feedback_comments", "feedback_comments", column: "parent_comment_id"
   add_foreign_key "feedback_comments", "plan_versions"
   add_foreign_key "feedback_comments", "users"

@@ -1,0 +1,19 @@
+APPROVAL WORKFLOW CANCELLED
+
+Hello <%= @recipient.first_name %>,
+
+The approval workflow for the following content has been cancelled:
+
+Title: <%= @content.title %>
+Campaign: <%= @campaign.name %>
+Content Type: <%= @content.content_type.humanize %>
+Cancelled by: <%= @cancelled_by&.full_name || 'System' %>
+<% if @cancellation_reason.present? %>Reason: <%= @cancellation_reason %><% end %>
+
+No further action is required from you regarding this workflow.
+
+If you have any questions about this cancellation, please contact the workflow creator or your team lead.
+
+---
+This is an automated notification from MarketerGen.
+Please do not reply to this email.

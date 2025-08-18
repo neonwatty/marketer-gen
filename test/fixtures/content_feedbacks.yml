@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  generated_content: one
+  reviewer_user: two
+  feedback_text: "This content needs some improvements to better align with our brand voice"
+  feedback_type: comment
+  status: pending
+  priority: 2
+  resolved_at: 
+  resolved_by_user: 
+  approval_workflow: one
+  metadata: {}
+
+two:
+  generated_content: two
+  reviewer_user: three
+  feedback_text: "I suggest we revise the call-to-action to be more compelling"
+  feedback_type: suggestion
+  status: acknowledged
+  priority: 2
+  resolved_at: 
+  resolved_by_user: 
+  approval_workflow: two
+  metadata: {}

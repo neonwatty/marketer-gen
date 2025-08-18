@@ -12,8 +12,10 @@ class PlanVersion < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
 
   before_validation :set_version_number, on: :create
-  after_create :set_as_current_version
-  after_update :update_campaign_plan_current_version, if: :saved_change_to_is_current?
+  after_create :set_as_current_version, unless: :skip_campaign_plan_updates
+  after_update :update_campaign_plan_current_version, if: :saved_change_to_is_current?, unless: :skip_campaign_plan_updates
+  
+  attr_accessor :skip_campaign_plan_updates
 
   def next_version_number
     campaign_plan.plan_versions.maximum(:version_number).to_i + 1

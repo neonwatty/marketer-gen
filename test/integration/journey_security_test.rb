@@ -188,6 +188,7 @@ class JourneySecurityIntegrationTest < ActionDispatch::IntegrationTest
 
   # File Upload Security (if implemented)
   test "validates file uploads if journey attachments added" do
+    skip "TODO: Fix during incremental development"
     # This test would be relevant if file uploads are added later
     skip "File upload functionality not yet implemented"
   end

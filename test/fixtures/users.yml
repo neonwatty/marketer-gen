@@ -48,3 +48,10 @@ admin_user:
   role: admin
   first_name: Admin
   last_name: User
+
+three:
+  email_address: user3@example.com
+  password_digest: <%= password_digest %>
+  role: team_member
+  first_name: Third
+  last_name: User

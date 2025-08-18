@@ -1,0 +1,32 @@
+📢 FEEDBACK STATUS UPDATE
+==========================
+
+Content: <%= @content.title %>
+Campaign: <%= @campaign.name %>
+
+Hello <%= @recipient.first_name %>,
+
+There has been a status update for feedback on the content "<%= @content.title %>" in the "<%= @campaign.name %>" campaign.
+
+<% if @status_change %>
+STATUS CHANGE
+-------------
+<%= @status_change %>
+
+<% end %>
+FEEDBACK DETAILS
+----------------
+From: <%= @reviewer.first_name %> <%= @reviewer.last_name %> (<%= @reviewer.email_address %>)
+Type: <%= @feedback.feedback_type.humanize %>
+Priority: <%= @feedback.priority_name %>
+Current Status: <%= @feedback.status.humanize %>
+Originally Submitted: <%= @feedback.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+Last Updated: <%= @feedback.updated_at.strftime("%B %d, %Y at %I:%M %p") %>
+
+ORIGINAL FEEDBACK:
+<%= @feedback.feedback_text %>
+
+View Content: <%= @content_url %>
+
+Best regards,
+The MarketerGen Team

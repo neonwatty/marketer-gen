@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  generated_content: one
+  created_by: one
+  workflow_type: single_approver
+  required_approvers: ["1"]
+  current_stage: 1
+  status: pending
+  due_date: 2025-08-19 16:00:00
+  escalation_rules: {}
+  metadata: {}
+
+two:
+  generated_content: two
+  created_by: two
+  workflow_type: consensus
+  required_approvers: ["1", "2"]
+  current_stage: 1
+  status: in_review
+  due_date: 2025-08-18 16:00:00
+  escalation_rules: {}
+  metadata: {} 

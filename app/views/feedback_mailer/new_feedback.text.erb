@@ -1,0 +1,36 @@
+<%= @priority_indicator %> NEW FEEDBACK RECEIVED
+================================================
+
+Hello <%= @recipient.first_name %>,
+
+New feedback has been submitted for your content by <%= @reviewer.first_name %> <%= @reviewer.last_name %>.
+
+CONTENT DETAILS
+---------------
+Title: <%= @content.title %>
+Type: <%= @content.content_type.humanize %>
+Format: <%= @content.format_variant.humanize %>
+<% if @campaign %>Campaign: <%= @campaign.name %><% end %>
+
+FEEDBACK DETAILS
+----------------
+Type: <%= @feedback.feedback_type.humanize %>
+Priority: <%= @feedback.priority_label %>
+Reviewer: <%= @reviewer.first_name %> <%= @reviewer.last_name %>
+
+Feedback:
+<%= @feedback.feedback_text %>
+
+<% if @workflow %>
+WORKFLOW INFORMATION
+--------------------
+Workflow Type: <%= @workflow.workflow_type.humanize %>
+Current Stage: <%= @workflow.current_stage %>
+Status: <%= @workflow.status.humanize %>
+<% end %>
+
+View Content: <%= @content_url %>
+
+---
+This is an automated notification from MarketerGen.
+Please do not reply to this email.

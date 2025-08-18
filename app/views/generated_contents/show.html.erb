@@ -1,0 +1,108 @@
+<% content_for :title, @generated_content.title %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900"><%= @generated_content.title %></h1>
+          <div class="flex items-center space-x-4 mt-2">
+            <span class="px-3 py-1 text-sm font-semibold rounded-full <%= @generated_content.status == 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+              <%= @generated_content.status.humanize %>
+            </span>
+            <span class="text-sm text-gray-600">Version <%= @generated_content.version_number %></span>
+            <span class="text-sm text-gray-600"><%= @generated_content.content_type.humanize %></span>
+          </div>
+        </div>
+        <div class="flex space-x-2">
+          <%= link_to "Edit", edit_generated_content_path(@generated_content), 
+              class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+          <% if @generated_content.campaign_plan %>
+            <%= link_to "Back to Campaign", @generated_content.campaign_plan, 
+                class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
+          <% end %>
+        </div>
+      </div>
+      
+      <div class="text-sm text-gray-600">
+        Created by <%= @generated_content.created_by.full_name %> on <%= @generated_content.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+        <% if @generated_content.approver %>
+          | Approved by <%= @generated_content.approver.full_name %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Content</h2>
+      <div class="prose max-w-none">
+        <%= simple_format(@generated_content.body_content) %>
+      </div>
+    </div>
+
+    <!-- Metadata -->
+    <% if @generated_content.metadata.present? %>
+      <div class="bg-gray-50 rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Metadata</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <span class="font-medium text-gray-700">Format:</span>
+            <span class="text-gray-600"><%= @generated_content.format_variant.humanize %></span>
+          </div>
+          <% if @generated_content.metadata.is_a?(Hash) %>
+            <% @generated_content.metadata.each do |key, value| %>
+              <div>
+                <span class="font-medium text-gray-700"><%= key.to_s.humanize %>:</span>
+                <span class="text-gray-600"><%= value %></span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Version History -->
+    <% if @version_history && @version_history.length > 1 %>
+      <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Version History</h2>
+        <div class="space-y-3">
+          <% @version_history.each do |version| %>
+            <div class="flex justify-between items-center p-3 border rounded <%= version == @generated_content ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200' %>">
+              <div>
+                <span class="font-medium">Version <%= version.version_number %></span>
+                <span class="text-sm text-gray-600 ml-2">
+                  <%= version.created_at.strftime("%B %d, %Y") %>
+                </span>
+                <% if version == @generated_content %>
+                  <span class="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">Current</span>
+                <% end %>
+              </div>
+              <div class="space-x-2">
+                <%= link_to "View", version, class: "text-blue-600 hover:text-blue-800" %>
+                <% if version != @generated_content %>
+                  <%= link_to "Compare", "#", class: "text-green-600 hover:text-green-800" %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Analytics -->
+    <% if @analytics && @analytics.any? %>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Analytics</h2>
+        <div class="grid grid-cols-3 gap-4">
+          <% @analytics.each do |key, value| %>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600"><%= value %></div>
+              <div class="text-sm text-gray-600"><%= key.to_s.humanize %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
