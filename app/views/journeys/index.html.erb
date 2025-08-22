@@ -4,7 +4,10 @@
       <h1 class="text-3xl font-bold text-gray-900">Customer Journeys</h1>
       <p class="text-gray-600 mt-2">Create and manage your customer journey campaigns</p>
     </div>
-    <%= link_to "New Journey", new_journey_path, class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+    <div class="flex space-x-3">
+      <%= link_to "Use Template", select_template_journeys_path, class: "bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors" %>
+      <%= link_to "New Journey", new_journey_path, class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+    </div>
   </div>
 
   <!-- Analytics Dashboard -->

@@ -45,16 +45,18 @@
     - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
     - *Testing: Model - Unit: validations, associations, template categorization; Integration: template selection workflow*
     - *Status: **COMPLETED** - JourneyTemplate model supports CAMPAIGN_TYPES with validation and customization methods*
-  - [ ] 1.2 Add template metadata fields (category, industry, complexity, prerequisites)
+  - [x] 1.2 Add template metadata fields (category, industry, complexity, prerequisites)
     - *Docs: https://guides.rubyonrails.org/active_record_migrations.html*
     - *Testing: Model - Unit: field validations, enum handling; Integration: template filtering and search*
+    - *Status: **COMPLETED** - Added category, industry, complexity_level, prerequisites fields with validations, indexes, scopes, and comprehensive testing*
   - [x] 1.3 Create seed data for pre-built journey templates
     - *Docs: https://guides.rubyonrails.org/active_record_migrations.html#migrations-and-seed-data*
     - *Testing: Model - Unit: seed data integrity; Integration: template availability after seeding*
     - *Status: **COMPLETED** - Template creation methods and default data structure implemented*
-  - [ ] 1.4 Implement LLM-guided campaign intake service
+  - [x] 1.4 Implement LLM-guided campaign intake service
     - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
     - *Testing: Service - Unit: LLM integration, response parsing; Integration: end-to-end intake workflow*
+    - *Status: **COMPLETED** - CampaignIntakeService and CampaignIntakeJob with comprehensive LLM-guided intake workflow*
   - [x] 1.5 Add campaign intake fields to Journey model (purpose, goals, timing, audience)
     - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
     - *Testing: Model - Unit: field validations, data serialization; Integration: intake form submission*

@@ -14,6 +14,7 @@ class JourneyStep < ApplicationRecord
 
   validates :sequence_order, uniqueness: { scope: :journey_id, message: "must be unique within the journey" }
 
+  serialize :content, coder: JSON
   serialize :settings, coder: JSON
 
   scope :ordered, -> { order(:sequence_order) }

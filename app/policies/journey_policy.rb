@@ -43,6 +43,18 @@ class JourneyPolicy < ApplicationPolicy
     index?
   end
 
+  def select_template?
+    user.present? && (user.admin? || user.marketer?)
+  end
+
+  def template_preview?
+    user.present?
+  end
+
+  def create_from_template?
+    create?
+  end
+
   class Scope < Scope
     def resolve
       if user.admin?

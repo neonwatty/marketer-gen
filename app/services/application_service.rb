@@ -15,7 +15,7 @@ class ApplicationService
     raise NotImplementedError, "#{self.class} must implement #call method"
   end
 
-  private
+  protected
 
   # Helper method for logging service calls
   def log_service_call(service_name, params = {})

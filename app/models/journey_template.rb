@@ -235,6 +235,7 @@ class JourneyTemplate < ApplicationRecord
         content: step_data["content"],
         channel: step_data["channel"],
         sequence_order: index,
+        status: 'draft',
         settings: step_data["settings"] || {}
       )
     end

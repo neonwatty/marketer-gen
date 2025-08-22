@@ -1,0 +1,165 @@
+<div class="space-y-6">
+  <!-- Template Header -->
+  <div class="border-b border-gray-200 pb-4">
+    <h4 class="text-xl font-semibold text-gray-900"><%= @preview_data[:template].name %></h4>
+    <p class="text-gray-600 mt-1"><%= @preview_data[:template].description %></p>
+    
+    <!-- Template Metadata -->
+    <div class="flex flex-wrap gap-2 mt-3">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        <%= @preview_data[:template].campaign_type.humanize %>
+      </span>
+      <% if @preview_data[:template].complexity_level %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                   <%= @preview_data[:template].complexity_level == 'beginner' ? 'bg-green-100 text-green-800' : 
+                       @preview_data[:template].complexity_level == 'expert' ? 'bg-purple-100 text-purple-800' : 
+                       'bg-yellow-100 text-yellow-800' %>">
+          <%= @preview_data[:template].complexity_level.humanize %>
+        </span>
+      <% end %>
+      <% if @preview_data[:template].industry %>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <%= @preview_data[:template].industry.humanize %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Template Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="text-center p-4 bg-gray-50 rounded-lg">
+      <div class="text-2xl font-bold text-gray-900"><%= @preview_data[:stages].length %></div>
+      <div class="text-sm text-gray-600">Stages</div>
+    </div>
+    <div class="text-center p-4 bg-gray-50 rounded-lg">
+      <div class="text-2xl font-bold text-gray-900"><%= @preview_data[:steps].length %></div>
+      <div class="text-sm text-gray-600">Steps</div>
+    </div>
+    <div class="text-center p-4 bg-gray-50 rounded-lg">
+      <div class="text-2xl font-bold text-gray-900"><%= @preview_data[:timeline] || "Flexible" %></div>
+      <div class="text-sm text-gray-600">Timeline</div>
+    </div>
+  </div>
+
+  <!-- Target Audience -->
+  <% if @preview_data[:target_audience] %>
+    <div>
+      <h5 class="text-sm font-medium text-gray-900 mb-2">Target Audience</h5>
+      <p class="text-sm text-gray-600"><%= @preview_data[:target_audience] %></p>
+    </div>
+  <% end %>
+
+  <!-- Key Metrics -->
+  <% if @preview_data[:key_metrics].any? %>
+    <div>
+      <h5 class="text-sm font-medium text-gray-900 mb-2">Key Metrics</h5>
+      <div class="flex flex-wrap gap-2">
+        <% @preview_data[:key_metrics].each do |metric| %>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+            <%= metric %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Journey Stages -->
+  <div>
+    <h5 class="text-sm font-medium text-gray-900 mb-3">Journey Stages</h5>
+    <div class="space-y-3">
+      <% @preview_data[:stages].each_with_index do |stage, index| %>
+        <div class="flex items-center space-x-3">
+          <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-blue-600 font-semibold text-sm"><%= index + 1 %></span>
+          </div>
+          <div class="flex-1">
+            <div class="text-sm font-medium text-gray-900"><%= stage.humanize %></div>
+            <div class="text-xs text-gray-500">
+              <%= pluralize(@preview_data[:steps].count { |step| step["stage"] == stage }, 'step') %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Steps Preview -->
+  <% if @preview_data[:steps].any? %>
+    <div>
+      <h5 class="text-sm font-medium text-gray-900 mb-3">Sample Steps</h5>
+      <div class="space-y-3 max-h-64 overflow-y-auto">
+        <% @preview_data[:steps].first(5).each_with_index do |step, index| %>
+          <div class="border border-gray-200 rounded-lg p-3">
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                <span class="text-gray-600 font-medium text-xs"><%= index + 1 %></span>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-900"><%= step["title"] %></div>
+                <% if step["description"] %>
+                  <div class="text-xs text-gray-600 mt-1"><%= truncate(step["description"], length: 100) %></div>
+                <% end %>
+                <div class="flex items-center space-x-4 mt-2">
+                  <% if step["step_type"] %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                      <%= step["step_type"].humanize %>
+                    </span>
+                  <% end %>
+                  <% if step["channel"] %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      <%= step["channel"].humanize %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <% if @preview_data[:steps].length > 5 %>
+          <div class="text-center py-2">
+            <span class="text-sm text-gray-500">
+              ... and <%= @preview_data[:steps].length - 5 %> more steps
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Prerequisites -->
+  <% if @preview_data[:template].prerequisites.present? %>
+    <div>
+      <h5 class="text-sm font-medium text-gray-900 mb-2">Prerequisites</h5>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+        <div class="flex items-start space-x-2">
+          <i class="lucide-alert-triangle w-4 h-4 text-yellow-600 mt-0.5"></i>
+          <div class="text-sm text-yellow-800"><%= @preview_data[:template].prerequisites %></div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Action Buttons -->
+  <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+    <button type="button" 
+            data-action="click->template-selector#closePreview"
+            class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors">
+      Close
+    </button>
+    
+    <%= form_with url: create_from_template_journeys_path, 
+        data: { 
+          controller: "template-form",
+          action: "submit->template-form#showCustomization"
+        },
+        class: "inline-flex" do |form| %>
+      
+      <%= form.hidden_field :template_id, value: @preview_data[:template].id %>
+      <%= form.hidden_field :journey_name, value: "#{@preview_data[:template].name} Journey" %>
+      
+      <%= form.submit "Use This Template", 
+          class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+    <% end %>
+  </div>
+</div>

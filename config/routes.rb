@@ -59,6 +59,9 @@ Rails.application.routes.draw do
   resources :journeys do
     collection do
       get :compare
+      get :select_template
+      post :create_from_template
+      get :template_preview
     end
     member do
       patch :reorder_steps
