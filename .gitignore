@@ -43,3 +43,5 @@
 
 # Ignore test coverage reports
 /coverage
+# TFQ test failure queue database
+.tfq/

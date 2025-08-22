@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_17_163900) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_22_170438) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -268,7 +268,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_163900) do
     t.boolean "is_default", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "category"
+    t.string "industry"
+    t.string "complexity_level"
+    t.text "prerequisites"
     t.index ["campaign_type", "is_default"], name: "index_journey_templates_on_campaign_type_and_is_default"
+    t.index ["category", "industry"], name: "index_journey_templates_on_category_and_industry"
+    t.index ["category"], name: "index_journey_templates_on_category"
+    t.index ["complexity_level"], name: "index_journey_templates_on_complexity_level"
+    t.index ["industry"], name: "index_journey_templates_on_industry"
     t.index ["name"], name: "index_journey_templates_on_name", unique: true
   end
 

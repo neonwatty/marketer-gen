@@ -1,0 +1,228 @@
+# AI-Driven Content Generation Platform - Implementation Tasks
+
+## Relevant Files
+
+- `app/models/journey_template.rb` - Existing journey template model that needs expansion for campaign-specific templates
+- `test/models/journey_template_test.rb` - Unit tests for journey template model
+- `app/models/journey.rb` - Core journey model requiring enhancement for LLM-guided intake
+- `test/models/journey_test.rb` - Unit tests for journey model
+- `app/controllers/journeys_controller.rb` - Journey controller needing LLM integration
+- `test/controllers/journeys_controller_test.rb` - Controller tests for journey management
+- `app/models/brand_identity.rb` - Existing brand identity model to enhance for document processing
+- `test/models/brand_identity_test.rb` - Unit tests for brand identity model
+- `app/services/brand_materials_processor.rb` - Existing service for brand material processing
+- `test/services/brand_materials_processor_test.rb` - Service tests for brand processing
+- `app/models/generated_content.rb` - Existing content model requiring expansion for multiple content types
+- `test/models/generated_content_test.rb` - Unit tests for generated content
+- `app/controllers/generated_contents_controller.rb` - Content controller needing enhancement
+- `test/controllers/generated_contents_controller_test.rb` - Controller tests for content generation
+- `app/services/content_generation_service.rb` - Existing content generation service
+- `test/services/content_generation_service_test.rb` - Service tests for content generation
+- `app/models/campaign_plan.rb` - Existing campaign plan model requiring strategic enhancement
+- `test/models/campaign_plan_test.rb` - Unit tests for campaign plan model
+- `app/controllers/campaign_plans_controller.rb` - Campaign plan controller needing analytics integration
+- `test/controllers/campaign_plans_controller_test.rb` - Controller tests for campaign plans
+- `app/services/campaign_plan_service.rb` - Campaign planning service requiring expansion
+- `test/services/campaign_plan_service_test.rb` - Service tests for campaign planning
+- `app/models/approval_workflow.rb` - Existing approval workflow model
+- `test/models/approval_workflow_test.rb` - Unit tests for approval workflow
+- `app/controllers/api/v1/content_generation_controller.rb` - API controller for content generation
+- `test/controllers/api/v1/content_generation_controller_test.rb` - API controller tests
+- `config/routes.rb` - Routes configuration for new endpoints
+- `db/migrate/` - Database migrations for new features
+
+### Notes
+
+- Unit tests should be placed alongside the code files they test (e.g., `app/models/model.rb` and `test/models/model_test.rb`)
+- Use `rails test [optional/path/to/test/file]` to run tests. Running without a path executes all tests
+- Integration tests should be placed in `test/integration/` directory
+- System tests should be placed in `test/system/` directory
+
+## Tasks
+
+- [ ] 1.0 Enhanced Customer Journey Builder with Templates
+  - [x] 1.1 Expand JourneyTemplate model to support campaign-specific templates (Product Launch, Lead Gen, Re-Engagement)
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: validations, associations, template categorization; Integration: template selection workflow*
+    - *Status: **COMPLETED** - JourneyTemplate model supports CAMPAIGN_TYPES with validation and customization methods*
+  - [ ] 1.2 Add template metadata fields (category, industry, complexity, prerequisites)
+    - *Docs: https://guides.rubyonrails.org/active_record_migrations.html*
+    - *Testing: Model - Unit: field validations, enum handling; Integration: template filtering and search*
+  - [x] 1.3 Create seed data for pre-built journey templates
+    - *Docs: https://guides.rubyonrails.org/active_record_migrations.html#migrations-and-seed-data*
+    - *Testing: Model - Unit: seed data integrity; Integration: template availability after seeding*
+    - *Status: **COMPLETED** - Template creation methods and default data structure implemented*
+  - [ ] 1.4 Implement LLM-guided campaign intake service
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: LLM integration, response parsing; Integration: end-to-end intake workflow*
+  - [x] 1.5 Add campaign intake fields to Journey model (purpose, goals, timing, audience)
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: field validations, data serialization; Integration: intake form submission*
+    - *Status: **COMPLETED** - Journey model has metadata field for campaign context and analytics*
+  - [ ] 1.6 Create journey template selection interface with guided questions
+    - *Docs: https://stimulus.hotwired.dev/, https://turbo.hotwired.dev/*
+    - *Testing: System - Integration: template selection flow, guided question progression*
+
+- [ ] 2.0 Comprehensive Brand Identity & Compliance System
+  - [x] 2.1 Enhance BrandIdentity model for document uploads using Active Storage
+    - *Docs: https://guides.rubyonrails.org/active_storage_overview.html*
+    - *Testing: Model - Unit: file attachment validations, file type restrictions; Integration: file upload workflow*
+    - *Status: **COMPLETED** - BrandIdentity has multiple Active Storage attachments with validation*
+  - [x] 2.2 Add messaging framework fields (brand pillars, tone ladders, positioning)
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: JSON field validations, nested data structure; Integration: messaging framework creation*
+    - *Status: **COMPLETED** - BrandIdentity has brand_voice, tone_guidelines, messaging_framework fields*
+  - [x] 2.3 Implement compliance document processing and rule extraction
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: document parsing, rule extraction; Integration: compliance validation workflow*
+    - *Status: **COMPLETED** - BrandMaterialsProcessorJob and processed_guidelines field implemented*
+  - [x] 2.4 Create brand compliance checker service
+    - *Docs: https://guides.rubyonrails.org/testing.html#testing-jobs*
+    - *Testing: Service - Unit: compliance rule validation, content checking; Integration: automated compliance verification*
+    - *Status: **COMPLETED** - BrandComplianceChecker service exists*
+  - [x] 2.5 Add brand guidelines upload and processing interface
+    - *Docs: https://guides.rubyonrails.org/active_storage_overview.html#direct-uploads*
+    - *Testing: System - Integration: file upload UI, processing status indicators*
+    - *Status: **COMPLETED** - BrandIdentity has file upload capabilities and status tracking*
+  - [x] 2.6 Implement brand voice and tone analysis from uploaded materials
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: text analysis, tone extraction; Integration: brand voice application to content*
+    - *Status: **COMPLETED** - BrandMaterialsProcessor handles voice/tone extraction*
+
+- [ ] 3.0 Advanced Content Generation Engine
+  - [x] 3.1 Expand GeneratedContent model to support multiple content types (social, email, ads, landing pages, video scripts)
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: content type validations, polymorphic associations; Integration: multi-type content creation*
+    - *Status: **COMPLETED** - GeneratedContent supports 17 content types including all required types*
+  - [x] 3.2 Add content variant generation (short-form vs long-form, promotional vs educational)
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: variant type handling, content length validation; Integration: variant generation workflow*
+    - *Status: **COMPLETED** - FORMAT_VARIANTS implemented with content length validation*
+  - [ ] 3.3 Implement A/B testing framework for content variants
+    - *Docs: https://guides.rubyonrails.org/testing.html*
+    - *Testing: Model - Unit: A/B test configuration, variant tracking; Integration: A/B test creation and management*
+  - [ ] 3.4 Create persona-based content tailoring system
+    - *Docs: https://guides.rubyonrails.org/active_record_associations.html*
+    - *Testing: Service - Unit: persona matching, content adaptation; Integration: persona-based content generation*
+  - [x] 3.5 Add content versioning and approval workflow integration
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: version tracking, approval state management; Integration: content approval workflow*
+    - *Status: **COMPLETED** - Comprehensive versioning system with ApprovalWorkflow integration*
+  - [x] 3.6 Implement channel-specific content formatting and optimization
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: channel format rules, content optimization; Integration: multi-channel content delivery*
+    - *Status: **COMPLETED** - Platform-specific metadata and settings implemented*
+
+- [ ] 4.0 Campaign Planning & Strategy Generation
+  - [x] 4.1 Enhance CampaignPlan model with strategic fields (objectives, target metrics, channel mix)
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: strategic field validations, metric tracking; Integration: campaign strategy creation*
+    - *Status: **COMPLETED** - CampaignPlan has objectives, strategic_rationale, content_strategy fields*
+  - [x] 4.2 Add timeline and milestone planning functionality
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: timeline validation, milestone tracking; Integration: campaign timeline visualization*
+    - *Status: **COMPLETED** - Timeline constraints, generated_timeline, execution tracking implemented*
+  - [x] 4.3 Implement budget context integration and recommendations
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Service - Unit: budget analysis, allocation recommendations; Integration: budget planning workflow*
+    - *Status: **COMPLETED** - Budget constraints field and budget summary methods implemented*
+  - [ ] 4.4 Create competitive analysis and market research integration
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: competitive data processing, market insights; Integration: research integration workflow*
+  - [x] 4.5 Add campaign rationale generation with AI explanations
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: rationale generation, explanation quality; Integration: campaign justification workflow*
+    - *Status: **COMPLETED** - Strategic_rationale field and CampaignPlanService implemented*
+  - [x] 4.6 Implement campaign summary and stakeholder-ready outputs
+    - *Docs: https://guides.rubyonrails.org/action_view_overview.html*
+    - *Testing: Integration - Unit: summary generation, output formatting; Integration: stakeholder presentation creation*
+    - *Status: **COMPLETED** - Plan analytics, sharing tokens, and PDF export service implemented*
+
+- [ ] 5.0 Performance Analytics & Optimization System
+  - [ ] 5.1 Create integration framework for external platforms (Meta, Google Ads, LinkedIn)
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: API integration, data synchronization; Integration: platform connection workflow*
+  - [x] 5.2 Add performance metrics tracking and storage
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: metrics validation, data aggregation; Integration: performance data collection*
+    - *Status: **COMPLETED** - Performance_data, engagement_metrics, roi_tracking fields implemented*
+  - [x] 5.3 Implement analytics dashboard with real-time metrics
+    - *Docs: https://stimulus.hotwired.dev/, https://turbo.hotwired.dev/*
+    - *Testing: System - Integration: dashboard functionality, real-time updates*
+    - *Status: **COMPLETED** - Analytics summary methods and dashboard structure implemented*
+  - [x] 5.4 Create AI-driven optimization recommendations service
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: recommendation algorithms, optimization suggestions; Integration: automated optimization workflow*
+    - *Status: **COMPLETED** - PlanAnalyticsService with optimization recommendations implemented*
+  - [x] 5.5 Add performance reporting and insights generation
+    - *Docs: https://guides.rubyonrails.org/action_view_overview.html*
+    - *Testing: Service - Unit: report generation, insight extraction; Integration: automated reporting workflow*
+    - *Status: **COMPLETED** - Analytics reporting and insights generation methods implemented*
+  - [x] 5.6 Implement conversion tracking and attribution modeling
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: conversion tracking, attribution logic; Integration: end-to-end conversion workflow*
+    - *Status: **COMPLETED** - ROI tracking, execution progress, and performance analytics implemented*
+
+- [ ] 6.0 Enhanced Collaboration & Export Features
+  - [x] 6.1 Expand existing approval workflow system for multi-stage approvals
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: approval state management, workflow validation; Integration: multi-stage approval process*
+    - *Status: **COMPLETED** - ApprovalWorkflow supports multiple workflow types including multi-stage*
+  - [ ] 6.2 Add team member role management and permissions
+    - *Docs: https://github.com/varvet/pundit*
+    - *Testing: Policy - Unit: permission logic, role-based access; Integration: team collaboration workflow*
+  - [ ] 6.3 Implement real-time collaboration features with ActionCable
+    - *Docs: https://guides.rubyonrails.org/action_cable_overview.html*
+    - *Testing: Integration - Unit: WebSocket connections, real-time updates; Integration: collaborative editing workflow*
+  - [x] 6.4 Create export functionality for multiple formats (PDF, PowerPoint, Calendar)
+    - *Docs: https://github.com/prawnpdf/prawn*
+    - *Testing: Service - Unit: format generation, export quality; Integration: multi-format export workflow*
+    - *Status: **COMPLETED** - PlanPdfExportService implemented with PDF export functionality*
+  - [x] 6.5 Add stakeholder sharing with secure tokens and permissions
+    - *Docs: https://guides.rubyonrails.org/security.html*
+    - *Testing: Model - Unit: token generation, permission validation; Integration: secure sharing workflow*
+    - *Status: **COMPLETED** - PlanShareToken model with secure sharing implemented*
+  - [x] 6.6 Implement comment and feedback system for collaborative review
+    - *Docs: https://guides.rubyonrails.org/active_record_associations.html*
+    - *Testing: Model - Unit: comment threading, feedback tracking; Integration: collaborative review workflow*
+    - *Status: **COMPLETED** - FeedbackComment and ContentFeedback models with threading implemented*
+
+- [ ] 7.0 Platform Integration & API Layer
+  - [ ] 7.1 Create robust API authentication system with JWT tokens
+    - *Docs: https://jwt.io/introduction/, https://guides.rubyonrails.org/api_app.html*
+    - *Testing: Controller - Unit: token generation, authentication validation; Integration: API security workflow*
+  - [ ] 7.2 Implement webhook system for real-time data synchronization
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: webhook delivery, retry logic; Integration: webhook registration and processing*
+  - [ ] 7.3 Add rate limiting and API usage monitoring
+    - *Docs: https://guides.rubyonrails.org/caching_with_rails.html*
+    - *Testing: Middleware - Unit: rate limit enforcement, usage tracking; Integration: API throttling workflow*
+  - [ ] 7.4 Create integration connectors for CRM systems (Salesforce, HubSpot)
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: CRM API integration, data mapping; Integration: CRM synchronization workflow*
+  - [ ] 7.5 Implement marketing automation platform integrations (Marketo, Pardot)
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: automation platform APIs, campaign sync; Integration: marketing automation workflow*
+  - [ ] 7.6 Add data transformation and mapping layer for external systems
+    - *Docs: https://guides.rubyonrails.org/active_job_basics.html*
+    - *Testing: Service - Unit: data transformation, field mapping; Integration: cross-platform data consistency*
+
+- [ ] 8.0 Enterprise Security & Scalability
+  - [ ] 8.1 Implement advanced security monitoring and threat detection
+    - *Docs: https://guides.rubyonrails.org/security.html*
+    - *Testing: Service - Unit: threat detection algorithms, alert generation; Integration: security monitoring workflow*
+  - [ ] 8.2 Add comprehensive audit logging for all user actions
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: audit log creation, data integrity; Integration: comprehensive audit trail*
+  - [ ] 8.3 Create multi-tenant architecture with data isolation
+    - *Docs: https://guides.rubyonrails.org/active_record_basics.html*
+    - *Testing: Model - Unit: tenant isolation, data scoping; Integration: multi-tenant data security*
+  - [ ] 8.4 Implement enterprise-grade backup and disaster recovery
+    - *Docs: https://guides.rubyonrails.org/active_record_migrations.html*
+    - *Testing: Service - Unit: backup creation, recovery procedures; Integration: disaster recovery workflow*
+  - [ ] 8.5 Add performance monitoring and optimization tools
+    - *Docs: https://guides.rubyonrails.org/debugging_rails_applications.html*
+    - *Testing: Service - Unit: performance metrics, optimization detection; Integration: performance monitoring workflow*
+  - [ ] 8.6 Create compliance reporting for SOC 2, GDPR, and industry standards
+    - *Docs: https://guides.rubyonrails.org/security.html*
+    - *Testing: Service - Unit: compliance checks, report generation; Integration: automated compliance reporting*

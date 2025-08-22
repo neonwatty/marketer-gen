@@ -162,6 +162,10 @@ JourneyTemplate.find_or_create_by!(
   template.description = 'Comprehensive template for launching new products with awareness building, consideration nurturing, conversion optimization, and retention focus'
   template.template_data = product_launch_data
   template.is_default = true
+  template.category = 'acquisition'
+  template.industry = 'general'
+  template.complexity_level = 'intermediate'
+  template.prerequisites = 'Product development completed, marketing assets ready, basic marketing team in place'
 end
 
 # Lead Generation Campaign Template
@@ -326,6 +330,10 @@ JourneyTemplate.find_or_create_by!(
   template.description = 'Systematic approach to generating and nurturing qualified leads through content marketing, webinars, and automated nurture sequences'
   template.template_data = lead_generation_data
   template.is_default = true
+  template.category = 'acquisition'
+  template.industry = 'b2b'
+  template.complexity_level = 'intermediate'
+  template.prerequisites = 'Content creation capability, CRM system, email marketing platform, basic SEO knowledge'
 end
 
 # Re-Engagement Campaign Template
@@ -488,6 +496,10 @@ JourneyTemplate.find_or_create_by!(
   template.description = 'Win back inactive customers and rebuild engagement through personalized outreach, special offers, and improved onboarding'
   template.template_data = re_engagement_data
   template.is_default = true
+  template.category = 'retention'
+  template.industry = 'general'
+  template.complexity_level = 'beginner'
+  template.prerequisites = 'Customer database with activity tracking, email marketing platform'
 end
 
 # Brand Awareness Campaign Template
@@ -650,6 +662,10 @@ JourneyTemplate.find_or_create_by!(
   template.description = 'Build brand recognition and preference through storytelling, community engagement, and authentic customer advocacy'
   template.template_data = brand_awareness_data
   template.is_default = true
+  template.category = 'engagement'
+  template.industry = 'general'
+  template.complexity_level = 'advanced'
+  template.prerequisites = 'Strong brand identity, social media presence, content creation team, community management capability'
 end
 
 puts "✓ Journey Templates created successfully!"
