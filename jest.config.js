@@ -13,7 +13,7 @@ const customJestConfig = {
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/', '<rootDir>/e2e/'],
   // Transform ES modules from Prisma and auth adapters
   transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$|@prisma/client|@auth/prisma-adapter|@auth/.*|oauth4webapi|next-auth|jose|openid-client))',
+    'node_modules/(?!(.*\\.mjs$|@prisma/client|@auth/prisma-adapter|@auth/.*|oauth4webapi|next-auth|jose|openid-client|@ai-sdk/.*|ai|eventsource-parser))',
   ],
   extensionsToTreatAsEsm: ['.ts'],
   // Handle Prisma client imports

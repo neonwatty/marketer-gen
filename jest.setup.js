@@ -3,6 +3,14 @@ import '@testing-library/jest-dom'
 // Polyfill for Request/Response in Node.js environment
 require('whatwg-fetch')
 
+// Polyfill for Web Streams API in Node.js environment
+if (!global.TransformStream) {
+  const { ReadableStream, WritableStream, TransformStream } = require('node:stream/web')
+  global.ReadableStream = ReadableStream
+  global.WritableStream = WritableStream  
+  global.TransformStream = TransformStream
+}
+
 // Also add undici for Node.js 18+ compatibility
 if (!global.Request) {
   const { Request, Response, Headers, FormData } = require('undici')

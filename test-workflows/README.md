@@ -1,6 +1,6 @@
 # Test Workflows Documentation
 
-This directory contains comprehensive user flow documentation for the marketing platform application, based on completed tasks from the Task Master system.
+This directory contains comprehensive user flow documentation for the marketing platform application.
 
 ## Overview
 
@@ -194,7 +194,6 @@ When adding new features or workflows:
 
 ## Support and Resources
 
-- **Task Master**: Use `task-master list` to view current project tasks
 - **Database**: Use `npm run db:studio` to inspect database
 - **Component Library**: Visit [Shadcn UI](https://ui.shadcn.com/) for component documentation
 - **API Documentation**: Check `/api` route files for endpoint details
