@@ -8,7 +8,10 @@
 
     <!-- Guided Questions Section -->
     <% if @guided_questions.any? %>
-      <div class="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6" data-template-selector-target="guidedQuestions">
+      <div class="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6" 
+           data-template-selector-target="guidedQuestions"
+           role="region"
+           aria-label="Guided template selection questions">
         <% question = @guided_questions.first %>
         <div class="flex items-start space-x-4">
           <div class="flex-shrink-0">
@@ -17,10 +20,12 @@
             </div>
           </div>
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-gray-900 mb-2"><%= question[:question] %></h3>
+            <h3 id="question-<%= question[:step] %>" class="text-lg font-semibold text-gray-900 mb-2"><%= question[:question] %></h3>
             <p class="text-gray-600 mb-4"><%= question[:description] %></p>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+                 role="group"
+                 aria-labelledby="question-<%= question[:step] %>">
               <% question[:options].each do |option| %>
                 <%= form_with url: select_template_journeys_path, method: :get, local: false, 
                     data: { 
@@ -37,7 +42,9 @@
                   <%= form.hidden_field question[:type], value: option[:value] %>
                   
                   <button type="submit" 
-                          class="text-left p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          class="text-left p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 hover:scale-102 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                          role="button"
+                          aria-label="Select <%= option[:label] %> - <%= option[:description] %>">
                     <div class="flex items-start space-x-3">
                       <% if option[:icon] %>
                         <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">

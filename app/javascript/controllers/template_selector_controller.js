@@ -22,25 +22,44 @@ export default class extends Controller {
 
   // Handle guided question responses
   handleQuestionResponse(event) {
-    // Add loading state to the question area
+    // Add progressive animation and loading state
     const questionArea = this.guidedQuestionsTarget
-    questionArea.classList.add("opacity-50", "pointer-events-none")
+    const clickedButton = event.target.closest('button')
     
-    // Add spinner or loading indicator
-    const loader = document.createElement("div")
-    loader.className = "absolute inset-0 flex items-center justify-center bg-white bg-opacity-75"
-    loader.innerHTML = '<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>'
+    // Highlight selected option
+    if (clickedButton) {
+      clickedButton.classList.add("bg-blue-100", "border-blue-400", "scale-95")
+    }
+    
+    // Add loading state with smoother animation
+    questionArea.classList.add("transition-all", "duration-300", "opacity-75", "pointer-events-none")
+    
+    // Add progress indicator
+    const progressBar = document.createElement("div")
+    progressBar.className = "absolute top-0 left-0 right-0 h-1 bg-blue-200 overflow-hidden"
+    progressBar.innerHTML = '<div class="h-full bg-blue-600 animate-pulse" style="width: 0%; transition: width 1s ease-out;"></div>'
     questionArea.style.position = "relative"
-    questionArea.appendChild(loader)
+    questionArea.appendChild(progressBar)
     
-    // The form submission will be handled by Turbo
-    // We just need to clean up the loading state after response
+    // Animate progress bar
     setTimeout(() => {
-      questionArea.classList.remove("opacity-50", "pointer-events-none")
-      if (loader.parentNode) {
-        loader.remove()
+      progressBar.querySelector('div').style.width = "100%"
+    }, 100)
+    
+    // Clean up after response
+    this.cleanupQuestionResponse(questionArea, progressBar, clickedButton)
+  }
+  
+  cleanupQuestionResponse(questionArea, progressBar, clickedButton) {
+    setTimeout(() => {
+      questionArea.classList.remove("opacity-75", "pointer-events-none")
+      if (progressBar && progressBar.parentNode) {
+        progressBar.remove()
       }
-    }, 1000)
+      if (clickedButton) {
+        clickedButton.classList.remove("bg-blue-100", "border-blue-400", "scale-95")
+      }
+    }, 1200)
   }
 
   // Show template preview in modal
