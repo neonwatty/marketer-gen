@@ -1,24 +1,24 @@
 "use client"
 
 import * as React from "react"
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useEffect,useState } from "react"
+
+import { BarChart3, Eye,FileText, Image, Plus, Search, Settings } from "lucide-react"
+
 import { 
-  BrandAssetLibrary, 
-  BrandOverview, 
   BrandAnalytics, 
+  BrandAssetLibrary, 
+  BrandComparison, 
   BrandGuidelines, 
-  BrandComparison 
-} from "@/components/features/brand"
-import { Plus, Search, Settings, BarChart3, FileText, Palette, Type, Image, Eye } from "lucide-react"
-import { BrandWithRelations, BrandSummary } from "@/lib/types/brand"
+  BrandOverview} from "@/components/features/brand"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BrandService } from "@/lib/api/brands"
+import { BrandSummary,BrandWithRelations } from "@/lib/types/brand"
 
 export default function BrandDashboardPage() {
   const [brands, setBrands] = useState<BrandSummary[]>([])

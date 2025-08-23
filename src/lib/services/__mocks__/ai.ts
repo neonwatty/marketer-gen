@@ -5,4 +5,4 @@
 const mockStreamText = jest.fn()
 const mockGenerateText = jest.fn()
 
-export { mockStreamText as streamText, mockGenerateText as generateText }
+export { mockGenerateText as generateText,mockStreamText as streamText }

@@ -3,7 +3,8 @@
  * These tests verify the service logic without requiring mocks
  * @jest-environment node
  */
-import { describe, expect, it, beforeEach, afterEach } from '@jest/globals'
+import { afterEach,beforeEach, describe, expect, it } from '@jest/globals'
+
 import { OpenAIService, OpenAIServiceError, TextGenerationRequestSchema } from './openai-service'
 
 describe('OpenAI Service - Integration Tests', () => {

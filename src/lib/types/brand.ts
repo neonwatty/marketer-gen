@@ -1,7 +1,7 @@
-import { Brand, BrandAsset, ColorPalette, Typography, BrandAssetType } from "@/generated/prisma"
+import { Brand, BrandAsset, BrandAssetType,ColorPalette, Typography } from "@/generated/prisma"
 
 // Base brand types from Prisma
-export type { Brand, BrandAsset, ColorPalette, Typography, BrandAssetType }
+export type { Brand, BrandAsset, BrandAssetType,ColorPalette, Typography }
 
 // Extended brand types with relationships
 export type BrandWithRelations = Brand & {

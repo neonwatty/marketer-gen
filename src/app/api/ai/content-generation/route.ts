@@ -1,9 +1,11 @@
-import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+
 import { z } from 'zod'
 
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { ContentVariantService } from '@/lib/services/content-variant-service'
 import { openAIService } from '@/lib/services/openai-service'
 
 // Retry configuration
@@ -71,6 +73,8 @@ const ContentGenerationRequestSchema = z.object({
   callToAction: z.string().optional(),
   includeVariants: z.boolean().default(false),
   variantCount: z.number().min(1).max(5).default(1),
+  variantStrategies: z.array(z.enum(['style_variation', 'length_variation', 'angle_variation', 'tone_variation', 'cta_variation'])).optional(),
+  useTemplates: z.boolean().default(false),
   maxLength: z.number().min(50).max(5000).optional(),
   keywords: z.array(z.string()).max(10).optional(),
   brandCompliance: z.object({
@@ -89,6 +93,26 @@ const ContentGenerationResponseSchema = z.object({
   success: z.boolean(),
   content: z.string(),
   variants: z.array(z.string()).optional(),
+  enhancedVariants: z.array(z.object({
+    id: z.string(),
+    content: z.string(),
+    strategy: z.enum(['style_variation', 'length_variation', 'angle_variation', 'tone_variation', 'cta_variation']),
+    score: z.number().optional(),
+    metrics: z.object({
+      estimatedEngagement: z.number(),
+      readabilityScore: z.number(),
+      brandAlignment: z.number(),
+      formatOptimization: z.number(),
+    }).optional(),
+    formatOptimizations: z.object({
+      platform: z.string().optional(),
+      characterCount: z.number(),
+      wordCount: z.number(),
+      hasHashtags: z.boolean().optional(),
+      hasCTA: z.boolean().optional(),
+      keywordDensity: z.record(z.string(), z.number()),
+    }).optional(),
+  })).optional(),
   brandCompliance: z.object({
     isCompliant: z.boolean(),
     violations: z.array(z.string()),
@@ -286,7 +310,7 @@ async function validateBrandCompliance(
   }
 }
 
-// Generate content variants
+// Legacy variant generation for backwards compatibility
 async function generateContentVariants(
   originalContent: string,
   contentType: string,
@@ -343,6 +367,8 @@ async function generateContent(
     keywords,
     includeVariants,
     variantCount,
+    variantStrategies,
+    useTemplates,
     brandCompliance,
     includeAnalysis
   } = request
@@ -358,55 +384,141 @@ async function generateContent(
     brandData.messagingFramework && `Key Messages: ${JSON.stringify(brandData.messagingFramework)}`,
   ].filter(Boolean).join('\n')
 
-  // Generate main content with enhanced prompt structure
-  const generationPrompt = `
-    You are a professional content creator specializing in ${contentType.toLowerCase().replace('_', ' ')} content.
-    
-    BRAND CONTEXT:
-    ${brandContext}
-    
-    CONTENT REQUIREMENTS:
-    - Type: ${contentType.replace('_', ' ')}
-    - Tone: ${tone}
-    ${targetAudience ? `- Target Audience: ${targetAudience}` : ''}
-    ${channel ? `- Channel: ${channel}` : ''}
-    ${callToAction ? `- Include CTA: ${callToAction}` : ''}
-    ${maxLength ? `- Max Length: ${maxLength} characters` : ''}
-    ${keywords ? `- Include Keywords: ${keywords.join(', ')}` : ''}
-    
-    USER PROMPT: ${prompt}
-    
-    Generate high-quality, brand-compliant ${contentType.toLowerCase().replace('_', ' ')} content that:
-    1. Aligns with the brand voice and messaging framework
-    2. Engages the target audience effectively  
-    3. Maintains the specified tone throughout
-    4. Incorporates the requirements naturally
-    5. Is optimized for the intended channel
-    6. Avoids restricted terms and follows brand guidelines
-    7. Uses varied vocabulary and engaging language
-    
-    Important: Create content that would score highly on brand compliance checks.
-    Provide only the content, no explanations or meta-commentary.
-  `
+  // Generate main content - use template-based generation if requested
+  let mainContent: string
+  let contentResult: any
 
-  const maxTokens = maxLength ? Math.min(2000, Math.ceil(maxLength / 2)) : 1500
-  const contentResult = await retryWithBackoff(() =>
-    openAIService.instance.generateText({
-      prompt: generationPrompt,
-      maxTokens,
-      temperature: 0.7
-    })
-  )
+  if (useTemplates) {
+    try {
+      mainContent = await ContentVariantService.generateTemplatedContent(
+        contentType,
+        prompt,
+        brandContext
+      )
+      // Create a mock result object for consistency
+      contentResult = { text: mainContent }
+    } catch (error) {
+      console.warn('Template-based generation failed, falling back to standard generation:', error)
+      // Fall back to standard generation
+      const generationPrompt = `
+        You are a professional content creator specializing in ${contentType.toLowerCase().replace('_', ' ')} content.
+        
+        BRAND CONTEXT:
+        ${brandContext}
+        
+        CONTENT REQUIREMENTS:
+        - Type: ${contentType.replace('_', ' ')}
+        - Tone: ${tone}
+        ${targetAudience ? `- Target Audience: ${targetAudience}` : ''}
+        ${channel ? `- Channel: ${channel}` : ''}
+        ${callToAction ? `- Include CTA: ${callToAction}` : ''}
+        ${maxLength ? `- Max Length: ${maxLength} characters` : ''}
+        ${keywords ? `- Include Keywords: ${keywords.join(', ')}` : ''}
+        
+        USER PROMPT: ${prompt}
+        
+        Generate high-quality, brand-compliant ${contentType.toLowerCase().replace('_', ' ')} content that:
+        1. Aligns with the brand voice and messaging framework
+        2. Engages the target audience effectively  
+        3. Maintains the specified tone throughout
+        4. Incorporates the requirements naturally
+        5. Is optimized for the intended channel
+        6. Avoids restricted terms and follows brand guidelines
+        7. Uses varied vocabulary and engaging language
+        
+        Important: Create content that would score highly on brand compliance checks.
+        Provide only the content, no explanations or meta-commentary.
+      `
 
-  const mainContent = contentResult.text.trim()
+      const maxTokens = maxLength ? Math.min(2000, Math.ceil(maxLength / 2)) : 1500
+      contentResult = await retryWithBackoff(() =>
+        openAIService.instance.generateText({
+          prompt: generationPrompt,
+          maxTokens,
+          temperature: 0.7
+        })
+      )
+      mainContent = contentResult.text.trim()
+    }
+  } else {
+    // Standard generation
+    const generationPrompt = `
+      You are a professional content creator specializing in ${contentType.toLowerCase().replace('_', ' ')} content.
+      
+      BRAND CONTEXT:
+      ${brandContext}
+      
+      CONTENT REQUIREMENTS:
+      - Type: ${contentType.replace('_', ' ')}
+      - Tone: ${tone}
+      ${targetAudience ? `- Target Audience: ${targetAudience}` : ''}
+      ${channel ? `- Channel: ${channel}` : ''}
+      ${callToAction ? `- Include CTA: ${callToAction}` : ''}
+      ${maxLength ? `- Max Length: ${maxLength} characters` : ''}
+      ${keywords ? `- Include Keywords: ${keywords.join(', ')}` : ''}
+      
+      USER PROMPT: ${prompt}
+      
+      Generate high-quality, brand-compliant ${contentType.toLowerCase().replace('_', ' ')} content that:
+      1. Aligns with the brand voice and messaging framework
+      2. Engages the target audience effectively  
+      3. Maintains the specified tone throughout
+      4. Incorporates the requirements naturally
+      5. Is optimized for the intended channel
+      6. Avoids restricted terms and follows brand guidelines
+      7. Uses varied vocabulary and engaging language
+      
+      Important: Create content that would score highly on brand compliance checks.
+      Provide only the content, no explanations or meta-commentary.
+    `
+
+    const maxTokens = maxLength ? Math.min(2000, Math.ceil(maxLength / 2)) : 1500
+    contentResult = await retryWithBackoff(() =>
+      openAIService.instance.generateText({
+        prompt: generationPrompt,
+        maxTokens,
+        temperature: 0.7
+      })
+    )
+    mainContent = contentResult.text.trim()
+  }
 
   // Validate brand compliance with enhanced scoring
   const complianceResult = await validateBrandCompliance(mainContent, brandData, brandCompliance)
 
-  // Generate variants if requested
-  const variants = includeVariants 
-    ? await generateContentVariants(mainContent, contentType, variantCount, brandContext)
-    : undefined
+  // Generate variants if requested - use enhanced variant service if strategies specified
+  let variants: string[] | undefined
+  let enhancedVariants: any[] | undefined
+
+  if (includeVariants && variantStrategies && variantStrategies.length > 0) {
+    // Use enhanced variant generation
+    try {
+      const enhancedVariantResults = await ContentVariantService.generateEnhancedVariants(
+        mainContent,
+        contentType,
+        variantCount,
+        brandContext,
+        {
+          strategies: variantStrategies,
+          currentTone: tone,
+          businessGoal: 'engagement',
+          targetAudience
+        }
+      )
+      
+      enhancedVariants = enhancedVariantResults
+      // Also provide basic variants for backwards compatibility
+      variants = enhancedVariantResults.map(v => v.content)
+    } catch (error) {
+      console.warn('Enhanced variant generation failed, falling back to legacy:', error)
+      // Fall back to legacy variant generation
+      variants = await generateContentVariants(mainContent, contentType, variantCount, brandContext)
+      enhancedVariants = undefined // Explicitly set to undefined on fallback
+    }
+  } else if (includeVariants) {
+    // Use legacy variant generation
+    variants = await generateContentVariants(mainContent, contentType, variantCount, brandContext)
+  }
 
   // Calculate content metrics
   const wordCount = mainContent.split(/\s+/).length
@@ -425,6 +537,7 @@ async function generateContent(
     success: true,
     content: mainContent,
     variants,
+    enhancedVariants,
     brandCompliance: complianceResult,
     analysis,
     metadata: {
@@ -903,7 +1016,15 @@ export async function GET() {
       supportedContentTypes: [
         'EMAIL', 'SOCIAL_POST', 'SOCIAL_AD', 'SEARCH_AD', 'BLOG_POST',
         'LANDING_PAGE', 'VIDEO_SCRIPT', 'INFOGRAPHIC', 'NEWSLETTER', 'PRESS_RELEASE'
-      ]
+      ],
+      variantStrategies: Object.keys(ContentVariantService.getVariantStrategies()),
+      formatTemplatesAvailable: true, 
+      features: {
+        enhancedVariants: true,
+        templateGeneration: true,
+        formatOptimization: true,
+        strategicVariation: true
+      }
     })
   } catch (error) {
     console.error('Health check error:', error)

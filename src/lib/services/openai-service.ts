@@ -1,5 +1,5 @@
 import { openai } from '@ai-sdk/openai'
-import { streamText, generateText, GenerateTextResult, StreamTextResult } from 'ai'
+import { generateText, streamText } from 'ai'
 import { z } from 'zod'
 
 /**

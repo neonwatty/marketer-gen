@@ -1,25 +1,23 @@
 "use client"
 
 import * as React from "react"
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useEffect,useState } from "react"
+
 import { 
+  BarChart3, 
   GitCompare, 
-  Plus, 
-  X, 
-  Palette, 
-  Type, 
-  FileText, 
-  BarChart3,
   Image as ImageIcon,
-  Users
-} from "lucide-react"
-import { BrandWithRelations, BrandSummary } from "@/lib/types/brand"
+  Palette, 
+  Plus, 
+  Users,
+  X} from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BrandService } from "@/lib/api/brands"
+import { BrandSummary,BrandWithRelations } from "@/lib/types/brand"
 
 interface BrandComparisonProps {
   currentBrand: BrandWithRelations

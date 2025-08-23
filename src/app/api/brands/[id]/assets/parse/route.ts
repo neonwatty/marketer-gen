@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
+
 import { z } from "zod"
 
 import { prisma } from "@/lib/database"
-import { BrandGuidelinesProcessor, BrandGuidelinesProcessingSettings } from "@/lib/services/brand-guidelines-processor"
+import { BrandGuidelinesProcessingSettings,BrandGuidelinesProcessor } from "@/lib/services/brand-guidelines-processor"
 
 // Document parse request schema
 const DocumentParseSchema = z.object({

@@ -1,15 +1,13 @@
 import { 
-  BrandWithRelations, 
-  BrandSummary, 
-  CreateBrandData, 
-  UpdateBrandData,
-  CreateBrandAssetData,
-  UpdateBrandAssetData,
   BrandAsset,
+  BrandSummary, 
+  BrandWithRelations, 
+  CreateBrandAssetData,
+  CreateBrandData, 
   DocumentParseRequest,
-  DocumentParseResult,
-  EnhancedDocumentParseResult
-} from "@/lib/types/brand"
+  EnhancedDocumentParseResult,
+  UpdateBrandAssetData,
+  UpdateBrandData} from "@/lib/types/brand"
 
 const API_BASE = "/api/brands"
 

@@ -3,7 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 
-import { AlertCircle,File, FileImage, FileText, Link, Upload, X } from "lucide-react"
+import { AlertCircle,File, FileImage, Link, Upload, X } from "lucide-react"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"

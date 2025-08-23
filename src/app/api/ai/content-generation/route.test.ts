@@ -1,6 +1,7 @@
-import { beforeEach, afterEach, describe, expect, it, jest } from '@jest/globals'
-import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
+import { getServerSession } from 'next-auth'
+
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals'
 
 // Mock dependencies before importing the route and services
 
@@ -40,6 +41,21 @@ jest.mock('@/lib/services/openai-service', () => ({
   },
 }))
 
+// Mock the ContentVariantService
+const mockGenerateEnhancedVariants = jest.fn()
+const mockGenerateTemplatedContent = jest.fn()
+const mockGetVariantStrategies = jest.fn()
+const mockGetFormatTemplate = jest.fn()
+
+jest.mock('@/lib/services/content-variant-service', () => ({
+  ContentVariantService: {
+    generateEnhancedVariants: mockGenerateEnhancedVariants,
+    generateTemplatedContent: mockGenerateTemplatedContent,
+    getVariantStrategies: mockGetVariantStrategies,
+    getFormatTemplate: mockGetFormatTemplate,
+  }
+}))
+
 // Mock the generated Prisma client
 const mockBrandFindFirst = jest.fn()
 
@@ -67,8 +83,9 @@ jest.mock('@/lib/auth', () => ({
 }))
 
 // Import after mocking
-import { openAIService } from '@/lib/services/openai-service'
 import { prisma } from '@/lib/db'
+import { openAIService } from '@/lib/services/openai-service'
+
 import { GET, POST } from './route'
 
 const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>
@@ -172,6 +189,73 @@ describe('/api/ai/content-generation', () => {
     instance.generateText = mockGenerateText
     instance.streamText = mockStreamText
     instance.getConfig = mockGetConfig
+
+    // Setup ContentVariantService mocks
+    mockGenerateEnhancedVariants.mockResolvedValue([
+      {
+        id: 'variant_2',
+        content: 'Style variant: Professional approach with formal language.',
+        strategy: 'style_variation',
+        metrics: {
+          estimatedEngagement: 75,
+          readabilityScore: 80,
+          brandAlignment: 85,
+          formatOptimization: 90
+        },
+        formatOptimizations: {
+          characterCount: 52,
+          wordCount: 8,
+          hasHashtags: false,
+          hasCTA: false,
+          keywordDensity: { 'professional': 12.5, 'approach': 12.5 }
+        }
+      },
+      {
+        id: 'variant_3',
+        content: 'Tone variant: Friendly and casual approach to the same topic.',
+        strategy: 'tone_variation',
+        metrics: {
+          estimatedEngagement: 70,
+          readabilityScore: 85,
+          brandAlignment: 80,
+          formatOptimization: 85
+        },
+        formatOptimizations: {
+          characterCount: 58,
+          wordCount: 10,
+          hasHashtags: false,
+          hasCTA: false,
+          keywordDensity: { 'friendly': 10, 'casual': 10, 'approach': 10 }
+        }
+      }
+    ])
+
+    mockGenerateTemplatedContent.mockResolvedValue(
+      'Subject: Welcome to our service\n\nHi there,\n\nWelcome message with template structure.\n\nClick here to get started\n\nBest regards,\nTeam'
+    )
+
+    mockGetVariantStrategies.mockReturnValue({
+      style_variation: { name: 'style_variation', description: 'Style variations', prompt: 'Create style variation...', temperature: 0.8 },
+      tone_variation: { name: 'tone_variation', description: 'Tone variations', prompt: 'Create tone variation...', temperature: 0.7 },
+      angle_variation: { name: 'angle_variation', description: 'Angle variations', prompt: 'Create angle variation...', temperature: 0.9 },
+      length_variation: { name: 'length_variation', description: 'Length variations', prompt: 'Create length variation...', temperature: 0.6 },
+      cta_variation: { name: 'cta_variation', description: 'CTA variations', prompt: 'Create CTA variation...', temperature: 0.7 }
+    })
+
+    mockGetFormatTemplate.mockReturnValue({
+      type: 'EMAIL',
+      name: 'Email Marketing Template',
+      template: 'Subject: {{subject}}\n\nHi {{recipient}},\n\n{{body}}\n\n{{cta}}\n\nBest regards,\n{{sender}}',
+      placeholders: ['subject', 'recipient', 'body', 'cta', 'sender'],
+      optimizations: {
+        maxCharacters: 3000,
+        maxWords: 500,
+        requiredElements: ['subject', 'personalization', 'clear_cta'],
+        bestPractices: ['Use personalization', 'Clear subject line', 'Single CTA', 'Mobile-friendly'],
+        platforms: ['email']
+      },
+      examples: ['Newsletter', 'Promotional email', 'Welcome series']
+    })
   })
 
   afterEach(() => {
@@ -631,5 +715,190 @@ describe('/api/ai/content-generation', () => {
       expect(data.requestId).toBeDefined()
       expect(data.requestId).toMatch(/^req_\d+_[a-z0-9]+$/)
     }, 10000)
+  })
+
+  describe('Enhanced Variant Generation', () => {
+    it('should generate enhanced variants with specified strategies', async () => {
+      const enhancedVariantRequest = {
+        ...mockContentGenerationRequest,
+        includeVariants: true,
+        variantCount: 3,
+        variantStrategies: ['style_variation', 'tone_variation']
+      }
+
+      // Mock main content generation and variant generation
+      mockGenerateText
+        .mockResolvedValueOnce(mockGeneratedContent) // Main content
+        .mockResolvedValueOnce({ text: 'Style variant: Professional approach with formal language.' }) // Style variation
+        .mockResolvedValueOnce({ text: 'Tone variant: Friendly and casual approach to the same topic.' }) // Tone variation
+
+      const request = createMockRequest(enhancedVariantRequest)
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(data.variants).toBeDefined()
+      expect(data.enhancedVariants).toBeDefined()
+      expect(data.enhancedVariants).toHaveLength(2)
+      
+      // Check enhanced variant structure
+      expect(data.enhancedVariants[0]).toHaveProperty('id')
+      expect(data.enhancedVariants[0]).toHaveProperty('content')
+      expect(data.enhancedVariants[0]).toHaveProperty('strategy')
+      expect(data.enhancedVariants[0]).toHaveProperty('metrics')
+      expect(data.enhancedVariants[0]).toHaveProperty('formatOptimizations')
+      
+      // Check strategies are applied correctly
+      expect(data.enhancedVariants[0].strategy).toBe('style_variation')
+      expect(data.enhancedVariants[1].strategy).toBe('tone_variation')
+    })
+
+    it('should handle enhanced variant generation with OpenAI service properly', async () => {
+      // This test verifies that enhanced variants work with the mocked OpenAI service
+      const enhancedVariantRequest = {
+        ...mockContentGenerationRequest,
+        includeVariants: true,
+        variantCount: 2,
+        variantStrategies: ['style_variation']
+      }
+
+      // Use the default mocking behavior - don't reset mocks
+      // The default mock will provide content that the ContentVariantService can use
+
+      const request = createMockRequest(enhancedVariantRequest)
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(data.variants).toBeDefined()
+      expect(data.enhancedVariants).toBeDefined()
+      
+      // The enhanced variants should be generated using the ContentVariantService
+      // which calls the OpenAI service mock and gets the default mock content
+      if (data.enhancedVariants.length > 0) {
+        expect(data.enhancedVariants[0]).toHaveProperty('id')
+        expect(data.enhancedVariants[0]).toHaveProperty('content')
+        expect(data.enhancedVariants[0]).toHaveProperty('strategy')
+        expect(data.enhancedVariants[0]).toHaveProperty('metrics')
+        expect(data.enhancedVariants[0]).toHaveProperty('formatOptimizations')
+        expect(data.enhancedVariants[0].strategy).toBe('style_variation')
+      }
+    })
+
+    it('should use legacy variant generation when no strategies specified', async () => {
+      const legacyVariantRequest = {
+        ...mockContentGenerationRequest,
+        includeVariants: true,
+        variantCount: 2
+        // No variantStrategies specified
+      }
+
+      mockGenerateText
+        .mockResolvedValueOnce(mockGeneratedContent) // Main content
+        .mockResolvedValueOnce({ text: 'Legacy variant content' }) // Legacy variant
+
+      const request = createMockRequest(legacyVariantRequest)
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.variants).toBeDefined()
+      expect(data.variants).toHaveLength(1)
+      expect(data.enhancedVariants).toBeUndefined()
+    })
+
+    it('should not generate variants when includeVariants is false', async () => {
+      const noVariantRequest = {
+        ...mockContentGenerationRequest,
+        includeVariants: false,
+        variantStrategies: ['style_variation']
+      }
+
+      mockGenerateText.mockResolvedValueOnce(mockGeneratedContent)
+
+      const request = createMockRequest(noVariantRequest)
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.variants).toBeUndefined()
+      expect(data.enhancedVariants).toBeUndefined()
+    })
+  })
+
+  describe('Template-based Generation', () => {
+    it('should use template-based generation when useTemplates is true', async () => {
+      const templateRequest = {
+        ...mockContentGenerationRequest,
+        useTemplates: true
+      }
+
+      // Mock template-based content generation
+      mockGenerateText.mockResolvedValueOnce({ 
+        text: 'Subject: Welcome to our service\n\nHi there,\n\nWelcome message with template structure.\n\nClick here to get started\n\nBest regards,\nTeam'
+      })
+
+      const request = createMockRequest(templateRequest)
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(data.content).toContain('Subject:')
+      expect(data.content).toContain('Welcome')
+      
+      // Check that the prompt contains template information
+      expect(mockGenerateText).toHaveBeenCalledWith(
+        expect.objectContaining({
+          prompt: expect.stringContaining('TEMPLATE:'),
+          temperature: 0.7
+        })
+      )
+    })
+
+    it('should fallback to standard generation when template generation fails', async () => {
+      const templateRequest = {
+        ...mockContentGenerationRequest,
+        useTemplates: true
+      }
+
+      // Mock template generation failure, then standard generation success
+      mockGenerateText
+        .mockRejectedValueOnce(new Error('Template generation failed'))
+        .mockResolvedValueOnce(mockGeneratedContent)
+
+      const request = createMockRequest(templateRequest)
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(data.content).toBe(mockGeneratedContent.text)
+    })
+  })
+
+  describe('Enhanced Health Check', () => {
+    it('should include variant strategies and features in health check', async () => {
+      const response = await GET()
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.variantStrategies).toBeDefined()
+      expect(Array.isArray(data.variantStrategies)).toBe(true)
+      expect(data.variantStrategies).toContain('style_variation')
+      expect(data.variantStrategies).toContain('tone_variation')
+      expect(data.variantStrategies).toContain('angle_variation')
+      expect(data.variantStrategies).toContain('length_variation')
+      expect(data.variantStrategies).toContain('cta_variation')
+      
+      expect(data.formatTemplatesAvailable).toBe(true)
+      expect(data.features).toBeDefined()
+      expect(data.features.enhancedVariants).toBe(true)
+      expect(data.features.templateGeneration).toBe(true)
+      expect(data.features.formatOptimization).toBe(true)
+      expect(data.features.strategicVariation).toBe(true)
+    })
   })
 })

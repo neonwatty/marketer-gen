@@ -1,20 +1,19 @@
 "use client"
 
 import * as React from "react"
-import { useState, useMemo } from "react"
+import { useMemo,useState } from "react"
 import Image from "next/image"
-import { Search, Filter, Grid, List, Download, Eye, MoreHorizontal, Plus, Tag, Calendar, FileType, SortAsc, SortDesc } from "lucide-react"
+
+import { Download, Eye, Grid, List, MoreHorizontal, Plus, Search, SortAsc, SortDesc,Tag } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Card, CardContent } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { BrandAsset, BrandAssetType } from "@/lib/types/brand"
 
 interface BrandAssetLibraryProps {
@@ -90,7 +89,7 @@ export function BrandAssetLibrary({
 
   // Filter and sort assets
   const filteredAssets = useMemo(() => {
-    let filtered = assets.filter(asset => {
+    const filtered = assets.filter(asset => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase()

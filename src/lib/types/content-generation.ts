@@ -118,11 +118,21 @@ export interface ContentTemplate {
 export interface ContentVariant {
   id: string
   content: string
+  strategy: 'style_variation' | 'length_variation' | 'angle_variation' | 'tone_variation' | 'cta_variation'
   score?: number
   metrics?: {
     estimatedEngagement: number
     readabilityScore: number
     brandAlignment: number
+    formatOptimization: number
+  }
+  formatOptimizations?: {
+    platform?: string
+    characterCount: number
+    wordCount: number
+    hasHashtags?: boolean
+    hasCTA?: boolean
+    keywordDensity: Record<string, number>
   }
 }
 
@@ -157,6 +167,8 @@ export interface ContentGenerationOptions {
   optimizeForPlatform?: string
   includeMetrics?: boolean
   validateCompliance?: boolean
+  variantStrategies?: Array<'style_variation' | 'length_variation' | 'angle_variation' | 'tone_variation' | 'cta_variation'>
+  formatTemplates?: boolean
 }
 
 // Content export format
@@ -240,9 +252,9 @@ export const BrandContextSchema = z.object({
 
 // Type exports
 export type {
+  BrandContext as BrandContextType,
   ContentGenerationRequest as ContentGenerationRequestType,
   ContentGenerationResponse as ContentGenerationResponseType,
-  BrandContext as BrandContextType,
 }
 
 // Helper functions
@@ -272,6 +284,31 @@ export const getToneDisplayName = (tone: ToneOptionValue): string => {
     [ToneOption.URGENT]: 'Urgent',
   }
   return displayNames[tone] || tone
+}
+
+// Format-specific templates and optimizations
+export interface ContentFormatTemplate {
+  type: ContentTypeValue
+  name: string
+  template: string
+  placeholders: string[]
+  optimizations: {
+    maxCharacters: number
+    maxWords: number
+    requiredElements: string[]
+    bestPractices: string[]
+    platforms?: string[]
+  }
+  examples: string[]
+}
+
+// Variant generation strategies
+export interface VariantStrategy {
+  name: 'style_variation' | 'length_variation' | 'angle_variation' | 'tone_variation' | 'cta_variation'
+  description: string
+  prompt: string
+  temperature: number
+  maxTokens?: number
 }
 
 export const validateContentLength = (content: string, type: ContentTypeValue): { isValid: boolean; message?: string } => {

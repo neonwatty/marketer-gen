@@ -2,27 +2,25 @@
 
 import * as React from "react"
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
+
 import { 
-  FileText, 
-  Download, 
-  Upload, 
-  Eye, 
-  Search, 
-  Filter,
   BookOpen,
-  Palette,
-  Type,
-  Image,
+  Download, 
+  Eye, 
+  FileText,
   MessageSquare,
+  Palette,
+  Plus,
+  Search, 
   Shield,
-  Plus
-} from "lucide-react"
-import { BrandWithRelations, BrandAsset, PARSEABLE_ASSET_TYPES } from "@/lib/types/brand"
+  Upload} from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { BrandAsset, BrandWithRelations, PARSEABLE_ASSET_TYPES } from "@/lib/types/brand"
 
 interface BrandGuidelinesProps {
   brand: BrandWithRelations

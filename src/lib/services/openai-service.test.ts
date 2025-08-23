@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { describe, expect, it, jest, beforeEach, afterEach } from '@jest/globals'
+import { afterEach,beforeEach, describe, expect, it, jest } from '@jest/globals'
 
 // Mock functions
 const mockOpenaiFunction = jest.fn()
@@ -23,9 +23,10 @@ jest.mock('ai', () => {
 })
 
 // Import modules after mocking
-import { OpenAIService, OpenAIServiceError, TextGenerationRequestSchema } from './openai-service'
 import { openai } from '@ai-sdk/openai'
-import { streamText, generateText } from 'ai'
+import { generateText,streamText } from 'ai'
+
+import { OpenAIService, OpenAIServiceError, TextGenerationRequestSchema } from './openai-service'
 
 // Cast imported modules to jest mocks for proper typing
 const mockOpenai = openai as jest.MockedFunction<typeof openai>
