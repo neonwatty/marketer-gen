@@ -306,6 +306,41 @@ model ContentTemplate {
   @@map("content_templates")
 }
 
+// JourneyTemplate model for pre-built journey templates with industry customization
+model JourneyTemplate {
+  id          String              @id @default(cuid())
+  name        String
+  description String?
+  industry    JourneyIndustry     // Industry for which this template is designed
+  category    JourneyCategory     // Template category (acquisition, retention, etc.)
+  stages      Json                // Template journey stages configuration as JSON
+  metadata    Json?               // Additional template metadata (tags, difficulty, etc.)
+  isActive    Boolean             @default(true)
+  isPublic    Boolean             @default(true) // Whether template is available to all users
+  
+  // Customization options
+  customizationConfig Json?       // Configuration for available customizations
+  defaultSettings     Json?       // Default settings for new journeys from this template
+  
+  // Usage statistics
+  usageCount   Int                @default(0) // How many times this template has been used
+  rating       Float?             // Average user rating (1-5)
+  ratingCount  Int                @default(0) // Number of ratings
+  
+  // Metadata
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  deletedAt    DateTime?          // Soft delete functionality
+  createdBy    String?            // User who created this template
+  updatedBy    String?            // User who last updated this template
+
+  @@index([industry])
+  @@index([category])
+  @@index([isActive])
+  @@index([isPublic])
+  @@map("journey_templates")
+}
+
 // Analytics model for tracking campaign and content performance
 model Analytics {
   id         String        @id @default(cuid())
@@ -410,4 +445,42 @@ enum BrandAssetType {
   VIDEO
   AUDIO
   OTHER
+}
+
+enum JourneyIndustry {
+  TECHNOLOGY
+  HEALTHCARE
+  FINANCE
+  RETAIL
+  EDUCATION
+  REAL_ESTATE
+  AUTOMOTIVE
+  HOSPITALITY
+  MANUFACTURING
+  CONSULTING
+  NONPROFIT
+  ECOMMERCE
+  SAAS
+  MEDIA
+  FOOD_BEVERAGE
+  FITNESS
+  TRAVEL
+  FASHION
+  LEGAL
+  OTHER
+}
+
+enum JourneyCategory {
+  CUSTOMER_ACQUISITION
+  LEAD_NURTURING
+  CUSTOMER_ONBOARDING
+  RETENTION
+  UPSELL_CROSS_SELL
+  WIN_BACK
+  REFERRAL
+  BRAND_AWARENESS
+  PRODUCT_LAUNCH
+  EVENT_PROMOTION
+  SEASONAL_CAMPAIGN
+  CRISIS_COMMUNICATION
 }

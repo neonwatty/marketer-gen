@@ -16,9 +16,15 @@ import {
   useNodesState,
 } from 'reactflow'
 
+import { Sparkles } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { JourneyStageConfig,JourneyTemplate } from '@/lib/types/journey'
 
 import { JourneyStageNode } from './JourneyStageNode'
+import { JourneyTemplateCustomizer } from './JourneyTemplateCustomizer'
+import { JourneyTemplateGallery } from './JourneyTemplateGallery'
 import { JourneyToolbar } from './JourneyToolbar'
 import { StageConfigurationPanel } from './StageConfigurationPanel'
 
@@ -135,6 +141,11 @@ export function JourneyBuilder() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false)
+  
+  // Template functionality state
+  const [showTemplateGallery, setShowTemplateGallery] = useState(false)
+  const [showTemplateCustomizer, setShowTemplateCustomizer] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState<JourneyTemplate | null>(null)
 
   const onConnect = useCallback(
     (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -196,43 +207,150 @@ export function JourneyBuilder() {
     [setNodes, setEdges, selectedNode]
   )
 
-  return (
-    <Card className="h-[800px] w-full">
-      <CardHeader>
-        <CardTitle>Journey Builder</CardTitle>
-      </CardHeader>
-      <CardContent className="h-full p-0">
-        <div className="relative h-full">
-          <JourneyToolbar onAddStage={onAddStage} />
-          
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onNodeClick={onNodeClick}
-            nodeTypes={nodeTypes}
-            fitView
-            className="h-full"
-          >
-            <Controls />
-            <MiniMap />
-            <Background variant={'dots' as any} gap={12} size={1} />
-          </ReactFlow>
+  // Template handling functions
+  const handleSelectTemplate = useCallback((template: JourneyTemplate) => {
+    setSelectedTemplate(template)
+    setShowTemplateGallery(false)
+    setShowTemplateCustomizer(true)
+  }, [])
 
-          <StageConfigurationPanel
-            isOpen={isConfigPanelOpen}
-            onClose={() => {
-              setIsConfigPanelOpen(false)
-              setSelectedNode(null)
-            }}
-            stage={selectedNode}
-            onUpdate={onUpdateStage}
-            onDelete={onDeleteStage}
-          />
+  const handleUseTemplate = useCallback((template: JourneyTemplate) => {
+    // Convert template stages to ReactFlow nodes
+    const templateNodes: Node[] = template.stages.map((stage: JourneyStageConfig, index: number) => ({
+      id: stage.id,
+      type: 'journeyStage',
+      position: stage.position,
+      data: {
+        type: stage.type,
+        title: stage.title,
+        description: stage.description,
+        contentTypes: stage.contentTypes,
+        messagingSuggestions: stage.messagingSuggestions,
+      },
+    }))
+
+    // Create edges to connect stages in sequence
+    const templateEdges: Edge[] = []
+    for (let i = 0; i < templateNodes.length - 1; i++) {
+      templateEdges.push({
+        id: `e${templateNodes[i].id}-${templateNodes[i + 1].id}`,
+        source: templateNodes[i].id,
+        target: templateNodes[i + 1].id,
+        type: 'smoothstep',
+        animated: true,
+        label: getTransitionLabel(templateNodes[i].data.type, templateNodes[i + 1].data.type),
+      })
+    }
+
+    // Replace current journey with template
+    setNodes(templateNodes)
+    setEdges(templateEdges)
+    setShowTemplateCustomizer(false)
+    setSelectedTemplate(null)
+  }, [setNodes, setEdges])
+
+  const getTransitionLabel = (fromType: string, toType: string): string => {
+    const transitions: Record<string, string> = {
+      'awareness-consideration': 'Nurture',
+      'consideration-conversion': 'Convert',
+      'conversion-retention': 'Retain',
+      'retention-advocacy': 'Advocate',
+      'awareness-conversion': 'Fast-track',
+      'consideration-advocacy': 'Promote',
+    }
+    return transitions[`${fromType}-${toType}`] || 'Next'
+  }
+
+  const handleStartFromTemplate = useCallback(() => {
+    setShowTemplateGallery(true)
+  }, [])
+
+  return (
+    <>
+      <Card className="h-[800px] w-full">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Journey Builder</CardTitle>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleStartFromTemplate}
+                variant="outline"
+                size="sm"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Use Template
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="h-full p-0">
+          <div className="relative h-full">
+            <JourneyToolbar onAddStage={onAddStage} />
+            
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onNodeClick={onNodeClick}
+              nodeTypes={nodeTypes}
+              fitView
+              className="h-full"
+            >
+              <Controls />
+              <MiniMap />
+              <Background variant={'dots' as any} gap={12} size={1} />
+            </ReactFlow>
+
+            <StageConfigurationPanel
+              isOpen={isConfigPanelOpen}
+              onClose={() => {
+                setIsConfigPanelOpen(false)
+                setSelectedNode(null)
+              }}
+              stage={selectedNode}
+              onUpdate={onUpdateStage}
+              onDelete={onDeleteStage}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Template Gallery Modal */}
+      {showTemplateGallery && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-7xl max-h-[90vh] overflow-hidden w-full">
+            <div className="p-6 border-b">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Choose a Journey Template</h2>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowTemplateGallery(false)}
+                >
+                  ×
+                </Button>
+              </div>
+            </div>
+            <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+              <JourneyTemplateGallery
+                onSelectTemplate={handleSelectTemplate}
+              />
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+
+      {/* Template Customizer Modal */}
+      <JourneyTemplateCustomizer
+        template={selectedTemplate}
+        open={showTemplateCustomizer}
+        onClose={() => {
+          setShowTemplateCustomizer(false)
+          setSelectedTemplate(null)
+        }}
+        onConfirm={handleUseTemplate}
+      />
+    </>
   )
 }

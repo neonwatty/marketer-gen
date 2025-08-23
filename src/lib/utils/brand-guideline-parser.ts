@@ -77,6 +77,9 @@ export class BrandGuidelineParser {
       })
 
       // Parse AI response
+      if (!response?.text) {
+        throw new Error('No response text received from AI service')
+      }
       const extractedData = JSON.parse(response.text)
       
       // Build brand context from extracted data
@@ -224,6 +227,9 @@ ${content.substring(0, 1000)}...
         maxTokens: 10
       })
 
+      if (!response?.text) {
+        throw new Error('No response text received from AI service')
+      }
       const detectedType = response.text.trim().toLowerCase()
       
       return Object.values(DocumentType).includes(detectedType as DocumentType)
@@ -386,6 +392,9 @@ Return a JSON array of strings: ["term1", "term2", ...]
         maxTokens: 200
       })
 
+      if (!response?.text) {
+        throw new Error('No response text received from AI service')
+      }
       const newTerms = JSON.parse(response.text)
       
       if (Array.isArray(newTerms)) {

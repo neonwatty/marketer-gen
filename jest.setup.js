@@ -15,6 +15,11 @@ if (!global.TransformStream) {
   global.TransformStream = TransformStream
 }
 
+// Add setImmediate polyfill for Node.js compatibility
+if (!global.setImmediate) {
+  global.setImmediate = setTimeout
+}
+
 // Also add undici for Node.js 18+ compatibility
 if (!global.Request) {
   const { Request, Response, Headers, FormData } = require('undici')
