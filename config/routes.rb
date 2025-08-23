@@ -45,6 +45,20 @@ Rails.application.routes.draw do
       get :search
     end
   end
+  
+  # Platform integrations for external advertising platforms
+  resources :platform_integrations, param: :platform do
+    member do
+      post :test_connection
+      post :sync_data
+    end
+    
+    collection do
+      post :sync_all
+      get :export
+      get 'sync_status/:job_id', to: 'platform_integrations#sync_status', as: :sync_status
+    end
+  end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root "home#index"
   

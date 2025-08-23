@@ -1,8 +1,6 @@
 require "test_helper"
 
 class PasswordsMailerTest < ActionMailer::TestCase
-  include Rails.application.routes.url_helpers
-  
   def setup
     Rails.application.routes.default_url_options[:host] = 'test.host'
     @user = User.create!(

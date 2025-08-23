@@ -26,6 +26,15 @@ class User < ApplicationRecord
 
   serialize :notification_preferences, coder: JSON
 
+  # Alias for compatibility with tests and common usage
+  def email
+    email_address
+  end
+
+  def email=(value)
+    self.email_address = value
+  end
+
   def marketer?
     role == 'marketer'
   end

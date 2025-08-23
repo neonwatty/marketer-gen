@@ -8,6 +8,28 @@ module ActivityMonitoring
 
   private
 
+  # General purpose activity logging method for controllers
+  def log_activity(event_type, event_data = {})
+    return unless Current.session&.user
+
+    activity_data = {
+      user_id: Current.session.user.id,
+      session_id: Current.session.id,
+      event_type: event_type,
+      event_data: event_data,
+      controller: controller_name,
+      action: action_name,
+      method: request.method,
+      path: request.path,
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent,
+      timestamp: Time.current
+    }
+
+    # Log to Rails logger with structured format
+    Rails.logger.info "[ACTIVITY_LOG] #{activity_data.to_json}"
+  end
+
   def log_user_activity
     # Ensure Current.session is set by calling resume_session if needed
     if Current.session.nil? && respond_to?(:resume_session, true)
