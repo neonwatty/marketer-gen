@@ -41,6 +41,10 @@ class CampaignPlan < ApplicationRecord
   serialize :engagement_metrics, coder: JSON
   serialize :performance_data, coder: JSON
   serialize :roi_tracking, coder: JSON
+  serialize :competitive_intelligence, coder: JSON
+  serialize :market_research_data, coder: JSON
+  serialize :competitor_analysis, coder: JSON
+  serialize :industry_benchmarks, coder: JSON
   
   scope :by_campaign_type, ->(type) { where(campaign_type: type) }
   scope :by_objective, ->(objective) { where(objective: objective) }
@@ -55,6 +59,28 @@ class CampaignPlan < ApplicationRecord
   scope :with_analytics_data, -> { where.not(engagement_metrics: nil).or(where.not(performance_data: nil)) }
   scope :execution_started, -> { where.not(plan_execution_started_at: nil) }
   scope :execution_completed, -> { where.not(plan_execution_completed_at: nil) }
+  scope :with_competitive_analysis, -> { where.not(competitive_intelligence: nil) }
+  scope :competitive_analysis_stale, -> { 
+    # Include records that:
+    # 1. Have no competitive data and no timestamp (never analyzed)
+    # 2. Have old timestamps (regardless of data presence)
+    # Exclude: Records with competitive data but no timestamp (considered fresh)
+    where(
+      '(competitive_intelligence IS NULL AND market_research_data IS NULL AND competitor_analysis IS NULL AND industry_benchmarks IS NULL AND competitive_analysis_last_updated_at IS NULL) OR competitive_analysis_last_updated_at < ?',
+      7.days.ago
+    )
+  }
+  scope :needs_competitive_analysis, -> { 
+    # Only include records that have no competitive data AND no timestamp
+    where(
+      competitive_analysis_last_updated_at: nil
+    ).where(
+      competitive_intelligence: nil,
+      market_research_data: nil,
+      competitor_analysis: nil,
+      industry_benchmarks: nil
+    )
+  }
   
   before_validation :set_default_metadata, on: :create
   before_validation :set_default_approval_status, on: :create
@@ -150,6 +176,94 @@ class CampaignPlan < ApplicationRecord
     end
   end
   
+  # Competitive Analysis Methods
+  def has_competitive_data?
+    competitive_intelligence.present? || market_research_data.present? ||
+    competitor_analysis.present? || industry_benchmarks.present?
+  end
+
+  def competitive_analysis_stale?
+    # If has competitive data but no timestamp, consider it fresh (just added)
+    return false if has_competitive_data? && competitive_analysis_last_updated_at.nil?
+    
+    # If no competitive data and no timestamp, it's stale (needs analysis)
+    return true unless competitive_analysis_last_updated_at
+    
+    # Check if timestamp is older than 7 days
+    competitive_analysis_last_updated_at < 7.days.ago
+  end
+
+  def parsed_competitive_intelligence
+    return {} unless competitive_intelligence.present?
+    safe_parse_json_field(:competitive_intelligence)
+  end
+
+  def parsed_market_research_data
+    return {} unless market_research_data.present?
+    safe_parse_json_field(:market_research_data)
+  end
+
+  def parsed_competitor_analysis
+    return {} unless competitor_analysis.present?
+    safe_parse_json_field(:competitor_analysis)
+  end
+
+  def parsed_industry_benchmarks
+    return {} unless industry_benchmarks.present?
+    safe_parse_json_field(:industry_benchmarks)
+  end
+
+  def competitive_analysis_summary
+    return {} unless has_competitive_data?
+    
+    {
+      competitive_intelligence: parsed_competitive_intelligence,
+      market_research: parsed_market_research_data,
+      competitor_data: parsed_competitor_analysis,
+      industry_benchmarks: parsed_industry_benchmarks,
+      last_updated: competitive_analysis_last_updated_at,
+      is_stale: competitive_analysis_stale?
+    }
+  end
+
+  def top_competitors
+    competitor_data = parsed_competitor_analysis
+    competitors = competitor_data.dig('competitors') || []
+    competitors.sort_by { |c| c['market_share'] || 0 }.reverse.first(5)
+  end
+
+  def key_market_insights
+    market_data = parsed_market_research_data
+    [
+      market_data.dig('market_trends'),
+      market_data.dig('consumer_insights'),
+      market_data.dig('growth_opportunities')
+    ].compact.flatten
+  end
+
+  def competitive_advantages
+    intelligence_data = parsed_competitive_intelligence
+    intelligence_data.dig('competitive_advantages') || []
+  end
+
+  def market_threats
+    intelligence_data = parsed_competitive_intelligence
+    intelligence_data.dig('market_threats') || []
+  end
+
+  def refresh_competitive_analysis!
+    service = CompetitiveAnalysisService.new(self)
+    result = service.call
+    
+    if result[:success]
+      touch(:competitive_analysis_last_updated_at)
+      true
+    else
+      Rails.logger.error "Failed to refresh competitive analysis for plan #{id}: #{result[:error]}"
+      false
+    end
+  end
+
   def plan_analytics
     {
       campaign_type: campaign_type,

@@ -262,6 +262,39 @@ class MockLlmService
     }
   end
 
+  def generate_content(params)
+    simulate_delay
+    simulate_error if should_simulate_error?
+
+    # Convert to hash to ensure consistent access
+    params = params.to_h if params.respond_to?(:to_h)
+    
+    prompt = params[:prompt] || params['prompt'] || ''
+    max_tokens = params[:max_tokens] || params['max_tokens'] || 1000
+    temperature = params[:temperature] || params['temperature'] || 0.7
+
+    # Generate mock content based on prompt keywords
+    content = generate_mock_content_from_prompt(prompt)
+
+    {
+      success: true,
+      content: content,
+      metadata: {
+        max_tokens: max_tokens,
+        temperature: temperature,
+        prompt_length: prompt.length,
+        generated_at: Time.current,
+        service: 'mock'
+      }
+    }
+  rescue => error
+    {
+      success: false,
+      error: error.message,
+      content: nil
+    }
+  end
+
   def health_check
     start_time = Time.current
     simulate_delay
@@ -739,5 +772,121 @@ class MockLlmService
     end
     
     content
+  end
+
+  def generate_mock_content_from_prompt(prompt)
+    prompt_lower = prompt.to_s.downcase
+    
+    # Generate content based on prompt keywords
+    if prompt_lower.include?('competitive intelligence') || prompt_lower.include?('competitive analysis')
+      generate_competitive_intelligence_content
+    elsif prompt_lower.include?('market research') || prompt_lower.include?('market trends')
+      generate_market_research_content
+    elsif prompt_lower.include?('competitors') || prompt_lower.include?('competitor analysis')
+      generate_competitor_analysis_content
+    elsif prompt_lower.include?('industry benchmarks') || prompt_lower.include?('benchmarks')
+      generate_industry_benchmarks_content
+    else
+      # Generic content
+      "Based on the provided information, here is a comprehensive analysis that addresses the key points mentioned in your prompt."
+    end
+  end
+
+  def generate_competitive_intelligence_content
+    {
+      "competitive_advantages" => ["Strong brand recognition", "Innovation leadership", "Market experience"],
+      "market_threats" => ["New competitors", "Economic uncertainty", "Technology disruption"],
+      "positioning_opportunities" => ["Premium market segment", "Underserved niches", "International expansion"],
+      "differentiation_strategies" => ["Technology focus", "Customer service excellence", "Innovation pipeline"],
+      "competitive_gaps" => ["Digital marketing", "Mobile optimization", "Social media presence"],
+      "strategic_recommendations" => ["Invest in digital transformation", "Expand product line", "Strengthen partnerships"]
+    }.to_json
+  end
+
+  def generate_market_research_content
+    {
+      "market_trends" => ["Digital transformation", "Sustainability focus", "Remote work adoption"],
+      "consumer_insights" => ["Price sensitivity increase", "Quality over quantity preference", "Brand loyalty changes"],
+      "market_size_data" => {
+        "total_addressable_market" => "$2.1B",
+        "growth_rate" => "8.5%",
+        "key_segments" => ["Enterprise", "Mid-market", "SMB"]
+      },
+      "growth_opportunities" => ["Emerging markets", "New product categories", "Partnership channels"],
+      "external_factors" => {
+        "regulatory" => ["Data privacy laws", "Industry compliance"],
+        "economic" => ["Interest rate changes", "Supply chain costs"],
+        "technological" => ["AI advancement", "Cloud adoption"]
+      }
+    }.to_json
+  end
+
+  def generate_competitor_analysis_content
+    {
+      "competitors" => [
+        {
+          "name" => "Market Leader",
+          "type" => "direct",
+          "market_share" => "35%",
+          "strengths" => ["Brand recognition", "Distribution network"],
+          "weaknesses" => ["High prices", "Slow innovation"],
+          "positioning" => "Premium leader",
+          "key_campaigns" => ["Brand awareness", "Product launch"],
+          "threat_level" => "high"
+        },
+        {
+          "name" => "Challenger",
+          "type" => "direct",
+          "market_share" => "20%",
+          "strengths" => ["Innovation", "Competitive pricing"],
+          "weaknesses" => ["Limited market presence"],
+          "positioning" => "Value leader",
+          "key_campaigns" => ["Price promotion", "Feature comparison"],
+          "threat_level" => "medium"
+        }
+      ],
+      "competitive_landscape" => {
+        "market_saturation" => "medium",
+        "barriers_to_entry" => "high",
+        "innovation_pace" => "fast"
+      },
+      "white_space_opportunities" => ["Niche segments", "Geographic expansion", "New use cases"]
+    }.to_json
+  end
+
+  def generate_industry_benchmarks_content
+    {
+      "performance_benchmarks" => {
+        "conversion_rates" => {
+          "email" => "3.1%",
+          "social_media" => "1.6%",
+          "paid_advertising" => "4.2%",
+          "organic_search" => "5.1%"
+        },
+        "engagement_metrics" => {
+          "email_open_rate" => "22%",
+          "email_click_rate" => "3.2%",
+          "social_engagement_rate" => "2.0%",
+          "website_bounce_rate" => "55%"
+        }
+      },
+      "cost_benchmarks" => {
+        "cost_per_acquisition" => "$95",
+        "cost_per_click" => "$2.75",
+        "cost_per_impression" => "$1.45",
+        "budget_allocation" => {
+          "paid_media" => "45%",
+          "content_creation" => "25%",
+          "tools_and_technology" => "20%",
+          "personnel" => "10%"
+        }
+      },
+      "timeline_benchmarks" => {
+        "campaign_planning" => "10 days",
+        "content_creation" => "7 days", 
+        "campaign_execution" => "30 days",
+        "performance_analysis" => "3 days"
+      }
+    }.to_json
   end
 end

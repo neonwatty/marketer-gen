@@ -680,4 +680,186 @@ class CampaignPlanTest < ActiveSupport::TestCase
     assert_includes audit_log.details["changed_fields"], "name"
     assert_equal [original_name, "Updated Campaign Name"], audit_log.details["changes"]["name"]
   end
+
+  # Competitive Analysis Tests
+  test "should serialize competitive analysis JSON fields" do
+    competitive_data = {
+      "competitive_advantages" => ["advantage1", "advantage2"],
+      "market_threats" => ["threat1", "threat2"]
+    }
+    
+    @campaign_plan.competitive_intelligence = competitive_data
+    @campaign_plan.save!
+    @campaign_plan.reload
+    
+    assert_equal competitive_data, @campaign_plan.competitive_intelligence
+  end
+
+  test "has_competitive_data? should return false when no competitive data" do
+    @campaign_plan.competitive_intelligence = nil
+    @campaign_plan.market_research_data = nil
+    @campaign_plan.competitor_analysis = nil
+    @campaign_plan.industry_benchmarks = nil
+    
+    assert_not @campaign_plan.has_competitive_data?
+  end
+
+  test "has_competitive_data? should return true when any competitive data present" do
+    @campaign_plan.competitive_intelligence = { "data" => "test" }
+    
+    assert @campaign_plan.has_competitive_data?
+  end
+
+  test "competitive_analysis_stale? should return true when never updated" do
+    @campaign_plan.competitive_analysis_last_updated_at = nil
+    
+    assert @campaign_plan.competitive_analysis_stale?
+  end
+
+  test "competitive_analysis_stale? should return true when updated more than 7 days ago" do
+    @campaign_plan.competitive_analysis_last_updated_at = 8.days.ago
+    
+    assert @campaign_plan.competitive_analysis_stale?
+  end
+
+  test "competitive_analysis_stale? should return false when updated recently" do
+    @campaign_plan.competitive_analysis_last_updated_at = 3.days.ago
+    
+    assert_not @campaign_plan.competitive_analysis_stale?
+  end
+
+  test "parsed_competitive_intelligence should return parsed JSON" do
+    intelligence_data = {
+      "competitive_advantages" => ["advantage1"],
+      "market_threats" => ["threat1"]
+    }
+    
+    @campaign_plan.competitive_intelligence = intelligence_data
+    
+    assert_equal intelligence_data, @campaign_plan.parsed_competitive_intelligence
+  end
+
+  test "parsed_competitive_intelligence should return empty hash for nil data" do
+    @campaign_plan.competitive_intelligence = nil
+    
+    assert_equal({}, @campaign_plan.parsed_competitive_intelligence)
+  end
+
+  test "competitive_analysis_summary should include all competitive data" do
+    @campaign_plan.competitive_intelligence = { "advantages" => ["test"] }
+    @campaign_plan.market_research_data = { "trends" => ["trend1"] }
+    @campaign_plan.competitor_analysis = { "competitors" => ["comp1"] }
+    @campaign_plan.industry_benchmarks = { "metrics" => ["metric1"] }
+    @campaign_plan.competitive_analysis_last_updated_at = Time.current
+    
+    summary = @campaign_plan.competitive_analysis_summary
+    
+    assert_includes summary.keys, :competitive_intelligence
+    assert_includes summary.keys, :market_research
+    assert_includes summary.keys, :competitor_data
+    assert_includes summary.keys, :industry_benchmarks
+    assert_includes summary.keys, :last_updated
+    assert_includes summary.keys, :is_stale
+  end
+
+  test "top_competitors should return sorted competitors by market share" do
+    competitor_data = {
+      "competitors" => [
+        { "name" => "Competitor A", "market_share" => 15 },
+        { "name" => "Competitor B", "market_share" => 25 },
+        { "name" => "Competitor C", "market_share" => 10 }
+      ]
+    }
+    
+    @campaign_plan.competitor_analysis = competitor_data
+    
+    top_competitors = @campaign_plan.top_competitors
+    
+    assert_equal 3, top_competitors.length
+    assert_equal "Competitor B", top_competitors.first["name"]
+    assert_equal 25, top_competitors.first["market_share"]
+  end
+
+  test "key_market_insights should extract insights from market research" do
+    market_data = {
+      "market_trends" => ["trend1", "trend2"],
+      "consumer_insights" => ["insight1"],
+      "growth_opportunities" => ["opportunity1", "opportunity2"]
+    }
+    
+    @campaign_plan.market_research_data = market_data
+    
+    insights = @campaign_plan.key_market_insights
+    
+    assert_equal 5, insights.length
+    assert_includes insights, "trend1"
+    assert_includes insights, "insight1"
+    assert_includes insights, "opportunity1"
+  end
+
+  test "competitive_advantages should extract advantages from intelligence data" do
+    intelligence_data = {
+      "competitive_advantages" => ["advantage1", "advantage2", "advantage3"]
+    }
+    
+    @campaign_plan.competitive_intelligence = intelligence_data
+    
+    advantages = @campaign_plan.competitive_advantages
+    
+    assert_equal 3, advantages.length
+    assert_includes advantages, "advantage1"
+  end
+
+  test "market_threats should extract threats from intelligence data" do
+    intelligence_data = {
+      "market_threats" => ["threat1", "threat2"]
+    }
+    
+    @campaign_plan.competitive_intelligence = intelligence_data
+    
+    threats = @campaign_plan.market_threats
+    
+    assert_equal 2, threats.length
+    assert_includes threats, "threat1"
+  end
+
+  # Scopes tests
+  test "with_competitive_analysis scope should find plans with competitive data" do
+    plan_with_data = campaign_plans(:draft_plan)
+    plan_with_data.update!(competitive_intelligence: { "data" => "test" })
+    
+    plan_without_data = campaign_plans(:generating_plan)
+    plan_without_data.update!(competitive_intelligence: nil)
+    
+    plans_with_data = CampaignPlan.with_competitive_analysis
+    
+    assert_includes plans_with_data, plan_with_data
+    assert_not_includes plans_with_data, plan_without_data
+  end
+
+  test "competitive_analysis_stale scope should find stale plans" do
+    stale_plan = campaign_plans(:draft_plan)
+    stale_plan.update!(competitive_analysis_last_updated_at: 8.days.ago)
+    
+    fresh_plan = campaign_plans(:generating_plan)
+    fresh_plan.update!(competitive_analysis_last_updated_at: 2.days.ago)
+    
+    stale_plans = CampaignPlan.competitive_analysis_stale
+    
+    assert_includes stale_plans, stale_plan
+    assert_not_includes stale_plans, fresh_plan
+  end
+
+  test "needs_competitive_analysis scope should find plans never analyzed" do
+    never_analyzed = campaign_plans(:draft_plan)
+    never_analyzed.update!(competitive_analysis_last_updated_at: nil)
+    
+    previously_analyzed = campaign_plans(:generating_plan)
+    previously_analyzed.update!(competitive_analysis_last_updated_at: 1.day.ago)
+    
+    needs_analysis = CampaignPlan.needs_competitive_analysis
+    
+    assert_includes needs_analysis, never_analyzed
+    assert_not_includes needs_analysis, previously_analyzed
+  end
 end

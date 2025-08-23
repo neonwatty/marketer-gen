@@ -103,6 +103,16 @@ module LlmServiceInterface
     raise NotImplementedError, "#{self.class} must implement generate_analytics_insights"
   end
 
+  # Generic content generation method
+  # @param [Hash] params - parameters for content generation
+  # @option params [String] :prompt - content generation prompt
+  # @option params [Integer] :max_tokens - maximum tokens to generate
+  # @option params [Float] :temperature - randomness of generation (0.0 to 1.0)
+  # @return [Hash] { success: Boolean, content: String, error: String }
+  def generate_content(params)
+    raise NotImplementedError, "#{self.class} must implement generate_content"
+  end
+
   # Health check for the LLM service
   # @return [Hash] { status: String, response_time: Float, metadata: Hash }
   def health_check

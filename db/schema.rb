@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_23_120508) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_23_155344) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -116,11 +116,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_23_120508) do
     t.datetime "analytics_last_updated_at"
     t.datetime "plan_execution_started_at"
     t.datetime "plan_execution_completed_at"
+    t.text "competitive_intelligence"
+    t.text "market_research_data"
+    t.text "competitor_analysis"
+    t.text "industry_benchmarks"
+    t.datetime "competitive_analysis_last_updated_at"
     t.index ["analytics_enabled"], name: "index_campaign_plans_on_analytics_enabled"
     t.index ["analytics_last_updated_at"], name: "index_campaign_plans_on_analytics_last_updated_at"
     t.index ["approval_status"], name: "index_campaign_plans_on_approval_status"
     t.index ["approved_by_id"], name: "index_campaign_plans_on_approved_by_id"
     t.index ["campaign_type"], name: "index_campaign_plans_on_campaign_type"
+    t.index ["competitive_analysis_last_updated_at"], name: "index_campaign_plans_on_competitive_analysis_last_updated_at"
     t.index ["current_version_id"], name: "index_campaign_plans_on_current_version_id"
     t.index ["objective"], name: "index_campaign_plans_on_objective"
     t.index ["plan_execution_started_at"], name: "index_campaign_plans_on_plan_execution_started_at"
