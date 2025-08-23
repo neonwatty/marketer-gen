@@ -47,6 +47,28 @@ const mockGenerateTemplatedContent = jest.fn()
 const mockGetVariantStrategies = jest.fn()
 const mockGetFormatTemplate = jest.fn()
 
+// Mock the ContentComplianceService
+const mockCheckCompliance = jest.fn()
+const mockTestConnection = jest.fn()
+const mockComplianceGetConfig = jest.fn()
+const mockGetActiveRules = jest.fn()
+
+const mockComplianceInstance = {
+  checkCompliance: mockCheckCompliance,
+  testConnection: mockTestConnection,
+  getConfig: mockComplianceGetConfig,
+  getActiveRules: mockGetActiveRules,
+}
+
+jest.mock('@/lib/services/content-compliance-service', () => ({
+  contentComplianceService: {
+    get instance() {
+      return mockComplianceInstance
+    },
+  },
+  ContentComplianceService: jest.fn().mockImplementation(() => mockComplianceInstance),
+}))
+
 jest.mock('@/lib/services/content-variant-service', () => ({
   ContentVariantService: {
     generateEnhancedVariants: mockGenerateEnhancedVariants,
@@ -180,6 +202,41 @@ describe('/api/ai/content-generation', () => {
       hasApiKey: true
     })
 
+    // Mock compliance service default responses
+    mockCheckCompliance.mockResolvedValue({
+      isCompliant: true,
+      overallScore: 95,
+      violations: [],
+      suggestions: [],
+      moderationResult: {
+        flagged: false,
+        categories: {},
+        category_scores: {},
+      },
+      brandComplianceScore: 95,
+      safetyScore: 100,
+      metadata: {
+        checkedAt: new Date().toISOString(),
+        rulesApplied: ['openai-moderation', 'restricted-terms'],
+        processingTime: 150,
+      },
+    })
+
+    mockTestConnection.mockResolvedValue(true)
+    mockComplianceGetConfig.mockReturnValue({
+      enableModeration: true,
+      enableBrandCompliance: true,
+      strictMode: false,
+      hasApiKey: true,
+    })
+    mockGetActiveRules.mockReturnValue([
+      { id: 'restricted-terms', name: 'Restricted Terms', type: 'brand', severity: 'error' },
+      { id: 'brand-voice-alignment', name: 'Brand Voice', type: 'brand', severity: 'warning' },
+      { id: 'messaging-framework', name: 'Messaging Framework', type: 'brand', severity: 'warning' },
+      { id: 'content-length', name: 'Content Length', type: 'content', severity: 'error' },
+      { id: 'professionalism', name: 'Professional Language', type: 'content', severity: 'warning' },
+    ])
+
     // Force override methods directly since Jest mocks aren't applying correctly
     prisma.brand.findFirst = mockBrandFindFirst
     
@@ -189,6 +246,14 @@ describe('/api/ai/content-generation', () => {
     instance.generateText = mockGenerateText
     instance.streamText = mockStreamText
     instance.getConfig = mockGetConfig
+    
+    // Override the compliance service instance methods
+    const { contentComplianceService } = require('@/lib/services/content-compliance-service')
+    const complianceInstance = contentComplianceService.instance
+    complianceInstance.checkCompliance = mockCheckCompliance
+    complianceInstance.testConnection = mockTestConnection
+    complianceInstance.getConfig = mockComplianceGetConfig
+    complianceInstance.getActiveRules = mockGetActiveRules
 
     // Setup ContentVariantService mocks
     mockGenerateEnhancedVariants.mockResolvedValue([
@@ -572,7 +637,47 @@ describe('/api/ai/content-generation', () => {
         text: 'Our CHEAP solution offers Low-Cost benefits!'
       }
       
-      mockGenerateText.mockResolvedValue(contentWithRestrictedTerms)
+      // Mock compliance service to return violations
+      mockCheckCompliance.mockResolvedValueOnce({
+        isCompliant: false,
+        overallScore: 45,
+        violations: [
+          {
+            ruleId: 'restricted-terms',
+            severity: 'error',
+            message: 'Contains restricted term: "cheap"',
+            suggestion: 'Replace "cheap" with "affordable"',
+          },
+          {
+            ruleId: 'restricted-terms',
+            severity: 'error',
+            message: 'Contains restricted term: "low-cost"',
+            suggestion: 'Replace "low-cost" with "cost-effective"',
+          },
+        ],
+        suggestions: [
+          {
+            type: 'brand',
+            priority: 'high',
+            suggestion: 'Replace "cheap" with "affordable"',
+            reason: 'Restricted term violation',
+          },
+        ],
+        moderationResult: {
+          flagged: false,
+          categories: {},
+          category_scores: {},
+        },
+        brandComplianceScore: 30,
+        safetyScore: 100,
+        metadata: {
+          checkedAt: new Date().toISOString(),
+          rulesApplied: ['restricted-terms'],
+          processingTime: 120,
+        },
+      })
+      
+      mockGenerateText.mockResolvedValueOnce(contentWithRestrictedTerms)
 
       const request = createMockRequest(mockContentGenerationRequest)
       const response = await POST(request)
@@ -899,6 +1004,342 @@ describe('/api/ai/content-generation', () => {
       expect(data.features.templateGeneration).toBe(true)
       expect(data.features.formatOptimization).toBe(true)
       expect(data.features.strategicVariation).toBe(true)
+    })
+
+    it('should include compliance service status in health check', async () => {
+      const response = await GET()
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.complianceService).toBeDefined()
+      expect(data.complianceService.ready).toBe(true)
+      expect(data.complianceService.moderationEnabled).toBeDefined()
+      expect(data.complianceService.brandComplianceEnabled).toBeDefined()
+      expect(data.complianceService.strictMode).toBeDefined()
+      expect(data.complianceService.hasApiKey).toBeDefined()
+      expect(data.complianceService.activeRules).toBe(5)
+
+      expect(data.features.brandCompliance).toBe(true)
+      expect(data.features.contentModeration).toBe(true)
+      expect(data.features.safetyFiltering).toBe(true)
+    })
+
+    it('should handle compliance service failures gracefully in health check', async () => {
+      // Override the compliance service instance methods for this specific test
+      const { contentComplianceService } = require('@/lib/services/content-compliance-service')
+      const complianceInstance = contentComplianceService.instance
+      complianceInstance.testConnection = jest.fn().mockResolvedValue(false)
+
+      const response = await GET()
+      const data = await response.json()
+
+      expect(response.status).toBe(200) // Should still be healthy
+      expect(data.complianceService.ready).toBe(false)
+    })
+  })
+
+  // Helper function to reset compliance service mock
+  function setupComplianceMock(mockResponse: any) {
+    const { contentComplianceService } = require('@/lib/services/content-compliance-service')
+    const complianceInstance = contentComplianceService.instance
+    complianceInstance.checkCompliance = jest.fn().mockResolvedValue(mockResponse)
+    return complianceInstance.checkCompliance
+  }
+
+  describe('Brand Compliance Integration', () => {
+    it('should use compliance service for content validation', async () => {
+      const mockCheckComplianceForTest = setupComplianceMock({
+        isCompliant: true,
+        overallScore: 95,
+        violations: [],
+        suggestions: [],
+        moderationResult: {
+          flagged: false,
+          categories: {},
+          category_scores: {},
+        },
+        brandComplianceScore: 95,
+        safetyScore: 100,
+        metadata: {
+          checkedAt: new Date().toISOString(),
+          rulesApplied: ['openai-moderation', 'restricted-terms'],
+          processingTime: 150,
+        },
+      })
+
+      const request = new NextRequest('http://localhost:3000/api/ai/content-generation', {
+        method: 'POST',
+        body: JSON.stringify(mockContentGenerationRequest)
+      })
+
+      const response = await POST(request)
+      const data = await response.json()
+
+      console.log('Response status:', response.status)
+      console.log('Response data:', JSON.stringify(data, null, 2))
+
+      expect(response.status).toBe(200)
+      expect(mockCheckComplianceForTest).toHaveBeenCalledWith({
+        content: mockGeneratedContent.text,
+        brandContext: expect.objectContaining({
+          name: mockBrand.name,
+          restrictedTerms: mockBrand.restrictedTerms,
+          voiceDescription: mockBrand.voiceDescription,
+        }),
+        options: {
+          checkModeration: true,
+          checkBrandCompliance: true,
+          strictMode: false,
+          includeDetailedAnalysis: true,
+        },
+      })
+
+      expect(data.brandCompliance.isCompliant).toBe(true)
+      expect(data.brandCompliance.score).toBe(95)
+    })
+
+    it('should handle compliance failures and return violations', async () => {
+      mockCheckCompliance.mockResolvedValueOnce({
+        isCompliant: false,
+        overallScore: 45,
+        violations: [
+          {
+            ruleId: 'restricted-terms',
+            severity: 'error',
+            message: 'Contains restricted term: "cheap"',
+            suggestion: 'Replace "cheap" with "affordable" or "cost-effective"',
+          },
+          {
+            ruleId: 'openai-moderation',
+            severity: 'error',
+            message: 'Content flagged by safety filters: harassment',
+            suggestion: 'Remove potentially harmful content',
+          },
+        ],
+        suggestions: [
+          {
+            type: 'brand',
+            priority: 'high',
+            suggestion: 'Replace "cheap" with "affordable"',
+            reason: 'Restricted term violation',
+          },
+        ],
+        moderationResult: {
+          flagged: true,
+          categories: { harassment: true },
+          category_scores: { harassment: 0.8 },
+        },
+        brandComplianceScore: 30,
+        safetyScore: 20,
+        metadata: {
+          checkedAt: new Date().toISOString(),
+          rulesApplied: ['openai-moderation', 'restricted-terms'],
+          processingTime: 200,
+        },
+      })
+
+      const request = new NextRequest('http://localhost:3000/api/ai/content-generation', {
+        method: 'POST',
+        body: JSON.stringify(mockContentGenerationRequest)
+      })
+
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.brandCompliance.isCompliant).toBe(false)
+      expect(data.brandCompliance.score).toBe(45)
+      expect(data.brandCompliance.violations).toHaveLength(2)
+      expect(data.brandCompliance.violations).toContain('Contains restricted term: "cheap"')
+      expect(data.brandCompliance.violations).toContain('Content flagged by safety filters: harassment')
+      expect(data.brandCompliance.suggestions).toContain('Replace "cheap" with "affordable"')
+    })
+
+    it('should fallback to basic validation when compliance service fails', async () => {
+      mockCheckCompliance.mockRejectedValueOnce(new Error('Compliance service unavailable'))
+
+      // Mock brand with restricted terms for fallback test
+      mockBrandFindFirst.mockResolvedValueOnce({
+        ...mockBrand,
+        restrictedTerms: ['test-restricted-term'],
+      })
+
+      const request = new NextRequest('http://localhost:3000/api/ai/content-generation', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...mockContentGenerationRequest,
+          prompt: 'Content with test-restricted-term that should be caught',
+        })
+      })
+
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(data.brandCompliance).toBeDefined()
+      // Should use fallback validation
+      expect(mockCheckCompliance).toHaveBeenCalled()
+    })
+
+    it('should handle different brand compliance options', async () => {
+      const requestWithOptions = {
+        ...mockContentGenerationRequest,
+        brandCompliance: {
+          enforceBrandVoice: false,
+          checkRestrictedTerms: true,
+          validateMessaging: false,
+        },
+      }
+
+      const request = new NextRequest('http://localhost:3000/api/ai/content-generation', {
+        method: 'POST',
+        body: JSON.stringify(requestWithOptions)
+      })
+
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(mockCheckCompliance).toHaveBeenCalledWith({
+        content: mockGeneratedContent.text,
+        brandContext: expect.objectContaining({
+          name: mockBrand.name,
+        }),
+        options: {
+          checkModeration: true,
+          checkBrandCompliance: true,
+          strictMode: false,
+          includeDetailedAnalysis: true,
+        },
+      })
+    })
+
+    it('should handle missing brand data gracefully', async () => {
+      mockBrandFindFirst.mockResolvedValueOnce({
+        ...mockBrand,
+        restrictedTerms: null,
+        voiceDescription: null,
+        messagingFramework: null,
+      })
+
+      const request = new NextRequest('http://localhost:3000/api/ai/content-generation', {
+        method: 'POST',
+        body: JSON.stringify(mockContentGenerationRequest)
+      })
+
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(mockCheckCompliance).toHaveBeenCalledWith({
+        content: mockGeneratedContent.text,
+        brandContext: expect.objectContaining({
+          name: mockBrand.name,
+          restrictedTerms: [],
+          voiceDescription: null,
+          messagingFramework: [],
+        }),
+        options: expect.any(Object),
+      })
+    })
+  })
+
+  describe('Content Moderation Features', () => {
+    it('should include moderation results in response when available', async () => {
+      mockCheckCompliance.mockResolvedValueOnce({
+        isCompliant: true,
+        overallScore: 85,
+        violations: [],
+        suggestions: [],
+        moderationResult: {
+          flagged: false,
+          categories: {
+            harassment: false,
+            hate: false,
+            violence: false,
+          },
+          category_scores: {
+            harassment: 0.01,
+            hate: 0.02,
+            violence: 0.01,
+          },
+        },
+        brandComplianceScore: 90,
+        safetyScore: 100,
+        metadata: {
+          checkedAt: new Date().toISOString(),
+          rulesApplied: ['openai-moderation', 'brand-voice-alignment'],
+          processingTime: 120,
+        },
+      })
+
+      const request = new NextRequest('http://localhost:3000/api/ai/content-generation', {
+        method: 'POST',
+        body: JSON.stringify(mockContentGenerationRequest)
+      })
+
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.brandCompliance.isCompliant).toBe(true)
+      expect(data.brandCompliance.score).toBe(85)
+    })
+
+    it('should handle severely flagged content appropriately', async () => {
+      mockCheckCompliance.mockResolvedValueOnce({
+        isCompliant: false,
+        overallScore: 15,
+        violations: [
+          {
+            ruleId: 'openai-moderation',
+            severity: 'error',
+            message: 'Content flagged by safety filters: violence, hate',
+            suggestion: 'Remove all harmful content and rewrite completely',
+          },
+        ],
+        suggestions: [
+          {
+            type: 'brand',
+            priority: 'high',
+            suggestion: 'Remove all harmful content and rewrite completely',
+            reason: 'Safety violation',
+          },
+        ],
+        moderationResult: {
+          flagged: true,
+          categories: {
+            violence: true,
+            hate: true,
+          },
+          category_scores: {
+            violence: 0.9,
+            hate: 0.85,
+          },
+        },
+        brandComplianceScore: 20,
+        safetyScore: 10,
+        metadata: {
+          checkedAt: new Date().toISOString(),
+          rulesApplied: ['openai-moderation'],
+          processingTime: 100,
+        },
+      })
+
+      const request = new NextRequest('http://localhost:3000/api/ai/content-generation', {
+        method: 'POST',
+        body: JSON.stringify(mockContentGenerationRequest)
+      })
+
+      const response = await POST(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200) // Still returns 200 but with violation data
+      expect(data.brandCompliance.isCompliant).toBe(false)
+      expect(data.brandCompliance.score).toBe(15)
+      expect(data.brandCompliance.violations).toContain('Content flagged by safety filters: violence, hate')
+      expect(data.brandCompliance.suggestions).toContain('Remove all harmful content and rewrite completely')
     })
   })
 })

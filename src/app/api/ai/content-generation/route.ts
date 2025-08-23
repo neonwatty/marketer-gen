@@ -7,6 +7,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { ContentVariantService } from '@/lib/services/content-variant-service'
 import { openAIService } from '@/lib/services/openai-service'
+import { contentComplianceService } from '@/lib/services/content-compliance-service'
 
 // Retry configuration
 const RETRY_CONFIG = {
@@ -145,8 +146,68 @@ const ContentGenerationResponseSchema = z.object({
 
 type ContentGenerationResponse = z.infer<typeof ContentGenerationResponseSchema>
 
-// Enhanced brand compliance validation function with scoring
+// Enhanced brand compliance validation function using the new service
 async function validateBrandCompliance(
+  content: string,
+  brandData: any,
+  options: ContentGenerationRequest['brandCompliance'] = {
+    enforceBrandVoice: true,
+    checkRestrictedTerms: true,
+    validateMessaging: true,
+  }
+): Promise<{ isCompliant: boolean; violations: string[]; suggestions?: string[]; score: number }> {
+  try {
+    // Prepare brand context for the compliance service
+    const brandContext = {
+      name: brandData.name || '',
+      restrictedTerms: Array.isArray(brandData.restrictedTerms) 
+        ? brandData.restrictedTerms 
+        : (brandData.restrictedTerms ? JSON.parse(brandData.restrictedTerms) : []),
+      complianceRules: Array.isArray(brandData.complianceRules) 
+        ? brandData.complianceRules 
+        : (brandData.complianceRules ? JSON.parse(brandData.complianceRules) : []),
+      voiceDescription: brandData.voiceDescription,
+      communicationStyle: brandData.communicationStyle,
+      values: Array.isArray(brandData.values) 
+        ? brandData.values 
+        : (brandData.values ? JSON.parse(brandData.values) : []),
+      messagingFramework: Array.isArray(brandData.messagingFramework)
+        ? brandData.messagingFramework
+        : (brandData.messagingFramework ? JSON.parse(brandData.messagingFramework) : []),
+    }
+
+    // Use the new compliance service
+    const result = await contentComplianceService.instance.checkCompliance({
+      content,
+      brandContext,
+      options: {
+        checkModeration: true,
+        checkBrandCompliance: true,
+        strictMode: false,
+        includeDetailedAnalysis: true,
+      },
+    })
+
+    // Convert the result to the expected format for backwards compatibility
+    const violations = result.violations.map(v => v.message)
+    const suggestions = result.suggestions.map(s => s.suggestion)
+
+    return {
+      isCompliant: result.isCompliant,
+      violations,
+      suggestions: suggestions.length > 0 ? suggestions : undefined,
+      score: result.overallScore,
+    }
+  } catch (error) {
+    console.warn('Enhanced compliance check failed, falling back to basic validation:', error)
+    
+    // Fallback to basic validation if the service fails
+    return await validateBrandComplianceBasic(content, brandData, options)
+  }
+}
+
+// Basic fallback validation function
+async function validateBrandComplianceBasic(
   content: string,
   brandData: any,
   options: ContentGenerationRequest['brandCompliance'] = {
@@ -157,11 +218,11 @@ async function validateBrandCompliance(
 ): Promise<{ isCompliant: boolean; violations: string[]; suggestions?: string[]; score: number }> {
   const violations: string[] = []
   const suggestions: string[] = []
-  let complianceScore = 100 // Start with perfect score
+  let complianceScore = 100
 
-  const { enforceBrandVoice = true, checkRestrictedTerms = true, validateMessaging = true } = options
+  const { checkRestrictedTerms = true } = options
 
-  // Check restricted terms (high severity - 20 point deduction per term)
+  // Basic restricted terms check
   if (checkRestrictedTerms && brandData.restrictedTerms) {
     const restrictedTerms = Array.isArray(brandData.restrictedTerms) 
       ? brandData.restrictedTerms 
@@ -177,126 +238,11 @@ async function validateBrandCompliance(
     }
   }
 
-  // Check brand voice compliance using enhanced AI analysis
-  if (enforceBrandVoice && brandData.voiceDescription) {
-    try {
-      const voiceAnalysisPrompt = `
-        Analyze the following content for brand voice compliance and provide a detailed assessment:
-        
-        Brand Voice Description: ${brandData.voiceDescription}
-        Brand Communication Style: ${brandData.communicationStyle || 'Not specified'}
-        Brand Tone Attributes: ${JSON.stringify(brandData.toneAttributes || {})}
-        Brand Values: ${JSON.stringify(brandData.values || [])}
-        
-        Content to analyze: "${content}"
-        
-        Provide your response in this exact format:
-        SCORE: [0-100]
-        STATUS: [COMPLIANT|NON_COMPLIANT]
-        REASON: [detailed explanation]
-        SUGGESTIONS: [specific improvement recommendations]
-      `
-
-      const voiceAnalysis = await retryWithBackoff(() => 
-        openAIService.instance.generateText({
-          prompt: voiceAnalysisPrompt,
-          maxTokens: 250,
-          temperature: 0.1
-        })
-      )
-
-      const analysisResult = voiceAnalysis.text.trim()
-      const scoreMatch = analysisResult.match(/SCORE:\s*(\d+)/)
-      const statusMatch = analysisResult.match(/STATUS:\s*(COMPLIANT|NON_COMPLIANT)/)
-      const reasonMatch = analysisResult.match(/REASON:\s*(.+?)(?=SUGGESTIONS:|$)/)
-      const suggestionsMatch = analysisResult.match(/SUGGESTIONS:\s*(.+)/)
-
-      if (scoreMatch) {
-        const voiceScore = parseInt(scoreMatch[1])
-        complianceScore = Math.min(complianceScore, (complianceScore * voiceScore) / 100)
-      }
-
-      if (statusMatch && statusMatch[1] === 'NON_COMPLIANT') {
-        const reason = reasonMatch ? reasonMatch[1].trim() : 'Voice style does not match brand guidelines'
-        violations.push(`Brand voice violation: ${reason}`)
-        
-        if (suggestionsMatch) {
-          suggestions.push(`Voice improvement: ${suggestionsMatch[1].trim()}`)
-        } else {
-          suggestions.push('Adjust tone and style to match brand voice guidelines')
-        }
-      }
-    } catch (error) {
-      console.warn('Brand voice analysis failed:', error)
-      complianceScore -= 5 // Small penalty for failed analysis
-    }
-  }
-
-  // Check messaging framework compliance with weighted scoring
-  if (validateMessaging && brandData.messagingFramework) {
-    const messagingPillars = Array.isArray(brandData.messagingFramework)
-      ? brandData.messagingFramework
-      : JSON.parse(brandData.messagingFramework || '[]')
-    
-    if (messagingPillars.length > 0) {
-      let messagingAlignmentScore = 0
-      const contentLower = content.toLowerCase()
-      
-      for (const pillar of messagingPillars) {
-        const pillarText = typeof pillar === 'string' 
-          ? pillar 
-          : pillar.pillar || pillar.description || pillar.text || pillar.title || ''
-        
-        // Check for pillar keywords
-        const keywords = typeof pillar === 'object' && pillar.keywords 
-          ? pillar.keywords 
-          : [pillarText]
-        
-        const keywordMatches = keywords.filter((keyword: string) => 
-          contentLower.includes(keyword.toLowerCase())
-        ).length
-        
-        if (keywordMatches > 0) {
-          messagingAlignmentScore += (keywordMatches / keywords.length) * (100 / messagingPillars.length)
-        }
-      }
-      
-      if (messagingAlignmentScore < 30) {
-        violations.push('Content does not align with brand messaging framework')
-        suggestions.push('Incorporate key brand messaging pillars and keywords into the content')
-        complianceScore = Math.min(complianceScore, messagingAlignmentScore + 50)
-      } else {
-        // Reward good messaging alignment
-        complianceScore = Math.min(100, complianceScore * (1 + messagingAlignmentScore / 200))
-      }
-    }
-  }
-
-  // Additional compliance checks for content quality
-  const contentLength = content.length
-  if (contentLength < 50) {
-    violations.push('Content is too short for meaningful brand compliance assessment')
-    suggestions.push('Expand content to better represent brand messaging')
+  // Basic length check
+  if (content.length < 50) {
+    violations.push('Content is too short for meaningful assessment')
+    suggestions.push('Expand content to provide more value')
     complianceScore -= 15
-  }
-
-  // Check for excessive repetition (indicates poor quality generation)
-  const words = content.toLowerCase().split(/\s+/)
-  const wordFreq = new Map<string, number>()
-  words.forEach(word => {
-    if (word.length > 3) { // Only count meaningful words
-      wordFreq.set(word, (wordFreq.get(word) || 0) + 1)
-    }
-  })
-
-  const excessivelyRepeatedWords = Array.from(wordFreq.entries()).filter(
-    ([_, count]) => count > Math.max(2, words.length * 0.1)
-  )
-
-  if (excessivelyRepeatedWords.length > 0) {
-    violations.push('Content contains excessive word repetition')
-    suggestions.push('Vary vocabulary to improve content quality and brand representation')
-    complianceScore -= 10
   }
 
   // Ensure score is within bounds
@@ -1005,6 +951,8 @@ export async function GET() {
   try {
     const serviceReady = openAIService.instance.isReady()
     const config = openAIService.instance.getConfig()
+    const complianceConfig = contentComplianceService.instance.getConfig()
+    const complianceReady = await contentComplianceService.instance.testConnection()
 
     return NextResponse.json({
       status: 'healthy',
@@ -1012,6 +960,14 @@ export async function GET() {
         ready: serviceReady,
         model: config.model,
         hasApiKey: config.hasApiKey
+      },
+      complianceService: {
+        ready: complianceReady,
+        moderationEnabled: complianceConfig.enableModeration,
+        brandComplianceEnabled: complianceConfig.enableBrandCompliance,
+        strictMode: complianceConfig.strictMode,
+        hasApiKey: complianceConfig.hasApiKey,
+        activeRules: contentComplianceService.instance.getActiveRules().length
       },
       supportedContentTypes: [
         'EMAIL', 'SOCIAL_POST', 'SOCIAL_AD', 'SEARCH_AD', 'BLOG_POST',
@@ -1023,7 +979,10 @@ export async function GET() {
         enhancedVariants: true,
         templateGeneration: true,
         formatOptimization: true,
-        strategicVariation: true
+        strategicVariation: true,
+        brandCompliance: true,
+        contentModeration: true,
+        safetyFiltering: true
       }
     })
   } catch (error) {
