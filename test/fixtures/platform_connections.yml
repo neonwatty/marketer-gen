@@ -1,0 +1,41 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+fixture_meta_connection:
+  user: one
+  platform: 'meta'
+  credentials: '{"access_token":"fixture_token","app_secret":"fixture_secret"}'
+  status: 'active'
+  account_id: 'fixture_account'
+  account_name: 'Fixture Meta Account'
+  last_sync_at: 2024-01-01 10:00:00
+  metadata: '{"sync_count":5,"last_successful_sync":"2024-01-01T10:00:00Z"}'
+
+fixture_google_ads_connection:
+  user: one
+  platform: 'google_ads'
+  credentials: '{"access_token":"fixture_token","developer_token":"fixture_dev","customer_id":"111111","refresh_token":"fixture_refresh"}'
+  status: 'active'
+  account_id: 'fixture_account'
+  account_name: 'Fixture Google Ads Account'
+  last_sync_at: 2024-01-01 10:00:00
+  metadata: '{"sync_count":5,"last_successful_sync":"2024-01-01T10:00:00Z"}'
+
+fixture_linkedin_connection:
+  user: two
+  platform: 'linkedin'
+  credentials: '{"access_token":"fixture_linkedin_token"}'
+  status: 'active'
+  account_id: 'urn:li:organization:fixture'
+  account_name: 'Fixture LinkedIn Org'
+  last_sync_at: 2024-01-01 09:00:00
+  metadata: '{"sync_count":3,"last_successful_sync":"2024-01-01T09:00:00Z"}'
+
+fixture_inactive_connection:
+  user: two
+  platform: 'meta'
+  credentials: '{"access_token":"inactive_token","app_secret":"inactive_secret"}'
+  status: 'inactive'
+  account_id: 'act_inactive'
+  account_name: 'Inactive Account'
+  last_sync_at: 2023-12-25 10:00:00
+  metadata: '{"sync_count":0}'

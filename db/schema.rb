@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_23_155344) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_23_171205) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -465,6 +465,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_23_155344) do
     t.index ["status"], name: "index_plan_versions_on_status"
   end
 
+  create_table "platform_connections", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "platform", null: false
+    t.text "credentials"
+    t.string "status", default: "inactive"
+    t.datetime "last_sync_at"
+    t.text "metadata"
+    t.string "account_id"
+    t.string "account_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_sync_at"], name: "index_platform_connections_on_last_sync_at"
+    t.index ["status"], name: "index_platform_connections_on_status"
+    t.index ["user_id", "platform"], name: "index_platform_connections_on_user_id_and_platform", unique: true
+    t.index ["user_id"], name: "index_platform_connections_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -529,5 +546,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_23_155344) do
   add_foreign_key "plan_share_tokens", "campaign_plans"
   add_foreign_key "plan_versions", "campaign_plans"
   add_foreign_key "plan_versions", "users", column: "created_by_id"
+  add_foreign_key "platform_connections", "users"
   add_foreign_key "sessions", "users"
 end

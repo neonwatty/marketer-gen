@@ -45,3 +45,5 @@
 /coverage
 # TFQ test failure queue database
 .tfq/
+
+/config/credentials/test.key

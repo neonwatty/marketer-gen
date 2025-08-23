@@ -15,8 +15,6 @@ class ApplicationService
     raise NotImplementedError, "#{self.class} must implement #call method"
   end
 
-  protected
-
   # Helper method for logging service calls
   def log_service_call(service_name, params = {})
     Rails.logger.info "Service Call: #{service_name} with params: #{params.inspect}"
@@ -43,4 +41,6 @@ class ApplicationService
       data: data
     }
   end
+
+  protected
 end

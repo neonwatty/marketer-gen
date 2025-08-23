@@ -1,5 +1,17 @@
 # Campaign Plans test fixtures
 
+one:
+  user: one
+  name: "Test Campaign Plan"
+  description: "A test campaign plan for fixture compatibility"
+  campaign_type: "product_launch"
+  objective: "brand_awareness"
+  target_audience: "Test audience"
+  budget_constraints: "Test budget"
+  timeline_constraints: "Test timeline"
+  status: "draft"
+  metadata: '{"version": "1.0"}'
+
 draft_plan:
   user: marketer_user
   name: "Q1 Product Launch"
