@@ -82,20 +82,17 @@ class CompetitiveAnalysisServiceTest < ActiveSupport::TestCase
     end
     
     @service.stubs(:llm_service).returns(mock_service)
-    begin
-      result = @service.perform_analysis
-      
-      assert result[:success], "Should succeed with default data even when LLM fails"
-      
-      @campaign_plan.reload
-      
-      # Should have default competitive intelligence data
-      competitive_data = @campaign_plan.parsed_competitive_intelligence
-      assert_includes competitive_data['competitive_advantages'], 'Market experience'
-      assert_includes competitive_data['market_threats'], 'New competitors'
-    ensure
-      @service.unstub(:llm_service) rescue nil
-    end
+    
+    result = @service.perform_analysis
+    
+    assert result[:success], "Should succeed with default data even when LLM fails"
+    
+    @campaign_plan.reload
+    
+    # Should have default competitive intelligence data
+    competitive_data = @campaign_plan.parsed_competitive_intelligence
+    assert_includes competitive_data['competitive_advantages'], 'Market experience'
+    assert_includes competitive_data['market_threats'], 'New competitors'
   end
 
   test "should extract industry context from campaign plan" do
@@ -313,10 +310,7 @@ class CompetitiveAnalysisServiceTest < ActiveSupport::TestCase
     mock_service.instance_variable_set(:@responses, responses)
     
     @service.stubs(:llm_service).returns(mock_service)
-    begin
-      yield if block_given?
-    ensure
-      @service.unstub(:llm_service) rescue nil
-    end
+    
+    yield if block_given?
   end
 end

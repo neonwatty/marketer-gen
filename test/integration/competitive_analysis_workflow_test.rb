@@ -384,12 +384,9 @@ class CompetitiveAnalysisWorkflowTest < ActionDispatch::IntegrationTest
       end
     end
     
-    stub = CompetitiveAnalysisService.any_instance.stubs(:llm_service).returns(mock_service)
-    begin
-      yield
-    ensure
-      stub.unstub(:llm_service) rescue nil
-    end
+    CompetitiveAnalysisService.any_instance.stubs(:llm_service).returns(mock_service)
+    
+    yield
   end
 
   def mock_failed_llm_responses
@@ -398,12 +395,9 @@ class CompetitiveAnalysisWorkflowTest < ActionDispatch::IntegrationTest
       { success: false, error: "LLM service unavailable" }
     end
     
-    stub = CompetitiveAnalysisService.any_instance.stubs(:llm_service).returns(mock_service)
-    begin
-      yield
-    ensure
-      stub.unstub(:llm_service) rescue nil
-    end
+    CompetitiveAnalysisService.any_instance.stubs(:llm_service).returns(mock_service)
+    
+    yield
   end
 
   def create_mock_llm_responses
