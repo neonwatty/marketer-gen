@@ -7,15 +7,15 @@ one:
   format_variant: "standard"
   status: "draft"
   version_number: 1
-  campaign_plan: completed_plan
+  campaign_plan: draft_plan
   created_by: marketer_user
   metadata: '{"keywords": ["test", "blog"]}'
 
 two:
   content_type: "social_post"
   title: "Social Media Post"
-  body_content: "Engaging social media content for our campaign."
-  format_variant: "short"
+  body_content: "Engaging social media content for our campaign with much more detailed information to meet standard format requirements. This content provides comprehensive details about our marketing strategy and includes all the necessary information to make it valuable for our target audience members."
+  format_variant: "standard"
   status: "approved"
   version_number: 1
   campaign_plan: draft_plan

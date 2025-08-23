@@ -60,6 +60,16 @@ archived_plan:
   status: "archived"
   generated_summary: "Customer retention campaign focusing on loyalty programs."
 
+active_plan:
+  user: marketer_user
+  name: "Active Campaign"
+  description: "Currently active campaign"
+  campaign_type: "product_launch"
+  objective: "brand_awareness"
+  target_audience: "Tech professionals"
+  status: "active"
+  generated_summary: "Active campaign for product launch."
+
 other_user_plan:
   user: team_member_user
   name: "Other User's Campaign"

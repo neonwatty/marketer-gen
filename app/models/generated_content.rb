@@ -16,6 +16,11 @@ class GeneratedContent < ApplicationRecord
   has_one :approval_workflow, dependent: :destroy
   has_many :content_feedbacks, dependent: :destroy
   
+  # A/B testing associations
+  has_many :control_ab_tests, class_name: 'ContentAbTest', foreign_key: 'control_content_id', dependent: :destroy
+  has_many :content_ab_test_variants, dependent: :destroy
+  has_many :variant_ab_tests, through: :content_ab_test_variants, source: :content_ab_test
+  
   # Constants
   CONTENT_TYPES = %w[
     email

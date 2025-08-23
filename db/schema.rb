@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_22_170438) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_22_233943) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -129,6 +129,74 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_170438) do
     t.index ["submitted_for_approval_at"], name: "index_campaign_plans_on_submitted_for_approval_at"
     t.index ["user_id", "name"], name: "index_campaign_plans_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_campaign_plans_on_user_id"
+  end
+
+  create_table "content_ab_test_results", force: :cascade do |t|
+    t.string "metric_name", limit: 100, null: false
+    t.decimal "metric_value", precision: 12, scale: 4, null: false
+    t.integer "sample_size", default: 1, null: false
+    t.date "recorded_date", null: false
+    t.string "data_source", limit: 100
+    t.text "metadata"
+    t.integer "content_ab_test_variant_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_ab_test_variant_id", "metric_name"], name: "idx_on_content_ab_test_variant_id_metric_name_bb8201f271"
+    t.index ["content_ab_test_variant_id", "recorded_date"], name: "idx_on_content_ab_test_variant_id_recorded_date_5e4f48b70f"
+    t.index ["content_ab_test_variant_id"], name: "index_content_ab_test_results_on_content_ab_test_variant_id"
+    t.index ["data_source"], name: "index_content_ab_test_results_on_data_source"
+    t.index ["metric_name", "recorded_date"], name: "index_content_ab_test_results_on_metric_name_and_recorded_date"
+    t.index ["metric_name"], name: "index_content_ab_test_results_on_metric_name"
+    t.index ["recorded_date"], name: "index_content_ab_test_results_on_recorded_date"
+  end
+
+  create_table "content_ab_test_variants", force: :cascade do |t|
+    t.string "variant_name", limit: 255, null: false
+    t.string "status", limit: 50, default: "draft", null: false
+    t.decimal "traffic_split", precision: 5, scale: 2, null: false
+    t.integer "sample_size", default: 0
+    t.text "metadata"
+    t.integer "content_ab_test_id", null: false
+    t.integer "generated_content_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["content_ab_test_id", "status"], name: "idx_on_content_ab_test_id_status_c257b84dff"
+    t.index ["content_ab_test_id", "variant_name"], name: "index_ab_test_variants_on_test_and_name", unique: true
+    t.index ["content_ab_test_id"], name: "index_content_ab_test_variants_on_content_ab_test_id"
+    t.index ["generated_content_id", "content_ab_test_id"], name: "index_ab_test_variants_on_content_and_test", unique: true
+    t.index ["generated_content_id"], name: "index_content_ab_test_variants_on_generated_content_id"
+    t.index ["status"], name: "index_content_ab_test_variants_on_status"
+  end
+
+  create_table "content_ab_tests", force: :cascade do |t|
+    t.string "test_name", limit: 255, null: false
+    t.string "status", limit: 50, default: "draft", null: false
+    t.string "primary_goal", limit: 50, null: false
+    t.string "confidence_level", limit: 10, default: "95", null: false
+    t.decimal "traffic_allocation", precision: 5, scale: 2, default: "100.0", null: false
+    t.integer "minimum_sample_size", default: 100, null: false
+    t.integer "test_duration_days", default: 14, null: false
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.boolean "statistical_significance", default: false
+    t.string "winner_variant_id", limit: 100
+    t.text "description"
+    t.text "secondary_goals"
+    t.text "audience_segments"
+    t.text "metadata"
+    t.integer "campaign_plan_id", null: false
+    t.integer "created_by_id", null: false
+    t.integer "control_content_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_plan_id", "status"], name: "index_content_ab_tests_on_campaign_plan_id_and_status"
+    t.index ["campaign_plan_id"], name: "index_content_ab_tests_on_campaign_plan_id"
+    t.index ["control_content_id"], name: "index_content_ab_tests_on_control_content_id"
+    t.index ["created_by_id"], name: "index_content_ab_tests_on_created_by_id"
+    t.index ["primary_goal"], name: "index_content_ab_tests_on_primary_goal"
+    t.index ["start_date", "end_date"], name: "index_content_ab_tests_on_start_date_and_end_date"
+    t.index ["status"], name: "index_content_ab_tests_on_status"
+    t.index ["test_name"], name: "index_content_ab_tests_on_test_name", unique: true
   end
 
   create_table "content_audit_logs", force: :cascade do |t|
@@ -382,6 +450,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_170438) do
   add_foreign_key "campaign_plans", "users"
   add_foreign_key "campaign_plans", "users", column: "approved_by_id"
   add_foreign_key "campaign_plans", "users", column: "rejected_by_id"
+  add_foreign_key "content_ab_test_results", "content_ab_test_variants"
+  add_foreign_key "content_ab_test_variants", "content_ab_tests"
+  add_foreign_key "content_ab_test_variants", "generated_contents"
+  add_foreign_key "content_ab_tests", "campaign_plans"
+  add_foreign_key "content_ab_tests", "generated_contents", column: "control_content_id"
+  add_foreign_key "content_ab_tests", "users", column: "created_by_id"
   add_foreign_key "content_audit_logs", "generated_contents"
   add_foreign_key "content_audit_logs", "users"
   add_foreign_key "content_feedbacks", "approval_workflows"
