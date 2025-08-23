@@ -311,6 +311,13 @@ export interface VariantStrategy {
   maxTokens?: number
 }
 
+// Brand compliance config validation schema
+export const BrandComplianceConfigSchema = z.object({
+  enforceBrandVoice: z.boolean().default(true),
+  checkRestrictedTerms: z.boolean().default(true),
+  validateMessaging: z.boolean().default(true)
+})
+
 export const validateContentLength = (content: string, type: ContentTypeValue): { isValid: boolean; message?: string } => {
   const limits: Record<ContentTypeValue, { min: number; max: number }> = {
     [ContentType.EMAIL]: { min: 100, max: 3000 },

@@ -5,9 +5,9 @@ import { z } from 'zod'
 
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { contentComplianceService } from '@/lib/services/content-compliance-service'
 import { ContentVariantService } from '@/lib/services/content-variant-service'
 import { openAIService } from '@/lib/services/openai-service'
-import { contentComplianceService } from '@/lib/services/content-compliance-service'
 
 // Retry configuration
 const RETRY_CONFIG = {

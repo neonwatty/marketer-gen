@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom'
 
+// Set up test environment variables
+process.env.OPENAI_API_KEY = 'test-api-key-for-testing'
+process.env.NODE_ENV = 'test'
+
 // Polyfill for Request/Response in Node.js environment
 require('whatwg-fetch')
 
