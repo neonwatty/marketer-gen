@@ -21,6 +21,10 @@ class GeneratedContent < ApplicationRecord
   has_many :content_ab_test_variants, dependent: :destroy
   has_many :variant_ab_tests, through: :content_ab_test_variants, source: :content_ab_test
   
+  # Persona associations
+  has_many :persona_contents, dependent: :destroy
+  has_many :personas, through: :persona_contents
+  
   # Constants
   CONTENT_TYPES = %w[
     email
@@ -533,8 +537,94 @@ class GeneratedContent < ApplicationRecord
       recent_activity: recent.limit(10).pluck(:id, :title, :updated_at)
     }
   end
+
+  # Persona-based content methods
+  def has_persona_adaptations?
+    persona_contents.exists?
+  end
+
+  def primary_persona_adaptation
+    persona_contents.primary_adaptations.first
+  end
+
+  def persona_adaptation_summary
+    return {} unless has_persona_adaptations?
+    
+    {
+      total_adaptations: persona_contents.count,
+      personas_involved: personas.pluck(:name),
+      adaptation_types: persona_contents.pluck(:adaptation_type).uniq,
+      average_effectiveness: persona_contents.average(:effectiveness_score) || 0.0,
+      best_adaptation: persona_contents.by_effectiveness.first&.performance_summary,
+      primary_adaptation: primary_persona_adaptation&.performance_summary
+    }
+  end
+
+  def create_persona_adaptation(persona, adaptation_type, options = {})
+    PersonaContent.create_adaptation(persona, self, adaptation_type, options)
+  end
+
+  def get_adapted_content_for_persona(persona)
+    persona_content = persona_contents.find_by(persona: persona)
+    persona_content&.adapted_content || body_content
+  end
+
+  def best_adaptation_for_user_profile(user_profile)
+    return body_content unless user_profile.is_a?(Hash)
+    
+    # Find personas that match the user profile
+    matching_personas = campaign_plan.user.find_matching_personas(user_profile)
+    
+    matching_personas.each do |persona|
+      adaptation = persona_contents.find_by(persona: persona)
+      return adaptation.adapted_content if adaptation&.effective?
+    end
+    
+    # Fallback to original content
+    body_content
+  end
+
+  def generate_persona_adaptations_for_user(user)
+    return [] unless user.has_personas?
+    
+    adaptations = []
+    user.active_personas.each do |persona|
+      # Skip if adaptation already exists
+      next if persona_contents.exists?(persona: persona)
+      
+      # Create adaptation for this persona
+      adaptation_type = determine_best_adaptation_type(persona)
+      adaptation = create_persona_adaptation(persona, adaptation_type, { primary: adaptations.empty? })
+      adaptations << adaptation
+    end
+    
+    adaptations
+  end
   
   private
+  
+  def determine_best_adaptation_type(persona)
+    # Logic to determine the most appropriate adaptation type based on persona characteristics
+    characteristics = persona.parse_content_preferences
+    traits = persona.parse_behavioral_traits
+    
+    # Priority-based selection
+    if traits['urgency_sensitive'] == true
+      'behavioral_trigger'
+    elsif characteristics['tone']&.present?
+      'tone_adaptation'
+    elsif traits['attention_span'] == 'short'
+      'length_adaptation'
+    elsif persona.preferred_channels.present?
+      'channel_optimization'
+    elsif persona.goals.present?
+      'goal_alignment'
+    elsif persona.pain_points.present?
+      'pain_point_focus'
+    else
+      'personalized_messaging'
+    end
+  end
   
   def set_default_metadata
     self.metadata ||= {

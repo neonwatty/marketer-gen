@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :created_contents, class_name: 'GeneratedContent', foreign_key: 'created_by_id', dependent: :destroy
   has_many :approved_contents, class_name: 'GeneratedContent', foreign_key: 'approved_by_id', dependent: :nullify
   has_many :created_ab_tests, class_name: 'ContentAbTest', foreign_key: 'created_by_id', dependent: :destroy
+  has_many :personas, dependent: :destroy
   has_one_attached :avatar
 
   ROLES = %w[marketer team_member admin].freeze
@@ -105,6 +106,48 @@ class User < ApplicationRecord
 
   def has_brand_identity?
     brand_identities.active.exists?
+  end
+
+  def active_personas
+    personas.active.by_priority
+  end
+
+  def has_personas?
+    personas.active.exists?
+  end
+
+  def find_matching_personas(user_profile)
+    return personas.none unless user_profile.is_a?(Hash)
+    
+    matching_personas = []
+    personas.active.each do |persona|
+      if persona.matches_user_profile?(user_profile)
+        score = persona.calculate_match_score(user_profile)
+        matching_personas << { persona: persona, score: score }
+      end
+    end
+    
+    matching_personas.sort_by { |match| match[:score] }.reverse.map { |match| match[:persona] }
+  end
+
+  def best_matching_persona(user_profile)
+    matching_personas = find_matching_personas(user_profile)
+    matching_personas.first
+  end
+
+  def persona_performance_summary
+    return {} unless has_personas?
+    
+    {
+      total_personas: personas.count,
+      active_personas: personas.active.count,
+      total_adaptations: PersonaContent.joins(:persona).where(persona: { user: self }).count,
+      average_effectiveness: PersonaContent.joins(:persona).where(persona: { user: self }).average(:effectiveness_score) || 0.0,
+      best_performing_persona: personas.joins(:persona_contents)
+                                       .group('personas.id')
+                                       .average('persona_contents.effectiveness_score')
+                                       .max_by(&:last)&.first
+    }
   end
 
   private

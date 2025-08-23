@@ -1,0 +1,65 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+professional_marketer:
+  name: "Professional Marketer"
+  description: "Target audience of experienced marketing professionals in B2B companies"
+  characteristics: "Detail-oriented, data-driven, strategic thinker, time-conscious"
+  demographics: '{"age_group": "26-40", "location": "urban", "industry": "marketing", "job_level": "manager"}'
+  goals: '["increase_productivity", "improve_roi", "streamline_processes", "data_driven_decisions"]'
+  pain_points: '["lack_of_time", "complex_workflows", "budget_constraints", "proving_roi"]'
+  preferred_channels: '["email", "linkedin", "webinar"]'
+  content_preferences: '{"tone": "professional", "format": "bullet_points", "length": "medium", "preferred_content_types": ["blog_article", "white_paper", "case_study"]}'
+  behavioral_traits: '{"attention_span": "medium", "urgency_sensitive": true, "detail_oriented": true, "social_proof_motivated": true}'
+  is_active: true
+  priority: 1
+  user: one
+  tags: '["b2b", "marketing", "professional", "data_driven"]'
+  matching_rules: '{"match_threshold": 55, "demographics_weight": 2, "behavioral_weight": 3, "goals_weight": 2}'
+
+startup_founder:
+  name: "Startup Founder"
+  description: "Early-stage startup founders looking for cost-effective marketing solutions"
+  characteristics: "Resourceful, fast-moving, growth-focused, budget-conscious"
+  demographics: '{"age_group": "25-35", "location": "tech_hub", "company_size": "1-10", "funding_stage": "seed"}'
+  goals: '["rapid_growth", "save_money", "market_validation", "user_acquisition"]'
+  pain_points: '["limited_budget", "wearing_many_hats", "scaling_challenges", "competition"]'
+  preferred_channels: '["social_media", "email", "twitter"]'
+  content_preferences: '{"tone": "casual", "format": "short_form", "length": "short", "preferred_content_types": ["social_post", "email", "ad_copy"]}'
+  behavioral_traits: '{"attention_span": "short", "urgency_sensitive": true, "cost_sensitive": true, "innovation_seeking": true}'
+  is_active: true
+  priority: 2
+  user: one
+  tags: '["startup", "growth", "budget_conscious", "b2c"]'
+  matching_rules: '{"match_threshold": 70, "demographics_weight": 1, "behavioral_weight": 3, "goals_weight": 3}'
+
+enterprise_exec:
+  name: "Enterprise Executive" 
+  description: "C-level executives in large enterprises focused on strategic initiatives"
+  characteristics: "Strategic, results-oriented, relationship-focused, quality-conscious"
+  demographics: '{"age_group": "40-60", "location": "global", "company_size": "1000+", "job_level": "executive"}'
+  goals: '["strategic_growth", "market_leadership", "operational_excellence", "stakeholder_value"]'
+  pain_points: '["complex_decision_making", "stakeholder_alignment", "market_disruption", "regulatory_compliance"]'
+  preferred_channels: '["linkedin", "email", "executive_briefings"]'
+  content_preferences: '{"tone": "executive", "format": "executive_summary", "length": "comprehensive", "preferred_content_types": ["white_paper", "case_study", "presentation"]}'
+  behavioral_traits: '{"attention_span": "long", "urgency_sensitive": false, "quality_focused": true, "relationship_driven": true}'
+  is_active: true
+  priority: 3
+  user: two
+  tags: '["enterprise", "executive", "strategic", "b2b"]'
+  matching_rules: '{"match_threshold": 80, "demographics_weight": 3, "behavioral_weight": 2, "goals_weight": 3}'
+
+small_business_owner:
+  name: "Small Business Owner"
+  description: "Small business owners seeking practical marketing solutions"
+  characteristics: "Practical, hands-on, community-focused, value-conscious"
+  demographics: '{"age_group": "35-55", "location": "suburban", "company_size": "2-50", "industry": "local_services"}'
+  goals: '["local_growth", "customer_retention", "brand_awareness", "operational_efficiency"]'
+  pain_points: '["limited_marketing_knowledge", "time_constraints", "budget_limitations", "competition_from_chains"]'
+  preferred_channels: '["email", "facebook", "local_advertising"]'
+  content_preferences: '{"tone": "friendly", "format": "simple", "length": "medium", "preferred_content_types": ["email", "social_post", "newsletter"]}'
+  behavioral_traits: '{"attention_span": "medium", "trust_focused": true, "local_oriented": true, "practical_minded": true}'
+  is_active: true
+  priority: 1
+  user: two
+  tags: '["small_business", "local", "practical", "community"]'
+  matching_rules: '{"match_threshold": 60, "demographics_weight": 2, "behavioral_weight": 2, "goals_weight": 2}'

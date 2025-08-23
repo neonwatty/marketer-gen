@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+professional_tone_adaptation:
+  persona: professional_marketer
+  generated_content: one
+  adaptation_type: tone_adaptation
+  adapted_content: "We are pleased to present our comprehensive marketing automation solution designed specifically for professional marketing teams. This enterprise-grade platform delivers measurable ROI through advanced analytics and streamlined campaign management capabilities."
+  adaptation_metadata: '{"original_content_type": "email", "adaptation_context": {"adaptation_method": "tone_adaptation", "persona_focus": "professional_language"}, "performance_tracking": {"engagement_prediction": 85, "conversion_likelihood": 72}}'
+  effectiveness_score: 8.7
+  is_primary_adaptation: true
+  adaptation_rationale: "Adapted for professional marketers requiring formal, data-driven messaging"
+
+startup_length_adaptation:
+  persona: startup_founder
+  generated_content: two
+  adaptation_type: length_adaptation
+  adapted_content: "🚀 Quick wins for your startup! Our tool helps you scale marketing fast without breaking the bank. Get results in days, not months."
+  adaptation_metadata: '{"original_content_type": "social_post", "adaptation_context": {"adaptation_method": "length_adaptation", "target_length": "short"}, "performance_tracking": {"engagement_prediction": 78, "conversion_likelihood": 65}}'
+  effectiveness_score: 7.9
+  is_primary_adaptation: true
+  adaptation_rationale: "Shortened for startup founders with limited attention spans"
+
+enterprise_demographic_targeting:
+  persona: enterprise_exec
+  generated_content: one
+  adaptation_type: demographic_targeting
+  adapted_content: "Trusted solution with proven results: Our enterprise marketing platform has delivered over $2B in tracked revenue for Fortune 500 companies. Strategic decision makers rely on our comprehensive analytics suite to drive stakeholder value and maintain market leadership."
+  adaptation_metadata: '{"original_content_type": "email", "adaptation_context": {"adaptation_method": "demographic_targeting", "target_demographic": "enterprise_executive"}, "performance_tracking": {"engagement_prediction": 82, "conversion_likelihood": 88}}'
+  effectiveness_score: 9.1
+  is_primary_adaptation: false
+  adaptation_rationale: "Targeted messaging for C-level executives emphasizing results and strategic value"

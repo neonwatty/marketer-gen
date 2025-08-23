@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_22_233943) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_23_120508) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -366,6 +366,47 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_233943) do
     t.index ["user_id"], name: "index_journeys_on_user_id"
   end
 
+  create_table "persona_contents", force: :cascade do |t|
+    t.integer "persona_id", null: false
+    t.integer "generated_content_id", null: false
+    t.string "adaptation_type", null: false
+    t.text "adapted_content"
+    t.text "adaptation_metadata"
+    t.decimal "effectiveness_score", precision: 5, scale: 2
+    t.boolean "is_primary_adaptation", default: false
+    t.text "adaptation_rationale"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["adaptation_type"], name: "index_persona_contents_on_adaptation_type"
+    t.index ["effectiveness_score"], name: "index_persona_contents_on_effectiveness_score"
+    t.index ["generated_content_id"], name: "index_persona_contents_on_generated_content_id"
+    t.index ["persona_id", "generated_content_id"], name: "index_persona_contents_unique", unique: true
+    t.index ["persona_id"], name: "index_persona_contents_on_persona_id"
+  end
+
+  create_table "personas", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.text "characteristics"
+    t.text "demographics"
+    t.text "goals"
+    t.text "pain_points"
+    t.text "preferred_channels"
+    t.text "content_preferences"
+    t.text "behavioral_traits"
+    t.boolean "is_active", default: true, null: false
+    t.integer "priority", default: 0
+    t.integer "user_id", null: false
+    t.text "tags"
+    t.text "matching_rules"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_personas_on_is_active"
+    t.index ["priority"], name: "index_personas_on_priority"
+    t.index ["user_id", "name"], name: "index_personas_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_personas_on_user_id"
+  end
+
   create_table "plan_audit_logs", force: :cascade do |t|
     t.integer "campaign_plan_id", null: false
     t.integer "user_id", null: false
@@ -473,6 +514,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_233943) do
   add_foreign_key "generated_contents", "users", column: "created_by_id"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journeys", "users"
+  add_foreign_key "persona_contents", "generated_contents"
+  add_foreign_key "persona_contents", "personas"
+  add_foreign_key "personas", "users"
   add_foreign_key "plan_audit_logs", "campaign_plans"
   add_foreign_key "plan_audit_logs", "plan_versions"
   add_foreign_key "plan_audit_logs", "users"
