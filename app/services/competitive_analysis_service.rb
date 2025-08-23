@@ -19,9 +19,9 @@ class CompetitiveAnalysisService < ApplicationService
       {
         success: true,
         data: {
-          message: 'Competitive analysis initiated',
+          message: "Competitive analysis initiated",
           campaign_plan_id: campaign_plan.id,
-          status: 'processing'
+          status: "processing"
         }
       }
     rescue => error
@@ -73,7 +73,7 @@ class CompetitiveAnalysisService < ApplicationService
 
   def generate_competitive_intelligence
     prompt = build_competitive_intelligence_prompt
-    
+
     # Use LLM service to generate competitive intelligence
     response = llm_service.generate_content(
       prompt: prompt,
@@ -91,7 +91,7 @@ class CompetitiveAnalysisService < ApplicationService
 
   def conduct_market_research
     prompt = build_market_research_prompt
-    
+
     response = llm_service.generate_content(
       prompt: prompt,
       max_tokens: 2000,
@@ -108,7 +108,7 @@ class CompetitiveAnalysisService < ApplicationService
 
   def analyze_competitors
     prompt = build_competitor_analysis_prompt
-    
+
     response = llm_service.generate_content(
       prompt: prompt,
       max_tokens: 2500,
@@ -125,7 +125,7 @@ class CompetitiveAnalysisService < ApplicationService
 
   def gather_industry_benchmarks
     prompt = build_industry_benchmarks_prompt
-    
+
     response = llm_service.generate_content(
       prompt: prompt,
       max_tokens: 1500,
@@ -144,19 +144,19 @@ class CompetitiveAnalysisService < ApplicationService
   def build_competitive_intelligence_prompt
     <<~PROMPT
       Generate competitive intelligence for the following campaign:
-      
+
       Campaign Type: #{campaign_plan.campaign_type}
       Objective: #{campaign_plan.objective}
       Target Audience: #{campaign_plan.target_audience}
       Industry Context: #{extract_industry_context}
-      
+
       Please provide a comprehensive competitive intelligence analysis including:
       1. Key competitive advantages we can leverage
       2. Market threats and challenges
       3. Positioning opportunities
       4. Differentiation strategies
       5. Competitive gaps to exploit
-      
+
       Format the response as JSON with the following structure:
       {
         "competitive_advantages": ["advantage1", "advantage2"],
@@ -172,19 +172,19 @@ class CompetitiveAnalysisService < ApplicationService
   def build_market_research_prompt
     <<~PROMPT
       Conduct market research analysis for the following campaign:
-      
+
       Campaign Type: #{campaign_plan.campaign_type}
       Objective: #{campaign_plan.objective}
       Target Audience: #{campaign_plan.target_audience}
       Budget Context: #{campaign_plan.budget_constraints}
-      
+
       Please provide comprehensive market research including:
       1. Current market trends
       2. Consumer insights and behavior patterns
       3. Market size and growth opportunities
       4. Emerging technologies and platforms
       5. Regulatory and economic factors
-      
+
       Format the response as JSON:
       {
         "market_trends": ["trend1", "trend2"],
@@ -207,19 +207,19 @@ class CompetitiveAnalysisService < ApplicationService
   def build_competitor_analysis_prompt
     <<~PROMPT
       Analyze competitors for the following campaign context:
-      
+
       Campaign Type: #{campaign_plan.campaign_type}
       Objective: #{campaign_plan.objective}
       Industry: #{extract_industry_context}
       Target Audience: #{campaign_plan.target_audience}
-      
+
       Please identify and analyze key competitors including:
       1. Direct competitors with similar offerings
       2. Indirect competitors solving similar problems
       3. Emerging competitors and disruptors
       4. Competitor strengths and weaknesses
       5. Market share and positioning analysis
-      
+
       Format the response as JSON:
       {
         "competitors": [
@@ -247,18 +247,18 @@ class CompetitiveAnalysisService < ApplicationService
   def build_industry_benchmarks_prompt
     <<~PROMPT
       Provide industry benchmarks and performance metrics for:
-      
+
       Campaign Type: #{campaign_plan.campaign_type}
       Objective: #{campaign_plan.objective}
       Industry: #{extract_industry_context}
-      
+
       Please provide relevant industry benchmarks including:
       1. Performance metrics and KPIs
       2. Cost benchmarks and budget allocation
       3. Channel performance standards
       4. Conversion rates and engagement metrics
       5. Timeline and execution benchmarks
-      
+
       Format the response as JSON:
       {
         "performance_benchmarks": {
@@ -328,88 +328,88 @@ class CompetitiveAnalysisService < ApplicationService
   # Default responses for error cases
   def default_competitive_intelligence
     {
-      'competitive_advantages' => ['Market experience', 'Brand recognition', 'Customer loyalty'],
-      'market_threats' => ['New competitors', 'Economic uncertainty', 'Technology disruption'],
-      'positioning_opportunities' => ['Unique value proposition', 'Underserved market segments'],
-      'differentiation_strategies' => ['Innovation focus', 'Customer service excellence'],
-      'competitive_gaps' => ['Digital presence', 'Mobile optimization'],
-      'strategic_recommendations' => ['Invest in digital transformation', 'Focus on customer experience']
+      "competitive_advantages" => [ "Market experience", "Brand recognition", "Customer loyalty" ],
+      "market_threats" => [ "New competitors", "Economic uncertainty", "Technology disruption" ],
+      "positioning_opportunities" => [ "Unique value proposition", "Underserved market segments" ],
+      "differentiation_strategies" => [ "Innovation focus", "Customer service excellence" ],
+      "competitive_gaps" => [ "Digital presence", "Mobile optimization" ],
+      "strategic_recommendations" => [ "Invest in digital transformation", "Focus on customer experience" ]
     }
   end
 
   def default_market_research
     {
-      'market_trends' => ['Digital transformation', 'Sustainability focus', 'Personalization'],
-      'consumer_insights' => ['Price sensitivity', 'Quality preference', 'Convenience demand'],
-      'market_size_data' => {
-        'total_addressable_market' => 'TBD',
-        'growth_rate' => '5-10%',
-        'key_segments' => ['Enterprise', 'SMB', 'Consumer']
+      "market_trends" => [ "Digital transformation", "Sustainability focus", "Personalization" ],
+      "consumer_insights" => [ "Price sensitivity", "Quality preference", "Convenience demand" ],
+      "market_size_data" => {
+        "total_addressable_market" => "TBD",
+        "growth_rate" => "5-10%",
+        "key_segments" => [ "Enterprise", "SMB", "Consumer" ]
       },
-      'growth_opportunities' => ['International expansion', 'New product lines'],
-      'external_factors' => {
-        'regulatory' => ['Data privacy', 'Industry compliance'],
-        'economic' => ['Interest rates', 'Consumer spending'],
-        'technological' => ['AI advancement', 'Mobile adoption']
+      "growth_opportunities" => [ "International expansion", "New product lines" ],
+      "external_factors" => {
+        "regulatory" => [ "Data privacy", "Industry compliance" ],
+        "economic" => [ "Interest rates", "Consumer spending" ],
+        "technological" => [ "AI advancement", "Mobile adoption" ]
       }
     }
   end
 
   def default_competitor_analysis
     {
-      'competitors' => [
+      "competitors" => [
         {
-          'name' => 'Market Leader',
-          'type' => 'direct',
-          'market_share' => '25%',
-          'strengths' => ['Brand recognition', 'Distribution network'],
-          'weaknesses' => ['High prices', 'Legacy technology'],
-          'positioning' => 'Premium market leader',
-          'key_campaigns' => ['Brand awareness', 'Product launch'],
-          'threat_level' => 'high'
+          "name" => "Market Leader",
+          "type" => "direct",
+          "market_share" => "25%",
+          "strengths" => [ "Brand recognition", "Distribution network" ],
+          "weaknesses" => [ "High prices", "Legacy technology" ],
+          "positioning" => "Premium market leader",
+          "key_campaigns" => [ "Brand awareness", "Product launch" ],
+          "threat_level" => "high"
         }
       ],
-      'competitive_landscape' => {
-        'market_saturation' => 'medium',
-        'barriers_to_entry' => 'medium',
-        'innovation_pace' => 'moderate'
+      "competitive_landscape" => {
+        "market_saturation" => "medium",
+        "barriers_to_entry" => "medium",
+        "innovation_pace" => "moderate"
       },
-      'white_space_opportunities' => ['Underserved demographics', 'Emerging channels']
+      "white_space_opportunities" => [ "Underserved demographics", "Emerging channels" ]
     }
   end
 
   def default_industry_benchmarks
     {
-      'performance_benchmarks' => {
-        'conversion_rates' => {
-          'email' => '2-3%',
-          'social_media' => '1-2%',
-          'paid_advertising' => '3-5%',
-          'organic_search' => '4-6%'
+      "performance_benchmarks" => {
+        "conversion_rates" => {
+          "email" => "2-3%",
+          "social_media" => "1-2%",
+          "paid_advertising" => "3-5%",
+          "organic_search" => "4-6%"
         },
-        'engagement_metrics' => {
-          'email_open_rate' => '20-25%',
-          'email_click_rate' => '2-5%',
-          'social_engagement_rate' => '1-3%',
-          'website_bounce_rate' => '40-60%'
+        "engagement_metrics" => {
+          "email_open_rate" => "20-25%",
+          "email_click_rate" => "2-5%",
+          "social_engagement_rate" => "1-3%",
+          "website_bounce_rate" => "40-60%"
         }
       },
-      'cost_benchmarks' => {
-        'cost_per_acquisition' => '$50-200',
-        'cost_per_click' => '$1-5',
-        'cost_per_impression' => '$0.50-2.00',
-        'budget_allocation' => {
-          'paid_media' => '40-50%',
-          'content_creation' => '20-30%',
-          'tools_and_technology' => '15-20%',
-          'personnel' => '20-25%'
+      "cost_benchmarks" => {
+        "cost_per_acquisition" => "$50-200",
+        "cost_per_click" => "$1-5",
+        "cost_per_impression" => "$0.50-2.00",
+        "budget_allocation" => {
+          "paid_media" => "40-50%",
+          "content_creation" => "20-30%",
+          "tools_and_technology" => "15-20%",
+          "personnel" => "20-25%"
         }
       },
-      'timeline_benchmarks' => {
-        'campaign_planning' => '14-21 days',
-        'content_creation' => '7-14 days',
-        'campaign_execution' => '30-90 days',
-        'performance_analysis' => '7-14 days'
+      "timeline_benchmarks" => {
+        "campaign_planning" => "14-21 days",
+        "content_creation" => "7-14 days",
+        "campaign_execution" => "30-90 days",
+        "performance_analysis" => "7-14 days"
       }
     }
   end
@@ -417,10 +417,10 @@ class CompetitiveAnalysisService < ApplicationService
   def extract_industry_context
     # Try to extract industry context from campaign plan or default to generic
     brand_context = campaign_plan.brand_context_summary
-    industry = brand_context.dig('industry') || 
-               brand_context.dig('vertical') || 
+    industry = brand_context.dig("industry") ||
+               brand_context.dig("vertical") ||
                campaign_plan.campaign_type.humanize
-    
-    industry.present? ? industry : 'General Business'
+
+    industry.present? ? industry : "General Business"
   end
 end
