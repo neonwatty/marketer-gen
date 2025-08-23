@@ -11,14 +11,18 @@ const customJestConfig = {
   testEnvironment: 'jsdom',
   moduleDirectories: ['node_modules', '<rootDir>/'],
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/', '<rootDir>/e2e/'],
-  // Transform ES modules from Prisma and auth adapters
+  // Transform ES modules from Prisma and auth adapters - more comprehensive pattern
   transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$|@prisma/client|@auth/prisma-adapter|@auth/.*|oauth4webapi|next-auth|jose|openid-client|@ai-sdk/.*|ai|eventsource-parser))',
+    'node_modules/(?!(jose|openid-client|@auth|oauth4webapi|next-auth|@prisma/client|@ai-sdk|ai|eventsource-parser|@panva|@scure|@noble)/).*/',
   ],
   extensionsToTreatAsEsm: ['.ts'],
-  // Handle Prisma client imports
+  // Handle Prisma client imports and mock problematic modules
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^jose$': '<rootDir>/jest.mocks/jose.js',
+    '^openid-client$': '<rootDir>/jest.mocks/openid-client.js',
+    '^@panva/hkdf$': '<rootDir>/jest.mocks/@panva/hkdf.js',
+    '^../generated/prisma$': '<rootDir>/jest.mocks/prisma-client.js',
   },
 }
 

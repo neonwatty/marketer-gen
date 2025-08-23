@@ -1,35 +1,48 @@
-// Create properly mocked methods
+// Create properly mocked methods that will be shared across all instances
 const mockUser = {
   findUnique: jest.fn(),
+  findFirst: jest.fn(),
+  findMany: jest.fn(),
   create: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
 }
 
 const mockAccount = {
+  findUnique: jest.fn(),
   findFirst: jest.fn(),
+  findMany: jest.fn(),
   create: jest.fn(),
+  update: jest.fn(),
   delete: jest.fn(),
 }
 
 const mockSession = {
-  create: jest.fn(),
   findUnique: jest.fn(),
+  findFirst: jest.fn(),
+  findMany: jest.fn(),
+  create: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
 }
 
 const mockVerificationToken = {
+  findUnique: jest.fn(),
   findFirst: jest.fn(),
-  delete: jest.fn(),
+  findMany: jest.fn(),
   create: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
 }
 
-// Mock the PrismaClient from the generated path used by db.ts
-jest.mock('@/generated/prisma', () => ({
+// Mock the Prisma client at the module level before any imports
+jest.mock('../generated/prisma', () => ({
   PrismaClient: jest.fn().mockImplementation(() => ({
-    $connect: jest.fn(),
-    $disconnect: jest.fn(),
+    $connect: jest.fn().mockResolvedValue(undefined),
+    $disconnect: jest.fn().mockResolvedValue(undefined),
+    $queryRaw: jest.fn(),
+    $executeRaw: jest.fn(),
+    $transaction: jest.fn(),
     user: mockUser,
     account: mockAccount,
     session: mockSession,
@@ -37,11 +50,8 @@ jest.mock('@/generated/prisma', () => ({
   })),
 }))
 
-// Export mocks for use in tests
-export { mockUser, mockAccount, mockSession, mockVerificationToken }
-
-// Import the mocked PrismaClient
-import { PrismaClient } from '@/generated/prisma'
+// Import after mocking
+import { PrismaClient } from '../generated/prisma'
 
 describe('Database Configuration', () => {
   const originalEnv = process.env

@@ -37,7 +37,7 @@
   - [x] 1.1 Set up OpenAI API service with streaming support
     - *Docs: [OpenAI API Integration Next.js 2025](https://ai-sdk.dev/docs/getting-started/nextjs-app-router), [AI SDK Documentation](https://github.com/openai/openai-assistants-quickstart)*
     - *Testing: API Service - Unit: API key validation, response parsing, error handling; Integration: streaming responses, rate limiting*
-  - [ ] 1.2 Create content generation API routes with brand compliance validation
+  - [x] 1.2 Create content generation API routes with brand compliance validation
     - *Docs: [Next.js API Routes App Router](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)*
     - *Testing: API Routes - Unit: request validation, response formatting; Integration: OpenAI API calls, database interactions*
   - [ ] 1.3 Implement content variants and format generation system

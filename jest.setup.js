@@ -47,7 +47,7 @@ jest.mock('next/image', () => ({
 import React from 'react'
 global.React = React
 
-// Mock NextResponse for all tests
+// Mock NextResponse and NextRequest for all tests
 jest.mock('next/server', () => ({
   NextResponse: {
     json: (data, init) => {
@@ -64,6 +64,14 @@ jest.mock('next/server', () => ({
     },
     redirect: jest.fn(),
     rewrite: jest.fn(),
+  },
+  NextRequest: class MockNextRequest extends global.Request {
+    constructor(input, init) {
+      super(input, init)
+      this.nextUrl = new URL(input)
+      this.geo = {}
+      this.ip = '127.0.0.1'
+    }
   },
 }))
 
@@ -93,3 +101,38 @@ if (typeof Element !== 'undefined') {
   // Mock scrollIntoView for jsdom compatibility
   Element.prototype.scrollIntoView = jest.fn()
 }
+
+// Mock next-auth globally to avoid ES module issues
+jest.mock('next-auth', () => ({
+  getServerSession: jest.fn(),
+  NextAuth: jest.fn().mockReturnValue({
+    handlers: { GET: jest.fn(), POST: jest.fn() },
+    auth: jest.fn(),
+    signIn: jest.fn(),
+    signOut: jest.fn(),
+  }),
+  AuthError: class AuthError extends Error {
+    constructor(message) {
+      super(message)
+      this.name = 'AuthError'
+    }
+  },
+}))
+
+// Mock next-auth/next
+jest.mock('next-auth/next', () => ({
+  withAuth: jest.fn((handler) => handler),
+}))
+
+// Mock auth lib
+jest.mock('@/lib/auth', () => ({
+  authOptions: {
+    providers: [],
+    adapter: {},
+    session: { strategy: 'jwt' },
+    callbacks: {
+      jwt: jest.fn(),
+      session: jest.fn(),
+    },
+  },
+}))

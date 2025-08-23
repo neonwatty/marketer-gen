@@ -29,19 +29,26 @@ export const authOptions: NextAuthOptions = {
       : []),
   ],
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
   pages: {
     signIn: "/auth/signin",
   },
   callbacks: {
-    async session({ session, user }) {
-      if (session?.user && user) {
-        (session.user as any).id = user.id;
+    async session({ session, token, user }) {
+      // Handle case where session.user is undefined
+      if (!session?.user) {
+        return session;
+      }
+
+      // Handle both JWT strategy (token) and database strategy (user)
+      const userId = user?.id || token?.sub;
+      if (userId) {
+        (session.user as any).id = userId;
         // Add custom user fields to session if needed
         try {
           const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
+            where: { id: userId },
             select: { role: true },
           });
           if (dbUser) {
