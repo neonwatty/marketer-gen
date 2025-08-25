@@ -22,6 +22,17 @@ active_brand:
   status: "active"
   is_active: true
 
+marketer_brand:
+  user: marketer_user
+  name: "Marketer Brand"
+  description: "Brand identity for the marketer user"
+  brand_voice: "Professional yet approachable"
+  tone_guidelines: "Always positive and helpful"
+  messaging_framework: "Focus on customer success"
+  restrictions: "Avoid technical jargon"
+  status: "active"
+  is_active: true
+
 other_user_brand:
   user: two
   name: "Other Brand"

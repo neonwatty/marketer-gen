@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../controllers/concerns/llm_service_helper'
+
 # Base class for application services
 # Provides common functionality and includes LLM service helper
 class ApplicationService

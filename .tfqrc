@@ -1,6 +1,6 @@
 {
   "database": {
-    "path": "./.tfq/queue.db"
+    "path": "/tmp/tfq-tfq.db"
   },
   "defaults": {
     "autoAdd": true,

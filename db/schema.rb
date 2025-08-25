@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_23_171205) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_25_175806) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -76,6 +76,45 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_23_171205) do
     t.index ["status"], name: "index_brand_identities_on_status"
     t.index ["user_id", "name"], name: "index_brand_identities_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_brand_identities_on_user_id"
+  end
+
+  create_table "brand_variants", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "brand_identity_id", null: false
+    t.integer "persona_id"
+    t.string "name", null: false
+    t.text "description", null: false
+    t.string "adaptation_context", null: false
+    t.string "adaptation_type", null: false
+    t.string "status", default: "draft", null: false
+    t.integer "priority", default: 0, null: false
+    t.integer "usage_count", default: 0, null: false
+    t.decimal "effectiveness_score", precision: 4, scale: 2
+    t.datetime "last_used_at"
+    t.datetime "last_measured_at"
+    t.datetime "activated_at"
+    t.datetime "archived_at"
+    t.datetime "testing_started_at"
+    t.json "adaptation_rules"
+    t.json "brand_voice_adjustments"
+    t.json "messaging_variations"
+    t.json "visual_guidelines"
+    t.json "channel_specifications"
+    t.json "audience_targeting"
+    t.json "performance_metrics"
+    t.json "a_b_test_results"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["adaptation_context", "adaptation_type"], name: "index_brand_variants_on_adaptation_context_and_adaptation_type"
+    t.index ["brand_identity_id"], name: "index_brand_variants_on_brand_identity_id"
+    t.index ["effectiveness_score"], name: "index_brand_variants_on_effectiveness_score"
+    t.index ["last_used_at"], name: "index_brand_variants_on_last_used_at"
+    t.index ["name", "user_id", "brand_identity_id"], name: "index_brand_variants_unique_name_per_user_brand", unique: true
+    t.index ["persona_id"], name: "index_brand_variants_on_persona_id"
+    t.index ["priority"], name: "index_brand_variants_on_priority"
+    t.index ["user_id", "brand_identity_id"], name: "index_brand_variants_on_user_id_and_brand_identity_id"
+    t.index ["user_id", "status"], name: "index_brand_variants_on_user_id_and_status"
+    t.index ["user_id"], name: "index_brand_variants_on_user_id"
   end
 
   create_table "campaign_plans", force: :cascade do |t|
@@ -511,6 +550,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_23_171205) do
   add_foreign_key "approval_workflows", "generated_contents"
   add_foreign_key "approval_workflows", "users", column: "created_by_id"
   add_foreign_key "brand_identities", "users"
+  add_foreign_key "brand_variants", "brand_identities"
+  add_foreign_key "brand_variants", "personas"
+  add_foreign_key "brand_variants", "users"
   add_foreign_key "campaign_plans", "users"
   add_foreign_key "campaign_plans", "users", column: "approved_by_id"
   add_foreign_key "campaign_plans", "users", column: "rejected_by_id"

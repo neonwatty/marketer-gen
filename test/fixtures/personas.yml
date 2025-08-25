@@ -12,7 +12,7 @@ professional_marketer:
   behavioral_traits: '{"attention_span": "medium", "urgency_sensitive": true, "detail_oriented": true, "social_proof_motivated": true}'
   is_active: true
   priority: 1
-  user: one
+  user: marketer_user
   tags: '["b2b", "marketing", "professional", "data_driven"]'
   matching_rules: '{"match_threshold": 55, "demographics_weight": 2, "behavioral_weight": 3, "goals_weight": 2}'
 
