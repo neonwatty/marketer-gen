@@ -1,5 +1,6 @@
 class BrandIdentity < ApplicationRecord
   belongs_to :user
+  has_many :brand_variants, dependent: :destroy
   
   has_many_attached :brand_materials
   has_many_attached :logo_files

@@ -6,6 +6,24 @@ Rails.application.routes.draw do
       patch :deactivate  
       post :process_materials
     end
+    
+    # Brand adaptation routes
+    resources :brand_adaptations, path: 'adaptations' do
+      member do
+        post :activate
+        post :deactivate
+        post :archive
+        post :test
+        post :duplicate
+        patch :update_effectiveness
+      end
+      
+      collection do
+        post :adapt_content
+        post :analyze_consistency
+        get :analyze_compatibility
+      end
+    end
   end
   
   resources :campaign_plans do
