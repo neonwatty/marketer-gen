@@ -144,6 +144,13 @@ class SecurityControllerTest < ActionDispatch::IntegrationTest
     session = @user.sessions.last
     session.update_column(:updated_at, 2.hours.ago)
     
+    # Clear current session and cookies to simulate fresh request  
+    Current.session = nil
+    cookies.delete(:session_id)
+    
+    # Temporarily mock Rails.env.test? to be false so expiration logic runs
+    Rails.env.stubs(:test?).returns(false)
+    
     # Next request should require re-authentication
     get journeys_path
     assert_redirected_to new_session_path

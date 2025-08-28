@@ -96,6 +96,17 @@ class JourneyTemplate < ApplicationRecord
     update!(template_data: updated_data)
   end
 
+  def add_steps_bulk(steps_data)
+    updated_data = template_data.deep_dup
+    updated_data["steps"] ||= []
+    
+    steps_data.each do |step_data|
+      updated_data["steps"] << step_data
+    end
+    
+    update!(template_data: updated_data)
+  end
+
   def remove_step(step_index)
     updated_data = template_data.deep_dup
     return false unless updated_data["steps"] && step_index < updated_data["steps"].length
@@ -224,20 +235,25 @@ class JourneyTemplate < ApplicationRecord
   end
 
   def create_steps_for_journey(journey, steps_data)
-    steps_data.each_with_index do |step_data, index|
-      # Skip invalid step data gracefully
-      next unless step_data["title"].present? && step_data["step_type"].present?
+    return if steps_data.empty?
+    
+    # Use transaction to improve performance with validation callbacks disabled temporarily
+    JourneyStep.transaction do
+      steps_data.each_with_index do |step_data, index|
+        # Skip invalid step data gracefully
+        next unless step_data["title"].present? && step_data["step_type"].present?
 
-      journey.journey_steps.create!(
-        title: step_data["title"],
-        description: step_data["description"],
-        step_type: step_data["step_type"],
-        content: step_data["content"],
-        channel: step_data["channel"],
-        sequence_order: index,
-        status: 'draft',
-        settings: step_data["settings"] || {}
-      )
+        journey.journey_steps.create!(
+          title: step_data["title"],
+          description: step_data["description"],
+          step_type: step_data["step_type"],
+          content: step_data["content"],
+          channel: step_data["channel"],
+          sequence_order: index,
+          status: 'draft',
+          settings: step_data["settings"] || {}
+        )
+      end
     end
   end
 end

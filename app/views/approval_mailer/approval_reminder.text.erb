@@ -1,3 +1,23 @@
-Approval#approval_reminder
+⏰ APPROVAL REMINDER: <%= @content.title %>
 
-<%= @greeting %>, find me in app/views/approval_mailer/approval_reminder.text.erb
+Hello <%= @approver.full_name %>,
+
+This is a reminder that the following content is still pending your approval:
+<% if @hours_waiting %>
+(Waiting for <%= @hours_waiting %> hours)
+<% end %>
+
+Title: <%= @content.title %>
+Content Type: <%= @content.content_type.titleize %>
+Campaign: <%= @campaign.name %>
+Created by: <%= @content.created_by.full_name %>
+
+Please review and approve or reject this content as soon as possible:
+
+Approve: <%= @approval_url %>
+Reject: <%= @reject_url %>
+
+Thank you for your prompt attention.
+
+Best regards,
+MarketerGen Team

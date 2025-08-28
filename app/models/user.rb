@@ -2,6 +2,8 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :journeys, dependent: :destroy
+  has_many :touchpoints, dependent: :destroy
+  has_many :attribution_models, dependent: :destroy
   has_many :brand_identities, dependent: :destroy
   has_many :brand_variants, dependent: :destroy
   has_many :campaign_plans, dependent: :destroy
@@ -10,6 +12,11 @@ class User < ApplicationRecord
   has_many :created_ab_tests, class_name: 'ContentAbTest', foreign_key: 'created_by_id', dependent: :destroy
   has_many :personas, dependent: :destroy
   has_many :platform_connections, dependent: :destroy
+  has_many :budget_allocations, dependent: :destroy
+  has_many :created_milestones, class_name: 'ProjectMilestone', foreign_key: 'created_by_id', dependent: :destroy
+  has_many :assigned_milestones, class_name: 'ProjectMilestone', foreign_key: 'assigned_to_id', dependent: :nullify
+  has_many :completed_milestones, class_name: 'ProjectMilestone', foreign_key: 'completed_by_id', dependent: :nullify
+  has_many :compliance_requirements, dependent: :destroy
   has_one_attached :avatar
 
   ROLES = %w[marketer team_member admin].freeze

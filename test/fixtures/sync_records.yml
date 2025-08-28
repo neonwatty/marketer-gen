@@ -1,0 +1,100 @@
+pending_sync:
+  platform_connection: fixture_meta_connection
+  entity_type: campaigns
+  external_id: campaign_123
+  sync_type: full_sync
+  status: pending
+  direction: bidirectional
+  metadata: |
+    {
+      "created_by": "test",
+      "sync_initiated_at": "2023-01-01T10:00:00Z"
+    }
+  retry_count: 0
+
+completed_sync:
+  platform_connection: fixture_meta_connection
+  entity_type: campaigns
+  external_id: campaign_456
+  sync_type: delta_sync
+  status: completed
+  direction: inbound
+  local_data: |
+    {
+      "id": "campaign_456",
+      "name": "Local Campaign",
+      "status": "active"
+    }
+  external_data: |
+    {
+      "id": "campaign_456",
+      "name": "External Campaign",
+      "status": "active"
+    }
+  metadata: |
+    {
+      "completed": "2023-01-01T11:00:00Z",
+      "sync_duration": 30.5
+    }
+  started_at: 2023-01-01 10:30:00
+  completed_at: 2023-01-01 11:00:00
+  retry_count: 0
+
+failed_sync:
+  platform_connection: fixture_google_ads_connection
+  entity_type: ad_groups
+  external_id: adgroup_789
+  sync_type: full_sync
+  status: failed
+  direction: bidirectional
+  error_message: "Connection timeout after 30 seconds"
+  metadata: |
+    {
+      "error": "Connection timeout after 30 seconds",
+      "failed_at": "2023-01-01T12:00:00Z"
+    }
+  retry_count: 2
+  started_at: 2023-01-01 11:45:00
+  completed_at: 2023-01-01 12:00:00
+
+conflict_sync:
+  platform_connection: fixture_linkedin_connection
+  entity_type: campaigns
+  external_id: campaign_conflict
+  sync_type: delta_sync
+  status: conflict_detected
+  direction: bidirectional
+  local_data: |
+    {
+      "id": "campaign_conflict",
+      "name": "Local Name",
+      "budget": 1000
+    }
+  external_data: |
+    {
+      "id": "campaign_conflict", 
+      "name": "External Name",
+      "budget": 2000
+    }
+  conflict_data: |
+    {
+      "conflicts": [
+        {
+          "field": "name",
+          "local_value": "Local Name",
+          "external_value": "External Name"
+        },
+        {
+          "field": "budget",
+          "local_value": 1000,
+          "external_value": 2000
+        }
+      ],
+      "detected_at": "2023-01-01T13:00:00Z"
+    }
+  metadata: |
+    {
+      "conflict_detected_at": "2023-01-01T13:00:00Z",
+      "requires_manual_resolution": true
+    }
+  retry_count: 0

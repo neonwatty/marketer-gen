@@ -1,3 +1,22 @@
-Approval#workflow_rejected
+❌ CONTENT REJECTED - <%= @content.title %>
 
-<%= @greeting %>, find me in app/views/approval_mailer/workflow_rejected.text.erb
+Hello <%= @recipient.full_name %>,
+
+Unfortunately, your content has been rejected and needs revisions:
+
+Title: <%= @content.title %>
+Content Type: <%= @content.content_type.titleize %>
+Campaign: <%= @campaign.name %>
+<% if @rejector %>Reviewed by: <%= @rejector.full_name %>
+<% end %>
+<% if @rejection_reason.present? %>
+Feedback:
+<%= @rejection_reason %>
+<% end %>
+
+Please review the feedback and make the necessary revisions before resubmitting.
+
+View content: <%= @content_url %>
+
+Best regards,
+MarketerGen Team

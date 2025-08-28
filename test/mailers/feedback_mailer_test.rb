@@ -33,7 +33,6 @@ class FeedbackMailerTest < ActionMailer::TestCase
   end
 
   test "feedback_acknowledged" do
-    skip "TODO: Fix during incremental development"
     mail = FeedbackMailer.feedback_acknowledged(@feedback, @user)
     assert_equal "✓ Feedback Acknowledged: #{@content.title}", mail.subject
     assert_equal [@reviewer.email_address], mail.to
@@ -42,7 +41,6 @@ class FeedbackMailerTest < ActionMailer::TestCase
   end
 
   test "feedback_addressed" do
-    skip "TODO: Fix during incremental development"
     response_note = "We've addressed your concerns"
     mail = FeedbackMailer.feedback_addressed(@feedback, @user, response_note)
     assert_equal "📝 Feedback Addressed: #{@content.title}", mail.subject
@@ -52,7 +50,6 @@ class FeedbackMailerTest < ActionMailer::TestCase
   end
 
   test "feedback_resolved" do
-    skip "TODO: Fix during incremental development"
     @feedback.update!(resolved_by_user: @user, resolved_at: Time.current)
     mail = FeedbackMailer.feedback_resolved(@feedback, @user)
     assert_equal "✅ Feedback Resolved: #{@content.title}", mail.subject
@@ -62,20 +59,18 @@ class FeedbackMailerTest < ActionMailer::TestCase
   end
 
   test "feedback_escalated" do
-    skip "TODO: Fix during incremental development"
     @feedback.update!(
       priority: ContentFeedback::PRIORITIES[:critical],
       metadata: { escalation_reason: 'Requires immediate attention' }
     )
     mail = FeedbackMailer.feedback_escalated(@feedback, @user)
-    assert_equal "🚨 🔴 URGENT Feedback Escalated: #{@content.title}", mail.subject
+    assert_equal "🚨 🔴 CRITICAL Feedback Escalated: #{@content.title}", mail.subject
     assert_equal [@user.email_address], mail.to
     assert_equal ["feedback@marketergen.com"], mail.from
     assert_match @content.title, mail.body.encoded
   end
 
   test "workflow_feedback" do
-    skip "TODO: Fix during incremental development"
     workflow = ApprovalWorkflow.create_workflow!(
       @content,
       'single_approver',
@@ -84,7 +79,7 @@ class FeedbackMailerTest < ActionMailer::TestCase
     )
     @feedback.update!(approval_workflow: workflow)
     
-    mail = FeedbackMailer.workflow_feedback(workflow, @feedback, @user)
+    mail = FeedbackMailer.workflow_feedback(@feedback, @user)
     assert_equal "📋 Workflow Feedback: #{@content.title}", mail.subject
     assert_equal [@user.email_address], mail.to
     assert_equal ["feedback@marketergen.com"], mail.from
@@ -92,7 +87,6 @@ class FeedbackMailerTest < ActionMailer::TestCase
   end
 
   test "feedback_urgent_attention" do
-    skip "TODO: Fix during incremental development"
     @feedback.update!(priority: ContentFeedback::PRIORITIES[:critical])
     mail = FeedbackMailer.feedback_urgent_attention(@feedback, @user, 3)
     assert_equal "⚠️ URGENT: Feedback Requires Attention - #{@content.title}", mail.subject

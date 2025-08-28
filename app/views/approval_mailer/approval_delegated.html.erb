@@ -1,5 +1,55 @@
-<h1>Approval#approval_delegated</h1>
-
-<p>
-  <%= @greeting %>, find me in app/views/approval_mailer/approval_delegated.html.erb
-</p>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+      .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+      .header { background-color: #cce5ff; padding: 20px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #99ccff; }
+      .content { background-color: white; padding: 20px; border: 1px solid #e9ecef; border-radius: 5px; }
+      .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 10px 5px; }
+      .delegation-info { background-color: #e7f3ff; padding: 15px; border-radius: 5px; margin: 15px 0; border: 1px solid #bee5eb; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>💼 Approval Delegated to You</h1>
+        <h2><%= @content.title %></h2>
+      </div>
+      
+      <div class="content">
+        <p>Hello <%= @to_user.full_name %>,</p>
+        
+        <div class="delegation-info">
+          <h3>You have been delegated an approval request</h3>
+          <p><%= @from_user.full_name %> has delegated this approval to you.</p>
+        </div>
+        
+        <p>Please review the following content that requires your approval:</p>
+        
+        <ul>
+          <li><strong>Title:</strong> <%= @content.title %></li>
+          <li><strong>Content Type:</strong> <%= @content.content_type.titleize %></li>
+          <li><strong>Campaign:</strong> <%= @campaign.name %></li>
+          <li><strong>Delegated by:</strong> <%= @from_user.full_name %></li>
+        </ul>
+        
+        <% if @reason.present? %>
+          <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #007bff;">
+            <h4>Message from <%= @from_user.full_name %>:</h4>
+            <p><%= simple_format(@reason) %></p>
+          </div>
+        <% end %>
+        
+        <p>Please review and approve or provide feedback on this content.</p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+          <a href="<%= @approval_url %>" class="button">Review Content</a>
+        </div>
+        
+        <p>Best regards,<br>MarketerGen Team</p>
+      </div>
+    </div>
+  </body>
+</html>

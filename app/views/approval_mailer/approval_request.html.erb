@@ -1,5 +1,47 @@
-<h1>Approval#approval_request</h1>
-
-<p>
-  <%= @greeting %>, find me in app/views/approval_mailer/approval_request.html.erb
-</p>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+      .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+      .header { background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+      .content { background-color: white; padding: 20px; border: 1px solid #e9ecef; border-radius: 5px; }
+      .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 10px 5px; }
+      .button.approve { background-color: #28a745; }
+      .button.reject { background-color: #dc3545; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Approval Required</h1>
+        <h2><%= @content.title %></h2>
+      </div>
+      
+      <div class="content">
+        <p>Hello <%= @approver.full_name %>,</p>
+        
+        <p>A new piece of content requires your approval:</p>
+        
+        <ul>
+          <li><strong>Title:</strong> <%= @content.title %></li>
+          <li><strong>Content Type:</strong> <%= @content.content_type.titleize %></li>
+          <li><strong>Campaign:</strong> <%= @campaign.name %></li>
+          <li><strong>Created by:</strong> <%= @content.created_by.full_name %></li>
+        </ul>
+        
+        <p>Please review and approve or reject this content:</p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+          <a href="<%= @approval_url %>" class="button approve">Approve</a>
+          <a href="<%= @reject_url %>" class="button reject">Reject</a>
+        </div>
+        
+        <p>Thank you for your attention to this matter.</p>
+        
+        <p>Best regards,<br>MarketerGen Team</p>
+      </div>
+    </div>
+  </body>
+</html>

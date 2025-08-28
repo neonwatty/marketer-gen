@@ -117,8 +117,6 @@ class PersonaTailoringService
     recommendations.sort_by { |rec| rec[:priority] }.reverse
   end
 
-  private
-
   def create_persona_adaptation(persona)
     return failure("Adaptation already exists") if @content.persona_contents.exists?(persona: persona)
 
@@ -143,6 +141,8 @@ class PersonaTailoringService
       failure("Failed to create adaptation: #{e.message}")
     end
   end
+
+  private
 
   def determine_optimal_adaptation_type(persona, content)
     # Analyze persona characteristics and content type to determine best adaptation

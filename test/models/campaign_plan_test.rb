@@ -600,11 +600,21 @@ class CampaignPlanTest < ActiveSupport::TestCase
   end
 
   test "should destroy dependent plan_audit_logs" do
-    skip "TODO: Fix during incremental development"
-    log = PlanAuditLog.create!(campaign_plan: @campaign_plan, user: @user, action: "created")
+    # Create a fresh campaign plan to avoid fixture dependencies
+    # This will automatically create one audit log via after_create callback
+    fresh_campaign = CampaignPlan.create!(
+      user: @user,
+      name: "Test Campaign for Audit Logs",
+      campaign_type: "product_launch",
+      objective: "brand_awareness"
+    )
     
-    assert_difference 'PlanAuditLog.count', -1 do
-      @campaign_plan.destroy
+    # Manually create an additional audit log
+    log = PlanAuditLog.create!(campaign_plan: fresh_campaign, user: @user, action: "updated")
+    
+    # Should destroy both the automatically created audit log and the manually created one
+    assert_difference 'PlanAuditLog.count', -2 do
+      fresh_campaign.destroy
     end
   end
 

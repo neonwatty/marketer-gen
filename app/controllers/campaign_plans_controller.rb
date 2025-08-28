@@ -67,9 +67,11 @@ class CampaignPlansController < ApplicationController
   
   def destroy
     campaign_plan_id = @campaign_plan.id
-    @campaign_plan.destroy!
-    
-    redirect_to campaign_plans_path, notice: 'Campaign plan was successfully deleted.'
+    if @campaign_plan.destroy
+      redirect_to campaign_plans_path, notice: 'Campaign plan was successfully deleted.'
+    else
+      redirect_to campaign_plans_path, alert: 'Failed to delete campaign plan. Please try again.'
+    end
   end
   
   def generate

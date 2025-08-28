@@ -1,3 +1,22 @@
-Approval#approval_delegated
+💼 APPROVAL DELEGATED TO YOU - <%= @content.title %>
 
-<%= @greeting %>, find me in app/views/approval_mailer/approval_delegated.text.erb
+Hello <%= @to_user.full_name %>,
+
+You have been delegated an approval request.
+<%= @from_user.full_name %> has delegated this approval to you.
+
+Please review the following content that requires your approval:
+
+Title: <%= @content.title %>
+Content Type: <%= @content.content_type.titleize %>
+Campaign: <%= @campaign.name %>
+Delegated by: <%= @from_user.full_name %>
+<% if @reason.present? %>Message from <%= @from_user.full_name %>:
+<%= @reason %>
+<% end %>
+Please review and approve or provide feedback on this content.
+
+Review content: <%= @approval_url %>
+
+Best regards,
+MarketerGen Team

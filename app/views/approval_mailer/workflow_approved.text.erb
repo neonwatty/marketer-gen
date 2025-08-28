@@ -1,3 +1,21 @@
-Approval#workflow_approved
+✅ CONTENT APPROVED: <%= @content.title %>
 
-<%= @greeting %>, find me in app/views/approval_mailer/workflow_approved.text.erb
+Hello <%= @recipient.full_name %>,
+
+Great news! Your content has been approved:
+
+Title: <%= @content.title %>
+Content Type: <%= @content.content_type.titleize %>
+Campaign: <%= @campaign.name %>
+<% if @approver %>
+Approved by: <%= @approver.full_name %>
+<% end %>
+
+Your content is now ready for publication or next steps in your workflow.
+
+View Content: <%= @content_url %>
+
+Congratulations on getting your content approved!
+
+Best regards,
+MarketerGen Team

@@ -7,11 +7,11 @@ module Api
     class ContentGenerationController < ApplicationController
       include LlmServiceHelper
       
-      # Skip the normal authentication and use API-specific authentication
+      # Skip CSRF token verification for API requests and standard auth  
       skip_before_action :require_authentication
       skip_before_action :verify_authenticity_token
-      before_action :authenticate_api_user
       before_action :validate_request_format
+      before_action :authenticate_api_user
       
       # Generate social media content
       # POST /api/v1/content_generation/social_media
@@ -126,8 +126,8 @@ module Api
       private
 
       def authenticate_api_user
-        # For API requests, check session cookie or implement token-based auth later
-        unless resume_session
+        # Use the standard authentication but return JSON error instead of redirect
+        unless authenticated?
           render json: { 
             success: false, 
             error: 'Authentication required',
@@ -136,21 +136,6 @@ module Api
           return false
         end
         true
-      end
-
-      def resume_session
-        # Simplified session resumption for API - reuse existing logic
-        Current.session ||= find_session_by_cookie
-        Current.session&.active? || false
-      end
-
-      def find_session_by_cookie
-        return nil unless cookies.signed[:session_id]
-        
-        session = Session.find_by(id: cookies.signed[:session_id])
-        return nil unless session&.active?
-        
-        session
       end
 
       def validate_request_format

@@ -55,6 +55,14 @@ class ExternalPlatforms::LinkedinApiClient < ExternalPlatforms::BaseApiClient
     get_request('/adCampaignsV2', params)
   end
 
+  def create_campaign(campaign_data)
+    post_request('/adCampaignsV2', campaign_data)
+  end
+
+  def update_campaign(campaign_id, campaign_data)
+    post_request("/adCampaignsV2/#{campaign_id}", campaign_data, method: :patch)
+  end
+
   def get_campaign_groups(ad_account_id, options = {})
     params = {
       q: 'search',

@@ -1,3 +1,20 @@
-Approval#approval_request
+APPROVAL REQUIRED: <%= @content.title %>
 
-<%= @greeting %>, find me in app/views/approval_mailer/approval_request.text.erb
+Hello <%= @approver.full_name %>,
+
+A new piece of content requires your approval:
+
+Title: <%= @content.title %>
+Content Type: <%= @content.content_type.titleize %>
+Campaign: <%= @campaign.name %>
+Created by: <%= @content.created_by.full_name %>
+
+Please review and approve or reject this content:
+
+Approve: <%= @approval_url %>
+Reject: <%= @reject_url %>
+
+Thank you for your attention to this matter.
+
+Best regards,
+MarketerGen Team

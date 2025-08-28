@@ -1,0 +1,718 @@
+≈ tailwindcss v4.1.11
+
+Done in 154ms
+
+up to date, audited 42 packages in 923ms
+
+19 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> build:css
+> sass ./app/assets/stylesheets/application.sass.scss:./app/assets/builds/application.css ./app/assets/stylesheets/rails_admin.scss:./app/assets/builds/rails_admin.css --no-source-map --load-path=node_modules
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+2 │ @import "rails_admin/src/rails_admin/styles/base";
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ╵
+    app/assets/stylesheets/rails_admin.scss 2:9  root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+5 │ @import "base/variables";
+  │         ^^^^^^^^^^^^^^^^
+  ╵
+    rails_admin/src/rails_admin/styles/base.scss 5:9  @import
+    app/assets/stylesheets/rails_admin.scss 2:9       root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+6 │ @import "base/mixins";
+  │         ^^^^^^^^^^^^^
+  ╵
+    rails_admin/src/rails_admin/styles/base.scss 6:9  @import
+    app/assets/stylesheets/rails_admin.scss 2:9       root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+10 │ @import "flatpickr/dist/flatpickr";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    rails_admin/src/rails_admin/styles/base.scss 10:9  @import
+    app/assets/stylesheets/rails_admin.scss 2:9        root stylesheet
+
+DEPRECATION WARNING [import]: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+15 │ @import "@fortawesome/fontawesome-free/scss/solid";
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   ╵
+    rails_admin/src/rails_admin/styles/base.scss 15:9  @import
+    app/assets/stylesheets/rails_admin.scss 2:9        root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use string.unquote instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+  ╷
+9 │     #{$fa-icon-property}: unquote("\"#{ $icon }\"");
+  │                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  ╵
+    node_modules/@fortawesome/fontawesome-free/scss/_icons.scss 9:27  @import
+    @fortawesome/fontawesome-free/scss/fontawesome.scss 20:9          @import
+    rails_admin/src/rails_admin/styles/base.scss 16:9                 @import
+    app/assets/stylesheets/rails_admin.scss 2:9                       root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use color.mix instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+207 │   @return mix(white, $color, $weight);
+    │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    node_modules/bootstrap/scss/_functions.scss 207:11  tint-color()
+    node_modules/bootstrap/scss/_variables.scss 79:12   @import
+    bootstrap/scss/bootstrap.scss 8:9                   @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9   @import
+    app/assets/stylesheets/rails_admin.scss 2:9         root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use color.mix instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+212 │   @return mix(black, $color, $weight);
+    │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    node_modules/bootstrap/scss/_functions.scss 212:11  shade-color()
+    node_modules/bootstrap/scss/_variables.scss 84:12   @import
+    bootstrap/scss/bootstrap.scss 8:9                   @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9   @import
+    app/assets/stylesheets/rails_admin.scss 2:9         root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use color.mix instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+    ╷
+342 │ $light-bg-subtle:         mix($gray-100, $white) !default;
+    │                           ^^^^^^^^^^^^^^^^^^^^^^
+    ╵
+    node_modules/bootstrap/scss/_variables.scss 342:27  @import
+    bootstrap/scss/bootstrap.scss 8:9                   @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9   @import
+    app/assets/stylesheets/rails_admin.scss 2:9         root stylesheet
+
+DEPRECATION WARNING [global-builtin]: Global built-in functions are deprecated and will be removed in Dart Sass 3.0.0.
+Use math.unit instead.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+   ╷
+11 │     @if $prev-num == null or unit($num) == "%" or unit($prev-num) == "%" {
+   │                              ^^^^^^^^^^
+   ╵
+    node_modules/bootstrap/scss/_functions.scss 11:30  -assert-ascending()
+    node_modules/bootstrap/scss/_variables.scss 494:1  @import
+    bootstrap/scss/bootstrap.scss 8:9                  @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9  @import
+    app/assets/stylesheets/rails_admin.scss 2:9        root stylesheet
+
+DEPRECATION WARNING [color-functions]: red() is deprecated. Suggestion:
+
+color.channel($color, "red", $space: rgb)
+
+More info: https://sass-lang.com/d/color-functions
+
+    ╷
+185 │     "r": red($color),
+    │          ^^^^^^^^^^^
+    ╵
+    node_modules/bootstrap/scss/_functions.scss 185:10  luminance()
+    node_modules/bootstrap/scss/_functions.scss 174:8   contrast-ratio()
+    node_modules/bootstrap/scss/_functions.scss 159:22  color-contrast()
+    node_modules/bootstrap/scss/_variables.scss 846:42  @import
+    bootstrap/scss/bootstrap.scss 8:9                   @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9   @import
+    app/assets/stylesheets/rails_admin.scss 2:9         root stylesheet
+
+DEPRECATION WARNING [color-functions]: green() is deprecated. Suggestion:
+
+color.channel($color, "green", $space: rgb)
+
+More info: https://sass-lang.com/d/color-functions
+
+    ╷
+186 │     "g": green($color),
+    │          ^^^^^^^^^^^^^
+    ╵
+    node_modules/bootstrap/scss/_functions.scss 186:10  luminance()
+    node_modules/bootstrap/scss/_functions.scss 174:8   contrast-ratio()
+    node_modules/bootstrap/scss/_functions.scss 159:22  color-contrast()
+    node_modules/bootstrap/scss/_variables.scss 846:42  @import
+    bootstrap/scss/bootstrap.scss 8:9                   @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9   @import
+    app/assets/stylesheets/rails_admin.scss 2:9         root stylesheet
+
+DEPRECATION WARNING [color-functions]: blue() is deprecated. Suggestion:
+
+color.channel($color, "blue", $space: rgb)
+
+More info: https://sass-lang.com/d/color-functions
+
+    ╷
+187 │     "b": blue($color)
+    │          ^^^^^^^^^^^^
+    ╵
+    node_modules/bootstrap/scss/_functions.scss 187:10  luminance()
+    node_modules/bootstrap/scss/_functions.scss 174:8   contrast-ratio()
+    node_modules/bootstrap/scss/_functions.scss 159:22  color-contrast()
+    node_modules/bootstrap/scss/_variables.scss 846:42  @import
+    bootstrap/scss/bootstrap.scss 8:9                   @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9   @import
+    app/assets/stylesheets/rails_admin.scss 2:9         root stylesheet
+
+DEPRECATION WARNING [color-functions]: red() is deprecated. Suggestion:
+
+color.channel($color, "red", $space: rgb)
+
+More info: https://sass-lang.com/d/color-functions
+
+   ╷
+37 │   @return red($value), green($value), blue($value);
+   │           ^^^^^^^^^^^
+   ╵
+    node_modules/bootstrap/scss/_functions.scss 37:11   to-rgb()
+    node_modules/bootstrap/scss/_variables.scss 846:31  @import
+    bootstrap/scss/bootstrap.scss 8:9                   @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9   @import
+    app/assets/stylesheets/rails_admin.scss 2:9         root stylesheet
+
+DEPRECATION WARNING [color-functions]: green() is deprecated. Suggestion:
+
+color.channel($color, "green", $space: rgb)
+
+More info: https://sass-lang.com/d/color-functions
+
+   ╷
+37 │   @return red($value), green($value), blue($value);
+   │                        ^^^^^^^^^^^^^
+   ╵
+    node_modules/bootstrap/scss/_functions.scss 37:24   to-rgb()
+    node_modules/bootstrap/scss/_variables.scss 846:31  @import
+    bootstrap/scss/bootstrap.scss 8:9                   @import
+    rails_admin/src/rails_admin/styles/base.scss 20:9   @import
+    app/assets/stylesheets/rails_admin.scss 2:9         root stylesheet
+
+WARNING: 275 repetitive deprecation warnings omitted.
+Run in verbose mode to see all warnings.
+
+Run options: --seed 60873
+
+# Running:
+
+...../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/rack-3.1.16/lib/rack/mock_request.rb:148: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)
+.S..............................................................................................................................................................................................................................................................................................................Mocked time: 2024-01-06 10:00:00 UTC, wday: 6
+Execution rules: {"start_hour" => 1, "end_hour" => 2, "timezone" => "UTC", "days_of_week" => [1]}
+In execution window? false
+Time.current in stub: 2024-01-06 10:00:00 UTC
+Original scheduled_at: 2024-01-06 09:55:00 UTC
+New scheduled_at: 2024-01-08 01:00:00 UTC
+Metadata: {"rescheduled_at" => "2024-01-06T10:00:00.000Z", "rescheduled_reason" => "outside_execution_window"}
+Status: scheduled
+....../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+.........../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+..................................................................................................................................................................................................................................................................................................................................................../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+............../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+/Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+/Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+............................................................................................S..../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/rack-3.1.16/lib/rack/mock_request.rb:148: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)
+.S..................................................................S./Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+........S............................................................................................................................Creating Journey Templates...
+✓ Journey Templates created successfully!
+.Creating Journey Templates...
+✓ Journey Templates created successfully!
+.Creating Journey Templates...
+✓ Journey Templates created successfully!
+..../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+..........................................................S......................................................................................................................./Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+........................................E
+
+Error:
+PredictionModelTest#test_should_calculate_next_version_correctly:
+ActiveRecord::RecordInvalid: Validation failed: Version has already been taken
+    test/models/prediction_model_test.rb:723:in 'block in <class:PredictionModelTest>'
+
+bin/rails test test/models/prediction_model_test.rb:721
+
+...E
+
+Error:
+PredictionModelTest#test_should_activate_model_successfully:
+ActiveRecord::RecordInvalid: Validation failed: Version has already been taken
+    test/models/prediction_model_test.rb:331:in 'block in <class:PredictionModelTest>'
+
+bin/rails test test/models/prediction_model_test.rb:329
+
+E
+
+Error:
+PredictionModelTest#test_should_determine_if_is_current_version:
+ActiveRecord::RecordInvalid: Validation failed: Version has already been taken
+    test/models/prediction_model_test.rb:421:in 'block in <class:PredictionModelTest>'
+
+bin/rails test test/models/prediction_model_test.rb:419
+
+F
+
+Failure:
+PredictionModelTest#test_should_set_defaults_on_creation [test/models/prediction_model_test.rb:717]:
+metadata should be present but got: {}
+
+bin/rails test test/models/prediction_model_test.rb:700
+
+.E
+
+Error:
+PredictionModelTest#test_should_find_high_accuracy_models:
+ActiveRecord::RecordInvalid: Validation failed: Version has already been taken
+    test/models/prediction_model_test.rb:586:in 'block in <class:PredictionModelTest>'
+
+bin/rails test test/models/prediction_model_test.rb:584
+
+...E
+
+Error:
+PredictionModelTest#test_should_find_previous_and_next_versions:
+ActiveRecord::RecordInvalid: Validation failed: Version has already been taken
+    test/models/prediction_model_test.rb:452:in 'block in <class:PredictionModelTest>'
+
+bin/rails test test/models/prediction_model_test.rb:450
+
+....E
+
+Error:
+PredictionModelTest#test_should_validate_version_uniqueness_within_campaign_and_prediction_type:
+ActiveRecord::RecordInvalid: Validation failed: Version has already been taken
+    test/models/prediction_model_test.rb:83:in 'block in <class:PredictionModelTest>'
+
+bin/rails test test/models/prediction_model_test.rb:82
+
+...........E
+
+Error:
+PredictionModelTest#test_should_find_active_models:
+ActiveRecord::RecordInvalid: Validation failed: Version has already been taken
+    test/models/prediction_model_test.rb:568:in 'block in <class:PredictionModelTest>'
+
+bin/rails test test/models/prediction_model_test.rb:566
+
+F
+
+Failure:
+PredictionModelTest#test_should_require_version [test/models/prediction_model_test.rb:79]:
+Expected [] to include "can't be blank".
+
+bin/rails test test/models/prediction_model_test.rb:71
+
+...E
+
+Error:
+PredictionModelTest#test_should_assign_version_1_when_no_existing_models:
+ActiveModel::UnknownAttributeError: unknown attribute 'start_date' for CampaignPlan.
+    test/models/prediction_model_test.rb:750:in 'block in <class:PredictionModelTest>'
+
+bin/rails test test/models/prediction_model_test.rb:748
+
+.................................F
+
+Failure:
+PerformanceOptimizationServiceTest#test_should_log_service_calls [test/services/performance_optimization_service_test.rb:411]:
+Expected "I, [2025-08-28T08:29:24.081756 #47781]  INFO -- : Service Call: PerformanceOptimizationService with params: {campaign_id: 119172476, rules_count: 1, performance_data_present: true}\nI, [2025-08-28T08:29:24.085342 #47781]  INFO -- : Optimization rule 1 (Budget Reallocation Rule) triggered for campaign 119172476\nI, [2025-08-28T08:29:24.086106 #47781]  INFO -- : Executing optimization rule 1 (budget_reallocation)\nI, [2025-08-28T08:29:24.086197 #47781]  INFO -- : Adjusting google_ads budget by {\"change_percent\" => 15, \"max_increase\" => 500}\nI, [2025-08-28T08:29:24.086217 #47781]  INFO -- : Adjusting facebook budget by {\"change_percent\" => -10, \"max_decrease\" => 200}\n" to include "PerformanceOptimizationService called for campaign".
+
+bin/rails test test/services/performance_optimization_service_test.rb:402
+
+............................................................................Creating Journey Templates...
+✓ Journey Templates created successfully!
+.Creating Journey Templates...
+✓ Journey Templates created successfully!
+.Creating Journey Templates...
+✓ Journey Templates created successfully!
+.Creating Journey Templates...
+✓ Journey Templates created successfully!
+.Creating Journey Templates...
+✓ Journey Templates created successfully!
+.Creating Journey Templates...
+✓ Journey Templates created successfully!
+......................................................................................../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/marcel-1.0.4/lib/marcel/magic.rb:120: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)
+/Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/marcel-1.0.4/lib/marcel/magic.rb:120: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)
+/Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/marcel-1.0.4/lib/marcel/magic.rb:120: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)
+/Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/marcel-1.0.4/lib/marcel/magic.rb:120: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)
+../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/marcel-1.0.4/lib/marcel/magic.rb:120: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)
+........................................................................................................................................................S.....S.....S................................................................................................./Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/rack-3.1.16/lib/rack/mock_request.rb:148: warning: literal string will be frozen in the future (run with --debug-frozen-string-literal for more information)
+...S.SSS............................................./Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+.........................................................................................................S...............................................................DEBUG: result = {success: true, data: {prediction_type: "campaign_performance", model_version: 1, confidence_score: 0.85e0, prediction_data: {performance_score: 0.740402084e5, detailed_metrics: {engagement_rate: 0.3e-1, conversion_rate: 0.12e-1, reach_estimate: 370000, cost_per_acquisition: 0.21e2, roi_projection: 0.18e3}, recommendations: ["Optimize conversion funnel and call-to-action placement"], prediction_date: 2025-08-28 15:30:04.451438000 UTC +00:00, data_points_used: 2, risk_factors: [], optimization_suggestions: ["Monitor performance metrics and adjust strategy as needed"]}, generated_at: 2025-08-28 15:30:04.451852000 UTC +00:00, model_accuracy: 0.8e0}}
+..................................../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+.................../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+..............................SS.SSSSSS......SSS..........................................................F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_optimizes_content_successfully [test/controllers/api/v1/content_generation_controller_test.rb:137]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:127
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_generates_ad_copy_successfully [test/controllers/api/v1/content_generation_controller_test.rb:63]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:52
+
+.F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_checks_brand_compliance_successfully [test/controllers/api/v1/content_generation_controller_test.rb:154]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:145
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_handles_missing_required_parameters [test/controllers/api/v1/content_generation_controller_test.rb:220]:
+Expected response to be a <400: bad_request>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}.
+Expected: 400
+  Actual: 401
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:217
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_generates_email_content_successfully [test/controllers/api/v1/content_generation_controller_test.rb:44]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:33
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_generates_content_variations_successfully [test/controllers/api/v1/content_generation_controller_test.rb:120]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:109
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_performs_health_check_successfully [test/controllers/api/v1/content_generation_controller_test.rb:184]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:181
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_generates_campaign_plan_successfully [test/controllers/api/v1/content_generation_controller_test.rb:101]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:91
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_generates_analytics_insights_successfully [test/controllers/api/v1/content_generation_controller_test.rb:173]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:163
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_requires_JSON_format [test/controllers/api/v1/content_generation_controller_test.rb:210]:
+Expected response to be a <406: not_acceptable>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}.
+Expected: 406
+  Actual: 401
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:205
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_generates_landing_page_content_successfully [test/controllers/api/v1/content_generation_controller_test.rb:83]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:72
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_handles_LLM_service_errors_gracefully [test/controllers/api/v1/content_generation_controller_test.rb:239]:
+Expected response to be a <500: internal_server_error>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}.
+Expected: 500
+  Actual: 401
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:226
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_generates_social_media_content_successfully [test/controllers/api/v1/content_generation_controller_test.rb:25]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:13
+
+F
+
+Failure:
+Api::V1::ContentGenerationControllerTest#test_handles_brand_context_parameters [test/controllers/api/v1/content_generation_controller_test.rb:261]:
+Expected response to be a <2XX: success>, but was a <401: Unauthorized>
+Response body: {"success":false,"error":"Authentication required","message":"Please sign in to access this API"}
+
+bin/rails test test/controllers/api/v1/content_generation_controller_test.rb:246
+
+..................F
+
+Failure:
+ProjectManagementServiceTest#test_completing_milestone_should_unlock_dependent_milestones [test/services/project_management_service_test.rb:446]:
+Expected false to be truthy.
+
+bin/rails test test/services/project_management_service_test.rb:426
+
+...........Test is missing assertions: `test_should_log_milestone_creation` /Users/jeremywatt/Desktop/marketer-gen/test/services/project_management_service_test.rb:394
+F
+
+Failure:
+ProjectManagementServiceTest#test_should_log_milestone_creation [app/models/project_milestone.rb:271]:
+unexpected invocation: #<Logger:0x24780>.info("ProjectMilestone status_changed_to_pending: Test Log Milestone (ID: 971330018) for Campaign: Q1 Product Launch")
+satisfied expectations:
+- expected exactly once, invoked once: #<Logger:0x24780>.info(includes("create_milestone"))
+
+
+bin/rails test test/services/project_management_service_test.rb:394
+
+...F
+
+Failure:
+ProjectManagementServiceTest#test_should_sync_with_campaign_timeline_when_available [test/services/project_management_service_test.rb:261]:
+Expected false to be truthy.
+
+bin/rails test test/services/project_management_service_test.rb:240
+
+....Test is missing assertions: `test_should_log_milestone_updates` /Users/jeremywatt/Desktop/marketer-gen/test/services/project_management_service_test.rb:401
+F
+
+Failure:
+ProjectManagementServiceTest#test_should_log_milestone_updates [app/models/project_milestone.rb:271]:
+unexpected invocation: #<Logger:0x24780>.info("ProjectMilestone updated: Updated Name (ID: 391948264) for Campaign: Q1 Product Launch")
+satisfied expectations:
+- expected exactly once, invoked once: #<Logger:0x24780>.info(includes("update_milestone"))
+
+
+bin/rails test test/services/project_management_service_test.rb:401
+
+...F
+
+Failure:
+ProjectManagementServiceTest#test_should_update_campaign_plan_metadata_on_milestone_completion [test/services/project_management_service_test.rb:459]:
+Expected ["version"] to include "project_progress".
+
+bin/rails test test/services/project_management_service_test.rb:449
+
+...F
+
+Failure:
+ProjectManagementServiceTest#test_should_parse_JSON_fields_correctly [test/services/project_management_service_test.rb:418]:
+Expected false to be truthy.
+
+bin/rails test test/services/project_management_service_test.rb:407
+
+..........S.S....S............................................................................................................./Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+......./Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+..../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+............../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+.................................................................S./Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+..../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+....S........S..S.........................................................................................S..........SS.S....................................................................................................................................................../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+.../Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+................./Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/json-2.13.0/lib/json/common.rb:338: warning: detected duplicate keys in JSON object. This will raise an error in json 3.0 unless enabled via `allow_duplicate_key: true` at line 1 column 1
+...F
+
+Failure:
+WebhooksControllerTest#test_should_accept_valid_linkedin_webhook [test/controllers/webhooks_controller_test.rb:57]:
+Expected response to be a <2XX: success>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}
+
+bin/rails test test/controllers/webhooks_controller_test.rb:51
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_verify_meta_webhook_with_correct_challenge [test/controllers/webhooks_controller_test.rb:125]:
+Expected response to be a <2XX: success>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}
+
+bin/rails test test/controllers/webhooks_controller_test.rb:116
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_accept_valid_google_ads_webhook [test/controllers/webhooks_controller_test.rb:69]:
+Expected response to be a <2XX: success>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}
+
+bin/rails test test/controllers/webhooks_controller_test.rb:63
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_reject_webhook_with_invalid_content_type [test/controllers/webhooks_controller_test.rb:80]:
+Expected response to be a <415: unsupported_media_type>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}.
+Expected: 415
+  Actual: 429
+
+bin/rails test test/controllers/webhooks_controller_test.rb:75
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_handle_generic_webhook_with_custom_platform [test/controllers/webhooks_controller_test.rb:110]:
+Expected response to be a <2XX: success>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}
+
+bin/rails test test/controllers/webhooks_controller_test.rb:105
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_handle_form_encoded_webhook_data [test/controllers/webhooks_controller_test.rb:189]:
+Expected response to be a <2XX: success>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}
+
+bin/rails test test/controllers/webhooks_controller_test.rb:184
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_verify_google_ads_webhook_with_correct_authorization [test/controllers/webhooks_controller_test.rb:158]:
+Expected response to be a <2XX: success>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}
+
+bin/rails test test/controllers/webhooks_controller_test.rb:151
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_enqueue_webhook_processing_job [test/controllers/webhooks_controller_test.rb:176]:
+No enqueued job found with {job: WebhookProcessingJob, args: [{"object" => "page", "entry" => [{"id" => "123456789", "time" => 1234567890, "messaging" => [{"type" => "message", "sender" => {"id" => "user123"}, "recipient" => {"id" => "page123"}, "timestamp" => 1234567890, "message" => {"text" => "Hello!"}}]}]}, Hash, "meta"]}
+
+No jobs were enqueued
+
+bin/rails test test/controllers/webhooks_controller_test.rb:175
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_accept_valid_meta_webhook_with_proper_headers [test/controllers/webhooks_controller_test.rb:45]:
+Expected response to be a <2XX: success>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}
+
+bin/rails test test/controllers/webhooks_controller_test.rb:39
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_verify_linkedin_webhook_with_challenge [test/controllers/webhooks_controller_test.rb:147]:
+Expected response to be a <2XX: success>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}
+
+bin/rails test test/controllers/webhooks_controller_test.rb:142
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_reject_google_ads_webhook_verification_with_wrong_auth [test/controllers/webhooks_controller_test.rb:170]:
+Expected response to be a <401: unauthorized>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}.
+Expected: 401
+  Actual: 429
+
+bin/rails test test/controllers/webhooks_controller_test.rb:163
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_reject_webhook_with_empty_payload [test/controllers/webhooks_controller_test.rb:90]:
+Expected response to be a <400: bad_request>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}.
+Expected: 400
+  Actual: 429
+
+bin/rails test test/controllers/webhooks_controller_test.rb:85
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_reject_meta_webhook_verification_with_wrong_token [test/controllers/webhooks_controller_test.rb:138]:
+Expected response to be a <403: forbidden>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}.
+Expected: 403
+  Actual: 429
+
+bin/rails test test/controllers/webhooks_controller_test.rb:129
+
+F
+
+Failure:
+WebhooksControllerTest#test_should_reject_webhook_with_invalid_JSON [test/controllers/webhooks_controller_test.rb:100]:
+Expected response to be a <400: bad_request>, but was a <429: Too Many Requests>
+Response body: {"error":"Rate limit exceeded"}.
+Expected: 400
+  Actual: 429
+
+bin/rails test test/controllers/webhooks_controller_test.rb:95
+
+........................................
+
+Finished in 176.637362s, 15.4271 runs/s, 63.0784 assertions/s.
+2725 runs, 11142 assertions, 37 failures, 8 errors, 36 skips
+
+You have skipped tests. Run with --verbose for details.

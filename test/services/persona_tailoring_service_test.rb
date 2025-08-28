@@ -4,11 +4,11 @@ class PersonaTailoringServiceTest < ActiveSupport::TestCase
   def setup
     @user = users(:one)
     @content = generated_contents(:one)
-    @persona = personas(:professional_marketer)
+    @persona = personas(:startup_founder)
     @service = PersonaTailoringService.new(@user, @content)
     
     # Clear any existing persona content to avoid uniqueness constraints
-    PersonaContent.where(persona: @persona, generated_content: @content).destroy_all
+    PersonaContent.where(persona: @persona).destroy_all
   end
 
   test "should initialize with user and content" do

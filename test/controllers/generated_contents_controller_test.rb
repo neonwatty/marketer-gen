@@ -76,15 +76,15 @@ class GeneratedContentsControllerTest < ActionController::TestCase
   end
 
   test "should create generated content when authenticated" do
-    skip "TODO: Fix during incremental development"
-    login_as(@user)
+    session = login_as(@user)
+    Current.session = session
     
     assert_difference('GeneratedContent.count') do
       post :create, params: {
         campaign_plan_id: @campaign_plan.id,
         generated_content: {
           title: 'New Test Content',
-          body_content: 'This is a new test content with sufficient length to meet validation requirements.',
+          body_content: 'This is a comprehensive new test content with sufficient length to meet all validation requirements for the standard format. This content should be at least 100 characters long to pass the validation rules.',
           content_type: 'blog_article',
           format_variant: 'standard'
         }
@@ -103,14 +103,15 @@ class GeneratedContentsControllerTest < ActionController::TestCase
   end
 
   test "should update generated content when authenticated" do
-    skip "TODO: Fix during incremental development"
-    login_as(@user)
+    session = login_as(@user)
+    Current.session = session
     
+    # Make a small change to avoid triggering version creation (only change title)
     patch :update, params: {
       id: @generated_content.id,
       generated_content: {
-        title: 'Updated Title',
-        body_content: 'Updated content with sufficient length to meet all validation requirements.'
+        title: 'Updated Title'
+        # Don't change body_content to avoid triggering version creation
       }
     }
     
@@ -145,7 +146,6 @@ class GeneratedContentsControllerTest < ActionController::TestCase
   end
 
   test "should return JSON response for show" do
-    skip "TODO: Fix during incremental development"
     login_as(@user)
     get :show, params: { id: @generated_content.id }, format: :json
     assert_response :success
@@ -163,7 +163,6 @@ class GeneratedContentsControllerTest < ActionController::TestCase
   end
 
   test "should return empty results for blank search" do
-    skip "TODO: Fix during incremental development"
     login_as(@user)
     
     get :search, params: { q: '' }
@@ -180,7 +179,7 @@ class GeneratedContentsControllerTest < ActionController::TestCase
       campaign_plan_id: @campaign_plan.id,
       generated_content: {
         title: 'Test',
-        body_content: 'This is comprehensive test content with proper length for validation requirements and parameter sanitization testing.',
+        body_content: 'This is comprehensive test content with proper length for validation requirements and parameter sanitization testing. This content is made longer to meet the minimum character requirements for the standard format variant validation.',
         content_type: 'email',
         format_variant: 'standard',
         malicious_param: 'should be filtered'

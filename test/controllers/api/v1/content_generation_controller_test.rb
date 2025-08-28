@@ -7,10 +7,15 @@ module Api
     class ContentGenerationControllerTest < ActionDispatch::IntegrationTest
       setup do
         @user = users(:one)
-        api_sign_in_as @user
       end
 
       test "generates social media content successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             platform: 'twitter',
@@ -31,6 +36,12 @@ module Api
       end
 
       test "generates email content successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             email_type: 'promotional',
@@ -50,6 +61,12 @@ module Api
       end
 
       test "generates ad copy successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             ad_type: 'search',
@@ -70,6 +87,12 @@ module Api
       end
 
       test "generates landing page content successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             page_type: 'product',
@@ -89,6 +112,12 @@ module Api
       end
 
       test "generates campaign plan successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             campaign_type: 'product_launch',
@@ -107,6 +136,12 @@ module Api
       end
 
       test "generates content variations successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             original_content: 'Test content',
@@ -125,6 +160,12 @@ module Api
       end
 
       test "optimizes content successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             content: 'Original content to optimize',
@@ -143,6 +184,12 @@ module Api
       end
 
       test "checks brand compliance successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             content: 'Sample content to check'
@@ -161,6 +208,12 @@ module Api
       end
 
       test "generates analytics insights successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             time_period: '30_days',
@@ -179,6 +232,12 @@ module Api
       end
 
       test "performs health check successfully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         get api_v1_health_path, as: :json
 
         assert_response :success
@@ -215,6 +274,12 @@ module Api
       end
 
       test "handles missing required parameters" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         post api_v1_social_media_path, params: {}, as: :json
 
         assert_response :bad_request
@@ -224,6 +289,12 @@ module Api
       end
 
       test "handles LLM service errors gracefully" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         # Stub the LLM service to raise an error
         MockLlmService.any_instance.stubs(:generate_social_media_content).raises(StandardError, "Service unavailable")
 
@@ -244,6 +315,12 @@ module Api
       end
 
       test "handles brand context parameters" do
+        # Sign in by posting to session path
+        post session_path, params: { 
+          email_address: @user.email_address, 
+          password: "password" 
+        }
+        
         params = {
           content_generation: {
             platform: 'twitter',
@@ -267,9 +344,8 @@ module Api
       private
 
       def sign_out
-        # For API tests, destroy the user's sessions
-        @user.sessions.destroy_all
-        Current.session = nil
+        # Use the integration test sign out method for proper session handling
+        super
       end
     end
   end

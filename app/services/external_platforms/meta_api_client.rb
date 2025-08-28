@@ -37,6 +37,15 @@ class ExternalPlatforms::MetaApiClient < ExternalPlatforms::BaseApiClient
     get_request("/act_#{ad_account_id}/campaigns", params)
   end
 
+  def create_campaign(campaign_data)
+    ad_account_id = campaign_data.delete(:ad_account_id) || @ad_account_id
+    post_request("/act_#{ad_account_id}/campaigns", campaign_data)
+  end
+
+  def update_campaign(campaign_id, campaign_data)
+    post_request("/#{campaign_id}", campaign_data)
+  end
+
   def get_campaign_performance(campaign_id, date_range = {})
     fields = %w[
       campaign_name spend impressions clicks cpc cpm ctr

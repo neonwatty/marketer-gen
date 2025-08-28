@@ -18,7 +18,9 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: storage/test.sqlite3
+  # Support for parallel testing - Rails will create separate databases
+  # for each worker process (e.g., storage/test.sqlite3, storage/test-0.sqlite3, etc.)
+  database: storage/test<%= ENV['TEST_ENV_NUMBER'] %>.sqlite3
 
 
 # Store production database in the storage/ directory, which by default

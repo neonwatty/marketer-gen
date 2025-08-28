@@ -1,6 +1,8 @@
 class Journey < ApplicationRecord
   belongs_to :user
   has_many :journey_steps, dependent: :destroy
+  has_many :touchpoints, dependent: :destroy
+  has_many :attribution_models, dependent: :destroy
 
   CAMPAIGN_TYPES = %w[awareness consideration conversion retention upsell_cross_sell].freeze
   STATUSES = %w[draft active paused completed archived].freeze

@@ -13,6 +13,12 @@ class CampaignPlan < ApplicationRecord
   has_many :plan_share_tokens, dependent: :destroy
   has_many :generated_contents, dependent: :destroy
   has_many :content_ab_tests, dependent: :destroy
+  has_many :budget_allocations, dependent: :destroy
+  has_many :execution_schedules, dependent: :destroy
+  has_many :campaign_insights, dependent: :destroy
+  has_many :prediction_models, dependent: :destroy
+  has_many :optimization_rules, dependent: :destroy
+  has_many :project_milestones, dependent: :destroy
   
   CAMPAIGN_TYPES = %w[product_launch brand_awareness lead_generation customer_retention sales_promotion event_marketing].freeze
   OBJECTIVES = %w[brand_awareness lead_generation customer_acquisition customer_retention sales_growth market_expansion].freeze
@@ -781,19 +787,6 @@ class CampaignPlan < ApplicationRecord
     end
   end
 
-  # Analytics helper methods
-  def safe_parse_json_field(field_name)
-    field_value = send(field_name)
-    return {} if field_value.blank?
-    
-    if field_value.is_a?(String)
-      JSON.parse(field_value)
-    else
-      field_value
-    end
-  rescue JSON::ParserError
-    {}
-  end
 
   def extract_planned_duration(timeline_data)
     # Mock implementation - extract planned duration from timeline
@@ -853,6 +846,20 @@ class CampaignPlan < ApplicationRecord
   alias_method :is_rejected?, :approval_rejected?
   alias_method :needs_approval?, :approval_required?
 
+  # Analytics helper method - made public for external access
+  def safe_parse_json_field(field_name)
+    field_value = send(field_name)
+    return {} if field_value.blank?
+    
+    if field_value.is_a?(String)
+      JSON.parse(field_value)
+    else
+      field_value
+    end
+  rescue JSON::ParserError
+    {}
+  end
+  
 private
 
   # Handle circular foreign key dependency

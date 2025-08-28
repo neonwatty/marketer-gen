@@ -1,0 +1,79 @@
+gdpr_requirement:
+  user: marketer_user
+  name: "GDPR Data Protection Compliance"
+  compliance_type: "gdpr"
+  description: "Implement comprehensive GDPR data protection measures including data subject rights, consent management, and breach notification procedures."
+  risk_level: "high"
+  status: "active"
+  implementation_deadline: <%= 2.months.from_now %>
+  next_review_date: <%= 3.months.from_now %>
+  responsible_party: "Data Protection Officer"
+  regulatory_reference: "GDPR Articles 12-23"
+  monitoring_frequency: "monthly"
+  custom_rules: '{}'
+  evidence_requirements: '[]'
+  monitoring_criteria: '{}'
+
+hipaa_requirement:
+  user: marketer_user
+  name: "HIPAA Privacy Rule Compliance"
+  compliance_type: "hipaa"
+  description: "Ensure all patient health information is properly protected according to HIPAA Privacy Rule requirements."
+  risk_level: "critical"
+  status: "monitoring"
+  implementation_deadline: <%= 1.month.from_now %>
+  next_review_date: <%= 4.months.from_now %>
+  responsible_party: "Privacy Officer"
+  regulatory_reference: "45 CFR Parts 160 and 164"
+  monitoring_frequency: "weekly"
+  custom_rules: '{"data_retention_period": {"enabled": true, "max_retention_days": 2555}}'
+  evidence_requirements: '[{"name": "Privacy Impact Assessment", "type": "document", "status": "pending"}]'
+  monitoring_criteria: '{"access_logs": {"required": true, "retention_years": 6}}'
+
+sox_requirement:
+  user: marketer_user
+  name: "Sarbanes-Oxley Financial Controls"
+  compliance_type: "sox"
+  description: "Implement and maintain internal controls over financial reporting as required by SOX Section 404."
+  risk_level: "medium"
+  status: "compliant"
+  implementation_deadline: <%= 1.month.ago %>
+  next_review_date: <%= 2.months.from_now %>
+  responsible_party: "Chief Financial Officer"
+  regulatory_reference: "SOX Section 404"
+  monitoring_frequency: "quarterly"
+  custom_rules: '{"audit_trail_requirements": {"enabled": true, "audit_retention_years": 7}}'
+  evidence_requirements: '[{"name": "Management Assessment", "type": "assessment", "status": "complete"}]'
+  monitoring_criteria: '{"financial_controls": {"status": "compliant", "last_tested": "2024-01-15"}}'
+
+overdue_requirement:
+  user: marketer_user
+  name: "Overdue PCI DSS Compliance"
+  compliance_type: "pci_dss"
+  description: "Payment Card Industry Data Security Standard compliance - overdue for testing."
+  risk_level: "high"
+  status: "non_compliant"
+  implementation_deadline: <%= 1.week.ago %>
+  next_review_date: <%= 1.month.from_now %>
+  responsible_party: "IT Security Manager"
+  regulatory_reference: "PCI DSS v4.0"
+  monitoring_frequency: "daily"
+  custom_rules: '{}'
+  evidence_requirements: '[]'
+  monitoring_criteria: '{}'
+
+draft_requirement:
+  user: marketer_user
+  name: "ISO 27001 Information Security"
+  compliance_type: "iso_27001"
+  description: "Information Security Management System implementation according to ISO 27001 standard."
+  risk_level: "medium"
+  status: "draft"
+  implementation_deadline: <%= 6.months.from_now %>
+  next_review_date: <%= 9.months.from_now %>
+  responsible_party: "CISO"
+  regulatory_reference: "ISO/IEC 27001:2022"
+  monitoring_frequency: "monthly"
+  custom_rules: '{"access_control_requirements": {"enabled": true, "required_roles": ["admin", "security_officer"]}}'
+  evidence_requirements: '[{"name": "Risk Assessment", "type": "document", "status": "pending"}]'
+  monitoring_criteria: '{"security_controls": {"implementation_status": "planning"}}'

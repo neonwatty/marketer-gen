@@ -21,7 +21,7 @@ class JourneyStep < ApplicationRecord
   scope :by_type, ->(type) { where(step_type: type) }
   scope :by_channel, ->(channel) { where(channel: channel) }
 
-  before_validation :set_next_sequence_order, on: :create, if: -> { sequence_order.blank? }
+  before_validation :set_next_sequence_order, on: :create, if: -> { sequence_order.blank? && !@skip_sequence_validation }
 
   def next_step
     journey.journey_steps.where('sequence_order > ?', sequence_order).order(:sequence_order).first

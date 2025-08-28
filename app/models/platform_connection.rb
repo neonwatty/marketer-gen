@@ -3,6 +3,7 @@
 # Model for storing encrypted platform API credentials and connection status
 class PlatformConnection < ApplicationRecord
   belongs_to :user
+  has_many :sync_records, dependent: :destroy
 
   SUPPORTED_PLATFORMS = %w[meta google_ads linkedin].freeze
   STATUSES = %w[inactive active error expired].freeze

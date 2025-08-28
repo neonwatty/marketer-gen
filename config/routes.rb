@@ -41,6 +41,16 @@ Rails.application.routes.draw do
       post :complete_execution
     end
     
+    # Campaign Intelligence routes
+    resources :campaign_intelligence, path: 'intelligence', controller: 'campaign_intelligence' do
+      collection do
+        post :generate
+        post :regenerate
+        get :analytics
+        get :export
+      end
+    end
+    
     # Nested content management
     resources :generated_contents, except: [:index, :show, :edit, :update, :destroy] do
       collection do
@@ -102,6 +112,21 @@ Rails.application.routes.draw do
       patch :archive
     end
     resources :journey_steps, except: [:show]
+  end
+
+  # Webhook routes - must be placed before API routes for proper routing
+  scope :webhooks do
+    # Platform-specific webhook endpoints
+    post 'meta', to: 'webhooks#meta_webhook'
+    post 'facebook', to: 'webhooks#facebook_webhook'
+    post 'instagram', to: 'webhooks#instagram_webhook'
+    post 'linkedin', to: 'webhooks#linkedin_webhook'
+    post 'google_ads', to: 'webhooks#google_ads_webhook'
+    post ':platform', to: 'webhooks#generic_webhook', constraints: { platform: /[a-z_]+/ }
+    
+    # Webhook verification endpoints (for platform setup)
+    get ':platform/verify', to: 'webhooks#verify', constraints: { platform: /[a-z_]+/ }
+    post ':platform/verify', to: 'webhooks#verify', constraints: { platform: /[a-z_]+/ }
   end
 
   # API routes

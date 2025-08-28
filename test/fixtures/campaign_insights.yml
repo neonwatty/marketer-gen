@@ -1,0 +1,33 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  campaign_plan: one
+  insight_type: competitive_analysis
+  insight_data: '{"competitive_advantages": ["advantage1", "advantage2"], "threats": ["threat1", "threat2"]}'
+  confidence_score: 0.85
+  analysis_date: <%= 5.days.ago %>
+  metadata: '{"source": "CompetitiveAnalysisService", "integration": true}'
+
+two:
+  campaign_plan: one
+  insight_type: market_trends
+  insight_data: '{"trending_topics": ["topic1", "topic2"], "behavior_shifts": ["shift1"]}'
+  confidence_score: 0.75
+  analysis_date: <%= 3.days.ago %>
+  metadata: '{"source": "LLM", "analysis_method": "trend_monitoring"}'
+
+three:
+  campaign_plan: one
+  insight_type: performance_prediction
+  insight_data: '{"engagement_predictions": {"email": "2.5%", "social_media": "1.8%"}, "roi_forecast": {"expected_roi": "250%"}}'
+  confidence_score: 0.90
+  analysis_date: <%= 1.day.ago %>
+  metadata: '{"source": "LLM", "prediction_horizon": "90_days"}'
+
+four:
+  campaign_plan: one
+  insight_type: audience_intelligence
+  insight_data: '{"audience_segments": [{"segment_name": "Early Adopters", "size_percentage": "25%"}]}'
+  confidence_score: 0.65
+  analysis_date: <%= 10.days.ago %>
+  metadata: '{"source": "LLM", "analysis_depth": "comprehensive"}'

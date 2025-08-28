@@ -90,3 +90,15 @@ other_user_plan:
   objective: "brand_awareness"
   target_audience: "Event attendees"
   status: "draft"
+
+another_plan:
+  user: marketer_user
+  name: "Another Campaign Plan"
+  description: "Another test campaign plan for batch optimization"
+  campaign_type: "sales_promotion"
+  objective: "sales_growth"
+  target_audience: "Potential customers"
+  budget_constraints: "Budget: $25,000 over 2 months"
+  timeline_constraints: "Start date: February 1st"
+  status: "active"
+  metadata: '{"version": "1.0"}'

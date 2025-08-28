@@ -43,6 +43,4 @@ class ApplicationService
       data: data
     }
   end
-
-  protected
 end

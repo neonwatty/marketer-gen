@@ -263,32 +263,10 @@ Rails.application.configure do
   config.llm_performance_tracking = ENV.fetch('LLM_PERFORMANCE_TRACKING', 'true') == 'true'
 end
 
-# Helper method to access LLM service in the application
-module LlmServiceHelper
-  def llm_service
-    service_type = Rails.application.config.llm_service_type
-    LlmServiceContainer.get(service_type)
-  rescue ArgumentError => e
-    Rails.logger.error "LLM Service Error: #{e.message}"
-    # Fallback to mock service if configured service is not available
-    if service_type != :mock && LlmServiceContainer.registered?(:mock)
-      Rails.logger.warn "Falling back to mock LLM service"
-      LlmServiceContainer.get(:mock)
-    else
-      raise e
-    end
-  end
-end
-
 # Include helper in controllers and services
 ActiveSupport.on_load(:action_controller) do
   include LlmServiceHelper
 end
-
-# Make it available in services too
-class ApplicationService
-  include LlmServiceHelper
-end unless defined?(ApplicationService)
 
 # Register services after application loads
 Rails.application.configure do

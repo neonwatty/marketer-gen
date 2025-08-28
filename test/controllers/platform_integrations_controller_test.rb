@@ -39,7 +39,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get index when authenticated" do
-    get platform_integrations_path
+    get platform_integrations_path, as: :json
     assert_response :success
   end
 
@@ -50,9 +50,10 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index should return connection status for all platforms" do
-    get platform_integrations_path
+    get platform_integrations_path, as: :json
     assert_response :success
-    assert_select 'body' # Basic HTML response check
+    json_response = JSON.parse(response.body)
+    assert json_response['connections']
   end
 
   test "index should return JSON with connection status" do
@@ -72,15 +73,25 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should show specific platform connection" do
-    get platform_integration_path('meta')
+    # Mock the account_info method for the connection that will be found
+    PlatformConnection.any_instance.expects(:account_info).returns({
+      platform: 'meta',
+      status: 'active'
+    })
+    
+    get platform_integration_path('meta'), as: :json
     assert_response :success
   end
 
   test "should return JSON for specific platform connection" do
-    # Mock the test_connection method
-    @meta_connection.expects(:test_connection).returns({
+    # Mock the test_connection and account_info methods for any instance
+    PlatformConnection.any_instance.expects(:test_connection).returns({
       success: true,
       status: :healthy
+    })
+    PlatformConnection.any_instance.expects(:account_info).returns({
+      platform: 'meta',
+      status: 'active'
     })
     
     get platform_integration_path('meta'), as: :json
@@ -101,15 +112,9 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
     # Remove existing connection to test creation
     @meta_connection.destroy
     
-    # Mock successful connection test
-    mock_connection = mock('platform_connection')
-    mock_connection.expects(:save).returns(true)
-    mock_connection.expects(:test_connection).returns({ success: true })
-    mock_connection.expects(:account_info).returns({ platform: 'meta', status: 'active' })
-    mock_connection.expects(:platform).returns('meta')
-    
-    PlatformConnection.expects(:build).returns(mock_connection)
-    @user.platform_connections.expects(:build).returns(mock_connection)
+    # Mock the test_connection to return success for the newly created connection
+    PlatformConnection.any_instance.expects(:test_connection).returns({ success: true })
+    PlatformConnection.any_instance.expects(:account_info).returns({ platform: 'meta', status: 'active' })
     
     post platform_integrations_path,
          params: {
@@ -125,8 +130,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
          },
          as: :json
     
-    # The test will fail without proper mocking, but structure is correct
-    # In a real scenario, you'd mock the connection creation properly
+    assert_response :success
   end
 
   test "should handle validation errors during connection creation" do
@@ -146,14 +150,14 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should update existing platform connection" do
     # Mock successful connection test
-    @meta_connection.expects(:update).returns(true)
-    @meta_connection.expects(:test_connection).returns({ success: true })
-    @meta_connection.expects(:account_info).returns({ platform: 'meta', status: 'active' })
-    @meta_connection.expects(:platform).returns('meta')
+    PlatformConnection.any_instance.expects(:update).returns(true)
+    PlatformConnection.any_instance.expects(:test_connection).returns({ success: true })
+    PlatformConnection.any_instance.expects(:account_info).returns({ platform: 'meta', status: 'active' })
     
     patch platform_integration_path('meta'),
           params: {
             platform_connection: {
+              platform: 'meta',  # Need to include platform in the update params
               account_name: 'Updated Meta Account',
               credentials: {
                 access_token: 'updated_token',
@@ -163,7 +167,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
           },
           as: :json
     
-    # Mock will determine response
+    assert_response :success
   end
 
   test "should delete platform connection" do
@@ -177,7 +181,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should test platform connection" do
     # Mock successful connection test
-    @meta_connection.expects(:test_connection).returns({
+    PlatformConnection.any_instance.expects(:test_connection).returns({
       success: true,
       status: :healthy,
       response_time: 0.5
@@ -193,7 +197,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should handle failed connection test" do
     # Mock failed connection test
-    @meta_connection.expects(:test_connection).returns({
+    PlatformConnection.any_instance.expects(:test_connection).returns({
       success: false,
       error: 'Authentication failed'
     })
@@ -210,7 +214,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
   test "should sync data for specific platform" do
     # Mock job creation
     mock_job = mock('platform_integration_job')
-    mock_job.expects(:job_id).returns('job_123')
+    mock_job.expects(:job_id).twice.returns('job_123')
     
     PlatformIntegrationJob.expects(:sync_platform).with(
       @user,
@@ -234,7 +238,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
   test "should sync data for specific platform with campaign plan" do
     # Mock job creation
     mock_job = mock('platform_integration_job')
-    mock_job.expects(:job_id).returns('job_456')
+    mock_job.expects(:job_id).twice.returns('job_456')
     
     PlatformIntegrationJob.expects(:sync_platform).with(
       @user,
@@ -263,7 +267,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
   test "should sync data for all platforms" do
     # Mock job creation
     mock_job = mock('platform_integration_job')
-    mock_job.expects(:job_id).returns('job_all_123')
+    mock_job.expects(:job_id).twice.returns('job_all_123')
     
     PlatformIntegrationJob.expects(:sync_all_platforms).with(
       @user,
@@ -284,9 +288,9 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should sync all platforms with date range" do
-    # Mock job creation
+    # Mock job creation - controller calls job_id twice (once for logging, once for response)
     mock_job = mock('platform_integration_job')
-    mock_job.expects(:job_id).returns('job_range_123')
+    mock_job.expects(:job_id).twice.returns('job_range_123')
     
     PlatformIntegrationJob.expects(:sync_all_platforms).with(
       @user,
@@ -387,7 +391,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
   test "should handle invalid date range gracefully" do
     # Mock job creation
     mock_job = mock('platform_integration_job')
-    mock_job.expects(:job_id).returns('job_invalid_date')
+    mock_job.expects(:job_id).twice.returns('job_invalid_date')
     
     PlatformIntegrationJob.expects(:sync_platform).with(
       @user,
@@ -440,6 +444,7 @@ class PlatformIntegrationsControllerTest < ActionDispatch::IntegrationTest
       [:get, export_platform_integrations_path]
     ]
     
+    sign_out
     routes_to_test.each do |method, path|
       send(method, path)
       assert_redirected_to new_session_path, "#{method.upcase} #{path} should require authentication"

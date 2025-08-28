@@ -14,26 +14,27 @@ class PersonaContentTailoringTest < ActionDispatch::IntegrationTest
       status: "draft"
     )
     @content = generated_contents(:one)
-    @persona = personas(:professional_marketer)
+    @persona = personas(:startup_founder)
   end
 
   test "complete persona-based content tailoring workflow" do
     # Step 1: Verify user has personas
     assert @user.has_personas?, "User should have active personas"
-    assert @user.active_personas.include?(@persona), "User should have professional marketer persona"
+    assert @user.active_personas.include?(@persona), "User should have startup founder persona"
 
     # Step 2: Test persona matching with user profile
     user_profile = {
       'demographics' => { 
-        'age_group' => '26-40', 
-        'location' => 'urban', 
-        'industry' => 'marketing' 
+        'age_group' => '25-35', 
+        'location' => 'tech_hub', 
+        'company_size' => '1-10' 
       },
       'behavioral_traits' => { 
-        'attention_span' => 'medium', 
-        'urgency_sensitive' => true 
+        'attention_span' => 'short', 
+        'urgency_sensitive' => true,
+        'cost_sensitive' => true
       },
-      'goals' => ['increase_productivity', 'improve_roi']
+      'goals' => ['rapid_growth', 'save_money', 'user_acquisition']
     }
 
     matching_personas = @user.find_matching_personas(user_profile)

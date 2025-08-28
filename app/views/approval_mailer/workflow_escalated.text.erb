@@ -1,3 +1,21 @@
-Approval#workflow_escalated
+🚨 ESCALATED: IMMEDIATE ATTENTION REQUIRED - <%= @content.title %>
 
-<%= @greeting %>, find me in app/views/approval_mailer/workflow_escalated.text.erb
+Hello <%= @recipient.full_name %>,
+
+🚨 URGENT: This approval request has been escalated
+
+This content has been waiting for approval and now requires immediate attention.
+
+Title: <%= @content.title %>
+Content Type: <%= @content.content_type.titleize %>
+Campaign: <%= @campaign.name %>
+<% if @escalation_reason %>Waiting time: <%= @escalation_reason %>
+<% end %>
+Please review this content as soon as possible to avoid further delays.
+
+Review now: <%= @approve_url %>
+
+Thank you for your immediate attention.
+
+Best regards,
+MarketerGen Team

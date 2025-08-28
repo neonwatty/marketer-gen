@@ -1,0 +1,75 @@
+# Project Milestones test fixtures
+
+design_phase:
+  campaign_plan: draft_plan
+  created_by: marketer_user
+  name: "Design Phase Milestone"
+  description: "Complete initial design and wireframes"
+  due_date: <%= 2.weeks.from_now.to_date %>
+  status: "pending"
+  priority: "high"
+  milestone_type: "design"
+  completion_percentage: 0
+  estimated_hours: 40
+  notes: "Initial design phase for product launch"
+
+development_milestone:
+  campaign_plan: completed_plan
+  created_by: marketer_user
+  assigned_to: team_member_user
+  name: "Development Milestone"
+  description: "Core development tasks"
+  due_date: <%= 3.weeks.from_now.to_date %>
+  status: "in_progress"
+  priority: "critical"
+  milestone_type: "development"
+  completion_percentage: 45
+  estimated_hours: 80
+  actual_hours: 35
+  started_at: <%= 1.week.ago %>
+
+completed_milestone:
+  campaign_plan: completed_plan
+  created_by: marketer_user
+  assigned_to: team_member_user
+  completed_by: team_member_user
+  name: "Completed Milestone"
+  description: "This milestone has been completed"
+  due_date: <%= 1.week.ago.to_date %>
+  status: "completed"
+  priority: "medium"
+  milestone_type: "planning"
+  completion_percentage: 100
+  estimated_hours: 20
+  actual_hours: 18
+  started_at: <%= 2.weeks.ago %>
+  completed_at: <%= 1.week.ago %>
+
+overdue_milestone:
+  campaign_plan: generating_plan
+  created_by: marketer_user
+  name: "Overdue Task"
+  description: "This task is overdue"
+  due_date: <%= 3.days.ago.to_date %>
+  status: "overdue"
+  priority: "critical"
+  milestone_type: "review"
+  completion_percentage: 25
+  estimated_hours: 16
+
+launch_milestone:
+  campaign_plan: active_plan
+  created_by: marketer_user
+  assigned_to: marketer_user
+  name: "Launch Milestone"
+  description: "Campaign launch activities"
+  due_date: <%= 1.week.from_now.to_date %>
+  status: "pending"
+  priority: "critical"
+  milestone_type: "launch"
+  completion_percentage: 0
+  estimated_hours: 60
+  resources_required: '[{"type": "developer", "cost": 1000}, {"type": "designer", "cost": 800}]'
+  deliverables: '[{"name": "Launch materials", "completed": false}, {"name": "Marketing copy", "completed": true}]'
+  dependencies: '[{"name": "Design approval", "completed": true, "required": true}]'
+  risk_factors: '[{"name": "Timeline pressure", "level": "high"}]'

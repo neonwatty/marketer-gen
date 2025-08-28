@@ -320,6 +320,10 @@ class PlanAnalyticsServiceTest < ActiveSupport::TestCase
     @service.send(:update_analytics_timestamp)
     @campaign_plan.reload
     
-    assert_operator @campaign_plan.analytics_last_updated_at, :>, original_timestamp if original_timestamp
+    if original_timestamp
+      assert_operator @campaign_plan.analytics_last_updated_at, :>, original_timestamp
+    else
+      assert_not_nil @campaign_plan.analytics_last_updated_at
+    end
   end
 end

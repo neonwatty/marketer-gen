@@ -4,9 +4,7 @@ require 'test_helper'
 
 class PlatformConnectionTest < ActiveSupport::TestCase
   def setup
-    @user = users(:one)
-    # Clear existing platform connections for test isolation
-    @user.platform_connections.destroy_all
+    @user = users(:three) # Use a different user to avoid fixture conflicts
     
     @valid_meta_credentials = {
       access_token: 'test_access_token',
@@ -24,6 +22,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "should create valid platform connection" do
+    
     connection = PlatformConnection.new(
       user: @user,
       platform: 'meta',
@@ -59,6 +58,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "should validate unique platform per user" do
+    
     PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -80,20 +80,18 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   test "should allow same platform for different users" do
     other_user = users(:two)
     
-    # Clean up any existing connections for these users to ensure test isolation
-    PlatformConnection.where(user: [@user, other_user], platform: 'meta').destroy_all
     
     PlatformConnection.create!(
       user: @user,
-      platform: 'meta',
-      credentials: @valid_meta_credentials.to_json,
+      platform: 'google_ads',
+      credentials: @valid_google_ads_credentials.to_json,
       status: 'active'
     )
     
     connection = PlatformConnection.new(
       user: other_user,
-      platform: 'meta',
-      credentials: @valid_meta_credentials.to_json,
+      platform: 'google_ads',
+      credentials: @valid_google_ads_credentials.to_json,
       status: 'active'
     )
     
@@ -101,6 +99,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "should store and retrieve credentials correctly" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -113,6 +112,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "active? should return true for active connection with valid credentials" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -124,6 +124,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "active? should return false for inactive connection" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -135,6 +136,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "active? should return false for connection with invalid credentials" do
+    
     invalid_credentials = { access_token: 'token' } # Missing app_secret for meta
     connection = PlatformConnection.create!(
       user: @user,
@@ -147,6 +149,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "expired? should return true for expired status" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -158,6 +161,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "expired? should return true for token expiration" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -170,6 +174,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "error? should return true for error status" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -181,6 +186,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "credential_data should return parsed JSON" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -192,6 +198,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "credential_data should handle invalid JSON gracefully" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -206,6 +213,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "update_credentials should update credentials and set status to active" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -220,6 +228,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "mark_failed! should set error status and metadata" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -236,6 +245,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "mark_expired! should set expired status and metadata" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -250,6 +260,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "update_sync_status! should update sync metadata on success" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -267,6 +278,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "update_sync_status! should update failure metadata on failure" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -282,6 +294,7 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "account_info should return formatted account information" do
+    
     connection = PlatformConnection.create!(
       user: @user,
       platform: 'meta',
@@ -362,11 +375,6 @@ class PlatformConnectionTest < ActiveSupport::TestCase
   end
 
   test "scopes should work correctly" do
-    # Clean up any existing connections to ensure test isolation
-    PlatformConnection.where(
-      user: [@user, users(:two)], 
-      platform: ['meta', 'linkedin', 'google_ads']
-    ).destroy_all
     
     active_connection = PlatformConnection.create!(
       user: @user,
@@ -383,17 +391,17 @@ class PlatformConnectionTest < ActiveSupport::TestCase
     )
     
     recently_synced_connection = PlatformConnection.create!(
-      user: users(:two),
-      platform: 'meta',
-      credentials: @valid_meta_credentials.to_json,
+      user: users(:one),
+      platform: 'linkedin',
+      credentials: @valid_linkedin_credentials.to_json,
       status: 'active',
       last_sync_at: 1.hour.ago
     )
     
     old_sync_connection = PlatformConnection.create!(
-      user: users(:two),
-      platform: 'linkedin',
-      credentials: @valid_linkedin_credentials.to_json,
+      user: users(:three),
+      platform: 'google_ads',
+      credentials: @valid_google_ads_credentials.to_json,
       status: 'active',
       last_sync_at: 2.days.ago
     )

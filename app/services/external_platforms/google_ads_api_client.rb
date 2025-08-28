@@ -40,6 +40,16 @@ class ExternalPlatforms::GoogleAdsApiClient < ExternalPlatforms::BaseApiClient
     search_request(customer_id, query)
   end
 
+  def create_campaign(campaign_data)
+    mutate_request('campaigns', 'create', campaign_data)
+  end
+
+  def update_campaign(campaign_id, campaign_data)
+    mutate_request('campaigns', 'update', campaign_data.merge(
+      resourceName: "customers/#{@customer_id}/campaigns/#{campaign_id}"
+    ))
+  end
+
   def get_campaign_performance(customer_id, campaign_id = nil, date_range = {})
     fields = %w[
       campaign.id campaign.name metrics.impressions metrics.clicks

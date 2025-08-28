@@ -15,57 +15,53 @@ class ApprovalMailerTest < ActionMailer::TestCase
     @workflow = ApprovalWorkflow.create_workflow!(@content, 'single_approver', [@approver.id])
   end
   test "approval_request" do
-    skip "TODO: Fix during incremental development"
-    mail = ApprovalMailer.approval_request
-    assert_equal "Approval request", mail.subject
-    assert_equal [ "to@example.org" ], mail.to
-    assert_equal [ "from@example.com" ], mail.from
-    assert_match "Hi", mail.body.encoded
+    mail = ApprovalMailer.approval_request(@workflow, @approver)
+    assert_equal "Approval Required: #{@content.title}", mail.subject
+    assert_equal [@approver.email_address], mail.to
+    assert_equal ["approvals@marketergen.com"], mail.from
+    assert_match @content.title, mail.body.encoded
   end
 
   test "approval_reminder" do
-    skip "TODO: Fix during incremental development"
-    mail = ApprovalMailer.approval_reminder
-    assert_equal "Approval reminder", mail.subject
-    assert_equal [ "to@example.org" ], mail.to
-    assert_equal [ "from@example.com" ], mail.from
-    assert_match "Hi", mail.body.encoded
+    hours_waiting = 24
+    mail = ApprovalMailer.approval_reminder(@workflow, @approver, hours_waiting)
+    assert_equal "Reminder: Approval Pending for #{@content.title}", mail.subject
+    assert_equal [@approver.email_address], mail.to
+    assert_equal ["approvals@marketergen.com"], mail.from
+    assert_match @content.title, mail.body.encoded
   end
 
   test "workflow_approved" do
-    skip "TODO: Fix during incremental development"
-    mail = ApprovalMailer.workflow_approved
-    assert_equal "Workflow approved", mail.subject
-    assert_equal [ "to@example.org" ], mail.to
-    assert_equal [ "from@example.com" ], mail.from
-    assert_match "Hi", mail.body.encoded
+    mail = ApprovalMailer.workflow_approved(@workflow, @user)
+    assert_equal "✅ Approved: #{@content.title}", mail.subject
+    assert_equal [@user.email_address], mail.to
+    assert_equal ["approvals@marketergen.com"], mail.from
+    assert_match @content.title, mail.body.encoded
   end
 
   test "workflow_rejected" do
-    skip "TODO: Fix during incremental development"
-    mail = ApprovalMailer.workflow_rejected
-    assert_equal "Workflow rejected", mail.subject
-    assert_equal [ "to@example.org" ], mail.to
-    assert_equal [ "from@example.com" ], mail.from
-    assert_match "Hi", mail.body.encoded
+    mail = ApprovalMailer.workflow_rejected(@workflow, @user)
+    assert_equal "❌ Rejected: #{@content.title}", mail.subject
+    assert_equal [@user.email_address], mail.to
+    assert_equal ["approvals@marketergen.com"], mail.from
+    assert_match @content.title, mail.body.encoded
   end
 
   test "workflow_escalated" do
-    skip "TODO: Fix during incremental development"
-    mail = ApprovalMailer.workflow_escalated
-    assert_equal "Workflow escalated", mail.subject
-    assert_equal [ "to@example.org" ], mail.to
-    assert_equal [ "from@example.com" ], mail.from
-    assert_match "Hi", mail.body.encoded
+    mail = ApprovalMailer.workflow_escalated(@workflow, @approver)
+    assert_equal "🚨 Escalated: #{@content.title} Requires Immediate Attention", mail.subject
+    assert_equal [@approver.email_address], mail.to
+    assert_equal ["approvals@marketergen.com"], mail.from
+    assert_match @content.title, mail.body.encoded
   end
 
   test "approval_delegated" do
-    skip "TODO: Fix during incremental development"
-    mail = ApprovalMailer.approval_delegated
-    assert_equal "Approval delegated", mail.subject
-    assert_equal [ "to@example.org" ], mail.to
-    assert_equal [ "from@example.com" ], mail.from
-    assert_match "Hi", mail.body.encoded
+    @delegate = users(:team_member_user) || users(:marketer_user)
+    mail = ApprovalMailer.approval_delegated(@workflow, @approver, @delegate)
+    assert_equal "Approval Delegated: #{@content.title}", mail.subject
+    assert_equal [@delegate.email_address], mail.to
+    assert_equal ["approvals@marketergen.com"], mail.from
+    assert_match @content.title, mail.body.encoded
   end
 
   test "deadline_warning" do

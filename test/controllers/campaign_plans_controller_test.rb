@@ -157,9 +157,11 @@ class CampaignPlansControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy campaign plan" do
-    skip "TODO: Fix during incremental development"
+    # Use a campaign plan without dependent records for this test
+    destroyable_plan = campaign_plans(:failed_plan) # This plan has no dependent records
+    
     assert_difference("CampaignPlan.count", -1) do
-      delete campaign_plan_url(@campaign_plan)
+      delete campaign_plan_url(destroyable_plan)
     end
 
     assert_redirected_to campaign_plans_path

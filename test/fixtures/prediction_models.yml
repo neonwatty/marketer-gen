@@ -1,0 +1,227 @@
+# Prediction Model Test Fixtures
+
+campaign_performance_model:
+  name: "Campaign Performance Model V1"
+  prediction_type: "campaign_performance"
+  model_type: "linear_regression"
+  status: "active"
+  version: 1
+  accuracy_score: 0.800
+  confidence_level: 0.850
+  campaign_plan: one
+  created_by: one
+  trained_by: one
+  prediction_count: 5
+  training_started_at: <%= 2.hours.ago %>
+  training_completed_at: <%= 1.hour.ago %>
+  activated_at: <%= 30.minutes.ago %>
+  last_prediction_at: <%= 10.minutes.ago %>
+  training_data: [
+    {
+      "features": {
+        "budget": 10000,
+        "timeline_days": 30,
+        "audience_size": 50000,
+        "campaign_type": "product_launch"
+      },
+      "target": 0.85
+    },
+    {
+      "features": {
+        "budget": 15000,
+        "timeline_days": 45,
+        "audience_size": 75000,
+        "campaign_type": "brand_awareness"
+      },
+      "target": 0.78
+    }
+  ]
+  model_parameters: {
+    "regularization": 0.01,
+    "learning_rate": 0.1,
+    "max_iterations": 100
+  }
+  feature_importance: {
+    "budget": 0.35,
+    "timeline_days": 0.25,
+    "audience_size": 0.20,
+    "campaign_type": 0.20
+  }
+  validation_metrics: {
+    "accuracy": 0.800,
+    "cv_score": 0.795,
+    "test_accuracy": 0.785,
+    "mae": 8.5,
+    "rmse": 12.3,
+    "r2_score": 0.76
+  }
+  prediction_results: {
+    "last_prediction": {
+      "performance_score": 82.5,
+      "confidence": 0.85,
+      "generated_at": "2024-08-27T20:00:00Z"
+    }
+  }
+  metadata: {
+    "created_via": "predictive_analytics_service",
+    "auto_generated": true,
+    "training_environment": "test"
+  }
+
+roi_forecast_model:
+  name: "ROI Forecast Model V1"
+  prediction_type: "roi_forecast"
+  model_type: "gradient_boosting"
+  status: "active"
+  version: 1
+  accuracy_score: 0.750
+  confidence_level: 0.800
+  campaign_plan: one
+  created_by: one
+  trained_by: one
+  prediction_count: 3
+  training_started_at: <%= 3.hours.ago %>
+  training_completed_at: <%= 2.hours.ago %>
+  activated_at: <%= 1.hour.ago %>
+  last_prediction_at: <%= 20.minutes.ago %>
+  training_data: [
+    {
+      "features": {
+        "budget": 20000,
+        "market_conditions": "favorable",
+        "competition": "medium",
+        "seasonality": "positive"
+      },
+      "target": 250.5
+    }
+  ]
+  model_parameters: {
+    "n_estimators": 100,
+    "learning_rate": 0.1,
+    "max_depth": 6
+  }
+  feature_importance: {
+    "budget": 0.40,
+    "market_conditions": 0.25,
+    "competition": 0.20,
+    "seasonality": 0.15
+  }
+  validation_metrics: {
+    "accuracy": 0.750,
+    "cv_score": 0.745,
+    "test_accuracy": 0.730,
+    "mae": 15.2,
+    "rmse": 22.8,
+    "r2_score": 0.71
+  }
+  metadata: {
+    "created_via": "predictive_analytics_service",
+    "model_complexity": "high"
+  }
+
+draft_model:
+  name: "Draft Optimization Model"
+  prediction_type: "optimization_opportunities"
+  model_type: "random_forest"
+  status: "draft"
+  version: 1
+  accuracy_score: 0.0
+  confidence_level: 0.0
+  campaign_plan: one
+  created_by: one
+  prediction_count: 0
+  training_data: [
+    {
+      "features": {
+        "current_performance": 65,
+        "channel_efficiency": 0.7,
+        "content_performance": 0.8
+      },
+      "target": "high_impact"
+    }
+  ]
+  model_parameters: {
+    "n_estimators": 100,
+    "max_depth": 10,
+    "min_samples_split": 2
+  }
+  metadata: {
+    "created_via": "predictive_analytics_service",
+    "status": "pending_training"
+  }
+
+training_model:
+  name: "Training Engagement Model"
+  prediction_type: "audience_engagement"
+  model_type: "neural_network"
+  status: "training"
+  version: 1
+  accuracy_score: 0.0
+  confidence_level: 0.0
+  campaign_plan: one
+  created_by: one
+  trained_by: one
+  prediction_count: 0
+  training_started_at: <%= 30.minutes.ago %>
+  training_data: [
+    {
+      "features": {
+        "content_type": "video",
+        "timing": "evening",
+        "audience_segment": "millennials"
+      },
+      "target": 0.75
+    }
+  ]
+  model_parameters: {
+    "hidden_layers": [64, 32, 16],
+    "learning_rate": 0.001,
+    "batch_size": 32
+  }
+  metadata: {
+    "training_job_id": "test_job_123",
+    "expected_completion": "<%= 10.minutes.from_now %>"
+  }
+
+failed_model:
+  name: "Failed Content Model"
+  prediction_type: "content_performance"
+  model_type: "linear_regression"
+  status: "failed"
+  version: 1
+  accuracy_score: 0.0
+  confidence_level: 0.0
+  campaign_plan: one
+  created_by: one
+  trained_by: one
+  prediction_count: 0
+  training_started_at: <%= 4.hours.ago %>
+  training_failed_at: <%= 3.hours.ago %>
+  error_message: "Insufficient training data for model convergence"
+  training_data: []
+  metadata: {
+    "failure_reason": "insufficient_data",
+    "retry_count": 3
+  }
+
+deprecated_model:
+  name: "Deprecated Campaign Model V2"
+  prediction_type: "campaign_performance"
+  model_type: "linear_regression"
+  status: "deprecated"
+  version: 2
+  accuracy_score: 0.650
+  confidence_level: 0.700
+  campaign_plan: one
+  created_by: one
+  trained_by: one
+  prediction_count: 15
+  training_started_at: <%= 1.week.ago %>
+  training_completed_at: <%= 6.days.ago %>
+  activated_at: <%= 6.days.ago %>
+  deprecated_at: <%= 1.day.ago %>
+  last_prediction_at: <%= 2.days.ago %>
+  metadata: {
+    "deprecated_reason": "replaced_by_better_model",
+    "replacement_model_version": 2
+  }

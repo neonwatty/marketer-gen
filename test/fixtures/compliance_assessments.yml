@@ -1,0 +1,27 @@
+gdpr_assessment_one:
+  compliance_requirement: gdpr_requirement
+  total_criteria: 10
+  met_criteria: 8
+  assessment_date: <%= 1.week.ago.to_date %>
+  status: "completed"
+
+gdpr_assessment_two:
+  compliance_requirement: gdpr_requirement
+  total_criteria: 15
+  met_criteria: 12
+  assessment_date: <%= 2.weeks.ago.to_date %>
+  status: "completed"
+
+hipaa_assessment:
+  compliance_requirement: hipaa_requirement
+  total_criteria: 20
+  met_criteria: 18
+  assessment_date: <%= 3.days.ago.to_date %>
+  status: "completed"
+
+sox_assessment:
+  compliance_requirement: sox_requirement
+  total_criteria: 8
+  met_criteria: 8
+  assessment_date: <%= 1.month.ago.to_date %>
+  status: "completed"

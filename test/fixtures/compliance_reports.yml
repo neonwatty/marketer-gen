@@ -1,0 +1,14 @@
+gdpr_monthly_report:
+  compliance_requirement: gdpr_requirement
+  report_type: "monthly_compliance_summary"
+  generated_at: <%= 1.week.ago %>
+
+hipaa_audit_report:
+  compliance_requirement: hipaa_requirement
+  report_type: "audit_readiness_report"
+  generated_at: <%= 3.days.ago %>
+
+sox_quarterly_report:
+  compliance_requirement: sox_requirement
+  report_type: "quarterly_assessment"
+  generated_at: <%= 1.month.ago %>

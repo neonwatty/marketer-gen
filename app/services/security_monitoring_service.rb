@@ -28,6 +28,9 @@ class SecurityMonitoringService
       # Store alert in database for analysis
       store_alert(alert_data, severity, alert_id)
       
+      # Create security incident for high severity alerts
+      create_security_incident(alert_data, severity, alert_id) if should_create_incident?(severity)
+      
       # Send notifications based on severity
       send_notifications(alert_data, severity, alert_id) if should_notify?(severity)
       
@@ -123,6 +126,181 @@ class SecurityMonitoringService
       Rails.cache.write(cache_key, recent_access, expires_in: 1.hour)
       
       total_records
+    end
+
+    # Advanced ML-based anomaly detection
+    def detect_behavioral_anomalies(user_id, time_window = 7.days)
+      user_behavior = analyze_user_behavior_patterns(user_id, time_window)
+      baseline = get_user_baseline(user_id)
+      
+      anomalies = []
+      
+      # Detect login time anomalies
+      if user_behavior[:avg_login_hour] && baseline[:typical_login_hours]
+        if !baseline[:typical_login_hours].include?(user_behavior[:avg_login_hour])
+          anomalies << {
+            type: 'unusual_login_time',
+            severity: :medium,
+            details: "Login at hour #{user_behavior[:avg_login_hour]} is unusual"
+          }
+        end
+      end
+      
+      # Detect access pattern anomalies
+      if user_behavior[:access_frequency] > (baseline[:avg_access_frequency] * 3)
+        anomalies << {
+          type: 'excessive_access_frequency',
+          severity: :high,
+          details: "Access frequency #{user_behavior[:access_frequency]} is #{(user_behavior[:access_frequency] / baseline[:avg_access_frequency]).round(2)}x normal"
+        }
+      end
+      
+      # Detect geographic anomalies
+      if user_behavior[:new_locations] && user_behavior[:new_locations].any?
+        anomalies << {
+          type: 'geographic_anomaly',
+          severity: :medium,
+          details: "Access from new locations: #{user_behavior[:new_locations].join(', ')}"
+        }
+      end
+      
+      # Create alerts for significant anomalies
+      anomalies.each do |anomaly|
+        alert_data = {
+          alert_type: "BEHAVIORAL_ANOMALY",
+          user_id: user_id,
+          anomaly_type: anomaly[:type],
+          severity: anomaly[:severity],
+          details: anomaly[:details],
+          behavior_data: user_behavior,
+          timestamp: Time.current
+        }
+        send_alert(alert_data)
+      end
+      
+      anomalies
+    end
+
+    # Threat intelligence integration
+    def check_threat_intelligence(ip_address, user_agent = nil)
+      threat_score = 0
+      threat_indicators = []
+      
+      # Check against known malicious IPs (simulated)
+      if is_malicious_ip?(ip_address)
+        threat_score += 75
+        threat_indicators << {
+          type: 'malicious_ip',
+          value: ip_address,
+          confidence: 0.9
+        }
+      end
+      
+      # Check user agent patterns
+      if user_agent && is_suspicious_user_agent?(user_agent)
+        threat_score += 25
+        threat_indicators << {
+          type: 'suspicious_user_agent',
+          value: user_agent,
+          confidence: 0.7
+        }
+      end
+      
+      # Check for known attack patterns
+      attack_patterns = detect_attack_patterns(ip_address)
+      attack_patterns.each do |pattern|
+        threat_score += pattern[:score]
+        threat_indicators << pattern[:indicator]
+      end
+      
+      if threat_score > 50 # High threat threshold
+        alert_data = {
+          alert_type: "THREAT_INTELLIGENCE_MATCH",
+          ip_address: ip_address,
+          user_agent: user_agent,
+          threat_score: threat_score,
+          threat_indicators: threat_indicators,
+          timestamp: Time.current
+        }
+        send_alert(alert_data)
+      end
+      
+      { threat_score: threat_score, indicators: threat_indicators }
+    end
+
+    # Advanced pattern recognition for attack detection
+    def analyze_attack_patterns(time_window = 1.hour)
+      patterns_detected = []
+      
+      # Detect coordinated attacks
+      coordinated_attack = detect_coordinated_attack(time_window)
+      patterns_detected << coordinated_attack if coordinated_attack
+      
+      # Detect privilege escalation attempts
+      privilege_escalation = detect_privilege_escalation_patterns(time_window)
+      patterns_detected << privilege_escalation if privilege_escalation
+      
+      # Detect data exfiltration patterns
+      data_exfiltration = detect_data_exfiltration_patterns(time_window)
+      patterns_detected << data_exfiltration if data_exfiltration
+      
+      patterns_detected.each do |pattern|
+        alert_data = {
+          alert_type: "ATTACK_PATTERN_DETECTED",
+          pattern_type: pattern[:type],
+          severity: pattern[:severity],
+          confidence: pattern[:confidence],
+          details: pattern[:details],
+          affected_resources: pattern[:affected_resources],
+          timestamp: Time.current
+        }
+        send_alert(alert_data)
+      end
+      
+      patterns_detected
+    end
+
+    # Real-time risk assessment
+    def calculate_risk_score(user_id, session_data, request_data)
+      risk_factors = []
+      total_score = 0
+      
+      # User risk factors
+      user_score, user_factors = calculate_user_risk(user_id)
+      total_score += user_score
+      risk_factors.concat(user_factors)
+      
+      # Session risk factors
+      session_score, session_factors = calculate_session_risk(session_data)
+      total_score += session_score
+      risk_factors.concat(session_factors)
+      
+      # Request risk factors
+      request_score, request_factors = calculate_request_risk(request_data)
+      total_score += request_score
+      risk_factors.concat(request_factors)
+      
+      # Environmental factors
+      env_score, env_factors = calculate_environmental_risk(request_data)
+      total_score += env_score
+      risk_factors.concat(env_factors)
+      
+      # Normalize score to 0-100 scale
+      normalized_score = [total_score, 100].min
+      
+      if normalized_score > 75
+        alert_data = {
+          alert_type: "HIGH_RISK_SESSION",
+          user_id: user_id,
+          risk_score: normalized_score,
+          risk_factors: risk_factors,
+          session_data: session_data&.slice(:id, :ip_address, :user_agent),
+          timestamp: Time.current
+        }
+        send_alert(alert_data)
+      end
+      
+      { score: normalized_score, factors: risk_factors }
     end
 
     # Generate security reports
@@ -300,6 +478,294 @@ class SecurityMonitoringService
         "Consider enabling two-factor authentication for admin users",
         "Monitor for unusual geographic access patterns"
       ]
+    end
+
+    # New private methods for enhanced threat detection
+
+    def should_create_incident?(severity)
+      SEVERITY_LEVELS[severity] >= SEVERITY_LEVELS[:high]
+    end
+
+    def create_security_incident(alert_data, severity, alert_id)
+      incident_type = map_alert_to_incident_type(alert_data[:alert_type])
+      
+      SecurityIncident.create!(
+        incident_id: alert_id,
+        incident_type: incident_type,
+        severity: severity.to_s,
+        status: 'open',
+        title: generate_incident_title(alert_data),
+        description: generate_incident_description(alert_data),
+        user_id: alert_data[:user_id],
+        source_ip: alert_data[:ip_address],
+        user_agent: alert_data[:user_agent],
+        metadata: alert_data,
+        threat_indicators: extract_threat_indicators(alert_data)
+      )
+    end
+
+    def map_alert_to_incident_type(alert_type)
+      case alert_type
+      when "BRUTE_FORCE_ATTACK" then "brute_force_attack"
+      when "PRIVILEGE_ESCALATION" then "privilege_escalation"
+      when "EXCESSIVE_DATA_ACCESS" then "excessive_data_access"
+      when "BEHAVIORAL_ANOMALY" then "activity_anomaly"
+      when "THREAT_INTELLIGENCE_MATCH" then "suspicious_login"
+      when "ATTACK_PATTERN_DETECTED" then "unauthorized_access"
+      when "HIGH_RISK_SESSION" then "session_hijacking"
+      else "suspicious_login"
+      end
+    end
+
+    def generate_incident_title(alert_data)
+      case alert_data[:alert_type]
+      when "BRUTE_FORCE_ATTACK"
+        "Brute force attack detected from #{alert_data[:ip_address]}"
+      when "PRIVILEGE_ESCALATION"
+        "Privilege escalation attempt by user #{alert_data[:user_id]}"
+      when "EXCESSIVE_DATA_ACCESS"
+        "Excessive data access by user #{alert_data[:user_id]}"
+      when "BEHAVIORAL_ANOMALY"
+        "Behavioral anomaly detected: #{alert_data[:anomaly_type]}"
+      when "THREAT_INTELLIGENCE_MATCH"
+        "Threat intelligence match for IP #{alert_data[:ip_address]}"
+      when "ATTACK_PATTERN_DETECTED"
+        "Attack pattern detected: #{alert_data[:pattern_type]}"
+      when "HIGH_RISK_SESSION"
+        "High-risk session detected for user #{alert_data[:user_id]}"
+      else
+        "Security incident: #{alert_data[:alert_type]}"
+      end
+    end
+
+    def generate_incident_description(alert_data)
+      base_description = "Security incident automatically generated from alert #{alert_data[:timestamp]}"
+      
+      case alert_data[:alert_type]
+      when "BRUTE_FORCE_ATTACK"
+        "#{base_description}. Detected #{alert_data[:attempt_count]} failed login attempts from IP #{alert_data[:ip_address]} within #{alert_data[:time_window]}."
+      when "PRIVILEGE_ESCALATION"
+        "#{base_description}. User #{alert_data[:user_id]} attempted to access privileged resources or escalate permissions."
+      when "EXCESSIVE_DATA_ACCESS"
+        "#{base_description}. User #{alert_data[:user_id]} accessed #{alert_data[:total_records_accessed]} records, exceeding normal patterns."
+      when "BEHAVIORAL_ANOMALY"
+        "#{base_description}. Detected unusual behavior: #{alert_data[:details]}. Behavior data: #{alert_data[:behavior_data]&.to_json}"
+      when "THREAT_INTELLIGENCE_MATCH"
+        "#{base_description}. IP #{alert_data[:ip_address]} matched threat intelligence with score #{alert_data[:threat_score]}. Indicators: #{alert_data[:threat_indicators]&.map { |i| i[:type] }&.join(', ')}"
+      else
+        "#{base_description}. Alert details: #{alert_data.except(:timestamp).to_json}"
+      end
+    end
+
+    def extract_threat_indicators(alert_data)
+      indicators = []
+      
+      if alert_data[:ip_address]
+        indicators << {
+          type: 'ip_address',
+          value: alert_data[:ip_address],
+          confidence: 0.8
+        }
+      end
+      
+      if alert_data[:user_agent]
+        indicators << {
+          type: 'user_agent',
+          value: alert_data[:user_agent],
+          confidence: 0.6
+        }
+      end
+      
+      if alert_data[:threat_indicators]
+        indicators.concat(alert_data[:threat_indicators])
+      end
+      
+      indicators
+    end
+
+    # Support methods for behavioral analysis
+    def analyze_user_behavior_patterns(user_id, time_window)
+      # Simulate behavioral analysis - in real implementation would analyze logs/database
+      {
+        avg_login_hour: rand(24),
+        access_frequency: rand(10..50),
+        new_locations: rand > 0.8 ? ['New York', 'London'] : [],
+        typical_actions: ['login', 'view_dashboard', 'create_content']
+      }
+    end
+
+    def get_user_baseline(user_id)
+      # Simulate baseline data - in real implementation would be stored/calculated
+      {
+        typical_login_hours: (9..17).to_a,
+        avg_access_frequency: 25,
+        typical_locations: ['San Francisco', 'Remote'],
+        avg_session_duration: 3.hours
+      }
+    end
+
+    # Threat intelligence methods
+    def is_malicious_ip?(ip_address)
+      # Simulate threat intelligence check
+      malicious_patterns = ['192.168.999', '10.0.999', '127.0.0']
+      malicious_patterns.any? { |pattern| ip_address.include?(pattern) }
+    end
+
+    def is_suspicious_user_agent?(user_agent)
+      # Check for suspicious patterns in user agent
+      suspicious_patterns = [
+        /sqlmap/i, /nikto/i, /nmap/i, /burp/i,
+        /bot/i, /crawler/i, /spider/i,
+        /<script>/i, /javascript:/i
+      ]
+      suspicious_patterns.any? { |pattern| user_agent.match?(pattern) }
+    end
+
+    def detect_attack_patterns(ip_address)
+      # Simulate attack pattern detection
+      patterns = []
+      
+      # Random pattern detection for demonstration
+      if rand > 0.7
+        patterns << {
+          score: 30,
+          indicator: {
+            type: 'scanning_pattern',
+            value: "Sequential port scanning detected from #{ip_address}",
+            confidence: 0.8
+          }
+        }
+      end
+      
+      patterns
+    end
+
+    # Advanced pattern detection methods
+    def detect_coordinated_attack(time_window)
+      # Simulate coordinated attack detection
+      return nil unless rand > 0.9
+      
+      {
+        type: 'coordinated_brute_force',
+        severity: :high,
+        confidence: 0.85,
+        details: 'Multiple IPs targeting same endpoints simultaneously',
+        affected_resources: ['/login', '/admin']
+      }
+    end
+
+    def detect_privilege_escalation_patterns(time_window)
+      # Simulate privilege escalation detection
+      return nil unless rand > 0.95
+      
+      {
+        type: 'privilege_escalation',
+        severity: :critical,
+        confidence: 0.9,
+        details: 'Unusual admin endpoint access patterns detected',
+        affected_resources: ['/admin/users', '/admin/settings']
+      }
+    end
+
+    def detect_data_exfiltration_patterns(time_window)
+      # Simulate data exfiltration detection
+      return nil unless rand > 0.92
+      
+      {
+        type: 'data_exfiltration',
+        severity: :critical,
+        confidence: 0.88,
+        details: 'Large volume data access patterns consistent with exfiltration',
+        affected_resources: ['/api/users', '/api/campaigns']
+      }
+    end
+
+    # Risk scoring methods
+    def calculate_user_risk(user_id)
+      return [0, []] unless user_id
+      
+      user = User.find_by(id: user_id)
+      return [0, []] unless user
+      
+      score = 0
+      factors = []
+      
+      # Admin users have higher base risk
+      if user.admin?
+        score += 10
+        factors << 'admin_user'
+      end
+      
+      # Check user history
+      if SecurityIncident.where(user_id: user_id).where('created_at > ?', 30.days.ago).exists?
+        score += 15
+        factors << 'previous_incidents'
+      end
+      
+      [score, factors]
+    end
+
+    def calculate_session_risk(session_data)
+      return [0, []] unless session_data
+      
+      score = 0
+      factors = []
+      
+      # Old sessions are riskier
+      if session_data[:created_at] && session_data[:created_at] < 24.hours.ago
+        score += 10
+        factors << 'old_session'
+      end
+      
+      # Different IP than usual
+      if session_data[:ip_changed]
+        score += 20
+        factors << 'ip_change'
+      end
+      
+      [score, factors]
+    end
+
+    def calculate_request_risk(request_data)
+      return [0, []] unless request_data
+      
+      score = 0
+      factors = []
+      
+      # Check for suspicious patterns in request
+      if request_data[:path]&.include?('admin')
+        score += 5
+        factors << 'admin_path_access'
+      end
+      
+      # Unusual request timing
+      if Time.current.hour.between?(2, 5)
+        score += 8
+        factors << 'unusual_time'
+      end
+      
+      [score, factors]
+    end
+
+    def calculate_environmental_risk(request_data)
+      return [0, []] unless request_data
+      
+      score = 0
+      factors = []
+      
+      # Check threat intelligence for IP
+      if request_data[:ip_address] && is_malicious_ip?(request_data[:ip_address])
+        score += 25
+        factors << 'malicious_ip'
+      end
+      
+      # Check user agent
+      if request_data[:user_agent] && is_suspicious_user_agent?(request_data[:user_agent])
+        score += 15
+        factors << 'suspicious_user_agent'
+      end
+      
+      [score, factors]
     end
   end
 

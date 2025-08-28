@@ -2,12 +2,19 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 require "mocha/minitest"
+require "minitest/mock"
 require "rails-controller-testing"
+
+class ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+end
 
 module ActiveSupport
   class TestCase
-    # Run tests in parallel with specified workers
-    # parallelize(workers: :number_of_processors)  # Disabled due to Mocha issues
+    # Parallel execution is disabled for controller and integration tests to avoid issues
+    # with shared state, session handling, and Mocha mocking. Model tests use 
+    # parallel_test_helper.rb which enables parallel execution for better performance.
+    # parallelize(workers: :number_of_processors)  # Intentionally disabled
 
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
@@ -23,7 +30,7 @@ module ActiveSupport
       Rails.cache.clear
       
       # Clean up sessions to avoid test interference
-      # Session.destroy_all  # Commented out to allow API tests to work
+      Session.destroy_all
       
       # Clear LLM service container state to avoid test interference
       LlmServiceContainer.clear! if defined?(LlmServiceContainer)
@@ -42,6 +49,9 @@ module ActiveSupport
     def teardown
       # Clear Current state after each test
       Current.reset
+      
+      # Clean up any sessions created during the test
+      Session.destroy_all
       
       # Restore original logger
       Rails.logger = @old_logger if @old_logger
@@ -134,8 +144,14 @@ class ActionDispatch::IntegrationTest
   end
 
   def api_sign_in_as(user)
-    # For API tests, just use the regular sign-in approach
-    # The session cookie will be set and available for subsequent API requests
-    sign_in_as(user)
+    # For API tests, use the standard authentication flow
+    # but avoid following redirects to keep it API-friendly
+    post session_path, params: { 
+      email_address: user.email_address, 
+      password: "password" 
+    }
+    
+    # Don't follow redirects for API tests - just ensure we got a successful auth
+    # The session cookie should now be set properly
   end
 end
