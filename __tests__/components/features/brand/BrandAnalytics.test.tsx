@@ -351,7 +351,7 @@ describe('BrandAnalytics', () => {
       expect(screen.getByText('Asset usage patterns over time')).toBeInTheDocument()
     })
 
-    it('should show placeholder for future charts', async () => {
+    it('should show charts and analytics data', async () => {
       const user = userEvent.setup()
       render(<BrandAnalytics brand={mockBrandWithAssets} />)
 
@@ -359,10 +359,9 @@ describe('BrandAnalytics', () => {
       await user.click(trendsTab)
 
       expect(screen.getByText('Weekly Downloads')).toBeInTheDocument()
-      expect(screen.getByText('Asset Type Trends')).toBeInTheDocument()
-      const chartPlaceholderTexts = screen.getAllByText('Chart placeholder')
-      expect(chartPlaceholderTexts.length).toBeGreaterThan(0)
-      expect(screen.getByText('Trends analysis coming soon')).toBeInTheDocument()
+      expect(screen.getByText('Asset Type Distribution')).toBeInTheDocument()
+      expect(screen.getByText('Monthly Usage Comparison')).toBeInTheDocument()
+      expect(screen.getByText('Asset Performance Metrics')).toBeInTheDocument()
     })
   })
 

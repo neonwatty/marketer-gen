@@ -60,7 +60,7 @@ export function TargetAudienceStep() {
   const selectedSegments = watch('targetAudience.segments') || []
 
   return (
-    <div className="space-y-6">
+    <div data-testid="target-audience-step" className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Target Audience</h3>
         <p className="text-muted-foreground text-sm">

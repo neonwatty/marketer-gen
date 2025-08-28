@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react'
 import {
   addEdge,
   Background,
+  BackgroundVariant,
   type Connection,
   Controls,
   type Edge,
@@ -157,6 +158,24 @@ export function JourneyBuilder() {
     setIsConfigPanelOpen(true)
   }, [])
 
+  const onNodeDragStop = useCallback((_event: React.MouseEvent, node: Node) => {
+    // Auto-arrange nodes if they get too close to each other
+    setNodes((nds) =>
+      nds.map((n) => {
+        if (n.id === node.id) {
+          return {
+            ...n,
+            position: {
+              x: Math.round(node.position.x / 20) * 20, // Snap to grid
+              y: Math.round(node.position.y / 20) * 20,
+            },
+          }
+        }
+        return n
+      })
+    )
+  }, [setNodes])
+
   const onAddStage = useCallback(
     (stageType: JourneyStage['type']) => {
       const newNodeId = `${nodes.length + 1}`
@@ -294,13 +313,19 @@ export function JourneyBuilder() {
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               onNodeClick={onNodeClick}
+              onNodeDragStop={onNodeDragStop}
               nodeTypes={nodeTypes}
               fitView
+              snapToGrid={true}
+              snapGrid={[20, 20]}
               className="h-full"
+              nodeOrigin={[0.5, 0.5]}
+              minZoom={0.2}
+              maxZoom={2}
             >
               <Controls />
               <MiniMap />
-              <Background variant={'dots' as any} gap={12} size={1} />
+              <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
             </ReactFlow>
 
             <StageConfigurationPanel

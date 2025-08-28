@@ -35,6 +35,82 @@ jest.mock('@/components/features/brand', () => ({
     <div data-testid="brand-comparison">Comparison for {currentBrand.name}</div>,
 }))
 
+// Mock Select component to properly handle interactions
+jest.mock('@/components/ui/select', () => {
+  const MockSelect = ({ children, value, onValueChange }: any) => {
+    const [isOpen, setIsOpen] = React.useState(false)
+    
+    return (
+      <div data-testid="ui-select" data-value={value}>
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, { 
+              ...child.props, 
+              __selectContext: { value, onValueChange, isOpen, setIsOpen }
+            })
+          }
+          return child
+        })}
+      </div>
+    )
+  }
+  
+  const MockSelectTrigger = ({ children, __selectContext }: any) => (
+    <button 
+      role="combobox"
+      data-testid="select-trigger"
+      onClick={() => __selectContext?.setIsOpen(true)}
+    >
+      {children}
+    </button>
+  )
+  
+  const MockSelectContent = ({ children, __selectContext }: any) => {
+    if (!__selectContext?.isOpen) return null
+    
+    return (
+      <div data-testid="select-content" role="listbox">
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, { 
+              ...child.props, 
+              __selectContext 
+            })
+          }
+          return child
+        })}
+      </div>
+    )
+  }
+  
+  const MockSelectItem = ({ children, value, __selectContext }: any) => (
+    <div 
+      role="option"
+      data-testid="select-item"
+      onClick={() => {
+        __selectContext?.onValueChange(value)
+        __selectContext?.setIsOpen(false)
+      }}
+    >
+      {children}
+    </div>
+  )
+  
+  const MockSelectValue = ({ placeholder, __selectContext }: any) => (
+    <span data-testid="select-value">
+      {__selectContext?.value === "all" ? (placeholder || "All Industries") : __selectContext?.value}
+    </span>
+  )
+  
+  return {
+    Select: MockSelect,
+    SelectTrigger: MockSelectTrigger,
+    SelectContent: MockSelectContent,
+    SelectItem: MockSelectItem,
+    SelectValue: MockSelectValue,
+  }
+})
+
 const mockBrandSummaries: BrandSummary[] = [
   {
     id: 'brand1',
@@ -210,7 +286,7 @@ describe('BrandDashboardPage', () => {
       expect(screen.getByText('Innovation First')).toBeInTheDocument()
       expect(screen.getByText('Your Health Matters')).toBeInTheDocument()
       expect(screen.getAllByText('Technology')[0]).toBeInTheDocument()
-      expect(screen.getByText('Healthcare')).toBeInTheDocument()
+      expect(screen.getAllByText('Healthcare')[0]).toBeInTheDocument()
     })
 
     it('should handle API error gracefully', async () => {
@@ -262,17 +338,24 @@ describe('BrandDashboardPage', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Tech Corp')).toBeInTheDocument()
+        expect(screen.getByText('Health Plus')).toBeInTheDocument()
       })
 
       // Find and click industry selector
       const industrySelect = screen.getByRole('combobox')
       await user.click(industrySelect)
       
-      const healthcareOptions = screen.getAllByText('Healthcare')
-      // Click the Healthcare option in the dropdown (should be the second one)
-      await user.click(healthcareOptions[1])
-
+      // Wait for dropdown to open and click Healthcare option
       await waitFor(() => {
+        expect(screen.getByRole('option', { name: 'Healthcare' })).toBeInTheDocument()
+      })
+      
+      const healthcareOption = screen.getByRole('option', { name: 'Healthcare' })
+      await user.click(healthcareOption)
+
+      // Should only call API once (component does client-side filtering)
+      await waitFor(() => {
+        expect(BrandService.getBrands).toHaveBeenCalledTimes(1)
         expect(screen.getByText('Health Plus')).toBeInTheDocument()
         expect(screen.queryByText('Tech Corp')).not.toBeInTheDocument()
       })

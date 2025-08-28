@@ -1,7 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Button } from '@/components/ui/button'
 import * as React from 'react'
+
+// Unmock the button component for this test
+jest.unmock('@/components/ui/button')
+import { Button } from '@/components/ui/button'
 
 describe('Button Component', () => {
   describe('Rendering', () => {

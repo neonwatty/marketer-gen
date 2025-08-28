@@ -1,4 +1,5 @@
 import { PrismaClient } from '../src/generated/prisma'
+import { seedJourneyTemplates } from '../src/lib/data/journey-templates'
 
 const prisma = new PrismaClient()
 
@@ -935,6 +936,32 @@ async function main() {
     await prisma.analytics.create({ data })
   }
 
+  // Create journey templates
+  console.log('🗺️ Creating journey templates...')
+  const journeyTemplates = await seedJourneyTemplates()
+  
+  for (const template of journeyTemplates) {
+    await prisma.journeyTemplate.create({
+      data: {
+        name: template.name,
+        description: template.description,
+        industry: template.industry,
+        category: template.category,
+        stages: template.stages as any, // Prisma JSON type
+        metadata: template.metadata as any,
+        isActive: template.isActive,
+        isPublic: template.isPublic,
+        customizationConfig: template.customizationConfig as any,
+        defaultSettings: template.defaultSettings as any,
+        usageCount: template.usageCount,
+        rating: template.rating,
+        ratingCount: template.ratingCount,
+        createdBy: user1.id, // Using admin user as creator
+        updatedBy: user1.id,
+      },
+    })
+  }
+
   console.log('✅ Database seeding completed successfully!')
   console.log(`
 📊 Seeding Summary:
@@ -947,6 +974,7 @@ async function main() {
 - 🗺️ Journeys: 3
 - 📝 Content: 3
 - 📋 Templates: 3
+- 🗺️ Journey Templates: ${journeyTemplates.length}
 - 📊 Analytics: ${analyticsData.length}
   `)
 }

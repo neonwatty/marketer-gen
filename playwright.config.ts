@@ -30,42 +30,107 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
+  /* Visual regression testing settings */
+  expect: {
+    /* Threshold for visual differences (0-1) */
+    toHaveScreenshot: { threshold: 0.2 },
+    toMatchSnapshot: { threshold: 0.2 }
+  },
+
   /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Enhanced browser-specific settings for E2E testing
+        launchOptions: {
+          args: ['--no-sandbox', '--disable-dev-shm-usage']
+        }
+      },
     },
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { 
+        ...devices['Desktop Firefox'],
+        // Firefox-specific configurations for E2E testing
+        launchOptions: {
+          firefoxUserPrefs: {
+            'media.navigator.streams.fake': true,
+            'media.navigator.permission.disabled': true,
+          }
+        }
+      },
     },
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: { 
+        ...devices['Desktop Safari'],
+        // Safari-specific configurations for E2E testing
+      },
     },
 
-    /* Test against mobile viewports. */
+    /* Enhanced mobile viewport testing */
     {
       name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      use: { 
+        ...devices['Pixel 5'],
+        // Mobile Chrome optimizations
+        hasTouch: true,
+        isMobile: true,
+      },
     },
     {
       name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      use: { 
+        ...devices['iPhone 12'],
+        // Mobile Safari optimizations
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+    
+    /* Additional mobile viewports for comprehensive testing */
+    {
+      name: 'Mobile Chrome Small',
+      use: {
+        ...devices['iPhone SE'],
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+    {
+      name: 'Tablet iPad',
+      use: {
+        ...devices['iPad Pro'],
+        hasTouch: true,
+        isMobile: false,
+      },
     },
 
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    /* Test against branded browsers for cross-browser validation */
+    {
+      name: 'Microsoft Edge',
+      use: { 
+        ...devices['Desktop Edge'], 
+        channel: 'msedge',
+        launchOptions: {
+          args: ['--no-sandbox', '--disable-dev-shm-usage']
+        }
+      },
+    },
+    {
+      name: 'Google Chrome',
+      use: { 
+        ...devices['Desktop Chrome'], 
+        channel: 'chrome',
+        launchOptions: {
+          args: ['--no-sandbox', '--disable-dev-shm-usage']
+        }
+      },
+    },
   ],
 
   /* Run your local dev server before starting the tests */

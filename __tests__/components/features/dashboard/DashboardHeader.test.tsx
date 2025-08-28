@@ -2,14 +2,6 @@ import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { DashboardHeader } from '@/components/features/dashboard/DashboardHeader'
 
-// Mock the sidebar trigger since it might have context dependencies
-jest.mock('@/components/ui/sidebar', () => ({
-  SidebarTrigger: ({ children, className }: any) => (
-    <button className={className} data-testid="sidebar-trigger">
-      {children || 'Menu'}
-    </button>
-  )
-}))
 
 describe('DashboardHeader', () => {
   beforeEach(() => {

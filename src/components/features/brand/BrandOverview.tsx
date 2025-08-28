@@ -3,7 +3,8 @@
 import * as React from "react"
 import { useState } from "react"
 
-import { Edit3, FileText, Globe, Palette, Save, Target, X } from "lucide-react"
+import { Activity, BarChart3, CheckCircle, Edit3, FileText, Globe, Palette, Save, Target, Users, X, XCircle } from "lucide-react"
+import { Area, AreaChart, Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -317,45 +318,321 @@ export function BrandOverview({ brand, onUpdate }: BrandOverviewProps) {
           </Card>
         </div>
 
-        {/* Brand Visual Preview */}
+        {/* Brand Dashboard Analytics */}
         <div className="space-y-6">
-          <BrandVisualPreview brand={brand} />
-          
-          {/* Quick Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Brand Usage Stats</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Total Assets</span>
-                <Badge variant="secondary">{brand._count.brandAssets}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Active Campaigns</span>
-                <Badge variant="secondary">{brand._count.campaigns}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Color Palettes</span>
-                <Badge variant="secondary">{brand._count.colorPalette}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Typography Sets</span>
-                <Badge variant="secondary">{brand._count.typography}</Badge>
-              </div>
-              <Separator />
-              <div className="text-xs text-muted-foreground">
-                Created {new Date(brand.createdAt).toLocaleDateString()}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Last updated {new Date(brand.updatedAt).toLocaleDateString()}
-              </div>
-            </CardContent>
-          </Card>
+          <BrandDashboard brand={brand} />
         </div>
       </div>
     </div>
   )
+}
+
+// Brand Dashboard Component with Analytics
+function BrandDashboard({ brand }: { brand: BrandWithRelations }) {
+  const dashboardData = calculateDashboardMetrics(brand)
+
+  return (
+    <div className="space-y-6">
+      {/* Brand Health Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            Brand Health Score
+          </CardTitle>
+          <CardDescription>Overall brand consistency and performance metrics</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-green-600 mb-2">{dashboardData.healthScore}%</div>
+              <Badge variant={dashboardData.healthScore >= 80 ? "default" : dashboardData.healthScore >= 60 ? "secondary" : "destructive"}>
+                {dashboardData.healthScore >= 80 ? "Excellent" : dashboardData.healthScore >= 60 ? "Good" : "Needs Attention"}
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-semibold">{dashboardData.assetConsistency}%</div>
+                <div className="text-sm text-muted-foreground">Asset Consistency</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-semibold">{dashboardData.complianceRate}%</div>
+                <div className="text-sm text-muted-foreground">Compliance Rate</div>
+              </div>
+            </div>
+
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={dashboardData.healthTrend}>
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Area 
+                    type="monotone" 
+                    dataKey="score" 
+                    stroke="#10b981" 
+                    fill="#10b981" 
+                    fillOpacity={0.1}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Asset Usage Analytics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            Asset Usage Tracking
+          </CardTitle>
+          <CardDescription>Monitor how brand assets are being utilized</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-700">{brand._count.brandAssets}</div>
+              <div className="text-sm text-blue-600">Total Assets</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-700">{dashboardData.activeAssets}</div>
+              <div className="text-sm text-green-600">Active Assets</div>
+            </div>
+            <div className="text-center p-4 bg-yellow-50 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-700">{dashboardData.totalDownloads}</div>
+              <div className="text-sm text-yellow-600">Total Downloads</div>
+            </div>
+          </div>
+
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={dashboardData.assetUsageData}>
+                <XAxis dataKey="type" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#3b82f6" />
+                <Bar dataKey="downloads" fill="#10b981" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Compliance Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5" />
+            Brand Compliance
+          </CardTitle>
+          <CardDescription>Brand guideline adherence and compliance tracking</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {dashboardData.complianceChecks.map((check, index) => (
+              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  {check.status === "pass" ? (
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                  ) : (
+                    <XCircle className="h-5 w-5 text-red-500" />
+                  )}
+                  <div>
+                    <div className="font-medium">{check.name}</div>
+                    <div className="text-sm text-muted-foreground">{check.description}</div>
+                  </div>
+                </div>
+                <Badge variant={check.status === "pass" ? "default" : "destructive"}>
+                  {check.status === "pass" ? "Compliant" : "Needs Review"}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Campaign Performance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Campaign Impact
+          </CardTitle>
+          <CardDescription>Brand asset usage across active campaigns</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {brand._count.campaigns > 0 ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-semibold">{brand._count.campaigns}</div>
+                  <div className="text-sm text-muted-foreground">Active Campaigns</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-semibold">{dashboardData.brandAssetUsageInCampaigns}</div>
+                  <div className="text-sm text-muted-foreground">Assets in Use</div>
+                </div>
+              </div>
+              
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={dashboardData.campaignAssetDistribution}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      label
+                    >
+                      {dashboardData.campaignAssetDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={["#3b82f6", "#10b981", "#f59e0b", "#ef4444"][index % 4]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No active campaigns</p>
+              <p className="text-sm text-muted-foreground mt-2">Create campaigns to see brand asset usage metrics</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Quick Stats */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Stats</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm">Color Palettes</span>
+            <Badge variant="secondary">{brand._count.colorPalette}</Badge>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm">Typography Sets</span>
+            <Badge variant="secondary">{brand._count.typography}</Badge>
+          </div>
+          <Separator />
+          <div className="text-xs text-muted-foreground">
+            Created {new Date(brand.createdAt).toLocaleDateString()}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Last updated {new Date(brand.updatedAt).toLocaleDateString()}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// Helper function to calculate dashboard metrics
+function calculateDashboardMetrics(brand: BrandWithRelations) {
+  const assets = brand.brandAssets
+  const totalAssets = assets.length
+  const activeAssets = assets.filter(asset => (asset.downloadCount || 0) > 0).length
+  const totalDownloads = assets.reduce((sum, asset) => sum + (asset.downloadCount || 0), 0)
+  
+  // Health score calculation (0-100)
+  const hasLogo = assets.some(asset => asset.type === "LOGO")
+  const hasColors = brand.colorPalette.length > 0
+  const hasTypography = brand.typography.length > 0
+  const hasMission = !!brand.mission
+  const hasValues = brand.values && Array.isArray(brand.values) && brand.values.length > 0
+  const assetUtilization = totalAssets > 0 ? (activeAssets / totalAssets) : 0
+  
+  const healthScore = Math.round(
+    (hasLogo ? 15 : 0) +
+    (hasColors ? 15 : 0) +
+    (hasTypography ? 15 : 0) +
+    (hasMission ? 10 : 0) +
+    (hasValues ? 10 : 0) +
+    (assetUtilization * 35)
+  )
+  
+  // Asset consistency (mock calculation)
+  const assetConsistency = Math.round(85 + Math.random() * 10)
+  
+  // Compliance rate (mock calculation)
+  const complianceRate = Math.round(80 + Math.random() * 15)
+  
+  // Health trend data (mock)
+  const healthTrend = [
+    { month: "Jan", score: healthScore - 15 },
+    { month: "Feb", score: healthScore - 10 },
+    { month: "Mar", score: healthScore - 5 },
+    { month: "Apr", score: healthScore }
+  ]
+  
+  // Asset usage data by type
+  const assetUsageData = Object.entries(
+    assets.reduce((acc, asset) => {
+      const type = asset.type.replace("_", " ")
+      if (!acc[type]) {
+        acc[type] = { type, count: 0, downloads: 0 }
+      }
+      acc[type].count++
+      acc[type].downloads += asset.downloadCount || 0
+      return acc
+    }, {} as Record<string, { type: string; count: number; downloads: number }>)
+  ).map(([_, data]) => data)
+  
+  // Compliance checks
+  const complianceChecks = [
+    {
+      name: "Logo Usage",
+      description: "Logo files follow naming and format guidelines",
+      status: hasLogo ? "pass" : "fail"
+    },
+    {
+      name: "Color Consistency",
+      description: "Brand colors are properly defined and documented",
+      status: hasColors ? "pass" : "fail"
+    },
+    {
+      name: "Typography Standards",
+      description: "Font usage follows brand typography guidelines",
+      status: hasTypography ? "pass" : "fail"
+    },
+    {
+      name: "Brand Documentation",
+      description: "Mission, vision, and values are properly defined",
+      status: (hasMission && hasValues) ? "pass" : "fail"
+    }
+  ]
+  
+  // Campaign asset distribution (mock data)
+  const campaignAssetDistribution = [
+    { name: "Logos", value: Math.round(totalDownloads * 0.4) },
+    { name: "Graphics", value: Math.round(totalDownloads * 0.3) },
+    { name: "Templates", value: Math.round(totalDownloads * 0.2) },
+    { name: "Other", value: Math.round(totalDownloads * 0.1) }
+  ].filter(item => item.value > 0)
+  
+  const brandAssetUsageInCampaigns = Math.round(activeAssets * 0.7)
+  
+  return {
+    healthScore,
+    assetConsistency,
+    complianceRate,
+    healthTrend,
+    activeAssets,
+    totalDownloads,
+    assetUsageData,
+    complianceChecks,
+    campaignAssetDistribution,
+    brandAssetUsageInCampaigns
+  }
 }
 
 // Brand Visual Preview Component

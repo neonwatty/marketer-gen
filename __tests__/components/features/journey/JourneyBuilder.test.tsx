@@ -29,7 +29,12 @@ jest.mock('reactflow', () => ({
   ),
   Controls: () => <div data-testid="controls">Controls</div>,
   MiniMap: () => <div data-testid="minimap">MiniMap</div>,
-  Background: () => <div data-testid="background">Background</div>,
+  Background: ({ variant, gap, size, ...props }: any) => <div data-testid="background" data-variant={variant} {...props}>Background</div>,
+  BackgroundVariant: {
+    Dots: 'dots',
+    Lines: 'lines',
+    Cross: 'cross',
+  },
   addEdge: jest.fn(),
   useNodesState: jest.fn(() => [
     [

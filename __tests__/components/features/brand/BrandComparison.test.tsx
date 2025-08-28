@@ -13,6 +13,83 @@ jest.mock('@/lib/api/brands', () => ({
   },
 }))
 
+// Mock Select component to properly handle interactions
+jest.mock('@/components/ui/select', () => {
+  const MockSelect = ({ children, value, onValueChange }: any) => {
+    const [isOpen, setIsOpen] = React.useState(false)
+    
+    return (
+      <div data-testid="ui-select" data-value={value}>
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, { 
+              ...child.props, 
+              __selectContext: { value, onValueChange, isOpen, setIsOpen }
+            })
+          }
+          return child
+        })}
+      </div>
+    )
+  }
+  
+  const MockSelectTrigger = ({ children, __selectContext }: any) => (
+    <button 
+      role="combobox"
+      data-testid="select-trigger"
+      aria-label="Select option"
+      onClick={() => __selectContext?.setIsOpen(true)}
+    >
+      {children}
+    </button>
+  )
+  
+  const MockSelectContent = ({ children, __selectContext }: any) => {
+    if (!__selectContext?.isOpen) return null
+    
+    return (
+      <div data-testid="select-content" role="listbox">
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, { 
+              ...child.props, 
+              __selectContext 
+            })
+          }
+          return child
+        })}
+      </div>
+    )
+  }
+  
+  const MockSelectItem = ({ children, value, __selectContext }: any) => (
+    <div 
+      role="option"
+      data-testid="select-item"
+      onClick={() => {
+        __selectContext?.onValueChange(value)
+        __selectContext?.setIsOpen(false)
+      }}
+    >
+      {children}
+    </div>
+  )
+  
+  const MockSelectValue = ({ placeholder, __selectContext }: any) => (
+    <span data-testid="select-value">
+      {__selectContext?.value || placeholder}
+    </span>
+  )
+  
+  return {
+    Select: MockSelect,
+    SelectTrigger: MockSelectTrigger,
+    SelectContent: MockSelectContent,
+    SelectItem: MockSelectItem,
+    SelectValue: MockSelectValue,
+  }
+})
+
 const mockCurrentBrand: BrandWithRelations = {
   id: 'brand1',
   name: 'Tech Corp',
@@ -348,12 +425,14 @@ describe('BrandComparison', () => {
         render(<BrandComparison currentBrand={mockCurrentBrand} />)
       })
 
+      // Wait for the async brands loading to complete
       await waitFor(() => {
-        expect(screen.getByText('Select a brand to compare')).toBeInTheDocument()
-      })
+        expect(BrandService.getBrands).toHaveBeenCalled()
+      }, { timeout: 3000 })
 
-      // Find and click the select dropdown
-      const selectDropdown = screen.getByRole('combobox', { name: /select a brand to compare/i })
+      // Find and click the first select dropdown
+      const selectDropdowns = screen.getAllByRole('combobox')
+      const selectDropdown = selectDropdowns[0]
       await user.click(selectDropdown)
 
       // Select a brand

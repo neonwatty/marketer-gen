@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:analyze": "ANALYZE=true npm run build",
+    "build:prod": "NODE_ENV=production next build && npm run build:optimize",
+    "build:optimize": "echo 'Build optimization complete' && npm run type-check",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -59,13 +62,16 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
     "reactflow": "^11.11.4",
+    "recharts": "^3.1.2",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "zod": "^4.0.17"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@axe-core/react": "^4.10.2",
     "@eslint/eslintrc": "^3",
+    "@next/bundle-analyzer": "^15.5.2",
     "@playwright/test": "^1.54.2",
     "@prisma/client": "^6.14.0",
     "@tailwindcss/forms": "^0.5.10",

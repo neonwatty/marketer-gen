@@ -9,8 +9,11 @@ import { cn } from "@/lib/utils"
 function Progress({
   className,
   value,
+  "aria-label": ariaLabel,
   ...props
-}: React.ComponentProps<typeof ProgressPrimitive.Root>) {
+}: React.ComponentProps<typeof ProgressPrimitive.Root> & {
+  "aria-label"?: string;
+}) {
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
@@ -19,6 +22,7 @@ function Progress({
         className
       )}
       value={value}
+      aria-label={ariaLabel || "Progress"}
       {...props}
     >
       <ProgressPrimitive.Indicator

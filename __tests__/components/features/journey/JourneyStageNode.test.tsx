@@ -41,20 +41,20 @@ describe('JourneyStageNode', () => {
   it('renders content types with badges', () => {
     render(<JourneyStageNode {...mockNodeProps} />)
     
-    expect(screen.getByText('Content Types:')).toBeInTheDocument()
+    expect(screen.getByText('Content Types')).toBeInTheDocument()
     expect(screen.getByText('Blog Posts')).toBeInTheDocument()
     expect(screen.getByText('Social Media')).toBeInTheDocument()
     expect(screen.getByText('Video Content')).toBeInTheDocument()
-    expect(screen.getByText('+1')).toBeInTheDocument() // Shows "+1" for the 4th item
+    expect(screen.getByText('+1 more')).toBeInTheDocument() // Shows "+1 more" for the 4th item
   })
 
   it('renders messaging suggestions', () => {
     render(<JourneyStageNode {...mockNodeProps} />)
     
-    expect(screen.getByText('Key Messages:')).toBeInTheDocument()
-    expect(screen.getByText('• Introduce your brand values')).toBeInTheDocument()
-    expect(screen.getByText('• Share educational content')).toBeInTheDocument()
-    expect(screen.getByText('• +1 more...')).toBeInTheDocument() // Shows "+1 more" for the 3rd item
+    expect(screen.getByText('Key Messages')).toBeInTheDocument()
+    expect(screen.getByText('Introduce your brand values')).toBeInTheDocument()
+    expect(screen.getByText('Share educational content')).toBeInTheDocument()
+    expect(screen.getByText('+1 more messages...')).toBeInTheDocument() // Shows "+1 more messages..." for the 3rd item
   })
 
   it('applies selected styling when selected', () => {

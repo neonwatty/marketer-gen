@@ -69,7 +69,7 @@ export function ReviewStep({ onSaveDraft }: ReviewStepProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-testid="review-step" className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Review Campaign</h3>
         <p className="text-muted-foreground text-sm">
@@ -237,6 +237,7 @@ export function ReviewStep({ onSaveDraft }: ReviewStepProps) {
             <div className="flex flex-col sm:flex-row gap-3">
               {onSaveDraft && (
                 <Button
+                  data-testid="save-draft-button"
                   variant="outline"
                   onClick={onSaveDraft}
                   className="flex items-center gap-2"

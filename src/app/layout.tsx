@@ -6,17 +6,22 @@ import { AuthProvider } from '@/lib/auth/AuthContext'
 import { SessionProvider } from '@/lib/auth/SessionProvider'
 import { QueryProvider } from '@/lib/providers/query-provider'
 import { ToastProvider } from '@/lib/providers/toast-provider'
+import { PerformanceScript } from '@/lib/utils/performance-script'
 
 import type { Metadata } from 'next'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
+  display: 'swap',
+  preload: true,
 })
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+  display: 'swap',
+  preload: true,
 })
 
 export const metadata: Metadata = {
@@ -37,6 +42,7 @@ export default function RootLayout({
             <QueryProvider>
               {children}
               <ToastProvider />
+              <PerformanceScript />
             </QueryProvider>
           </AuthProvider>
         </SessionProvider>

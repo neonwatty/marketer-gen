@@ -1,12 +1,22 @@
 'use client'
 
-import { useEffect,useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import {
+  Background,
+  BackgroundVariant,
+  Controls,
+  type Edge,
+  MiniMap,
+  type Node,
+  ReactFlow,
+} from 'reactflow'
 
-import { AlertCircle,Check, Edit2, Plus, Trash2, X } from 'lucide-react'
+import { AlertCircle, Check, Edit2, Eye, Plus, Trash2, X } from 'lucide-react'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -36,7 +46,40 @@ export function JourneyTemplateCustomizer({ template, open, onClose, onConfirm }
   const [stages, setStages] = useState<JourneyStageConfig[]>([])
   const [editingStage, setEditingStage] = useState<JourneyStageConfig | null>(null)
   const [showStageEditor, setShowStageEditor] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
+
+  // Convert stages to ReactFlow nodes and edges for preview
+  const generatePreviewNodes = useCallback((): Node[] => {
+    return stages.map((stage, index) => ({
+      id: stage.id,
+      type: 'default',
+      position: { x: index * 200, y: 100 },
+      data: {
+        label: (
+          <div className="text-xs">
+            <div className="font-semibold">{stage.title}</div>
+            <div className="text-muted-foreground mt-1">{stage.type}</div>
+          </div>
+        ),
+      },
+      className: 'bg-background border-2 border-border rounded-lg shadow-sm',
+    }))
+  }, [stages])
+
+  const generatePreviewEdges = useCallback((): Edge[] => {
+    const edges: Edge[] = []
+    for (let i = 0; i < stages.length - 1; i++) {
+      edges.push({
+        id: `e${stages[i].id}-${stages[i + 1].id}`,
+        source: stages[i].id,
+        target: stages[i + 1].id,
+        type: 'smoothstep',
+        animated: true,
+      })
+    }
+    return edges
+  }, [stages])
 
   useEffect(() => {
     if (template && open) {
@@ -159,15 +202,28 @@ export function JourneyTemplateCustomizer({ template, open, onClose, onConfirm }
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Customize Journey Template</DialogTitle>
-            <DialogDescription>
-              Customize this template to fit your specific needs. You can modify stages, content, and messaging.
-            </DialogDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle>Customize Journey Template</DialogTitle>
+                <DialogDescription>
+                  Customize this template to fit your specific needs. You can modify stages, content, and messaging.
+                </DialogDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPreview(!showPreview)}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                {showPreview ? 'Hide Preview' : 'Show Preview'}
+              </Button>
+            </div>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto space-y-6">
+          <div className="flex-1 overflow-hidden flex gap-4">
+            <div className="flex-1 overflow-y-auto space-y-6">
             {/* Errors */}
             {errors.length > 0 && (
               <Alert variant="destructive">
@@ -305,6 +361,37 @@ export function JourneyTemplateCustomizer({ template, open, onClose, onConfirm }
                 </div>
               )}
             </div>
+            </div>
+
+            {/* Preview Panel */}
+            {showPreview && (
+              <div className="w-1/2 border-l pl-4">
+                <Label className="text-base font-semibold mb-2 block">Live Preview</Label>
+                <Card className="h-96">
+                  <CardContent className="h-full p-2">
+                    <ReactFlow
+                      nodes={generatePreviewNodes()}
+                      edges={generatePreviewEdges()}
+                      fitView
+                      nodeOrigin={[0.5, 0.5]}
+                      minZoom={0.1}
+                      maxZoom={1}
+                      nodesDraggable={false}
+                      nodesConnectable={false}
+                      elementsSelectable={false}
+                      className="w-full h-full"
+                    >
+                      <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+                      <Controls showInteractive={false} />
+                      <MiniMap pannable={false} zoomable={false} />
+                    </ReactFlow>
+                  </CardContent>
+                </Card>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Preview updates automatically as you modify stages
+                </p>
+              </div>
+            )}
           </div>
 
           <DialogFooter>

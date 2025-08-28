@@ -26,7 +26,16 @@ export async function GET(
         userId: session.user.id,
         deletedAt: null
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        purpose: true,
+        goals: true,
+        status: true,
+        startDate: true,
+        endDate: true,
+        createdAt: true,
+        updatedAt: true,
         brand: {
           select: {
             id: true,
@@ -34,47 +43,54 @@ export async function GET(
             description: true,
             tagline: true,
             mission: true,
-            vision: true
+            vision: true,
+            industry: true,
           }
         },
         journeys: {
-          where: {
-            deletedAt: null
-          },
-          include: {
+          select: {
+            id: true,
+            stages: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
             content: {
-              where: {
-                deletedAt: null
-              },
               select: {
                 id: true,
                 type: true,
-                status: true
-              }
+                status: true,
+                createdAt: true,
+              },
+              where: { deletedAt: null },
+              take: 20, // Limit for performance
+              orderBy: { updatedAt: 'desc' }
             },
             _count: {
               select: {
-                content: true
+                content: { where: { deletedAt: null } }
               }
             }
-          }
+          },
+          where: { deletedAt: null },
+          orderBy: { updatedAt: 'desc' },
+          take: 20 // Reasonable limit
         },
         analytics: {
           select: {
             id: true,
             eventType: true,
             metrics: true,
-            timestamp: true
+            timestamp: true,
+            source: true,
           },
-          orderBy: {
-            timestamp: 'desc'
-          },
-          take: 10
+          where: { deletedAt: null },
+          orderBy: { timestamp: 'desc' },
+          take: 50 // More analytics data for detailed view
         },
         _count: {
           select: {
-            journeys: true,
-            analytics: true
+            journeys: { where: { deletedAt: null } },
+            analytics: { where: { deletedAt: null } }
           }
         }
       }

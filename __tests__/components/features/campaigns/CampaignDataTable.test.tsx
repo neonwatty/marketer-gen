@@ -93,7 +93,7 @@ describe('CampaignDataTable', () => {
       render(<CampaignDataTable campaigns={mockCampaigns} {...mockHandlers} />)
 
       expect(screen.getByText('Campaign Name')).toBeInTheDocument()
-      expect(screen.getByText('Status')).toBeInTheDocument()
+      expect(screen.getByRole('columnheader', { name: /status/i })).toBeInTheDocument()
       expect(screen.getByText('Journey Type')).toBeInTheDocument()
       expect(screen.getByText('Progress')).toBeInTheDocument()
       expect(screen.getByText('Created')).toBeInTheDocument()
@@ -239,7 +239,7 @@ describe('CampaignDataTable', () => {
       const actionButton = screen.getAllByRole('button', { name: /open menu/i })[0]
       await user.click(actionButton)
 
-      const viewButton = screen.getByText('View')
+      const viewButton = screen.getAllByText('View')[0]
       await user.click(viewButton)
 
       expect(mockHandlers.onView).toHaveBeenCalledWith('3')
@@ -252,7 +252,7 @@ describe('CampaignDataTable', () => {
       const actionButton = screen.getAllByRole('button', { name: /open menu/i })[0]
       await user.click(actionButton)
 
-      const editButton = screen.getByText('Edit')
+      const editButton = screen.getAllByText('Edit')[0]
       await user.click(editButton)
 
       expect(mockHandlers.onEdit).toHaveBeenCalledWith('3')
@@ -265,7 +265,7 @@ describe('CampaignDataTable', () => {
       const actionButton = screen.getAllByRole('button', { name: /open menu/i })[0]
       await user.click(actionButton)
 
-      const duplicateButton = screen.getByText('Duplicate')
+      const duplicateButton = screen.getAllByText('Duplicate')[0]
       await user.click(duplicateButton)
 
       expect(mockHandlers.onDuplicate).toHaveBeenCalledWith('3')
@@ -278,7 +278,7 @@ describe('CampaignDataTable', () => {
       const actionButton = screen.getAllByRole('button', { name: /open menu/i })[0]
       await user.click(actionButton)
 
-      const archiveButton = screen.getByText('Archive')
+      const archiveButton = screen.getAllByText('Archive')[0]
       await user.click(archiveButton)
 
       expect(mockHandlers.onArchive).toHaveBeenCalledWith('3')
@@ -321,9 +321,18 @@ describe('CampaignDataTable', () => {
     it('should display status badges with correct styling', () => {
       render(<CampaignDataTable campaigns={mockCampaigns} {...mockHandlers} />)
 
-      expect(screen.getByText('Active')).toBeInTheDocument()
-      expect(screen.getByText('Completed')).toBeInTheDocument()
-      expect(screen.getByText('Draft')).toBeInTheDocument()
+      // Look for status badges specifically, not dropdown items
+      const activebadges = screen.getAllByText('Active')
+      const activeBadge = activebadges.find(badge => badge.getAttribute('data-testid') === 'ui-badge')
+      expect(activeBadge).toBeInTheDocument()
+
+      const completedBadges = screen.getAllByText('Completed')
+      const completedBadge = completedBadges.find(badge => badge.getAttribute('data-testid') === 'ui-badge')
+      expect(completedBadge).toBeInTheDocument()
+
+      const draftBadges = screen.getAllByText('Draft')
+      const draftBadge = draftBadges.find(badge => badge.getAttribute('data-testid') === 'ui-badge')
+      expect(draftBadge).toBeInTheDocument()
     })
   })
 })

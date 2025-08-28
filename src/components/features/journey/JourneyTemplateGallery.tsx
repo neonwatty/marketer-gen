@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect,useState } from 'react'
-
-import { Copy, Eye, Filter, Search, Sparkles,Star, Users } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Copy, Eye, Filter, Search, Settings, Sparkles, Star, Users } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -11,12 +10,18 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { JourneyTemplate } from '@/lib/types/journey'
+
+// Import utility functions
 import {
   getCategoryDisplayName,
   getIndustryDisplayName,
+} from '@/lib/types/journey'
+
+// Import types separately to avoid issues
+import type {
   JourneyCategoryValue,
   JourneyIndustryValue,
-  JourneyTemplate,
 } from '@/lib/types/journey'
 
 interface JourneyTemplateGalleryProps {
@@ -24,13 +29,14 @@ interface JourneyTemplateGalleryProps {
   onPreviewTemplate?: (template: JourneyTemplate) => void
 }
 
-export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: JourneyTemplateGalleryProps) {
+export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: JourneyTemplateGalleryProps): React.ReactElement {
   const [templates, setTemplates] = useState<JourneyTemplate[]>([])
   const [filteredTemplates, setFilteredTemplates] = useState<JourneyTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedIndustry, setSelectedIndustry] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('')
   const [showFilters, setShowFilters] = useState(false)
   
   // Popular and recommended templates
@@ -40,6 +46,10 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
   // Preview modal
   const [previewTemplate, setPreviewTemplate] = useState<JourneyTemplate | null>(null)
   const [showPreview, setShowPreview] = useState(false)
+  
+  // Customization modal
+  const [customizationTemplate, setCustomizationTemplate] = useState<JourneyTemplate | null>(null)
+  const [showCustomization, setShowCustomization] = useState(false)
 
   const industries: JourneyIndustryValue[] = [
     'TECHNOLOGY', 'HEALTHCARE', 'FINANCE', 'RETAIL', 'EDUCATION', 'REAL_ESTATE',
@@ -53,6 +63,8 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
     'EVENT_PROMOTION', 'SEASONAL_CAMPAIGN', 'CRISIS_COMMUNICATION'
   ]
 
+  const difficulties = ['beginner', 'intermediate', 'advanced']
+
   // Fetch templates on mount
   useEffect(() => {
     fetchTemplates()
@@ -63,7 +75,7 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
   // Filter templates when search or filters change
   useEffect(() => {
     filterTemplates()
-  }, [templates, searchQuery, selectedIndustry, selectedCategory])
+  }, [templates, searchQuery, selectedIndustry, selectedCategory, selectedDifficulty])
 
   const fetchTemplates = async () => {
     try {
@@ -124,13 +136,18 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
     }
 
     // Industry filter
-    if (selectedIndustry) {
+    if (selectedIndustry && selectedIndustry !== 'all') {
       filtered = filtered.filter(template => template.industry === selectedIndustry)
     }
 
     // Category filter
-    if (selectedCategory) {
+    if (selectedCategory && selectedCategory !== 'all') {
       filtered = filtered.filter(template => template.category === selectedCategory)
+    }
+
+    // Difficulty filter
+    if (selectedDifficulty && selectedDifficulty !== 'all') {
+      filtered = filtered.filter(template => template.metadata?.difficulty === selectedDifficulty)
     }
 
     setFilteredTemplates(filtered)
@@ -154,6 +171,11 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
     onPreviewTemplate?.(template)
   }
 
+  const handleCustomize = (template: JourneyTemplate) => {
+    setCustomizationTemplate(template)
+    setShowCustomization(true)
+  }
+
   const handleDuplicateTemplate = async (template: JourneyTemplate) => {
     try {
       const name = `${template.name} (Copy)`
@@ -173,15 +195,27 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
   }
 
   const TemplateCard = ({ template, showUsageStats = true }: { template: JourneyTemplate; showUsageStats?: boolean }) => (
-    <Card key={template.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer">
+    <Card 
+      key={template.id} 
+      className="group hover:shadow-lg transition-all duration-200 cursor-pointer focus-within:ring-2 focus-within:ring-ring focus-within:outline-none" 
+      role="article"
+      aria-labelledby={`template-title-${template.id}`}
+      aria-describedby={`template-description-${template.id}`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">
+            <CardTitle 
+              id={`template-title-${template.id}`} 
+              className="text-lg line-clamp-2 group-hover:text-blue-600 transition-colors"
+            >
               {template.name}
             </CardTitle>
             {template.description && (
-              <CardDescription className="line-clamp-2 mt-1">
+              <CardDescription 
+                id={`template-description-${template.id}`}
+                className="line-clamp-2 mt-1"
+              >
                 {template.description}
               </CardDescription>
             )}
@@ -256,13 +290,23 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
           variant="outline" 
           size="sm"
           onClick={() => handlePreview(template)}
+          aria-label={`Preview ${template.name} template`}
         >
           <Eye className="w-4 h-4" />
         </Button>
         <Button 
           variant="outline" 
           size="sm"
+          onClick={() => handleCustomize(template)}
+          aria-label={`Customize ${template.name} template`}
+        >
+          <Settings className="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
           onClick={() => handleDuplicateTemplate(template)}
+          aria-label={`Duplicate ${template.name} template`}
         >
           <Copy className="w-4 h-4" />
         </Button>
@@ -273,8 +317,8 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
               <CardHeader>
                 <Skeleton className="h-6 w-3/4" />
@@ -306,6 +350,7 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
+            aria-label={showFilters ? "Hide filters" : "Show filters"}
           >
             <Filter className="w-4 h-4 mr-2" />
             Filters
@@ -315,23 +360,26 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
         {/* Search and Filters */}
         <div className="space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
-              placeholder="Search templates..."
+              placeholder="Search templates by name, description, or tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
+              aria-label="Search journey templates"
+              role="searchbox"
+              type="search"
             />
           </div>
 
           {showFilters && (
-            <div className="flex flex-wrap gap-4 p-4 bg-muted rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
               <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full" aria-label="Filter by industry">
                   <SelectValue placeholder="Select industry" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Industries</SelectItem>
+                  <SelectItem value="all">All Industries</SelectItem>
                   {industries.map(industry => (
                     <SelectItem key={industry} value={industry}>
                       {getIndustryDisplayName(industry)}
@@ -341,11 +389,11 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
               </Select>
 
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full" aria-label="Filter by category">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories.map(category => (
                     <SelectItem key={category} value={category}>
                       {getCategoryDisplayName(category)}
@@ -354,17 +402,34 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
                 </SelectContent>
               </Select>
 
-              {(selectedIndustry || selectedCategory || searchQuery) && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchQuery('')
-                    setSelectedIndustry('')
-                    setSelectedCategory('')
-                  }}
-                >
-                  Clear Filters
-                </Button>
+              <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                <SelectTrigger className="w-full" aria-label="Filter by difficulty level">
+                  <SelectValue placeholder="Select difficulty" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Difficulties</SelectItem>
+                  {difficulties.map(difficulty => (
+                    <SelectItem key={difficulty} value={difficulty}>
+                      {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {(selectedIndustry && selectedIndustry !== 'all' || selectedCategory && selectedCategory !== 'all' || selectedDifficulty && selectedDifficulty !== 'all' || searchQuery) && (
+                <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4 flex justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSearchQuery('')
+                      setSelectedIndustry('')
+                      setSelectedCategory('')
+                      setSelectedDifficulty('')
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                </div>
               )}
             </div>
           )}
@@ -372,13 +437,13 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
       </div>
 
       {/* Recommended Templates */}
-      {recommendedTemplates.length > 0 && !searchQuery && !selectedIndustry && !selectedCategory && (
+      {recommendedTemplates.length > 0 && !searchQuery && (!selectedIndustry || selectedIndustry === 'all') && (!selectedCategory || selectedCategory === 'all') && (!selectedDifficulty || selectedDifficulty === 'all') && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-yellow-500" />
             <h3 className="text-lg font-semibold">Recommended for You</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {recommendedTemplates.map(template => (
               <TemplateCard key={template.id} template={template} showUsageStats={false} />
             ))}
@@ -387,10 +452,10 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
       )}
 
       {/* Popular Templates */}
-      {popularTemplates.length > 0 && !searchQuery && !selectedIndustry && !selectedCategory && (
+      {popularTemplates.length > 0 && !searchQuery && (!selectedIndustry || selectedIndustry === 'all') && (!selectedCategory || selectedCategory === 'all') && (!selectedDifficulty || selectedDifficulty === 'all') && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Popular Templates</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {popularTemplates.map(template => (
               <TemplateCard key={template.id} template={template} />
             ))}
@@ -399,13 +464,18 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
       )}
 
       {/* All Templates */}
-      <div className="space-y-4">
+      <section className="space-y-4" aria-labelledby="templates-heading">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">
-            {searchQuery || selectedIndustry || selectedCategory ? 'Search Results' : 'All Templates'}
+          <h3 id="templates-heading" className="text-lg font-semibold">
+            {searchQuery || (selectedIndustry && selectedIndustry !== 'all') || (selectedCategory && selectedCategory !== 'all') || (selectedDifficulty && selectedDifficulty !== 'all') ? 'Search Results' : 'All Templates'}
           </h3>
-          <span className="text-sm text-muted-foreground">
-            {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''}
+          <span 
+            className="text-sm text-muted-foreground" 
+            aria-live="polite"
+            aria-atomic="true"
+            role="status"
+          >
+            {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''} found
           </span>
         </div>
 
@@ -414,63 +484,173 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
             <p>No templates found matching your criteria.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+            aria-label="Journey templates grid"
+          >
             {filteredTemplates.map(template => (
               <TemplateCard key={template.id} template={template} />
             ))}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Preview Modal */}
+      {/* Enhanced Preview Modal */}
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{previewTemplate?.name}</DialogTitle>
-            <DialogDescription>{previewTemplate?.description}</DialogDescription>
+        <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <DialogTitle className="text-xl">{previewTemplate?.name}</DialogTitle>
+                <DialogDescription className="text-base">{previewTemplate?.description}</DialogDescription>
+              </div>
+              {previewTemplate?.rating && (
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-medium">{previewTemplate.rating.toFixed(1)}</span>
+                </div>
+              )}
+            </div>
           </DialogHeader>
           
           {previewTemplate && (
             <div className="space-y-6">
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">
-                  {getIndustryDisplayName(previewTemplate.industry)}
-                </Badge>
-                <Badge variant="outline">
-                  {getCategoryDisplayName(previewTemplate.category)}
-                </Badge>
-                {previewTemplate.metadata?.difficulty && (
-                  <Badge variant="default">{previewTemplate.metadata.difficulty}</Badge>
-                )}
+              {/* Template Metadata */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
+                <div>
+                  <h5 className="font-medium text-sm text-muted-foreground mb-1">Industry</h5>
+                  <Badge variant="secondary" className="w-fit">
+                    {getIndustryDisplayName(previewTemplate.industry)}
+                  </Badge>
+                </div>
+                <div>
+                  <h5 className="font-medium text-sm text-muted-foreground mb-1">Category</h5>
+                  <Badge variant="outline" className="w-fit">
+                    {getCategoryDisplayName(previewTemplate.category)}
+                  </Badge>
+                </div>
+                <div>
+                  <h5 className="font-medium text-sm text-muted-foreground mb-1">Difficulty</h5>
+                  {previewTemplate.metadata?.difficulty && (
+                    <Badge 
+                      variant={previewTemplate.metadata.difficulty === 'beginner' ? 'default' : 
+                             previewTemplate.metadata.difficulty === 'intermediate' ? 'secondary' : 'destructive'}
+                      className="w-fit"
+                    >
+                      {previewTemplate.metadata.difficulty}
+                    </Badge>
+                  )}
+                </div>
+                <div>
+                  <h5 className="font-medium text-sm text-muted-foreground mb-1">Duration</h5>
+                  <span className="text-sm">
+                    {previewTemplate.metadata?.estimatedDuration || 'Variable'} days
+                  </span>
+                </div>
               </div>
 
+              {/* Template Stats */}
+              <div className="grid grid-cols-3 gap-4 p-4 border rounded-lg">
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <Users className="w-4 h-4" />
+                    <span className="text-lg font-semibold">{previewTemplate.usageCount}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Uses</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <Eye className="w-4 h-4" />
+                    <span className="text-lg font-semibold">{previewTemplate.stages.length}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Stages</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <Star className="w-4 h-4" />
+                    <span className="text-lg font-semibold">{previewTemplate.rating?.toFixed(1) || 'N/A'}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Rating</p>
+                </div>
+              </div>
+
+              {/* Journey Stages */}
               <div className="space-y-4">
-                <h4 className="font-semibold">Journey Stages</h4>
-                <div className="grid gap-3">
+                <h4 className="font-semibold text-lg">Journey Stages</h4>
+                <div className="grid gap-4">
                   {previewTemplate.stages.map((stage, index) => (
-                    <div key={stage.id} className="p-3 border rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-semibold">
+                    <div key={stage.id} className="p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                      <div className="flex items-start gap-3 mb-3">
+                        <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold shrink-0">
                           {index + 1}
                         </span>
-                        <h5 className="font-medium">{stage.title}</h5>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">{stage.description}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {stage.contentTypes.map((type, i) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            {type}
-                          </Badge>
-                        ))}
+                        <div className="flex-1 min-w-0">
+                          <h5 className="font-medium mb-1">{stage.title}</h5>
+                          <p className="text-sm text-muted-foreground mb-3">{stage.description}</p>
+                          
+                          <div className="space-y-2">
+                            <div>
+                              <span className="text-xs font-medium text-muted-foreground">Content Types:</span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {stage.contentTypes.map((type, i) => (
+                                  <Badge key={i} variant="outline" className="text-xs">
+                                    {type}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            {stage.messagingSuggestions && stage.messagingSuggestions.length > 0 && (
+                              <div>
+                                <span className="text-xs font-medium text-muted-foreground">Sample Messages:</span>
+                                <ul className="mt-1 space-y-1">
+                                  {stage.messagingSuggestions.slice(0, 2).map((message, i) => (
+                                    <li key={i} className="text-xs text-muted-foreground italic">
+                                      "{ message}"
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs text-muted-foreground">{stage.duration} days</span>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
+              {/* Tags and Target Info */}
+              {previewTemplate.metadata?.tags && (
+                <div className="space-y-2">
+                  <h5 className="font-medium">Tags</h5>
+                  <div className="flex flex-wrap gap-1">
+                    {previewTemplate.metadata.tags.map((tag, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
               <div className="flex gap-3 pt-4 border-t">
-                <Button onClick={() => previewTemplate && handleUseTemplate(previewTemplate)}>
+                <Button 
+                  onClick={() => previewTemplate && handleUseTemplate(previewTemplate)}
+                  className="flex-1"
+                >
                   Use This Template
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => previewTemplate && handleCustomize(previewTemplate)}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Customize
                 </Button>
                 <Button 
                   variant="outline" 
@@ -478,6 +658,166 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
                 >
                   <Copy className="w-4 h-4 mr-2" />
                   Duplicate
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowPreview(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Customization Modal */}
+      <Dialog open={showCustomization} onOpenChange={setShowCustomization}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Customize Template: {customizationTemplate?.name}</DialogTitle>
+            <DialogDescription>
+              Preview and adjust template settings before using
+            </DialogDescription>
+          </DialogHeader>
+          
+          {customizationTemplate && (
+            <div className="space-y-6">
+              {/* Customization Options */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h4 className="font-semibold">Template Information</h4>
+                  <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium">Industry:</span>
+                        <p className="text-muted-foreground">{getIndustryDisplayName(customizationTemplate.industry)}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Category:</span>
+                        <p className="text-muted-foreground">{getCategoryDisplayName(customizationTemplate.category)}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Difficulty:</span>
+                        <p className="text-muted-foreground">{customizationTemplate.metadata?.difficulty || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Est. Duration:</span>
+                        <p className="text-muted-foreground">{customizationTemplate.metadata?.estimatedDuration || 'Variable'} days</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="font-semibold">Customization Options</h4>
+                  <div className="space-y-3 p-4 border rounded-lg">
+                    {customizationTemplate.customizationConfig ? (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Stage Reordering:</span>
+                          <Badge variant={customizationTemplate.customizationConfig.allowStageReordering ? "default" : "outline"}>
+                            {customizationTemplate.customizationConfig.allowStageReordering ? "Allowed" : "Fixed Order"}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Add New Stages:</span>
+                          <Badge variant={customizationTemplate.customizationConfig.allowStageAddition ? "default" : "outline"}>
+                            {customizationTemplate.customizationConfig.allowStageAddition ? "Allowed" : "Not Allowed"}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">Delete Stages:</span>
+                          <Badge variant={customizationTemplate.customizationConfig.allowStageDeletion ? "default" : "outline"}>
+                            {customizationTemplate.customizationConfig.allowStageDeletion ? "Allowed" : "Protected"}
+                          </Badge>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Standard customization options available</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Stages Overview */}
+              <div className="space-y-4">
+                <h4 className="font-semibold">Template Stages ({customizationTemplate.stages.length})</h4>
+                <div className="grid gap-3">
+                  {customizationTemplate.stages.map((stage, index) => (
+                    <div key={stage.id} className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30">
+                      <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-semibold">
+                        {index + 1}
+                      </span>
+                      <div className="flex-1">
+                        <h5 className="font-medium">{stage.title}</h5>
+                        <p className="text-xs text-muted-foreground line-clamp-1">{stage.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-muted-foreground">{stage.duration} days</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Required Channels & KPIs */}
+              {customizationTemplate.metadata && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {customizationTemplate.metadata.requiredChannels && (
+                    <div className="space-y-2">
+                      <h5 className="font-medium">Required Channels</h5>
+                      <div className="flex flex-wrap gap-1">
+                        {customizationTemplate.metadata.requiredChannels.map((channel, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {channel}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {customizationTemplate.metadata.kpis && (
+                    <div className="space-y-2">
+                      <h5 className="font-medium">Key Performance Indicators</h5>
+                      <div className="flex flex-wrap gap-1">
+                        {customizationTemplate.metadata.kpis.map((kpi, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {kpi}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t">
+                <Button 
+                  onClick={() => {
+                    if (customizationTemplate) {
+                      handleUseTemplate(customizationTemplate)
+                      setShowCustomization(false)
+                    }
+                  }}
+                  className="flex-1"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Use & Customize
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => customizationTemplate && handlePreview(customizationTemplate)}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Full Preview
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowCustomization(false)}
+                >
+                  Close
                 </Button>
               </div>
             </div>
@@ -487,3 +827,5 @@ export function JourneyTemplateGallery({ onSelectTemplate, onPreviewTemplate }: 
     </div>
   )
 }
+
+export default JourneyTemplateGallery

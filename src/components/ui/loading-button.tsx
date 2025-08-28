@@ -17,6 +17,7 @@ const LoadingButton = React.forwardRef<HTMLButtonElement, LoadingButtonProps>(
   ({ className, variant, size, loading = false, loadingText, children, disabled, ...props }, ref) => {
     return (
       <Button
+        data-slot="loading-button"
         className={cn(className)}
         variant={variant}
         size={size}

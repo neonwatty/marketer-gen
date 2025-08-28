@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback,useState } from 'react'
+import { useCallback,useState, useMemo } from 'react'
 import * as React from 'react'
 import { FormProvider,useForm } from 'react-hook-form'
 
@@ -102,62 +102,86 @@ export function CampaignWizard({
   isLoading = false 
 }: CampaignWizardProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const [steps, setSteps] = useState<WizardStep[]>(wizardSteps)
+
+  const defaultFormValues = {
+    name: initialData?.name || '',
+    description: initialData?.description || '',
+    startDate: initialData?.startDate || '',
+    endDate: initialData?.endDate || '',
+    templateId: initialData?.templateId || '',
+    isDraft: initialData?.isDraft ?? true,
+    goals: {
+      primary: initialData?.goals?.primary || '',
+      budget: initialData?.goals?.budget ?? 0,
+      targetConversions: initialData?.goals?.targetConversions ?? 1,
+      targetEngagementRate: initialData?.goals?.targetEngagementRate ?? 0,
+    },
+  }
 
   const form = useForm({
     // resolver: zodResolver(campaignFormSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      startDate: '',
-      endDate: '',
-      templateId: '',
-      isDraft: true,
-      goals: {
-        primary: '',
-        budget: 0,
-        targetConversions: 1,
-        targetEngagementRate: 0,
-      },
-      ...initialData,
-    },
+    defaultValues: defaultFormValues,
     mode: 'onChange',
   })
 
   const { watch, formState: { isValid } } = form
 
-  // Watch form data for step validation
-  const watchedData = watch()
+  // Watch specific form fields for step validation instead of all data
+  const name = watch('name')
+  const description = watch('description')
+  const startDate = watch('startDate')
+  const endDate = watch('endDate')
+  const templateId = watch('templateId')
+  const goalsPrimary = watch('goals.primary')
+  const goalsBudget = watch('goals.budget')
+
 
   const validateStep = useCallback((stepIndex: number): boolean => {
     switch (stepIndex) {
       case 0: // Basic Info
-        return !!(watchedData.name && watchedData.description && watchedData.startDate && watchedData.endDate)
+        return !!(name && description && startDate && endDate)
       case 1: // Template Selection
-        return !!watchedData.templateId
+        return !!templateId
       case 2: // Target Audience (optional)
         return true
       case 3: // Goals & KPIs
-        return !!(watchedData.goals?.primary && watchedData.goals?.budget >= 0)
+        return !!(goalsPrimary && (goalsBudget || goalsBudget === 0) && goalsBudget >= 0)
       case 4: // Review
         return isValid
       default:
         return false
     }
-  }, [watchedData, isValid])
+  }, [name, description, startDate, endDate, templateId, goalsPrimary, goalsBudget, isValid])
 
-  // Update step completion status
-  const updateStepCompletion = useCallback(() => {
-    setSteps(prev => prev.map((step, index) => ({
-      ...step,
-      isCompleted: validateStep(index)
-    })))
-  }, [validateStep])
-
-  // Call updateStepCompletion when form data changes
-  React.useEffect(() => {
-    updateStepCompletion()
-  }, [updateStepCompletion])
+  // Compute steps with completion status using useMemo to avoid infinite loops
+  const steps = useMemo(() => {
+    return wizardSteps.map((step, index) => {
+      let isCompleted = false
+      switch (index) {
+        case 0: // Basic Info
+          isCompleted = !!(name && description && startDate && endDate)
+          break
+        case 1: // Template Selection
+          isCompleted = !!templateId
+          break
+        case 2: // Target Audience (optional)
+          isCompleted = true
+          break
+        case 3: // Goals & KPIs
+          isCompleted = !!(goalsPrimary && (goalsBudget || goalsBudget === 0) && goalsBudget >= 0)
+          break
+        case 4: // Review
+          isCompleted = isValid
+          break
+        default:
+          isCompleted = false
+      }
+      return {
+        ...step,
+        isCompleted
+      }
+    })
+  }, [name, description, startDate, endDate, templateId, goalsPrimary, goalsBudget, isValid])
 
   const handleStepClick = (stepIndex: number) => {
     setCurrentStep(stepIndex)
@@ -180,7 +204,7 @@ export function CampaignWizard({
 
   const handleSaveDraft = async () => {
     if (onSaveDraft) {
-      await onSaveDraft(watchedData)
+      await onSaveDraft(form.getValues())
     }
   }
 

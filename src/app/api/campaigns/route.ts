@@ -10,8 +10,9 @@ import {
   createCampaignSchema} from '@/lib/validation/campaigns'
 
 export async function GET(request: NextRequest) {
+  let session: any
   try {
-    const session = await getServerSession(authOptions)
+    session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -47,22 +48,37 @@ export async function GET(request: NextRequest) {
     const [campaigns, total] = await prisma.$transaction([
       prisma.campaign.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          name: true,
+          purpose: true,
+          goals: true,
+          status: true,
+          startDate: true,
+          endDate: true,
+          createdAt: true,
+          updatedAt: true,
           brand: {
             select: {
               id: true,
-              name: true
+              name: true,
+              industry: true,
             }
           },
           journeys: {
             select: {
               id: true,
-              status: true
-            }
+              status: true,
+              createdAt: true,
+            },
+            where: { deletedAt: null },
+            take: 10, // Limit for performance
+            orderBy: { updatedAt: 'desc' }
           },
           _count: {
             select: {
-              journeys: true
+              journeys: { where: { deletedAt: null } },
+              analytics: { where: { deletedAt: null } }
             }
           }
         },
@@ -75,40 +91,92 @@ export async function GET(request: NextRequest) {
       prisma.campaign.count({ where })
     ])
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       campaigns,
       pagination: {
         page,
         limit,
         total,
         pages: Math.ceil(total / limit)
-      }
+      },
+      timestamp: new Date().toISOString()
     })
+
+    // Add caching headers for GET requests
+    response.headers.set('Cache-Control', 'private, max-age=300') // 5 minutes
+    response.headers.set('ETag', `"campaigns-${session.user.id}-${total}-${new Date().getTime()}"`)
+    
+    return response
   } catch (error) {
-    console.error('Error fetching campaigns:', error)
+    console.error('[CAMPAIGNS_GET] Error:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: request.url,
+      method: request.method,
+      userId: (session as any)?.user?.id
+    })
+    
     return NextResponse.json(
-      { error: 'Failed to fetch campaigns' },
+      { 
+        error: 'Internal server error',
+        message: 'Failed to fetch campaigns',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     )
   }
 }
 
 export async function POST(request: NextRequest) {
+  let session: any
   try {
-    const session = await getServerSession(authOptions)
+    session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ 
+        error: 'Unauthorized',
+        message: 'Authentication required',
+        timestamp: new Date().toISOString()
+      }, { status: 401 })
     }
 
-    const body = await request.json()
+    // Check content type
+    if (!request.headers.get('content-type')?.includes('application/json')) {
+      return NextResponse.json(
+        { 
+          error: "Invalid content type", 
+          message: "Content-Type must be application/json",
+          timestamp: new Date().toISOString()
+        },
+        { status: 415 }
+      )
+    }
+
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json(
+        { 
+          error: "Invalid JSON", 
+          message: "Request body must be valid JSON",
+          timestamp: new Date().toISOString()
+        },
+        { status: 400 }
+      )
+    }
     
     // Validate request body
     const validation = createCampaignSchema.safeParse(body)
     
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: validation.error.format() },
+        { 
+          error: 'Invalid request data', 
+          details: validation.error.format(),
+          timestamp: new Date().toISOString()
+        },
         { status: 400 }
       )
     }
@@ -126,7 +194,11 @@ export async function POST(request: NextRequest) {
 
     if (!brand) {
       return NextResponse.json(
-        { error: 'Brand not found or access denied' },
+        { 
+          error: 'Brand not found or access denied',
+          message: 'The specified brand does not exist or you do not have permission to access it',
+          timestamp: new Date().toISOString()
+        },
         { status: 404 }
       )
     }
@@ -160,11 +232,26 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json(campaign, { status: 201 })
+    return NextResponse.json({
+      ...campaign,
+      timestamp: new Date().toISOString()
+    }, { status: 201 })
   } catch (error) {
-    console.error('Error creating campaign:', error)
+    console.error('[CAMPAIGNS_POST] Error:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: request.url,
+      method: request.method,
+      userId: (session as any)?.user?.id
+    })
+    
     return NextResponse.json(
-      { error: 'Failed to create campaign' },
+      { 
+        error: 'Internal server error',
+        message: 'Failed to create campaign',
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     )
   }

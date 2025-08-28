@@ -108,7 +108,7 @@ export function TemplateSelectionStep() {
   const selectedTemplateId = watch('templateId')
 
   return (
-    <div className="space-y-6">
+    <div data-testid="template-selection-step" className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Choose Journey Template</h3>
         <p className="text-muted-foreground text-sm">

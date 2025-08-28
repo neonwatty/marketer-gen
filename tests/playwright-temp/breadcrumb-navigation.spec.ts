@@ -39,26 +39,28 @@ test.describe('Breadcrumb Navigation', () => {
   test('should display breadcrumbs on individual campaign page', async ({ page }) => {
     await page.goto('/dashboard/campaigns/1');
     
-    // Should show Dashboard > Campaigns > [Campaign Name/ID]
-    await expect(page.getByText('Dashboard')).toBeVisible();
-    await expect(page.getByText('Campaigns')).toBeVisible();
+    // Should show Dashboard > Campaigns > [Campaign Name/ID] in breadcrumb area
+    const breadcrumbNav = page.locator('nav[aria-label*="breadcrumb"]').or(page.locator('[data-slot="breadcrumb"]')).first();
+    await expect(breadcrumbNav.getByText('Dashboard')).toBeVisible();
+    await expect(breadcrumbNav.getByText('Campaigns')).toBeVisible();
     
-    // Both Dashboard and Campaigns should be clickable
-    await expect(page.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/dashboard');
-    await expect(page.getByRole('link', { name: 'Campaigns' })).toHaveAttribute('href', '/dashboard/campaigns');
+    // Both Dashboard and Campaigns should be clickable in breadcrumbs
+    await expect(breadcrumbNav.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/dashboard');
+    await expect(breadcrumbNav.getByRole('link', { name: 'Campaigns' })).toHaveAttribute('href', '/dashboard/campaigns');
   });
 
   test('should navigate through breadcrumb hierarchy', async ({ page }) => {
     // Start at individual campaign page
     await page.goto('/dashboard/campaigns/1');
     
-    // Click Campaigns breadcrumb
-    await page.getByRole('link', { name: 'Campaigns' }).click();
+    // Click Campaigns breadcrumb - be specific about breadcrumb area
+    const breadcrumbNav = page.locator('nav[aria-label*="breadcrumb"]').or(page.locator('[data-slot="breadcrumb"]')).first();
+    await breadcrumbNav.getByRole('link', { name: 'Campaigns', exact: true }).click();
     await page.waitForURL('/dashboard/campaigns');
     await expect(page.getByRole('heading', { name: 'Campaigns' })).toBeVisible();
     
     // Now click Dashboard breadcrumb
-    await page.getByRole('link', { name: 'Dashboard' }).click();
+    await breadcrumbNav.getByRole('link', { name: 'Dashboard' }).click();
     await page.waitForURL('/dashboard');
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   });

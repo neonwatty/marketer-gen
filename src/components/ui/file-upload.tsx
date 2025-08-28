@@ -292,7 +292,7 @@ export function FileUpload({
   }
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div data-slot="file-upload" className={cn("space-y-4", className)}>
       {/* Error Messages */}
       {(errors.length > 0 || error) && (
         <Alert variant="destructive">

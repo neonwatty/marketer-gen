@@ -104,10 +104,17 @@ export function UserProfile({ user, isLoading = false, onEdit, onSignOut }: User
           </div>
           
           <div className="flex gap-2 pt-4 border-t">
-            <Button variant="outline" className="flex-1" onClick={onEdit}>
+            <Button variant="outline" className="flex-1" onClick={onEdit} data-testid="edit-profile-button">
               Edit Profile
             </Button>
-            <Button variant="ghost" onClick={onSignOut}>
+            <Button variant="ghost" onClick={() => {
+              try {
+                onSignOut?.()
+              } catch (error) {
+                console.error('Sign out error:', error)
+                // Component remains functional even if sign out fails
+              }
+            }} data-testid="sign-out-button">
               Sign Out
             </Button>
           </div>

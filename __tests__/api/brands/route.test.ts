@@ -4,12 +4,25 @@ import { prisma } from '@/lib/database'
 
 // Mock NextRequest to avoid URL property issues
 const createMockRequest = (url: string, options: RequestInit = {}) => {
+  const headers = new Headers(options.headers)
+  
+  // Automatically set content-type for POST requests with JSON body
+  if (options.method === 'POST' && options.body && !headers.get('content-type')) {
+    headers.set('content-type', 'application/json')
+  }
+  
+  const parsedUrl = new URL(url)
+  
   const mockRequest = {
     url,
     method: options.method || 'GET',
-    headers: new Headers(options.headers),
+    headers,
     json: jest.fn().mockResolvedValue(JSON.parse(options.body as string || '{}')),
-    nextUrl: new URL(url),
+    nextUrl: parsedUrl,
+    // Add searchParams getter for compatibility
+    get searchParams() {
+      return parsedUrl.searchParams
+    }
   } as unknown as NextRequest
   return mockRequest
 }
@@ -22,21 +35,49 @@ jest.mock('@/lib/database', () => ({
       create: jest.fn(),
       count: jest.fn(),
     },
+    $transaction: jest.fn().mockImplementation(async (queries) => {
+      // Execute the queries and return their results
+      const results = []
+      for (const query of queries) {
+        results.push(await query)
+      }
+      return results
+    }),
   },
 }))
 
 // Mock NextAuth
 jest.mock('next-auth/next', () => ({
-  getServerSession: jest.fn(),
+  getServerSession: jest.fn().mockResolvedValue({
+    user: {
+      id: 'test-user-id',
+      name: 'Test User',
+      email: 'test@example.com',
+    },
+  }),
 }))
 
 // Mock NextResponse
 jest.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn((data, init) => ({
-      json: () => Promise.resolve(data),
-      status: init?.status || 200,
-    })),
+    json: jest.fn((data, init) => {
+      const mockHeaders = {
+        set: jest.fn(),
+        get: jest.fn(),
+        has: jest.fn(),
+        delete: jest.fn(),
+        forEach: jest.fn(),
+        entries: jest.fn(),
+        keys: jest.fn(),
+        values: jest.fn(),
+      }
+      
+      return {
+        json: () => Promise.resolve(data),
+        status: init?.status || 200,
+        headers: mockHeaders,
+      }
+    }),
   },
 }))
 
@@ -76,6 +117,7 @@ describe('/api/brands', () => {
       const request = createMockRequest('http://localhost/api/brands')
       const response = await GET(request)
       const data = await response.json()
+
 
       expect(response.status).toBe(200)
       expect(data.brands).toHaveLength(1)
@@ -156,7 +198,7 @@ describe('/api/brands', () => {
   describe('POST /api/brands', () => {
     const mockSession = {
       user: {
-        id: 'user1',
+        id: 'test-user-id',
         email: 'test@example.com',
       },
     }
@@ -178,7 +220,7 @@ describe('/api/brands', () => {
       const mockCreatedBrand = {
         id: 'brand1',
         ...brandData,
-        userId: 'cmefuzqdo0000nutz18es59jr',
+        userId: 'test-user-id',
         createdAt: new Date('2024-01-01'),
         updatedAt: new Date('2024-01-01'),
         user: mockSession.user,
@@ -206,13 +248,13 @@ describe('/api/brands', () => {
 
       expect(response.status).toBe(201)
       expect(data.name).toBe(brandData.name)
-      expect(data.userId).toBe('cmefuzqdo0000nutz18es59jr')
+      expect(data.userId).toBe('test-user-id')
       expect(mockPrisma.brand.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
             name: brandData.name,
-            userId: 'cmefuzqdo0000nutz18es59jr',
-            createdBy: 'cmefuzqdo0000nutz18es59jr',
+            userId: 'test-user-id',
+            createdBy: 'test-user-id',
           }),
         })
       )
@@ -222,7 +264,7 @@ describe('/api/brands', () => {
       const mockBrand = {
         id: 'brand1',
         name: 'Test Brand',
-        userId: 'cmefuzqdo0000nutz18es59jr',
+        userId: 'test-user-id',
       }
       
       mockPrisma.brand.create.mockResolvedValue(mockBrand as any)

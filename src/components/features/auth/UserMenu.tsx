@@ -60,7 +60,7 @@ export function UserMenu({ className }: UserMenuProps) {
   return (
     <div className={`flex items-center gap-2 ${className || ''}`}>
       <Dialog>
-        <DialogTrigger asChild>
+        <DialogTrigger asChild data-testid="dialog-trigger">
           <Button variant="ghost" className="flex items-center gap-2 h-auto px-2 py-1">
             <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
               {displayUser.avatar ? (
@@ -96,7 +96,14 @@ export function UserMenu({ className }: UserMenuProps) {
           <UserProfile
             user={displayUser}
             onEdit={() => {/* TODO: Implement edit profile functionality */}}
-            onSignOut={() => signOut()}
+            onSignOut={async () => {
+              try {
+                await signOut()
+              } catch (error) {
+                console.error('Sign out error:', error)
+                // Component remains functional even if sign out fails
+              }
+            }}
           />
         </DialogContent>
       </Dialog>

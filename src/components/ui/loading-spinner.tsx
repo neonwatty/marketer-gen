@@ -16,7 +16,7 @@ const sizeClasses = {
 
 export function LoadingSpinner({ className, size = 'md', text }: LoadingSpinnerProps) {
   return (
-    <div className={cn('flex items-center justify-center gap-2', className)}>
+    <div data-slot="loading-spinner" className={cn('flex items-center justify-center gap-2', className)}>
       <Loader2 className={cn('animate-spin', sizeClasses[size])} />
       {text && <span className="text-sm text-muted-foreground">{text}</span>}
     </div>
@@ -37,7 +37,7 @@ export function LoadingOverlay({
   }
 
   return (
-    <div className="relative">
+    <div data-slot="loading-overlay" className="relative">
       <div className="opacity-50">{children}</div>
       <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
         <LoadingSpinner text={text} />
@@ -48,7 +48,7 @@ export function LoadingOverlay({
 
 export function FullPageLoader({ text = 'Loading...' }: { text?: string }) {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center">
+    <div data-slot="full-page-loader" className="flex min-h-[50vh] items-center justify-center">
       <LoadingSpinner size="lg" text={text} />
     </div>
   )

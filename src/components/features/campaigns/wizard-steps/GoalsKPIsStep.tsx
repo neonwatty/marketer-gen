@@ -69,7 +69,7 @@ export function GoalsKPIsStep() {
   const selectedGoalOption = primaryGoalOptions.find(goal => goal.value === selectedGoal)
 
   return (
-    <div className="space-y-6">
+    <div data-testid="goals-kpis-step" className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Goals & KPIs</h3>
         <p className="text-muted-foreground text-sm">

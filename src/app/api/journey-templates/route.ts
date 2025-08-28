@@ -16,11 +16,16 @@ import {
  * Get journey templates with filtering, sorting, and pagination
  */
 export async function GET(request: NextRequest) {
+  let session: any
   try {
-    const session = await getServerSession(authOptions)
+    session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json(
-        { error: 'Authentication required' },
+        { 
+          error: 'Authentication required',
+          message: 'You must be authenticated to access this resource',
+          timestamp: new Date().toISOString()
+        },
         { status: 401 }
       )
     }
@@ -77,7 +82,20 @@ export async function GET(request: NextRequest) {
     const sortOrder = (searchParams.get('sortOrder') || 'desc') as JourneyTemplateSortOrder
 
     // Validate filters
-    const validatedFilters = JourneyTemplateFiltersSchema.parse(filters)
+    const filtersValidation = JourneyTemplateFiltersSchema.safeParse(filters)
+    
+    if (!filtersValidation.success) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid query parameters', 
+          details: filtersValidation.error.format(),
+          timestamp: new Date().toISOString()
+        },
+        { status: 400 }
+      )
+    }
+    
+    const validatedFilters = filtersValidation.data
     
     // Get templates
     const result = await JourneyTemplateService.getTemplates(
@@ -88,14 +106,34 @@ export async function GET(request: NextRequest) {
       pageSize
     )
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: result,
+      timestamp: new Date().toISOString()
     })
+
+    // Add caching headers for GET requests
+    response.headers.set('Cache-Control', 'private, max-age=600') // 10 minutes for templates
+    response.headers.set('ETag', `"journey-templates-${result.totalCount || 0}-${new Date().getTime()}"`)
+    
+    return response
   } catch (error: any) {
-    console.error('Error fetching journey templates:', error)
+    console.error('[JOURNEY_TEMPLATES_GET] Error:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: request.url,
+      method: request.method,
+      userId: (session as any)?.user?.id
+    })
+    
     return NextResponse.json(
-      { error: 'Failed to fetch templates', details: error.message },
+      { 
+        error: 'Internal server error',
+        message: 'Failed to fetch templates',
+        details: error instanceof Error ? error.message : undefined,
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     )
   }
@@ -106,16 +144,45 @@ export async function GET(request: NextRequest) {
  * Create a new journey template
  */
 export async function POST(request: NextRequest) {
+  let session: any
   try {
-    const session = await getServerSession(authOptions)
+    session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json(
-        { error: 'Authentication required' },
+        { 
+          error: 'Authentication required',
+          message: 'You must be authenticated to access this resource',
+          timestamp: new Date().toISOString()
+        },
         { status: 401 }
       )
     }
 
-    const body = await request.json()
+    // Check content type
+    if (!request.headers.get('content-type')?.includes('application/json')) {
+      return NextResponse.json(
+        { 
+          error: "Invalid content type", 
+          message: "Content-Type must be application/json",
+          timestamp: new Date().toISOString()
+        },
+        { status: 415 }
+      )
+    }
+
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json(
+        { 
+          error: "Invalid JSON", 
+          message: "Request body must be valid JSON",
+          timestamp: new Date().toISOString()
+        },
+        { status: 400 }
+      )
+    }
     
     // Add creator information
     const templateData = {
@@ -125,7 +192,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate template data
-    const validatedData = JourneyTemplateSchema.parse(templateData)
+    const validation = JourneyTemplateSchema.safeParse(templateData)
+    
+    if (!validation.success) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid template data', 
+          details: validation.error.format(),
+          timestamp: new Date().toISOString()
+        },
+        { status: 400 }
+      )
+    }
+    
+    const validatedData = validation.data
 
     // Create template
     const newTemplate = await JourneyTemplateService.createTemplate(validatedData)
@@ -133,19 +213,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: newTemplate,
+      timestamp: new Date().toISOString()
     }, { status: 201 })
   } catch (error: any) {
-    console.error('Error creating journey template:', error)
+    console.error('[JOURNEY_TEMPLATES_POST] Error:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+      url: request.url,
+      method: request.method,
+      userId: (session as any)?.user?.id
+    })
     
-    if (error.name === 'ZodError') {
-      return NextResponse.json(
-        { error: 'Invalid template data', details: error.errors },
-        { status: 400 }
-      )
-    }
-
     return NextResponse.json(
-      { error: 'Failed to create template', details: error.message },
+      { 
+        error: 'Internal server error',
+        message: 'Failed to create template',
+        details: error instanceof Error ? error.message : undefined,
+        timestamp: new Date().toISOString()
+      },
       { status: 500 }
     )
   }

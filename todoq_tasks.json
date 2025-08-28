@@ -1,0 +1,592 @@
+{
+  "tasks": [
+    {
+      "number": "1.0",
+      "name": "Customer Journey Builder Foundation",
+      "description": "Implement the core guided customer journey builder with template selection and stage management. This forms the foundation of the campaign creation flow.",
+      "parent": null,
+      "status": "completed",
+      "priority": 1,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/journey/JourneyBuilder.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/journey/JourneyTemplateGallery.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/data/journey-templates.ts"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/card",
+        "https://ui.shadcn.com/docs/components/dialog",
+        "https://reactflow.dev/docs"
+      ],
+      "testing_strategy": "Unit tests for template selection, integration tests for journey flow builder, E2E tests for complete journey creation workflow",
+      "notes": "Leverage existing ReactFlow integration and journey template data structure. Focus on intuitive drag-and-drop experience."
+    },
+    {
+      "number": "1.1",
+      "name": "Journey Template Selection UI",
+      "description": "Enhance the existing JourneyTemplateGallery component to provide filtering by industry, category, and difficulty. Add template preview and customization options.",
+      "parent": "1.0",
+      "status": "completed",
+      "priority": 1,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/journey/JourneyTemplateGallery.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/ui/card.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/ui/badge.tsx"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/card",
+        "https://ui.shadcn.com/docs/components/select"
+      ],
+      "testing_strategy": "Unit tests for filtering logic, visual regression tests for template cards, accessibility tests for keyboard navigation",
+      "notes": "Use existing journey template data from src/lib/data/journey-templates.ts. Implement responsive grid layout with shadcn/ui components."
+    },
+    {
+      "number": "1.2", 
+      "name": "Journey Stage Configuration Panel",
+      "description": "Implement the StageConfigurationPanel component for editing journey stages, including content types, messaging suggestions, channels, and timing configuration.",
+      "parent": "1.0",
+      "status": "pending", 
+      "priority": 1,
+      "dependencies": ["1.1"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/journey/StageConfigurationPanel.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/ui/form.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/ui/textarea.tsx"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/form",
+        "https://react-hook-form.com/get-started"
+      ],
+      "testing_strategy": "Unit tests for form validation, integration tests for stage updates, mock API calls for saving configurations",
+      "notes": "Integrate with react-hook-form for validation. Support real-time preview of changes in the journey visualization."
+    },
+    {
+      "number": "1.3",
+      "name": "Visual Journey Builder Canvas",
+      "description": "Enhance the JourneyBuilder component with ReactFlow to provide visual journey editing, stage connections, and real-time updates.",
+      "parent": "1.0",
+      "status": "pending",
+      "priority": 1, 
+      "dependencies": ["1.2"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/journey/JourneyBuilder.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/journey/JourneyStageNode.tsx"
+      ],
+      "docs_references": [
+        "https://reactflow.dev/docs/quickstart",
+        "https://reactflow.dev/docs/api/nodes/custom-nodes"
+      ],
+      "testing_strategy": "Integration tests for node interactions, visual tests for canvas rendering, E2E tests for complete journey building workflow",
+      "notes": "Use ReactFlow library already installed. Implement custom node types for different journey stages. Support drag-and-drop reordering."
+    },
+    {
+      "number": "1.4",
+      "name": "Journey Template API Integration", 
+      "description": "Connect the journey builder to the backend API endpoints for loading, saving, and customizing journey templates.",
+      "parent": "1.0",
+      "status": "pending",
+      "priority": 1,
+      "dependencies": ["1.3"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/api/journey-templates/route.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/services/journey-template-service.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/hooks/use-journey-templates.ts"
+      ],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/route-handlers",
+        "https://tanstack.com/query/latest/docs/framework/react/overview"
+      ],
+      "testing_strategy": "API route unit tests, service layer integration tests, React Query hook testing with mock data",
+      "notes": "Use existing API structure. Implement caching with TanStack Query. Add error handling and loading states."
+    },
+    {
+      "number": "2.0",
+      "name": "Brand Identity & Asset Management System",
+      "description": "Implement comprehensive brand identity management including document upload, parsing, asset library, and compliance rule enforcement.",
+      "parent": null,
+      "status": "pending",
+      "priority": 1,
+      "dependencies": ["1.0"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/brand/BrandGuidelines.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/brand/BrandAssetLibrary.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/utils/brand-guideline-parser.ts"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/dialog",
+        "https://developer.mozilla.org/en-US/docs/Web/API/File_API"
+      ],
+      "testing_strategy": "Unit tests for document parsing, integration tests for file upload, E2E tests for complete brand setup workflow",
+      "notes": "Leverage existing brand parsing utilities and Prisma models for comprehensive brand management."
+    },
+    {
+      "number": "2.1",
+      "name": "Brand Document Upload & Processing",
+      "description": "Enhance the BrandDocumentUpload component to support multiple file formats (PDF, DOCX, images) with intelligent parsing and brand guideline extraction.",
+      "parent": "2.0",
+      "status": "pending",
+      "priority": 1, 
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/brand/BrandDocumentUpload.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/ui/file-upload.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/utils/brand-guideline-parser.ts"
+      ],
+      "docs_references": [
+        "https://developer.mozilla.org/en-US/docs/Web/API/File_API",
+        "https://ui.shadcn.com/docs/components/progress"
+      ],
+      "testing_strategy": "Unit tests for file validation, integration tests for document parsing, mock API tests for upload functionality",
+      "notes": "Support PDF parsing with pdf-parse, DOCX with mammoth. Implement progress indicators and error handling for large files."
+    },
+    {
+      "number": "2.2",
+      "name": "Brand Asset Library & Organization", 
+      "description": "Implement comprehensive brand asset management with categorization, tagging, version control, and usage tracking.",
+      "parent": "2.0",
+      "status": "pending",
+      "priority": 1,
+      "dependencies": ["2.1"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/brand/BrandAssetLibrary.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/api/brands/[id]/assets/route.ts"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/table",
+        "https://ui.shadcn.com/docs/components/dialog"
+      ],
+      "testing_strategy": "Unit tests for asset filtering and search, integration tests for CRUD operations, visual tests for grid and list views",
+      "notes": "Use existing Prisma BrandAsset model. Implement drag-and-drop file organization, bulk operations, and asset preview."
+    },
+    {
+      "number": "2.3",
+      "name": "Brand Compliance Rule Engine",
+      "description": "Implement automated brand compliance checking with rule definition, content validation, and violation reporting.",
+      "parent": "2.0", 
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["2.2"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/services/brand-compliance.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/api/ai/content-compliance/route.ts"
+      ],
+      "docs_references": [
+        "https://docs.openai.com/guides/text-generation",
+        "https://zod.dev/"
+      ],
+      "testing_strategy": "Unit tests for compliance rules, integration tests with AI service, mock tests for violation detection",
+      "notes": "Integrate with OpenAI service for intelligent compliance checking. Use Zod for rule validation schemas."
+    },
+    {
+      "number": "2.4",
+      "name": "Brand Overview Dashboard",
+      "description": "Create comprehensive brand overview with analytics, asset usage tracking, compliance status, and brand health metrics.",
+      "parent": "2.0",
+      "status": "pending",
+      "priority": 2, 
+      "dependencies": ["2.3"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/brand/BrandOverview.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/brand/BrandAnalytics.tsx"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/card", 
+        "https://recharts.org/en-US/"
+      ],
+      "testing_strategy": "Unit tests for metric calculations, integration tests for data aggregation, visual regression tests for charts",
+      "notes": "Display brand asset usage, compliance scores, and brand consistency metrics. Consider adding chart library for visualizations."
+    },
+    {
+      "number": "3.0",
+      "name": "AI-Powered Content Generation System",
+      "description": "Implement comprehensive content generation system with multi-channel support, variant creation, and brand-aware AI content creation.",
+      "parent": null,
+      "status": "pending",
+      "priority": 1,
+      "dependencies": ["1.0", "2.0"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/api/ai/content-generation/route.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/services/content-variant-service.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/services/openai-service.ts"
+      ],
+      "docs_references": [
+        "https://docs.openai.com/api-reference/chat",
+        "https://sdk.vercel.ai/docs"
+      ],
+      "testing_strategy": "Unit tests for content generation logic, integration tests with OpenAI API, mock tests for various content types",
+      "notes": "Leverage existing OpenAI service integration. Support multiple content formats and brand-aware generation."
+    },
+    {
+      "number": "3.1", 
+      "name": "Multi-Channel Content Generation",
+      "description": "Implement content generation for email, social media, ads, landing pages, and video scripts with channel-specific optimization.",
+      "parent": "3.0",
+      "status": "pending",
+      "priority": 1,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/services/content-variant-service.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/types/content-generation.ts"
+      ],
+      "docs_references": [
+        "https://docs.openai.com/guides/text-generation",
+        "https://sdk.vercel.ai/docs/ai-sdk-core/generating-text"
+      ],
+      "testing_strategy": "Unit tests for each content type generator, integration tests with AI service, validation tests for content format compliance",
+      "notes": "Use existing ContentType enum from Prisma schema. Implement channel-specific prompts and formatting rules."
+    },
+    {
+      "number": "3.2",
+      "name": "Content Variant & A/B Testing",
+      "description": "Generate multiple content variants for A/B testing with performance tracking and optimization recommendations.",
+      "parent": "3.0",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["3.1"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/services/content-variant-service.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/content/VariantComparison.tsx"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/tabs",
+        "https://ui.shadcn.com/docs/components/comparison"
+      ],
+      "testing_strategy": "Unit tests for variant generation, comparison tests for A/B performance, mock analytics integration tests",
+      "notes": "Generate 2-5 variants per content piece. Implement side-by-side comparison UI and performance metrics tracking."
+    },
+    {
+      "number": "3.3",
+      "name": "Content Review & Approval Workflow",
+      "description": "Implement content review system with approval workflows, collaboration features, and revision tracking.",
+      "parent": "3.0",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["3.2"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/content/ContentReview.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/content/ApprovalWorkflow.tsx"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/dialog",
+        "https://ui.shadcn.com/docs/components/alert"
+      ],
+      "testing_strategy": "Unit tests for approval logic, integration tests for collaboration features, E2E tests for complete review workflow",
+      "notes": "Support multiple reviewers, comment threads, and status tracking. Integrate with existing ContentStatus enum."
+    },
+    {
+      "number": "4.0",
+      "name": "Campaign Wizard & Management Interface", 
+      "description": "Implement comprehensive campaign creation wizard with step-by-step guidance, template integration, and campaign management features.",
+      "parent": null,
+      "status": "pending",
+      "priority": 1,
+      "dependencies": ["1.0", "2.0", "3.0"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/CampaignWizard.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/wizard-steps/"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/form",
+        "https://ui.shadcn.com/docs/components/steps"
+      ],
+      "testing_strategy": "E2E tests for complete wizard flow, unit tests for each step validation, integration tests for data persistence",
+      "notes": "Integrate with existing wizard step components. Support save-and-resume functionality."
+    },
+    {
+      "number": "4.1",
+      "name": "Campaign Wizard Step Enhancement",
+      "description": "Enhance existing wizard steps (BasicInfo, Goals/KPIs, Target Audience, Template Selection, Review) with improved UX and validation.",
+      "parent": "4.0",
+      "status": "pending",
+      "priority": 1,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/wizard-steps/BasicInfoStep.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/wizard-steps/GoalsKPIsStep.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/wizard-steps/TargetAudienceStep.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/wizard-steps/TemplateSelectionStep.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/wizard-steps/ReviewStep.tsx"
+      ],
+      "docs_references": [
+        "https://react-hook-form.com/docs/useform",
+        "https://ui.shadcn.com/docs/components/form"
+      ],
+      "testing_strategy": "Unit tests for form validation, accessibility tests for form controls, integration tests for step navigation",
+      "notes": "Use react-hook-form for validation. Add progress indicators and contextual help. Support conditional fields based on selections."
+    },
+    {
+      "number": "4.2",
+      "name": "Campaign Management Dashboard",
+      "description": "Enhance campaign grid and card components with advanced filtering, sorting, status management, and bulk operations.",
+      "parent": "4.0",
+      "status": "pending",
+      "priority": 1,
+      "dependencies": ["4.1"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/dashboard/CampaignGridWithData.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/dashboard/EnhancedCampaignCard.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/CampaignDataTable.tsx"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/data-table",
+        "https://ui.shadcn.com/docs/components/dropdown-menu"
+      ],
+      "testing_strategy": "Unit tests for filtering logic, visual tests for card layouts, integration tests for bulk operations",
+      "notes": "Support multiple view modes (grid, list, table). Add campaign duplication and archiving features using existing dialog components."
+    },
+    {
+      "number": "4.3",
+      "name": "Campaign Summary & Plan Generation",
+      "description": "Implement automated campaign summary generation with strategic rationale, content overview, and stakeholder-ready outputs.",
+      "parent": "4.0", 
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["4.2"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/campaigns/CampaignSummary.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/services/campaign-summary-service.ts"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/card",
+        "https://docs.openai.com/guides/text-generation"
+      ],
+      "testing_strategy": "Unit tests for summary generation logic, integration tests with AI service, export functionality tests",
+      "notes": "Generate comprehensive campaign plans with journey visualization, content calendar, and performance projections."
+    },
+    {
+      "number": "5.0",
+      "name": "User Interface & Navigation System",
+      "description": "Implement cohesive navigation system with responsive design, accessibility compliance, and consistent user experience across all pages.",
+      "parent": null,
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/navigation/Header.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/dashboard/DashboardSidebar.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/dashboard/DashboardHeader.tsx"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/navigation-menu",
+        "https://ui.shadcn.com/docs/components/sidebar"
+      ],
+      "testing_strategy": "Accessibility tests with jest-axe, responsive design tests, keyboard navigation tests",
+      "notes": "Ensure WCAG 2.1 compliance. Support keyboard navigation and screen readers. Mobile-first responsive design."
+    },
+    {
+      "number": "5.1", 
+      "name": "Dashboard Layout & Navigation",
+      "description": "Enhance dashboard layout components with improved responsive behavior, navigation state management, and user preference persistence.",
+      "parent": "5.0",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/layouts/DashboardLayout.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/dashboard/DashboardSidebar.tsx",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/features/dashboard/DashboardBreadcrumb.tsx"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/sidebar",
+        "https://ui.shadcn.com/docs/components/breadcrumb"
+      ],
+      "testing_strategy": "Responsive design tests across breakpoints, navigation state persistence tests, accessibility compliance tests",
+      "notes": "Support collapsible sidebar, breadcrumb navigation, and mobile-friendly hamburger menu. Store user preferences in localStorage."
+    },
+    {
+      "number": "5.2",
+      "name": "UI Component Library Standardization",
+      "description": "Audit and standardize all UI components for consistency, accessibility, and proper shadcn/ui integration throughout the application.",
+      "parent": "5.0",
+      "status": "pending", 
+      "priority": 2,
+      "dependencies": ["5.1"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/components/ui/",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/components.json"
+      ],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components",
+        "https://ui.shadcn.com/docs/theming"
+      ],
+      "testing_strategy": "Component library audit, accessibility testing with automated tools, visual regression testing",
+      "notes": "Ensure all components follow shadcn/ui patterns. Update any custom components to match design system. Add Storybook if needed for documentation."
+    },
+    {
+      "number": "6.0",
+      "name": "Data Management & API Layer",
+      "description": "Implement robust data layer with optimized API endpoints, caching strategies, error handling, and database optimization.",
+      "parent": null,
+      "status": "pending",
+      "priority": 2, 
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/api/",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/api/",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/db.ts"
+      ],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/route-handlers",
+        "https://www.prisma.io/docs/concepts/components/prisma-client"
+      ],
+      "testing_strategy": "API endpoint testing, database query optimization tests, error handling integration tests",
+      "notes": "Optimize database queries, implement proper error handling, add request validation with Zod schemas."
+    },
+    {
+      "number": "6.1",
+      "name": "API Route Optimization & Error Handling",
+      "description": "Enhance all API routes with proper error handling, input validation, response caching, and performance optimization.",
+      "parent": "6.0",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/api/brands/route.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/api/campaigns/route.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/api/journey-templates/route.ts"
+      ],
+      "docs_references": [
+        "https://nextjs.org/docs/app/api-reference/file-conventions/route",
+        "https://zod.dev/"
+      ],
+      "testing_strategy": "Unit tests for each API endpoint, error scenario testing, validation testing with malformed inputs",
+      "notes": "Add comprehensive error handling, input validation with Zod, and proper HTTP status codes. Implement rate limiting for AI endpoints."
+    },
+    {
+      "number": "6.2",
+      "name": "Database Query Optimization",
+      "description": "Optimize Prisma queries, implement efficient data fetching patterns, and add database indexes for performance.",
+      "parent": "6.0", 
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["6.1"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/prisma/schema.prisma",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/api/brands.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/lib/api/campaigns.ts"
+      ],
+      "docs_references": [
+        "https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries",
+        "https://www.prisma.io/docs/concepts/components/prisma-schema/indexes"
+      ],
+      "testing_strategy": "Database performance tests, query analysis with Prisma debugging, load testing for data-heavy operations",
+      "notes": "Add database indexes for frequently queried fields. Implement efficient pagination and data loading patterns."
+    },
+    {
+      "number": "7.0",
+      "name": "Testing Infrastructure & Quality Assurance",
+      "description": "Implement comprehensive testing strategy with unit tests, integration tests, and E2E tests to ensure application reliability.",
+      "parent": null,
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/jest.config.js",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/playwright.config.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/__tests__/"
+      ],
+      "docs_references": [
+        "https://jestjs.io/docs/getting-started",
+        "https://playwright.dev/docs/intro"
+      ],
+      "testing_strategy": "Achieve >80% code coverage, comprehensive E2E test coverage for critical user flows, accessibility testing integration",
+      "notes": "Leverage existing Jest and Playwright setup. Add visual regression testing for UI components."
+    },
+    {
+      "number": "7.1",
+      "name": "Component Testing Suite Completion", 
+      "description": "Complete unit and integration tests for all React components with focus on user interactions and accessibility.",
+      "parent": "7.0",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/__tests__/components/",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/jest.setup.js"
+      ],
+      "docs_references": [
+        "https://testing-library.com/docs/react-testing-library/intro/",
+        "https://github.com/nickcolley/jest-axe"
+      ],
+      "testing_strategy": "Unit tests for all feature components, accessibility tests with jest-axe, user interaction testing with user-event",
+      "notes": "Use existing Testing Library setup. Add jest-axe for accessibility testing. Mock external dependencies properly."
+    },
+    {
+      "number": "7.2",
+      "name": "E2E Testing for Critical User Flows",
+      "description": "Implement comprehensive E2E tests for campaign creation, brand setup, and content generation workflows using Playwright.",
+      "parent": "7.0",
+      "status": "pending",
+      "priority": 2, 
+      "dependencies": ["7.1"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/tests/",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/playwright.config.ts"
+      ],
+      "docs_references": [
+        "https://playwright.dev/docs/writing-tests",
+        "https://playwright.dev/docs/test-fixtures"
+      ],
+      "testing_strategy": "E2E tests for complete user journeys, cross-browser testing, mobile responsive testing",
+      "notes": "Test complete campaign creation flow, brand onboarding, and content generation. Add visual comparison testing for UI consistency."
+    },
+    {
+      "number": "8.0",
+      "name": "Performance Optimization & Deployment Readiness",
+      "description": "Optimize application performance, implement monitoring, and prepare for production deployment with proper DevOps practices.",
+      "parent": null,
+      "status": "pending",
+      "priority": 3,
+      "dependencies": ["1.0", "2.0", "3.0", "4.0"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/next.config.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/package.json"
+      ],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/optimizing",
+        "https://vercel.com/docs/deployments"
+      ],
+      "testing_strategy": "Performance benchmarking, bundle size analysis, load testing for scalability",
+      "notes": "Focus on Core Web Vitals optimization, bundle size reduction, and production deployment configuration."
+    },
+    {
+      "number": "8.1",
+      "name": "Bundle Optimization & Code Splitting",
+      "description": "Implement code splitting, lazy loading, and bundle optimization to improve application load times and performance.",
+      "parent": "8.0",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": [],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/next.config.ts",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/src/app/layout.tsx"
+      ],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/optimizing/bundle-analyzer",
+        "https://nextjs.org/docs/app/building-your-application/optimizing/lazy-loading"
+      ],
+      "testing_strategy": "Bundle size analysis, performance testing with Lighthouse, lazy loading verification",
+      "notes": "Implement route-based code splitting, lazy load heavy components, optimize third-party library imports."
+    },
+    {
+      "number": "8.2",
+      "name": "Production Configuration & Environment Setup",
+      "description": "Configure production environment settings, error monitoring, analytics, and deployment pipeline for scalable production deployment.",
+      "parent": "8.0",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": ["8.1"],
+      "files": [
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/.env.example",
+        "/Users/jeremywatt/Desktop/marketer-gen-nextjs/next.config.ts"
+      ],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/configuring/environment-variables",
+        "https://vercel.com/docs/concepts/projects/environment-variables"
+      ],
+      "testing_strategy": "Environment configuration testing, production build verification, deployment smoke tests",
+      "notes": "Set up proper environment variable management, error monitoring integration, and CI/CD pipeline configuration."
+    }
+  ]
+}

@@ -103,7 +103,10 @@ export async function POST(
       )
     } catch (error) {
       // For demo purposes, use sample text if file can't be fetched
-      console.warn('Could not fetch/parse file, using sample data:', error)
+      // Only log in non-test environments to reduce noise during testing
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn('Could not fetch/parse file, using sample data:', error)
+      }
       extractedText = `
         Brand Guidelines Sample
         
@@ -191,7 +194,10 @@ export async function POST(
       )
     }
 
-    console.error("[DOCUMENT_PARSE]", error)
+    // Only log in non-test environments to reduce noise during testing
+    if (process.env.NODE_ENV !== 'test') {
+      console.error("[DOCUMENT_PARSE]", error)
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

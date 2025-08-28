@@ -75,7 +75,7 @@ describe('Card Components', () => {
       const title = screen.getByText('Title Text')
 
       expect(title).toBeInTheDocument()
-      expect(title.tagName).toBe('DIV')
+      expect(title.tagName).toBe('H3')
     })
 
     it('has correct typography classes', () => {
@@ -85,11 +85,11 @@ describe('Card Components', () => {
       expect(title).toHaveClass('font-semibold', 'leading-none')
     })
 
-    it('renders as div by default', () => {
+    it('renders as h3 by default', () => {
       render(<CardTitle>Default Title</CardTitle>)
       const title = screen.getByText('Default Title')
 
-      expect(title.tagName).toBe('DIV')
+      expect(title.tagName).toBe('H3')
     })
 
     it('accepts custom className', () => {

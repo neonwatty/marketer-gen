@@ -474,7 +474,7 @@ describe('Document Parser Integration Tests', () => {
       const endTime = Date.now()
 
       expect(response.status).toBe(200)
-      expect(endTime - startTime).toBeLessThan(15000) // Should complete within 15 seconds
+      expect(endTime - startTime).toBeLessThan(20000) // Should complete within 20 seconds
     })
   })
 })

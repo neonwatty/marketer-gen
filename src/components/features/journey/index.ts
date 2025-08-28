@@ -1,5 +1,6 @@
 export type { JourneyStage } from './JourneyBuilder'
 export { JourneyBuilder } from './JourneyBuilder'
 export { JourneyStageNode } from './JourneyStageNode'
+export { JourneyTemplateGallery } from './JourneyTemplateGallery'
 export { JourneyToolbar } from './JourneyToolbar'
 export { StageConfigurationPanel } from './StageConfigurationPanel'

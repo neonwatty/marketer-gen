@@ -124,6 +124,11 @@ model Brand {
   colorPalette ColorPalette[]
   typography   Typography[]
 
+  @@index([userId])
+  @@index([industry])
+  @@index([userId, industry])
+  @@index([name])
+  @@index([createdAt])
   @@map("brands")
 }
 
@@ -244,6 +249,14 @@ model Campaign {
   journeys Journey[]
   analytics Analytics[]
 
+  @@index([userId])
+  @@index([brandId])
+  @@index([status])
+  @@index([userId, status])
+  @@index([brandId, status])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([createdAt])
   @@map("campaigns")
 }
 
@@ -264,6 +277,10 @@ model Journey {
   content  Content[]
   analytics Analytics[]
 
+  @@index([campaignId])
+  @@index([status])
+  @@index([campaignId, status])
+  @@index([createdAt])
   @@map("journeys")
 }
 
@@ -286,6 +303,12 @@ model Content {
   journey Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
   analytics Analytics[]
 
+  @@index([journeyId])
+  @@index([type])
+  @@index([status])
+  @@index([journeyId, status])
+  @@index([type, status])
+  @@index([createdAt])
   @@map("content")
 }
 
