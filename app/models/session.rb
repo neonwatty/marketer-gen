@@ -25,7 +25,13 @@ class Session < ApplicationRecord
   end
   
   def touch_activity!
-    touch(:updated_at) if active?
+    return unless active?
+    
+    # Only update if it's been more than 10 minutes since last update to reduce DB calls
+    return if updated_at > 10.minutes.ago
+    
+    # Use update_column to avoid callbacks and validations for better performance
+    update_column(:updated_at, Time.current)
   end
   
   def terminate!

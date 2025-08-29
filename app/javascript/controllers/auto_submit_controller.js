@@ -19,33 +19,47 @@ export default class extends Controller {
   }
 
   submit(event) {
-    // Clear any existing timeout
-    if (this.timeout) {
-      clearTimeout(this.timeout)
+    try {
+      // Clear any existing timeout
+      if (this.timeout) {
+        clearTimeout(this.timeout)
+      }
+
+      // Skip auto-submit for certain field types
+      const fieldName = event.target.name
+      if (this.skipFieldsValue.includes(fieldName)) {
+        return
+      }
+
+      // For text inputs, add a delay to avoid too many requests
+      const isTextInput = event.target.type === "text" || event.target.type === "search"
+      const delay = isTextInput ? this.delayValue : 0
+
+      // Set timeout for delayed submission
+      this.timeout = setTimeout(() => {
+        this.performSubmit()
+      }, delay)
+    } catch (error) {
+      console.error("Auto-submit error:", error)
     }
-
-    // Skip auto-submit for certain field types
-    const fieldName = event.target.name
-    if (this.skipFieldsValue.includes(fieldName)) {
-      return
-    }
-
-    // For text inputs, add a delay to avoid too many requests
-    const isTextInput = event.target.type === "text" || event.target.type === "search"
-    const delay = isTextInput ? this.delayValue : 0
-
-    // Set timeout for delayed submission
-    this.timeout = setTimeout(() => {
-      this.performSubmit()
-    }, delay)
   }
 
   performSubmit() {
-    // Add loading state
-    this.addLoadingState()
-    
-    // Submit the form
-    this.element.requestSubmit()
+    try {
+      // Add loading state
+      this.addLoadingState()
+      
+      // Submit the form
+      if (this.element && typeof this.element.requestSubmit === 'function') {
+        this.element.requestSubmit()
+      } else {
+        // Fallback for older browsers
+        this.element.submit()
+      }
+    } catch (error) {
+      console.error("Form submission error:", error)
+      this.removeLoadingState()
+    }
   }
 
   addLoadingState() {
@@ -70,7 +84,7 @@ export default class extends Controller {
   }
 
   // Called after Turbo response
-  turbo:submit-end() {
+  turboSubmitEnd(event) {
     this.removeLoadingState()
   }
 }

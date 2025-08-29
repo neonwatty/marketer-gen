@@ -7,5 +7,9 @@
   "dependencies": {
     "rails_admin": "^3.3.0",
     "sass": "^1.90.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "playwright": "^1.55.0"
   }
 }

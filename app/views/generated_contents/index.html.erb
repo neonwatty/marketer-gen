@@ -1,8 +1,8 @@
-<% content_for :title, "Generated Content" %>
+<% content_for :title, "Content" %>
 
 <div class="container mx-auto px-4 py-8">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">Generated Content</h1>
+    <h1 class="text-3xl font-bold text-gray-900">Content</h1>
     <% if @campaign_plan %>
       <%= link_to "New Content", new_campaign_plan_generated_content_path(@campaign_plan), 
           class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
@@ -51,11 +51,44 @@
     <% end %>
   <% else %>
     <div class="text-center py-12">
-      <div class="text-gray-500 text-lg mb-4">No content generated yet</div>
-      <% if @campaign_plan %>
-        <%= link_to "Generate First Content", new_campaign_plan_generated_content_path(@campaign_plan), 
-            class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
-      <% end %>
+      <div class="max-w-md mx-auto">
+        <!-- Icon -->
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
+          <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        
+        <!-- Title -->
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No content generated yet</h3>
+        
+        <!-- Description -->
+        <p class="text-gray-500 mb-6">
+          Start creating AI-powered content for your marketing campaigns. Generate emails, social posts, blog articles, and more.
+        </p>
+        
+        <!-- Actions -->
+        <div class="space-y-3">
+          <% if @campaign_plan %>
+            <%= link_to "Generate First Content", new_campaign_plan_generated_content_path(@campaign_plan), 
+                class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+          <% else %>
+            <%= link_to "Create Campaign Plan", campaign_plans_path, 
+                class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" %>
+            <p class="text-sm text-gray-500 mt-2">Create a campaign plan first to start generating content</p>
+          <% end %>
+        </div>
+        
+        <!-- Tips -->
+        <div class="mt-8 text-left bg-blue-50 rounded-lg p-4">
+          <h4 class="text-sm font-medium text-blue-900 mb-2">Get started with content generation:</h4>
+          <ul class="text-sm text-blue-700 space-y-1">
+            <li>• Set up your brand identity for consistent messaging</li>
+            <li>• Create customer journeys to guide content strategy</li>
+            <li>• Use AI suggestions to optimize your content</li>
+          </ul>
+        </div>
+      </div>
     </div>
   <% end %>
 </div>

@@ -1,7 +1,8 @@
-<div class="mx-auto max-w-md mt-10">
-  <h1 class="text-3xl font-bold mb-6">Sign Up</h1>
+<div class="mx-auto max-w-md mt-4 px-4 sm:px-0">
+  <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-900">Sign Up</h1>
 
-  <%= form_with model: @user, url: sign_up_path, local: true do |form| %>
+  <%= form_with model: @user, url: sign_up_path, local: true, 
+      data: { controller: "form-validation", action: "submit->form-validation#submit" } do |form| %>
     <% if @user.errors.any? %>
       <div class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         <h2 class="font-bold mb-2"><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
@@ -13,24 +14,59 @@
       </div>
     <% end %>
 
-    <div class="mb-4">
+    <div class="mb-4 relative">
       <%= form.label :email_address, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.email_field :email_address, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline", placeholder: "email@example.com" %>
+      <%= form.email_field :email_address, 
+          autocomplete: "email", 
+          required: true,
+          aria_describedby: (@user.errors[:email_address].any? ? "email_error" : nil),
+          data: { form_validation_target: "field" },
+          class: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors", 
+          placeholder: "email@example.com" %>
+      <% if @user.errors[:email_address].any? %>
+        <div id="email_error" class="text-red-600 text-sm mt-1" role="alert">
+          <%= @user.errors[:email_address].first %>
+        </div>
+      <% end %>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-4 relative">
       <%= form.label :password, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.password_field :password, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <%= form.password_field :password, 
+          autocomplete: "new-password", 
+          required: true,
+          minlength: 8,
+          aria_describedby: (@user.errors[:password].any? ? "password_error" : "password_help"),
+          data: { form_validation_target: "field" },
+          class: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" %>
+      <div id="password_help" class="text-gray-600 text-xs mt-1">Minimum 8 characters</div>
+      <% if @user.errors[:password].any? %>
+        <div id="password_error" class="text-red-600 text-sm mt-1" role="alert">
+          <%= @user.errors[:password].first %>
+        </div>
+      <% end %>
     </div>
 
-    <div class="mb-6">
+    <div class="mb-6 relative">
       <%= form.label :password_confirmation, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.password_field :password_confirmation, class: "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %>
+      <%= form.password_field :password_confirmation, 
+          autocomplete: "new-password", 
+          required: true,
+          aria_describedby: (@user.errors[:password_confirmation].any? ? "password_confirmation_error" : nil),
+          data: { form_validation_target: "field" },
+          class: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" %>
+      <% if @user.errors[:password_confirmation].any? %>
+        <div id="password_confirmation_error" class="text-red-600 text-sm mt-1" role="alert">
+          <%= @user.errors[:password_confirmation].first %>
+        </div>
+      <% end %>
     </div>
 
-    <div class="flex items-center justify-between">
-      <%= form.submit "Sign Up", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" %>
-      <%= link_to "Sign In", new_session_path, class: "inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" %>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+      <%= form.submit "Sign Up", 
+          data: { form_validation_target: "submit" },
+          class: "w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-colors text-center" %>
+      <%= link_to "Sign In", new_session_path, class: "text-center sm:text-left block font-bold text-sm text-blue-500 hover:text-blue-800 transition-colors" %>
     </div>
   <% end %>
 </div>

@@ -1,0 +1,1558 @@
+{
+  "config": {
+    "configFile": "/Users/jeremywatt/Desktop/marketer-gen/playwright.config.js",
+    "rootDir": "/Users/jeremywatt/Desktop/marketer-gen/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 5
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/jeremywatt/Desktop/marketer-gen/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/jeremywatt/Desktop/marketer-gen/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/jeremywatt/Desktop/marketer-gen/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/jeremywatt/Desktop/marketer-gen/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/jeremywatt/Desktop/marketer-gen/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/jeremywatt/Desktop/marketer-gen/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/jeremywatt/Desktop/marketer-gen/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Users/jeremywatt/Desktop/marketer-gen/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/jeremywatt/Desktop/marketer-gen/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Users/jeremywatt/Desktop/marketer-gen/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/jeremywatt/Desktop/marketer-gen/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "Tablet",
+        "name": "Tablet",
+        "testDir": "/Users/jeremywatt/Desktop/marketer-gen/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 5,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "ux-audit.spec.js",
+      "file": "ux-audit.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Marketer Gen UX Audit",
+          "file": "ux-audit.spec.js",
+          "line": 43,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Home Page and Landing Experience",
+              "file": "ux-audit.spec.js",
+              "line": 45,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should display welcoming home page for unauthenticated users",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 13221,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('a[href=\"/sessions/new\"]')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href=\"/sessions/new\"]')\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('a[href=\"/sessions/new\"]')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href=\"/sessions/new\"]')\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:58:34",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 34,
+                              "line": 58
+                            },
+                            "snippet": "  56 |       \n  57 |       await expect(signUpButton).toBeVisible();\n> 58 |       await expect(signInButton).toBeVisible();\n     |                                  ^\n  59 |       \n  60 |       // Check if buttons are properly styled and accessible\n  61 |       const signUpBg = await signUpButton.evaluate(el => getComputedStyle(el).backgroundColor);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 34,
+                                "line": 58
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('a[href=\"/sessions/new\"]')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href=\"/sessions/new\"]')\u001b[22m\n\n\n  56 |       \n  57 |       await expect(signUpButton).toBeVisible();\n> 58 |       await expect(signInButton).toBeVisible();\n     |                                  ^\n  59 |       \n  60 |       // Check if buttons are properly styled and accessible\n  61 |       const signUpBg = await signUpButton.evaluate(el => getComputedStyle(el).backgroundColor);\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:58:34"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:22.530Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-2c57f-e-for-unauthenticated-users-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-2c57f-e-for-unauthenticated-users-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-2c57f-e-for-unauthenticated-users-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-2c57f-e-for-unauthenticated-users-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 34,
+                            "line": 58
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-7535565aa7e752a9684b",
+                  "file": "ux-audit.spec.js",
+                  "line": 46,
+                  "column": 5
+                },
+                {
+                  "title": "should have proper mobile responsiveness",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 3759,
+                          "error": {
+                            "message": "Error: expect.toBeVisible: Error: strict mode violation: locator('.container, .mx-auto') resolved to 2 elements:\n    1) <main class=\"container mx-auto mt-28 px-5\">…</main> aka getByRole('main')\n    2) <div class=\"mx-auto max-w-4xl mt-10\">…</div> aka getByText('Welcome to Marketer Gen AI-')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.container, .mx-auto')\u001b[22m\n",
+                            "stack": "Error: expect.toBeVisible: Error: strict mode violation: locator('.container, .mx-auto') resolved to 2 elements:\n    1) <main class=\"container mx-auto mt-28 px-5\">…</main> aka getByRole('main')\n    2) <div class=\"mx-auto max-w-4xl mt-10\">…</div> aka getByText('Welcome to Marketer Gen AI-')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.container, .mx-auto')\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:76:31",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 31,
+                              "line": 76
+                            },
+                            "snippet": "  74 |       // Check if mobile layout adapts properly\n  75 |       const container = page.locator('.container, .mx-auto');\n> 76 |       await expect(container).toBeVisible();\n     |                               ^\n  77 |       \n  78 |       // Check button sizes on mobile\n  79 |       const signUpButton = page.locator('a[href=\"/sign_up\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 31,
+                                "line": 76
+                              },
+                              "message": "Error: expect.toBeVisible: Error: strict mode violation: locator('.container, .mx-auto') resolved to 2 elements:\n    1) <main class=\"container mx-auto mt-28 px-5\">…</main> aka getByRole('main')\n    2) <div class=\"mx-auto max-w-4xl mt-10\">…</div> aka getByText('Welcome to Marketer Gen AI-')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.container, .mx-auto')\u001b[22m\n\n\n  74 |       // Check if mobile layout adapts properly\n  75 |       const container = page.locator('.container, .mx-auto');\n> 76 |       await expect(container).toBeVisible();\n     |                               ^\n  77 |       \n  78 |       // Check button sizes on mobile\n  79 |       const signUpButton = page.locator('a[href=\"/sign_up\"]');\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:76:31"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:36.494Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-a4073-roper-mobile-responsiveness-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-a4073-roper-mobile-responsiveness-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-a4073-roper-mobile-responsiveness-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-a4073-roper-mobile-responsiveness-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 31,
+                            "line": 76
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-948096b4932e4dbd1f1d",
+                  "file": "ux-audit.spec.js",
+                  "line": 69,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Authentication Flow",
+              "file": "ux-audit.spec.js",
+              "line": 90,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should handle user registration with proper validation",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 9,
+                          "parallelIndex": 0,
+                          "status": "timedOut",
+                          "duration": 61114,
+                          "error": {
+                            "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
+                            "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                          },
+                          "errors": [
+                            {
+                              "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                            },
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 18,
+                                "line": 118
+                              },
+                              "message": "Error: page.waitForURL: Test timeout of 60000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================\n\n  116 |       \n  117 |       // Should redirect to home or login page\n> 118 |       await page.waitForURL(/\\/$/);\n      |                  ^\n  119 |       logTestResult('User registration', 'PASS', `Created user: ${testUser.email}`);\n  120 |     });\n  121 |\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:118:18"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "🔍 UX Issue [MEDIUM]: No validation errors shown for empty form submission on Sign Up\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 1\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 1\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n🔍 UX ISSUES IDENTIFIED:\n"
+                            },
+                            {
+                              "text": "\n1. [MEDIUM] Validation\n"
+                            },
+                            {
+                              "text": "   Page: Sign Up\n"
+                            },
+                            {
+                              "text": "   Issue: No validation errors shown for empty form submission\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:40.768Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-bf069-tion-with-proper-validation-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-bf069-tion-with-proper-validation-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-bf069-tion-with-proper-validation-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-bf069-tion-with-proper-validation-chromium/trace.zip"
+                            }
+                          ]
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-4bcf213d4b2e887a5ad8",
+                  "file": "ux-audit.spec.js",
+                  "line": 91,
+                  "column": 5
+                },
+                {
+                  "title": "should handle login flow",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 6533,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign in\"\u001b[39m\nReceived string: \u001b[31m\"Routing Error\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    9 × locator resolved to <h1>Routing Error</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Routing Error\"\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign in\"\u001b[39m\nReceived string: \u001b[31m\"Routing Error\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    9 × locator resolved to <h1>Routing Error</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Routing Error\"\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:126:40",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 40,
+                              "line": 126
+                            },
+                            "snippet": "  124 |       \n  125 |       // Check sign in form\n> 126 |       await expect(page.locator('h1')).toContainText('Sign in');\n      |                                        ^\n  127 |       \n  128 |       // Test empty form validation\n  129 |       await page.click('input[type=\"submit\"]');"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 40,
+                                "line": 126
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected string: \u001b[32m\"Sign in\"\u001b[39m\nReceived string: \u001b[31m\"Routing Error\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\u001b[2m    9 × locator resolved to <h1>Routing Error</h1>\u001b[22m\n\u001b[2m      - unexpected value \"Routing Error\"\u001b[22m\n\n\n  124 |       \n  125 |       // Check sign in form\n> 126 |       await expect(page.locator('h1')).toContainText('Sign in');\n      |                                        ^\n  127 |       \n  128 |       // Test empty form validation\n  129 |       await page.click('input[type=\"submit\"]');\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:126:40"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:22.536Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-6f009-ow-should-handle-login-flow-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-6f009-ow-should-handle-login-flow-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-6f009-ow-should-handle-login-flow-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-6f009-ow-should-handle-login-flow-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 40,
+                            "line": 126
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-f87d479155dc060ab514",
+                  "file": "ux-audit.spec.js",
+                  "line": 122,
+                  "column": 5
+                },
+                {
+                  "title": "should provide proper feedback for wrong credentials",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 5,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 16066,
+                          "error": {
+                            "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n",
+                            "stack": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:151:18",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 18,
+                              "line": 151
+                            },
+                            "snippet": "  149 |       await page.goto('/sessions/new');\n  150 |       \n> 151 |       await page.fill('input[name=\"email_address\"]', 'wrong@email.com');\n      |                  ^\n  152 |       await page.fill('input[name=\"password\"]', 'wrongpassword');\n  153 |       await page.click('input[type=\"submit\"]');\n  154 |       "
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 18,
+                                "line": 151
+                              },
+                              "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n\n  149 |       await page.goto('/sessions/new');\n  150 |       \n> 151 |       await page.fill('input[name=\"email_address\"]', 'wrong@email.com');\n      |                  ^\n  152 |       await page.fill('input[name=\"password\"]', 'wrongpassword');\n  153 |       await page.click('input[type=\"submit\"]');\n  154 |       \n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:151:18"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:29.906Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-4416d-dback-for-wrong-credentials-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-4416d-dback-for-wrong-credentials-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-4416d-dback-for-wrong-credentials-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-4416d-dback-for-wrong-credentials-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 18,
+                            "line": 151
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-1c9c5a3c1aa6826a6cde",
+                  "file": "ux-audit.spec.js",
+                  "line": 148,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Authenticated User Experience",
+              "file": "ux-audit.spec.js",
+              "line": 167,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should display dashboard with proper navigation",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 10,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 15498,
+                          "error": {
+                            "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n",
+                            "stack": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 18,
+                              "line": 171
+                            },
+                            "snippet": "  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 18,
+                                "line": 171
+                              },
+                              "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n\n  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:46.651Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-c957e-oard-with-proper-navigation-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-c957e-oard-with-proper-navigation-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-c957e-oard-with-proper-navigation-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-c957e-oard-with-proper-navigation-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 18,
+                            "line": 171
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-80499c6788c7f1b5834f",
+                  "file": "ux-audit.spec.js",
+                  "line": 177,
+                  "column": 5
+                },
+                {
+                  "title": "should navigate to journeys section",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 15957,
+                          "error": {
+                            "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n",
+                            "stack": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 18,
+                              "line": 171
+                            },
+                            "snippet": "  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 18,
+                                "line": 171
+                              },
+                              "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n\n  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:22.519Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-a3519-avigate-to-journeys-section-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-a3519-avigate-to-journeys-section-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-a3519-avigate-to-journeys-section-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-a3519-avigate-to-journeys-section-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 18,
+                            "line": 171
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-9d70b0b337f63b85f3fb",
+                  "file": "ux-audit.spec.js",
+                  "line": 201,
+                  "column": 5
+                },
+                {
+                  "title": "should test campaign plans functionality",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 7,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 15788,
+                          "error": {
+                            "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n",
+                            "stack": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 18,
+                              "line": 171
+                            },
+                            "snippet": "  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 18,
+                                "line": 171
+                              },
+                              "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n\n  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:39.417Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-8a539-ampaign-plans-functionality-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-8a539-ampaign-plans-functionality-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-8a539-ampaign-plans-functionality-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-8a539-ampaign-plans-functionality-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 18,
+                            "line": 171
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-673a188a1e0cefe9c4a9",
+                  "file": "ux-audit.spec.js",
+                  "line": 223,
+                  "column": 5
+                },
+                {
+                  "title": "should test profile management",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 11,
+                          "parallelIndex": 2,
+                          "status": "failed",
+                          "duration": 15393,
+                          "error": {
+                            "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n",
+                            "stack": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 18,
+                              "line": 171
+                            },
+                            "snippet": "  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 18,
+                                "line": 171
+                              },
+                              "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n\n  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:55.814Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-83238-uld-test-profile-management-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-83238-uld-test-profile-management-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-83238-uld-test-profile-management-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-83238-uld-test-profile-management-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 18,
+                            "line": 171
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-d802adb761d72563b814",
+                  "file": "ux-audit.spec.js",
+                  "line": 249,
+                  "column": 5
+                },
+                {
+                  "title": "should handle sign out",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 3,
+                          "status": "failed",
+                          "duration": 16243,
+                          "error": {
+                            "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n",
+                            "stack": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18",
+                            "location": {
+                              "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                              "column": 18,
+                              "line": 171
+                            },
+                            "snippet": "  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                                "column": 18,
+                                "line": 171
+                              },
+                              "message": "TimeoutError: page.fill: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"email_address\"]')\u001b[22m\n\n\n  169 |       // Login before each test\n  170 |       await page.goto('/sessions/new');\n> 171 |       await page.fill('input[name=\"email_address\"]', testUser.email);\n      |                  ^\n  172 |       await page.fill('input[name=\"password\"]', testUser.password);\n  173 |       await page.click('input[type=\"submit\"]');\n  174 |       await page.waitForURL(/\\/$/);\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js:171:18"
+                            }
+                          ],
+                          "stdout": [
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 0\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 0\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 0\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:22.494Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-59bd0-ence-should-handle-sign-out-chromium/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-59bd0-ence-should-handle-sign-out-chromium/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-59bd0-ence-should-handle-sign-out-chromium/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/ux-audit-Marketer-Gen-UX-A-59bd0-ence-should-handle-sign-out-chromium/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ux-audit.spec.js",
+                            "column": 18,
+                            "line": 171
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-32d38c07513065a68522",
+                  "file": "ux-audit.spec.js",
+                  "line": 263,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Error Handling and Edge Cases",
+              "file": "ux-audit.spec.js",
+              "line": 283,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should handle 404 errors gracefully",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 611,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "🔍 UX Issue [MEDIUM]: Generic 404 page, could be more user-friendly on 404 Page\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:39.709Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-d478ad185608d94d9c55",
+                  "file": "ux-audit.spec.js",
+                  "line": 284,
+                  "column": 5
+                },
+                {
+                  "title": "should test accessibility features",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 3,
+                          "status": "passed",
+                          "duration": 3555,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "✅ Test: Basic accessibility check - COMPLETED\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 1\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 1\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 1\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n🔍 UX ISSUES IDENTIFIED:\n"
+                            },
+                            {
+                              "text": "\n1. [MEDIUM] Error Handling\n"
+                            },
+                            {
+                              "text": "   Page: 404 Page\n"
+                            },
+                            {
+                              "text": "   Issue: Generic 404 page, could be more user-friendly\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "1. Basic accessibility check: COMPLETED\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:40.398Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-4b5c7f0d7fc8b53c7a94",
+                  "file": "ux-audit.spec.js",
+                  "line": 298,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Performance and Load Times",
+              "file": "ux-audit.spec.js",
+              "line": 324,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should measure page load performance",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 4,
+                          "parallelIndex": 4,
+                          "status": "passed",
+                          "duration": 6269,
+                          "errors": [],
+                          "stdout": [
+                            {
+                              "text": "🔍 UX Issue [MEDIUM]: Slow page load time: 5860ms on Home Page\n"
+                            },
+                            {
+                              "text": "✅ Test: Page load performance - MEASURED: Load time: 5860ms\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            },
+                            {
+                              "text": "MARKETER GEN UX AUDIT REPORT\n"
+                            },
+                            {
+                              "text": "================================================================================\n"
+                            },
+                            {
+                              "text": "\n📊 SUMMARY:\n"
+                            },
+                            {
+                              "text": "- Total Tests: 1\n"
+                            },
+                            {
+                              "text": "- UX Issues Found: 1\n"
+                            },
+                            {
+                              "text": "- Critical Issues: 0\n"
+                            },
+                            {
+                              "text": "- Medium Issues: 1\n"
+                            },
+                            {
+                              "text": "- Low Issues: 0\n"
+                            },
+                            {
+                              "text": "\n🔍 UX ISSUES IDENTIFIED:\n"
+                            },
+                            {
+                              "text": "\n1. [MEDIUM] Performance\n"
+                            },
+                            {
+                              "text": "   Page: Home Page\n"
+                            },
+                            {
+                              "text": "   Issue: Slow page load time: 5860ms\n"
+                            },
+                            {
+                              "text": "\n✅ TEST RESULTS:\n"
+                            },
+                            {
+                              "text": "1. Page load performance: MEASURED - Load time: 5860ms\n"
+                            },
+                            {
+                              "text": "\n================================================================================\n"
+                            }
+                          ],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-29T01:01:22.514Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "3aa82a820b754f03e7d4-83ac74ba1dbbc8267de4",
+                  "file": "ux-audit.spec.js",
+                  "line": 325,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-08-29T01:01:22.074Z",
+    "duration": 80141.537,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 10,
+    "flaky": 0
+  }
+}

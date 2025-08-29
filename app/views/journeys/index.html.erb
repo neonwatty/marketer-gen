@@ -111,28 +111,78 @@
     <% end %>
   </div>
 
-  <!-- Journey Comparison -->
+  <!-- Bulk Actions -->
   <% if @journeys.any? %>
-    <%= form_with url: compare_journeys_path, method: :get, local: true, class: "mb-6" do |form| %>
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-medium text-gray-900">Compare Journeys</h3>
+    <div data-controller="bulk-actions" 
+         data-bulk-actions-resource-value="journeys"
+         data-bulk-actions-archive-url-value="<%= bulk_archive_journeys_path %>"
+         data-bulk-actions-duplicate-url-value="<%= bulk_duplicate_journeys_path %>"
+         data-bulk-actions-delete-url-value="<%= bulk_delete_journeys_path %>"
+         class="mb-6">
+      
+      <!-- Bulk Actions Toolbar (Initially Hidden) -->
+      <div data-bulk-actions-target="toolbar" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <span class="text-sm font-medium text-blue-900">
+              <span data-bulk-actions-target="selectedCount">0</span> journeys selected
+            </span>
+            <button type="button" 
+                    data-action="click->bulk-actions#clearSelection"
+                    class="text-sm text-blue-600 hover:text-blue-800">Clear Selection</button>
+          </div>
+          
           <div class="flex space-x-2">
-            <button type="button" onclick="selectAllJourneys(false)" class="text-sm text-gray-600 hover:text-gray-800">Clear All</button>
-            <%= form.submit "Compare Selected", class: "bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors", disabled: true, id: "compare-button" %>
+            <button type="button" 
+                    data-action="click->bulk-actions#bulkDuplicate"
+                    data-bulk-actions-target="bulkButton"
+                    class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-3 rounded-md text-sm transition-colors">
+              Duplicate Selected
+            </button>
+            <button type="button" 
+                    data-action="click->bulk-actions#bulkArchive"
+                    data-bulk-actions-target="bulkButton"
+                    class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-3 rounded-md text-sm transition-colors">
+              Archive Selected
+            </button>
+            <button type="button" 
+                    data-action="click->bulk-actions#bulkDelete"
+                    data-bulk-actions-target="bulkButton"
+                    data-min-selection="1"
+                    class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-3 rounded-md text-sm transition-colors">
+              Delete Selected
+            </button>
           </div>
         </div>
-        <p class="text-sm text-gray-600 mt-1">Select 2-4 journeys to compare their performance and structure.</p>
+      </div>
+
+      <!-- Select All Header -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <input type="checkbox" 
+                   data-bulk-actions-target="selectAllCheckbox"
+                   data-action="change->bulk-actions#selectAll"
+                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <h3 class="text-lg font-medium text-gray-900">Select Journeys</h3>
+          </div>
+          <p class="text-sm text-gray-600">Select journeys to perform bulk actions</p>
+        </div>
       </div>
     
       <!-- Journeys Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-controller="journey-comparison">
         <% @journeys.each do |journey| %>
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow" data-bulk-actions-target="row">
           <div class="p-6">
             <div class="flex justify-between items-start mb-4">
               <div class="flex items-center space-x-3">
-                <%= form.check_box :journey_ids, { multiple: true, class: "rounded border-gray-300 text-purple-600 focus:ring-purple-500", onchange: "updateCompareButton()" }, journey.id, "" %>
+                <input type="checkbox" 
+                       name="journey_ids[]" 
+                       value="<%= journey.id %>"
+                       data-bulk-actions-target="checkbox"
+                       data-action="change->bulk-actions#toggleSelection"
+                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 <h3 class="text-lg font-semibold text-gray-900 truncate"><%= journey.name %></h3>
               </div>
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= status_badge_classes(journey.status) %>">
@@ -187,7 +237,7 @@
         </div>
         <% end %>
       </div>
-    <% end %>
+    </div>
   <% else %>
     <div class="text-center py-12">
       <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -202,26 +252,3 @@
   <% end %>
 </div>
 
-<script>
-function updateCompareButton() {
-  const checkboxes = document.querySelectorAll('input[name="journey_ids[]"]:checked');
-  const compareButton = document.getElementById('compare-button');
-  const count = checkboxes.length;
-  
-  if (count >= 2 && count <= 4) {
-    compareButton.disabled = false;
-    compareButton.textContent = `Compare Selected (${count})`;
-  } else {
-    compareButton.disabled = true;
-    compareButton.textContent = count === 0 ? 'Compare Selected' : 
-                                count === 1 ? 'Select 1 more' : 
-                                'Too many selected (max 4)';
-  }
-}
-
-function selectAllJourneys(select) {
-  const checkboxes = document.querySelectorAll('input[name="journey_ids[]"]');
-  checkboxes.forEach(checkbox => checkbox.checked = select);
-  updateCompareButton();
-}
-</script>

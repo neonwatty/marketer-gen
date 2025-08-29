@@ -90,6 +90,9 @@ Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root "home#index"
   
+  # Help and documentation
+  get "help", to: "pages#help", as: :help_page
+  
   resource :profile, only: [:show, :edit, :update]
   
   get "sign_up", to: "registrations#new"
@@ -104,6 +107,9 @@ Rails.application.routes.draw do
       get :select_template
       post :create_from_template
       get :template_preview
+      patch :bulk_archive
+      patch :bulk_duplicate
+      patch :bulk_delete
     end
     member do
       patch :reorder_steps

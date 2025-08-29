@@ -55,7 +55,11 @@ module Authentication
         end
         
         # Touch session activity for idle timeout tracking (skip in test)
-        Current.session.touch_activity! unless Rails.env.test?
+        # Only do this once per request to avoid multiple DB updates
+        unless Rails.env.test? || @session_activity_touched
+          Current.session.touch_activity!
+          @session_activity_touched = true
+        end
         
         # Security checks (relaxed in test)
         perform_security_checks! unless Rails.env.test?

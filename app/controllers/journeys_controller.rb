@@ -18,11 +18,12 @@ class JourneysController < ApplicationController
     @journeys = @journeys.by_template_type(params[:template_type]) if params[:template_type].present?
     @journeys = @journeys.where(status: params[:status]) if params[:status].present?
     
-    # Analytics data
+    # Analytics data - optimized with a single query
+    journey_counts = @journeys.group(:status).count
     @analytics = {
       total_journeys: @journeys.count,
-      active_journeys: @journeys.where(status: 'active').count,
-      completed_journeys: @journeys.where(status: 'completed').count,
+      active_journeys: journey_counts['active'] || 0,
+      completed_journeys: journey_counts['completed'] || 0,
       average_completion_rate: calculate_average_completion_rate(@journeys)
     }
   end
@@ -279,6 +280,81 @@ class JourneysController < ApplicationController
     else
       redirect_to @journey, alert: 'Journey cannot be archived in its current state.'
     end
+  end
+
+  def bulk_archive
+    authorize Journey
+    journey_ids = params[:ids] || []
+    
+    if journey_ids.empty?
+      render json: { error: 'No journeys selected' }, status: :bad_request
+      return
+    end
+
+    journeys = policy_scope(Journey).where(id: journey_ids)
+    archived_count = 0
+    failed_count = 0
+
+    journeys.find_each do |journey|
+      if journey.can_be_archived?
+        journey.update(status: 'archived')
+        archived_count += 1
+      else
+        failed_count += 1
+      end
+    end
+
+    message = "#{archived_count} journeys archived successfully"
+    message += ", #{failed_count} could not be archived" if failed_count > 0
+
+    redirect_to journeys_path, notice: message
+  end
+
+  def bulk_duplicate
+    authorize Journey
+    journey_ids = params[:ids] || []
+    
+    if journey_ids.empty?
+      render json: { error: 'No journeys selected' }, status: :bad_request
+      return
+    end
+
+    journeys = policy_scope(Journey).where(id: journey_ids)
+    duplicated_count = 0
+
+    journeys.find_each do |journey|
+      new_journey = journey.dup
+      new_journey.name = "Copy of #{journey.name}"
+      new_journey.status = 'draft'
+      new_journey.user = Current.user
+      
+      if new_journey.save
+        # Duplicate journey steps
+        journey.journey_steps.find_each do |step|
+          new_step = step.dup
+          new_step.journey = new_journey
+          new_step.save
+        end
+        duplicated_count += 1
+      end
+    end
+
+    redirect_to journeys_path, notice: "#{duplicated_count} journeys duplicated successfully"
+  end
+
+  def bulk_delete
+    authorize Journey
+    journey_ids = params[:ids] || []
+    
+    if journey_ids.empty?
+      render json: { error: 'No journeys selected' }, status: :bad_request
+      return
+    end
+
+    journeys = policy_scope(Journey).where(id: journey_ids)
+    deleted_count = journeys.destroy_all.count
+
+    redirect_to journeys_path, notice: "#{deleted_count} journeys deleted successfully"
   end
 
   def compare
