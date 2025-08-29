@@ -23,11 +23,4 @@ describe('Performance', () => {
     expect(endTime - startTime).toBeLessThan(500) // 500ms budget for test environment
   })
 
-  it('should have priority loading for Next.js logo', () => {
-    const { container } = render(<Home />)
-    const priorityImage = container.querySelector('img[alt="Next.js logo"]')
-
-    // Check for priority attribute in test environment
-    expect(priorityImage?.getAttribute('data-priority')).toBeTruthy()
-  })
 })

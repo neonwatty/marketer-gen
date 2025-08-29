@@ -6,7 +6,8 @@ import {
   Megaphone, 
   Plus, 
   Settings, 
-  Users} from 'lucide-react'
+  Users,
+  GitBranch} from 'lucide-react'
 
 export interface NavigationItem {
   name: string
@@ -23,6 +24,7 @@ export interface QuickAction {
 
 export const mainNavigationItems: NavigationItem[] = [
   { name: 'Dashboard', title: 'Overview', href: '/dashboard', icon: Home },
+  { name: 'Journeys', title: 'Journeys', href: '/dashboard/journeys', icon: GitBranch },
   { name: 'Campaigns', title: 'Campaigns', href: '/dashboard/campaigns', icon: Megaphone },
   { name: 'Analytics', title: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Content', title: 'Audience', href: '/dashboard/audience', icon: Users },
@@ -37,6 +39,7 @@ export const publicNavigationItems: NavigationItem[] = [
 
 export const dashboardNavigationItems: NavigationItem[] = [
   { name: 'Overview', title: 'Overview', href: '/dashboard', icon: Home },
+  { name: 'Journeys', title: 'Journeys', href: '/dashboard/journeys', icon: GitBranch },
   { name: 'Campaigns', title: 'Campaigns', href: '/dashboard/campaigns', icon: Megaphone },
   { name: 'Analytics', title: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Audience', title: 'Audience', href: '/dashboard/audience', icon: Users },
@@ -45,6 +48,7 @@ export const dashboardNavigationItems: NavigationItem[] = [
 ]
 
 export const quickActions: QuickAction[] = [
+  { name: 'New Journey', href: '/dashboard/journeys/new', icon: Plus },
   { name: 'New Campaign', href: '/dashboard/campaigns/new', icon: Plus },
 ]
 

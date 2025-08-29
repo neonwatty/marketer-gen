@@ -1,8 +1,10 @@
 'use client'
 
-import { useCallback,useState, useMemo } from 'react'
+import { useCallback, useState, useMemo, useEffect, useRef } from 'react'
 import * as React from 'react'
-import { FormProvider,useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 
 import * as z from 'zod'
 
@@ -32,13 +34,13 @@ const campaignFormSchema = z.object({
   // Target Audience
   targetAudience: z.object({
     demographics: z.object({
-      ageRange: z.array(z.number()).optional(),
-      gender: z.array(z.string()).optional(),
-      locations: z.array(z.string()).optional(),
-    }).optional(),
-    segments: z.array(z.string()).optional(),
-    estimatedSize: z.number().optional(),
-  }).optional(),
+      ageRange: z.array(z.number()),
+      gender: z.array(z.string()),
+      locations: z.array(z.string()),
+    }),
+    segments: z.array(z.string()),
+    estimatedSize: z.number(),
+  }),
   
   // Goals & KPIs
   goals: z.object({
@@ -49,7 +51,7 @@ const campaignFormSchema = z.object({
   }),
   
   // Additional settings
-  isDraft: z.boolean().default(true),
+  isDraft: z.boolean(),
 })
 
 export type CampaignFormData = z.infer<typeof campaignFormSchema>
@@ -102,6 +104,10 @@ export function CampaignWizard({
   isLoading = false 
 }: CampaignWizardProps) {
   const [currentStep, setCurrentStep] = useState(0)
+  const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastSavedDataRef = useRef<string | null>(null)
 
   const defaultFormValues = {
     name: initialData?.name || '',
@@ -110,6 +116,15 @@ export function CampaignWizard({
     endDate: initialData?.endDate || '',
     templateId: initialData?.templateId || '',
     isDraft: initialData?.isDraft ?? true,
+    targetAudience: {
+      demographics: {
+        ageRange: initialData?.targetAudience?.demographics?.ageRange || [],
+        gender: initialData?.targetAudience?.demographics?.gender || [],
+        locations: initialData?.targetAudience?.demographics?.locations || [],
+      },
+      segments: initialData?.targetAudience?.segments || [],
+      estimatedSize: initialData?.targetAudience?.estimatedSize || 0,
+    },
     goals: {
       primary: initialData?.goals?.primary || '',
       budget: initialData?.goals?.budget ?? 0,
@@ -119,12 +134,13 @@ export function CampaignWizard({
   }
 
   const form = useForm({
-    // resolver: zodResolver(campaignFormSchema),
+    resolver: zodResolver(campaignFormSchema),
     defaultValues: defaultFormValues,
     mode: 'onChange',
   })
 
   const { watch, formState: { isValid } } = form
+  const allFormData = watch()
 
   // Watch specific form fields for step validation instead of all data
   const name = watch('name')
@@ -204,9 +220,83 @@ export function CampaignWizard({
 
   const handleSaveDraft = async () => {
     if (onSaveDraft) {
-      await onSaveDraft(form.getValues())
+      const formData = form.getValues()
+      await onSaveDraft(formData)
+      
+      // Update auto-save state after manual save
+      setLastAutoSave(new Date())
+      setHasUnsavedChanges(false)
+      lastSavedDataRef.current = JSON.stringify(formData)
     }
   }
+
+  const handleAutoSave = useCallback(async () => {
+    console.log('Auto-save: handleAutoSave called', { hasUnsavedChanges, onSaveDraft: !!onSaveDraft })
+    if (onSaveDraft && hasUnsavedChanges) {
+      try {
+        const formData = form.getValues()
+        console.log('Auto-save: Calling onSaveDraft with data:', formData)
+        await onSaveDraft(formData)
+        setLastAutoSave(new Date())
+        setHasUnsavedChanges(false)
+        lastSavedDataRef.current = JSON.stringify(formData)
+        
+        // Show subtle auto-save notification
+        toast.success('Draft auto-saved', {
+          duration: 2000,
+          description: `Auto-saved at ${new Date().toLocaleTimeString()}`,
+        })
+      } catch (error) {
+        console.error('Auto-save failed:', error)
+        toast.error('Auto-save failed', {
+          duration: 3000,
+          description: 'Your changes could not be auto-saved. Please save manually.',
+        })
+      }
+    } else {
+      console.log('Auto-save: Skipping auto-save - conditions not met')
+    }
+  }, [onSaveDraft, hasUnsavedChanges, form])
+
+  // Auto-save effect
+  useEffect(() => {
+    // Clear existing timeout
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current)
+    }
+
+    // Check if form data has changed
+    const currentDataString = JSON.stringify(allFormData)
+    
+    // Initialize if this is the first time
+    if (lastSavedDataRef.current === null) {
+      lastSavedDataRef.current = currentDataString
+      return
+    }
+    
+    const hasChanges = lastSavedDataRef.current !== currentDataString
+    
+    // Update unsaved changes state
+    if (hasChanges !== hasUnsavedChanges) {
+      setHasUnsavedChanges(hasChanges)
+      console.log('Auto-save: Changes detected:', hasChanges)
+    }
+
+    // Set up new auto-save timeout if there are changes
+    if (hasChanges && onSaveDraft) {
+      console.log('Auto-save: Setting up auto-save timer')
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        console.log('Auto-save: Timer triggered, calling handleAutoSave')
+        handleAutoSave()
+      }, 10000) // Auto-save every 10 seconds for faster testing
+    }
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current)
+      }
+    }
+  }, [allFormData, hasUnsavedChanges, handleAutoSave, onSaveDraft])
 
   const renderStep = () => {
     switch (currentStep) {
@@ -230,7 +320,24 @@ export function CampaignWizard({
       <div className="mx-auto max-w-4xl space-y-8">
         <Card>
           <CardHeader>
-            <CardTitle>Create New Campaign</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Create New Campaign</span>
+              {/* Auto-save status indicator */}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                {hasUnsavedChanges && (
+                  <div className="flex items-center gap-1">
+                    <div className="h-2 w-2 bg-yellow-500 rounded-full animate-pulse" />
+                    <span>Unsaved changes</span>
+                  </div>
+                )}
+                {lastAutoSave && !hasUnsavedChanges && (
+                  <div className="flex items-center gap-1">
+                    <div className="h-2 w-2 bg-green-500 rounded-full" />
+                    <span>Auto-saved at {lastAutoSave.toLocaleTimeString()}</span>
+                  </div>
+                )}
+              </div>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <CampaignWizardNav

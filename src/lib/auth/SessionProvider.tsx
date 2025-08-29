@@ -11,10 +11,9 @@ interface SessionProviderProps {
 export function SessionProvider({ children }: SessionProviderProps) {
   return (
     <NextAuthSessionProvider
-      // Session configuration - currently allows the app to work without authentication
-      session={null} // No initial session
-      refetchInterval={0} // Disable session refetching
-      refetchOnWindowFocus={false} // Disable refetch on window focus
+      // Enable session management for proper authentication
+      refetchInterval={5 * 60} // Refetch session every 5 minutes
+      refetchOnWindowFocus={true} // Refetch on window focus
     >
       {children}
     </NextAuthSessionProvider>

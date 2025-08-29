@@ -104,7 +104,7 @@ const journeyTemplates: JourneyTemplate[] = [
 ]
 
 export function TemplateSelectionStep() {
-  const { control, watch } = useFormContext()
+  const { control, watch, setValue } = useFormContext()
   const selectedTemplateId = watch('templateId')
 
   return (
@@ -116,99 +116,92 @@ export function TemplateSelectionStep() {
         </p>
       </div>
 
-      <FormField
-        control={control}
-        name="templateId"
-        render={({ field }) => (
-          <FormItem>
-            <FormControl>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {journeyTemplates.map((template) => {
-                  const isSelected = field.value === template.id
-                  const Icon = template.icon
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {journeyTemplates.map((template) => {
+          const isSelected = selectedTemplateId === template.id
+          const Icon = template.icon
 
-                  return (
-                    <Card
-                      key={template.id}
-                      className={cn(
-                        'cursor-pointer transition-all hover:shadow-md',
-                        isSelected && 'ring-2 ring-primary ring-offset-2'
+          return (
+            <Card
+              key={template.id}
+              className={cn(
+                'cursor-pointer transition-all hover:shadow-md',
+                isSelected && 'ring-2 ring-primary ring-offset-2'
+              )}
+              onClick={() => {
+                console.log('Direct template click:', template.id)
+                setValue('templateId', template.id)
+                console.log('Template value set to:', template.id)
+              }}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-lg bg-primary/10 p-2">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base">{template.name}</CardTitle>
+                      <div className="flex items-center gap-2 mt-1">
+                        {template.recommended && (
+                          <Badge variant="default" className="text-xs">
+                            Recommended
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs">
+                          {template.difficulty}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  {isSelected && (
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                  )}
+                </div>
+              </CardHeader>
+              
+              <CardContent className="space-y-3">
+                <CardDescription className="text-sm leading-relaxed">
+                  {template.description}
+                </CardDescription>
+                
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <span className="font-medium text-foreground">Duration:</span>
+                    <span className="text-muted-foreground ml-1">{template.estimatedDuration}</span>
+                  </div>
+                  
+                  <div>
+                    <span className="font-medium text-foreground">Stages:</span>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {template.stages.slice(0, 3).map((stage) => (
+                        <Badge key={stage} variant="secondary" className="text-xs">
+                          {stage}
+                        </Badge>
+                      ))}
+                      {template.stages.length > 3 && (
+                        <Badge variant="secondary" className="text-xs">
+                          +{template.stages.length - 3} more
+                        </Badge>
                       )}
-                      onClick={() => field.onChange(template.id)}
-                    >
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="rounded-lg bg-primary/10 p-2">
-                              <Icon className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                              <CardTitle className="text-base">{template.name}</CardTitle>
-                              <div className="flex items-center gap-2 mt-1">
-                                {template.recommended && (
-                                  <Badge variant="default" className="text-xs">
-                                    Recommended
-                                  </Badge>
-                                )}
-                                <Badge variant="outline" className="text-xs">
-                                  {template.difficulty}
-                                </Badge>
-                              </div>
-                            </div>
-                          </div>
-                          {isSelected && (
-                            <CheckCircle2 className="h-5 w-5 text-primary" />
-                          )}
-                        </div>
-                      </CardHeader>
-                      
-                      <CardContent className="space-y-3">
-                        <CardDescription className="text-sm leading-relaxed">
-                          {template.description}
-                        </CardDescription>
-                        
-                        <div className="space-y-2 text-xs">
-                          <div>
-                            <span className="font-medium text-foreground">Duration:</span>
-                            <span className="text-muted-foreground ml-1">{template.estimatedDuration}</span>
-                          </div>
-                          
-                          <div>
-                            <span className="font-medium text-foreground">Stages:</span>
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              {template.stages.slice(0, 3).map((stage) => (
-                                <Badge key={stage} variant="secondary" className="text-xs">
-                                  {stage}
-                                </Badge>
-                              ))}
-                              {template.stages.length > 3 && (
-                                <Badge variant="secondary" className="text-xs">
-                                  +{template.stages.length - 3} more
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <span className="font-medium text-foreground">Key Metrics:</span>
-                            <div className="mt-1">
-                              <span className="text-muted-foreground">
-                                {template.metrics.slice(0, 2).join(', ')}
-                                {template.metrics.length > 2 && '...'}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
-              </div>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <span className="font-medium text-foreground">Key Metrics:</span>
+                    <div className="mt-1">
+                      <span className="text-muted-foreground">
+                        {template.metrics.slice(0, 2).join(', ')}
+                        {template.metrics.length > 2 && '...'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
 
       {selectedTemplateId && (
         <div className="rounded-lg bg-muted/50 p-4">

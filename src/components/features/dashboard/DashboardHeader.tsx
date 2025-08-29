@@ -96,7 +96,7 @@ export function DashboardHeader() {
                 aria-haspopup="menu"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder-avatar.jpg" alt="Demo User profile picture" />
+                  <AvatarImage src="/placeholder-avatar.svg" alt="Demo User profile picture" />
                   <AvatarFallback>
                     <User className="h-4 w-4" aria-hidden="true" />
                   </AvatarFallback>

@@ -64,7 +64,7 @@ const primaryGoalOptions = [
 ]
 
 export function GoalsKPIsStep() {
-  const { control, watch } = useFormContext()
+  const { control, watch, setValue } = useFormContext()
   const selectedGoal = watch('goals.primary')
   const selectedGoalOption = primaryGoalOptions.find(goal => goal.value === selectedGoal)
 
@@ -90,53 +90,46 @@ export function GoalsKPIsStep() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <FormField
-              control={control}
-              name="goals.primary"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                      {primaryGoalOptions.map((goal) => {
-                        const isSelected = field.value === goal.value
-                        const Icon = goal.icon
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {primaryGoalOptions.map((goal) => {
+                const isSelected = selectedGoal === goal.value
+                const Icon = goal.icon
 
-                        return (
-                          <div
-                            key={goal.value}
-                            className={cn(
-                              'relative rounded-lg border p-4 cursor-pointer transition-all hover:border-primary/50',
-                              isSelected ? 'border-primary bg-primary/5' : 'border-border'
-                            )}
-                            onClick={() => field.onChange(goal.value)}
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className="rounded-lg bg-primary/10 p-2 mt-1">
-                                <Icon className="h-4 w-4 text-primary" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium text-sm">{goal.label}</div>
-                                <div className="text-muted-foreground text-xs mt-1 leading-relaxed">
-                                  {goal.description}
-                                </div>
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                  {goal.metrics.slice(0, 2).map((metric) => (
-                                    <Badge key={metric} variant="outline" className="text-xs">
-                                      {metric}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })}
+                return (
+                  <div
+                    key={goal.value}
+                    className={cn(
+                      'relative rounded-lg border p-4 cursor-pointer transition-all hover:border-primary/50',
+                      isSelected ? 'border-primary bg-primary/5' : 'border-border'
+                    )}
+                    onClick={() => {
+                      console.log('Direct goal click:', goal.value)
+                      setValue('goals.primary', goal.value)
+                      console.log('Goal value set to:', goal.value)
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="rounded-lg bg-primary/10 p-2 mt-1">
+                        <Icon className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm">{goal.label}</div>
+                        <div className="text-muted-foreground text-xs mt-1 leading-relaxed">
+                          {goal.description}
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {goal.metrics.slice(0, 2).map((metric) => (
+                            <Badge key={metric} variant="outline" className="text-xs">
+                              {metric}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                  </div>
+                )
+              })}
+            </div>
 
             {selectedGoalOption && (
               <div className="mt-4 p-3 rounded-lg bg-muted/50">

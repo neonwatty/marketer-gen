@@ -22,7 +22,6 @@ const nextConfig: NextConfig = {
   
   // Environment-specific settings
   reactStrictMode: true,
-  swcMinify: true,
   
   // Production optimizations
   ...(isProd && {
@@ -73,22 +72,22 @@ const nextConfig: NextConfig = {
     webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
     // Production-specific features
     ...(isProd && {
-      instrumentationHook: true,
       scrollRestoration: true,
       optimizeServerReact: true,
-    }),
-    // Development-specific features
-    ...(isDev && {
-      turbo: {
-        loaders: {
-          '.svg': ['@svgr/webpack'],
-        },
-      },
     }),
   },
   
   // External packages for server components
   serverExternalPackages: ['prisma'],
+  
+  // Turbopack configuration
+  ...(isDev && {
+    turbopack: {
+      rules: {
+        '*.svg': ['@svgr/webpack'],
+      },
+    },
+  }),
   
   // Image optimization
   images: {

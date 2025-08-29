@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { CampaignDataTable } from '../campaigns/CampaignDataTable'
+import { LoadingButton } from '@/components/ui/loading-button'
 
 import { type Campaign } from './CampaignCard'
 
@@ -105,7 +106,9 @@ const mockCampaigns: Campaign[] = [
 ]
 
 export function CampaignExample() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [refreshing, setRefreshing] = useState(false)
 
   const handleView = (id: string) => {
     console.log('View campaign:', id)
@@ -123,6 +126,27 @@ export function CampaignExample() {
     console.log('Archive campaign:', id)
   }
 
+  // Simulate initial data loading
+  useEffect(() => {
+    const loadCampaigns = async () => {
+      setIsLoading(true)
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      setCampaigns(mockCampaigns)
+      setIsLoading(false)
+    }
+    
+    loadCampaigns()
+  }, [])
+
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    setCampaigns(mockCampaigns)
+    setRefreshing(false)
+  }
+
   const toggleLoading = () => {
     setIsLoading(!isLoading)
   }
@@ -136,17 +160,29 @@ export function CampaignExample() {
             Comprehensive campaign listing with advanced filtering and sorting
           </p>
         </div>
-        <button
-          onClick={toggleLoading}
-          className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-        >
-          Toggle Loading State
-        </button>
+        <div className="flex items-center gap-2">
+          <LoadingButton
+            onClick={handleRefresh}
+            loading={refreshing}
+            loadingText="Refreshing..."
+            variant="outline"
+            size="sm"
+          >
+            Refresh Data
+          </LoadingButton>
+          <LoadingButton
+            onClick={toggleLoading}
+            variant="secondary"
+            size="sm"
+          >
+            Toggle Loading State
+          </LoadingButton>
+        </div>
       </div>
 
       <CampaignDataTable
-        campaigns={mockCampaigns}
-        isLoading={isLoading}
+        campaigns={isLoading ? [] : campaigns}
+        isLoading={isLoading || refreshing}
         onView={handleView}
         onEdit={handleEdit}
         onDuplicate={handleDuplicate}

@@ -93,7 +93,9 @@ export function TargetAudienceStep() {
                         control={control}
                         name="targetAudience.segments"
                         render={({ field }) => {
-                          const isSelected = field.value?.includes(segment.value)
+                          // Ensure field.value is always an array to prevent controlled/uncontrolled warnings
+                          const currentValue = field.value || []
+                          const isSelected = currentValue.includes(segment.value)
                           return (
                             <FormItem>
                               <FormControl>
@@ -102,7 +104,6 @@ export function TargetAudienceStep() {
                                     isSelected ? 'border-primary bg-primary/5' : 'border-border'
                                   }`}
                                   onClick={() => {
-                                    const currentValue = field.value || []
                                     const newValue = isSelected
                                       ? currentValue.filter((v: string) => v !== segment.value)
                                       : [...currentValue, segment.value]

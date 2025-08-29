@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, type ReactNode,useContext, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn as nextAuthSignIn } from 'next-auth/react'
 
 import { type User } from '@/lib/types'
 
@@ -95,7 +95,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.log('Sign out attempted')
       
       // In the future, this will use NextAuth signOut
-      // await signOut({ redirect: false })
+      // await nextAuthSignOut({ redirect: false })
       
       // For now, just log the attempt
       setError('Authentication is not currently active. This is a placeholder implementation.')

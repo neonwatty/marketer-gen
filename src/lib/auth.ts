@@ -1,14 +1,40 @@
 import { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
-import { prisma } from "./db";
+import { prisma } from "./database";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
+    // Development-only demo authentication
+    ...(process.env.NODE_ENV === "development"
+      ? [
+          CredentialsProvider({
+            id: "demo",
+            name: "Demo User",
+            credentials: {
+              email: { label: "Email", type: "email", placeholder: "demo@example.com" },
+            },
+            async authorize(credentials) {
+              // Development-only demo user
+              if (credentials?.email === "demo@example.com") {
+                return {
+                  id: "demo-user-id",
+                  email: "demo@example.com",
+                  name: "Demo User",
+                  image: null,
+                  role: "USER",
+                };
+              }
+              return null;
+            },
+          }),
+        ]
+      : []),
     // Providers are configured but disabled by default
     // These can be enabled by setting the appropriate environment variables
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET

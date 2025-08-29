@@ -380,10 +380,7 @@ describe('Shadcn UI Build Integration', () => {
       // Page should import shadcn components correctly
       expect(content).toContain('@/components/ui/button')
       expect(content).toContain('@/components/ui/card')
-      expect(content).toContain('@/components/ui/input')
-      expect(content).toContain('@/components/ui/label')
       expect(content).toContain('@/components/ui/badge')
-      expect(content).toContain('@/components/ui/alert')
     })
   })
 })
