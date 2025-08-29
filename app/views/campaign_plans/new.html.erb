@@ -7,7 +7,13 @@
       <p class="mt-2 text-gray-600">Set up your campaign parameters to generate a comprehensive marketing plan</p>
     </div>
 
-    <%= form_with model: @campaign_plan, local: true, class: "space-y-6" do |form| %>
+    <%= form_with model: @campaign_plan, local: true, class: "space-y-6",
+        data: { 
+          controller: "form-validation", 
+          action: "submit->form-validation#submit",
+          form_validation_server_validation_value: true,
+          form_validation_debounce_value: 300
+        } do |form| %>
       <% if @campaign_plan.errors.any? %>
         <div class="bg-red-50 border border-red-200 rounded-md p-4">
           <h3 class="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</h3>
@@ -23,22 +29,25 @@
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
         
         <div class="space-y-4">
-          <div>
-            <div class="flex items-center space-x-2 mb-1">
-              <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
-              <%= render 'shared/help_tooltip', content: "Choose a descriptive name that identifies the campaign's purpose and timeframe. This will help you organize and find your campaigns later.", position: "top" %>
-            </div>
-            <%= form.text_field :name, 
-                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-                placeholder: "e.g., Q1 Product Launch Campaign" %>
-          </div>
+          <%= render 'shared/smart_field',
+              form: form,
+              field_name: :name,
+              field_type: :text_field,
+              label: "Campaign Name",
+              required: true,
+              suggestions_endpoint: "/api/v1/suggestions/campaign_plans",
+              placeholder: "e.g., Q1 Product Launch Campaign",
+              help_text: "Choose a descriptive name that identifies the campaign's purpose and timeframe",
+              css_classes: "pr-16" %>
 
-          <div>
-            <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-1" %>
-            <%= form.text_area :description, rows: 3,
-                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-                placeholder: "Brief description of the campaign goals and context..." %>
-          </div>
+          <%= render 'shared/smart_field',
+              form: form,
+              field_name: :description,
+              field_type: :text_area,
+              label: "Description",
+              suggestions_endpoint: "/api/v1/suggestions/campaign_plans",
+              placeholder: "Brief description of the campaign goals and context...",
+              help_text: "Describe what you want to achieve with this campaign" %>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -64,12 +73,14 @@
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Target Audience & Context</h2>
         
         <div class="space-y-4">
-          <div>
-            <%= form.label :target_audience, class: "block text-sm font-medium text-gray-700 mb-1" %>
-            <%= form.text_area :target_audience, rows: 3,
-                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-                placeholder: "Describe your target audience: demographics, interests, pain points..." %>
-          </div>
+          <%= render 'shared/smart_field',
+              form: form,
+              field_name: :target_audience,
+              field_type: :text_area,
+              label: "Target Audience",
+              suggestions_endpoint: "/api/v1/suggestions/campaign_plans",
+              placeholder: "Describe your target audience: demographics, interests, pain points...",
+              help_text: "Define who you want to reach with this campaign" %>
 
           <div>
             <%= form.label :brand_context, "Brand Context (Optional)", class: "block text-sm font-medium text-gray-700 mb-1" %>
@@ -85,19 +96,23 @@
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Constraints (Optional)</h2>
         
         <div class="space-y-4">
-          <div>
-            <%= form.label :budget_constraints, class: "block text-sm font-medium text-gray-700 mb-1" %>
-            <%= form.text_area :budget_constraints, rows: 2,
-                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-                placeholder: "Budget limitations, preferred channels, cost considerations..." %>
-          </div>
+          <%= render 'shared/smart_field',
+              form: form,
+              field_name: :budget_constraints,
+              field_type: :text_area,
+              label: "Budget Constraints",
+              suggestions_endpoint: "/api/v1/suggestions/campaign_plans",
+              placeholder: "Budget limitations, preferred channels, cost considerations...",
+              help_text: "Specify your budget range and any spending preferences" %>
 
-          <div>
-            <%= form.label :timeline_constraints, class: "block text-sm font-medium text-gray-700 mb-1" %>
-            <%= form.text_area :timeline_constraints, rows: 2,
-                class: "w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-                placeholder: "Timeline requirements, key dates, campaign duration..." %>
-          </div>
+          <%= render 'shared/smart_field',
+              form: form,
+              field_name: :timeline_constraints,
+              field_type: :text_area,
+              label: "Timeline Constraints",
+              suggestions_endpoint: "/api/v1/suggestions/campaign_plans",
+              placeholder: "Timeline requirements, key dates, campaign duration...",
+              help_text: "Define when the campaign should launch and run" %>
         </div>
       </div>
 

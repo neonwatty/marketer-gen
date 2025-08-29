@@ -96,27 +96,8 @@
       </div>
     </div>
 
-    <!-- Generation Status -->
-    <% if @campaign_plan.generating? %>
-      <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
-        <div class="flex items-center">
-          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600 mr-3"></div>
-          <div>
-            <h3 class="text-sm font-medium text-yellow-800">Generating Campaign Plan</h3>
-            <p class="text-sm text-yellow-700">Your campaign plan is being generated. This may take a few moments. Please refresh to see updates.</p>
-          </div>
-        </div>
-      </div>
-    <% end %>
-
-    <% if @campaign_plan.failed? %>
-      <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-        <h3 class="text-sm font-medium text-red-800">Generation Failed</h3>
-        <p class="text-sm text-red-700 mt-1">
-          <%= @campaign_plan.metadata&.dig('error_message') || 'An error occurred while generating the campaign plan.' %>
-        </p>
-      </div>
-    <% end %>
+    <!-- Enhanced Generation Status -->
+    <%= render 'progress_section' %>
 
     <!-- Campaign Parameters -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

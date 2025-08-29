@@ -1,0 +1,153 @@
+<%#
+  Reusable progress indicator component
+  
+  Usage:
+  <%= render 'shared/progress_indicator', 
+      steps: ["Step 1", "Step 2", "Step 3"],
+      current_step: 1,
+      progress_percentage: 33,
+      status: "active", # active, completed, error, pending
+      show_percentage: true,
+      size: "normal" # small, normal, large
+  %>
+%>
+
+<%
+  # Set defaults
+  steps ||= []
+  current_step ||= 0
+  progress_percentage ||= 0
+  status ||= "pending"
+  show_percentage ||= true
+  size ||= "normal"
+  
+  # Size classes
+  size_classes = case size
+    when "small"
+      {
+        container: "py-2",
+        text: "text-xs",
+        step_size: "w-6 h-6 text-xs",
+        connector: "h-0.5"
+      }
+    when "large"
+      {
+        container: "py-6",
+        text: "text-base",
+        step_size: "w-12 h-12 text-lg",
+        connector: "h-1"
+      }
+    else # normal
+      {
+        container: "py-4",
+        text: "text-sm",
+        step_size: "w-8 h-8 text-sm",
+        connector: "h-0.5"
+      }
+  end
+  
+  # Status colors
+  status_colors = {
+    "pending" => "text-gray-400 border-gray-300",
+    "active" => "text-blue-600 border-blue-300 bg-blue-50",
+    "completed" => "text-green-600 border-green-300 bg-green-50",
+    "error" => "text-red-600 border-red-300 bg-red-50"
+  }
+  
+  base_color = status_colors[status] || status_colors["pending"]
+%>
+
+<div class="progress-indicator <%= size_classes[:container] %>">
+  <!-- Progress Bar -->
+  <% if show_percentage %>
+    <div class="mb-4">
+      <div class="flex justify-between <%= size_classes[:text] %> text-gray-600 mb-2">
+        <span class="font-medium">Progress</span>
+        <span><%= progress_percentage %>%</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="h-2 rounded-full transition-all duration-300 ease-out
+                    <%= case status
+                        when 'completed' then 'bg-green-600'
+                        when 'error' then 'bg-red-600'
+                        when 'active' then 'bg-blue-600'
+                        else 'bg-gray-400'
+                        end %>"
+             style="width: <%= progress_percentage %>%"></div>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- Step Indicators -->
+  <% unless steps.empty? %>
+    <div class="flex items-center justify-between">
+      <% steps.each_with_index do |step, index| %>
+        <% 
+          step_completed = index < current_step
+          step_current = index == current_step
+          step_future = index > current_step
+          
+          step_status = if step_completed
+                         "completed"
+                       elsif step_current && status == "error"
+                         "error"
+                       elsif step_current
+                         "active"
+                       else
+                         "pending"
+                       end
+        %>
+        
+        <div class="flex items-center <%= 'flex-1' unless index == steps.length - 1 %>">
+          <!-- Step Circle -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center justify-center <%= size_classes[:step_size] %> rounded-full border-2 font-medium transition-all duration-200
+                        <%= case step_status
+                            when 'completed'
+                              'bg-green-600 border-green-600 text-white'
+                            when 'active'
+                              'bg-blue-600 border-blue-600 text-white'
+                            when 'error'
+                              'bg-red-600 border-red-600 text-white'
+                            else
+                              'bg-white border-gray-300 text-gray-500'
+                            end %>">
+              <% if step_completed %>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              <% elsif step_status == "error" %>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              <% elsif step_current %>
+                <div class="w-2 h-2 bg-current rounded-full animate-pulse"></div>
+              <% else %>
+                <%= index + 1 %>
+              <% end %>
+            </div>
+            
+            <!-- Step Label -->
+            <span class="mt-2 <%= size_classes[:text] %> font-medium text-center max-w-20
+                         <%= case step_status
+                             when 'completed' then 'text-green-600'
+                             when 'active' then 'text-blue-600'
+                             when 'error' then 'text-red-600'
+                             else 'text-gray-500'
+                             end %>">
+              <%= step %>
+            </span>
+          </div>
+          
+          <!-- Connector Line -->
+          <% unless index == steps.length - 1 %>
+            <div class="flex-1 mx-4">
+              <div class="<%= size_classes[:connector] %> rounded transition-colors duration-200
+                          <%= step_completed ? 'bg-green-600' : 'bg-gray-300' %>"></div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

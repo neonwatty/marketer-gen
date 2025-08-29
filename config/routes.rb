@@ -150,6 +150,28 @@ Rails.application.routes.draw do
         post :analytics_insights, to: 'content_generation#analytics_insights'
         get :health, to: 'content_generation#health'
       end
+      
+      # Validation endpoints
+      scope :validations do
+        post :validate_field, to: 'validations#validate_field'
+        post 'users/email_address', to: 'validations#users_email_address'
+        post 'campaign_plans/name', to: 'validations#campaign_plans_name'
+        post 'journeys/name', to: 'validations#journeys_name'
+      end
+      
+      # Progress tracking endpoints
+      scope :progress do
+        get 'campaign_plans/:id', to: 'progress#campaign_plan_progress', as: :campaign_plan_progress
+        get 'tasks/:task_id', to: 'progress#task_progress', as: :task_progress
+      end
+      
+      # Smart suggestions endpoints
+      scope :suggestions do
+        get 'campaign_plans', to: 'suggestions#campaign_plan_suggestions'
+        get 'journeys', to: 'suggestions#journey_suggestions'
+        get 'onboarding', to: 'suggestions#onboarding_status'
+        get 'onboarding_progress', to: 'suggestions#onboarding_progress'
+      end
     end
   end
   

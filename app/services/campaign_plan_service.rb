@@ -16,17 +16,33 @@ class CampaignPlanService < ApplicationService
     @campaign_plan.mark_generation_started!
 
     begin
-      # Gather brand context
+      # Step 1: Analyzing Requirements (0-15%)
+      update_progress(0, 5, 'Analyzing campaign requirements...', '2-3 minutes')
+      sleep(0.5) # Simulate processing time
+      
+      # Step 2: Gathering Brand Context (15-35%)
+      update_progress(1, 20, 'Gathering brand context and guidelines...', '90 seconds')
       brand_context = gather_brand_context
+      sleep(0.5)
 
-      # Prepare parameters for LLM service
+      # Step 3: Generating Strategy (35-60%)
+      update_progress(2, 45, 'Generating campaign strategy...', '60 seconds')
       llm_params = prepare_llm_parameters(brand_context)
+      sleep(0.5)
 
-      # Generate campaign plan using LLM service
+      # Step 4: Creating Content Plan (60-80%)
+      update_progress(3, 70, 'Creating detailed content plan...', '45 seconds')
       llm_response = llm_service.generate_campaign_plan(llm_params)
+      sleep(0.5)
 
-      # Process and store the response
+      # Step 5: Building Timeline (80-95%)
+      update_progress(4, 85, 'Building campaign timeline...', '20 seconds')
       process_llm_response(llm_response)
+      sleep(0.5)
+
+      # Step 6: Finalizing Assets (95-100%)
+      update_progress(5, 95, 'Finalizing campaign assets...', '10 seconds')
+      sleep(0.5)
 
       @campaign_plan.mark_generation_completed!
       success_result('Campaign plan generated successfully', @campaign_plan)
@@ -37,6 +53,17 @@ class CampaignPlanService < ApplicationService
       Rails.logger.error e.backtrace.join("\n")
       failure_result("Failed to generate campaign plan: #{e.message}")
     end
+  end
+
+  private
+
+  def update_progress(step, percentage, message, estimated_time)
+    @campaign_plan.update_generation_progress(
+      step: step,
+      percentage: percentage,
+      message: message,
+      estimated_time: estimated_time
+    )
   end
 
   def regenerate_plan

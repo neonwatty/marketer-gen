@@ -15,4 +15,18 @@ module ApplicationHelper
       'bg-gray-100 text-gray-800'
     end
   end
+
+  def time_duration_in_words(seconds)
+    return nil unless seconds
+
+    if seconds < 60
+      "#{seconds.round}s"
+    elsif seconds < 3600
+      minutes = (seconds / 60).round
+      "#{minutes}m"
+    else
+      hours = (seconds / 3600).round(1)
+      "#{hours}h"
+    end
+  end
 end

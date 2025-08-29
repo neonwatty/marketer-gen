@@ -26,7 +26,7 @@ class CampaignPlansController < ApplicationController
   end
   
   def show
-    @analytics = @campaign_plan.plan_analytics
+    # Display the campaign plan
   end
   
   def new

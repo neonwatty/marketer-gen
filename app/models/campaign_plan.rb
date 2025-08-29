@@ -247,6 +247,148 @@ class CampaignPlan < ApplicationRecord
     ].compact.flatten
   end
 
+  # Progress tracking methods for campaign generation
+  def generation_steps
+    [
+      'Analyzing Requirements',
+      'Gathering Brand Context', 
+      'Generating Strategy',
+      'Creating Content Plan',
+      'Building Timeline',
+      'Finalizing Assets'
+    ]
+  end
+
+  def current_generation_step
+    return 0 unless generating?
+    progress_data = metadata&.dig('generation_progress') || {}
+    progress_data['current_step'] || 0
+  end
+
+  def generation_progress_percentage
+    return 0 unless generating? || completed?
+    return 100 if completed?
+    
+    progress_data = metadata&.dig('generation_progress') || {}
+    progress_data['percentage'] || 0
+  end
+
+  def generation_status_message
+    return nil unless generating?
+    progress_data = metadata&.dig('generation_progress') || {}
+    progress_data['message'] || 'Processing...'
+  end
+
+  def estimated_time_remaining
+    return nil unless generating?
+    progress_data = metadata&.dig('generation_progress') || {}
+    progress_data['estimated_time_remaining']
+  end
+
+  def update_generation_progress(step:, percentage:, message: nil, estimated_time: nil)
+    current_metadata = metadata || {}
+    progress_data = current_metadata['generation_progress'] || {}
+    
+    progress_data.merge!(
+      current_step: step,
+      percentage: percentage,
+      message: message,
+      estimated_time_remaining: estimated_time,
+      last_updated: Time.current
+    )
+    
+    current_metadata['generation_progress'] = progress_data
+    update!(metadata: current_metadata)
+    
+    # Broadcast progress update via Action Cable if needed
+    broadcast_progress_update if defined?(ActionCable)
+  end
+
+  def mark_generation_started!
+    update!(
+      status: 'generating',
+      metadata: (metadata || {}).merge(
+        generation_started_at: Time.current,
+        generation_progress: {
+          current_step: 0,
+          percentage: 0,
+          message: 'Starting generation...',
+          estimated_time_remaining: '2-3 minutes'
+        }
+      )
+    )
+  end
+
+  def mark_generation_completed!
+    update!(
+      status: 'completed',
+      metadata: (metadata || {}).merge(
+        generation_completed_at: Time.current,
+        generation_progress: {
+          current_step: generation_steps.length,
+          percentage: 100,
+          message: 'Generation completed successfully'
+        }
+      )
+    )
+  end
+
+  def mark_generation_failed!(error_message)
+    update!(
+      status: 'failed',
+      metadata: (metadata || {}).merge(
+        generation_failed_at: Time.current,
+        error_message: error_message,
+        generation_progress: {
+          current_step: current_generation_step,
+          percentage: generation_progress_percentage,
+          message: "Generation failed: #{error_message}"
+        }
+      )
+    )
+  end
+
+  def generation_duration
+    return nil unless metadata
+    
+    started_at = metadata['generation_started_at']
+    completed_at = metadata['generation_completed_at'] || metadata['generation_failed_at']
+    
+    return nil unless started_at && completed_at
+    
+    Time.parse(completed_at) - Time.parse(started_at)
+  end
+
+  def can_be_archived?
+    %w[completed failed].include?(status)
+  end
+  
+  def can_be_regenerated?
+    %w[completed failed archived].include?(status)
+  end
+  
+  def archive!
+    return false unless can_be_archived?
+    update!(status: 'archived')
+  end
+
+  private
+
+  def broadcast_progress_update
+    # This would broadcast to ActionCable if implemented
+    # ActionCable.server.broadcast(
+    #   "campaign_plan_progress_#{id}",
+    #   {
+    #     campaign_plan_id: id,
+    #     current_step: current_generation_step,
+    #     percentage: generation_progress_percentage,
+    #     message: generation_status_message,
+    #     status: status,
+    #     estimated_time_remaining: estimated_time_remaining
+    #   }
+    # )
+  end
+
   def competitive_advantages
     intelligence_data = parsed_competitive_intelligence
     intelligence_data.dig('competitive_advantages') || []
@@ -467,19 +609,6 @@ class CampaignPlan < ApplicationRecord
 
     service = PlanAnalyticsService.new(self)
     service.sync_with_external_platforms
-  end
-  
-  def can_be_archived?
-    %w[completed failed].include?(status)
-  end
-  
-  def can_be_regenerated?
-    %w[completed failed archived].include?(status)
-  end
-  
-  def archive!
-    return false unless can_be_archived?
-    update!(status: 'archived')
   end
   
   def mark_generation_started!

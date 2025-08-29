@@ -2,7 +2,12 @@
   <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-900">Sign Up</h1>
 
   <%= form_with model: @user, url: sign_up_path, local: true, 
-      data: { controller: "form-validation", action: "submit->form-validation#submit" } do |form| %>
+      data: { 
+        controller: "form-validation", 
+        action: "submit->form-validation#submit",
+        form_validation_server_validation_value: true,
+        form_validation_debounce_value: 300
+      } do |form| %>
     <% if @user.errors.any? %>
       <div class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
         <h2 class="font-bold mb-2"><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
@@ -14,53 +19,39 @@
       </div>
     <% end %>
 
-    <div class="mb-4 relative">
-      <%= form.label :email_address, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.email_field :email_address, 
-          autocomplete: "email", 
-          required: true,
-          aria_describedby: (@user.errors[:email_address].any? ? "email_error" : nil),
-          data: { form_validation_target: "field" },
-          class: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors", 
-          placeholder: "email@example.com" %>
-      <% if @user.errors[:email_address].any? %>
-        <div id="email_error" class="text-red-600 text-sm mt-1" role="alert">
-          <%= @user.errors[:email_address].first %>
-        </div>
-      <% end %>
-    </div>
+    <%= render 'shared/field_with_validation',
+        form: form,
+        field_name: :email_address,
+        field_type: :email_field,
+        label: "Email Address",
+        required: true,
+        server_validation: true,
+        table_name: "users",
+        placeholder: "email@example.com",
+        help_text: "We'll use this to sign you in",
+        css_classes: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" %>
 
-    <div class="mb-4 relative">
-      <%= form.label :password, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.password_field :password, 
-          autocomplete: "new-password", 
-          required: true,
-          minlength: 8,
-          aria_describedby: (@user.errors[:password].any? ? "password_error" : "password_help"),
-          data: { form_validation_target: "field" },
-          class: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" %>
-      <div id="password_help" class="text-gray-600 text-xs mt-1">Minimum 8 characters</div>
-      <% if @user.errors[:password].any? %>
-        <div id="password_error" class="text-red-600 text-sm mt-1" role="alert">
-          <%= @user.errors[:password].first %>
-        </div>
-      <% end %>
-    </div>
+    <%= render 'shared/field_with_validation',
+        form: form,
+        field_name: :password,
+        field_type: :password_field,
+        label: "Password",
+        required: true,
+        server_validation: false,
+        placeholder: "Enter your password",
+        help_text: "Minimum 8 characters",
+        css_classes: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" %>
 
-    <div class="mb-6 relative">
-      <%= form.label :password_confirmation, class: "block text-gray-700 text-sm font-bold mb-2" %>
-      <%= form.password_field :password_confirmation, 
-          autocomplete: "new-password", 
-          required: true,
-          aria_describedby: (@user.errors[:password_confirmation].any? ? "password_confirmation_error" : nil),
-          data: { form_validation_target: "field" },
-          class: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" %>
-      <% if @user.errors[:password_confirmation].any? %>
-        <div id="password_confirmation_error" class="text-red-600 text-sm mt-1" role="alert">
-          <%= @user.errors[:password_confirmation].first %>
-        </div>
-      <% end %>
-    </div>
+    <%= render 'shared/field_with_validation',
+        form: form,
+        field_name: :password_confirmation,
+        field_type: :password_field,
+        label: "Password Confirmation",
+        required: true,
+        server_validation: false,
+        placeholder: "Confirm your password",
+        help_text: "Must match your password above",
+        css_classes: "shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" %>
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
       <%= form.submit "Sign Up", 
