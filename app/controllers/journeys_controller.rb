@@ -396,7 +396,7 @@ class JourneysController < ApplicationController
   end
 
   def journey_params
-    params.require(:journey).permit(:name, :description, :campaign_type, :status, :template_type, stages: [], metadata: {})
+    params.require(:journey).permit(:name, :description, :campaign_type, :status, :template_type, :target_audience, stages: [], metadata: {})
   end
 
   def calculate_average_completion_rate(journeys)

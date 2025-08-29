@@ -79,14 +79,74 @@
           <% end %>
         </div>
         
-        <!-- Tips -->
-        <div class="mt-8 text-left bg-blue-50 rounded-lg p-4">
-          <h4 class="text-sm font-medium text-blue-900 mb-2">Get started with content generation:</h4>
-          <ul class="text-sm text-blue-700 space-y-1">
-            <li>• Set up your brand identity for consistent messaging</li>
-            <li>• Create customer journeys to guide content strategy</li>
-            <li>• Use AI suggestions to optimize your content</li>
-          </ul>
+        <!-- Onboarding Steps -->
+        <div class="mt-8 text-left bg-blue-50 rounded-lg p-6">
+          <h4 class="text-sm font-medium text-blue-900 mb-4">Quick Start Guide:</h4>
+          <div class="space-y-3">
+            <div class="flex items-center">
+              <% if Current.user.brand_identities.any? %>
+                <div class="flex-shrink-0 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <span class="ml-3 text-sm text-green-700 font-medium">Brand identity set up</span>
+              <% else %>
+                <div class="flex-shrink-0 w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center">
+                  <span class="text-xs text-gray-500">1</span>
+                </div>
+                <%= link_to "Set up your brand identity", new_brand_identity_path, 
+                    class: "ml-3 text-sm text-blue-700 hover:text-blue-900 font-medium underline" %>
+              <% end %>
+            </div>
+            
+            <div class="flex items-center">
+              <% if Current.user.campaign_plans.any? %>
+                <div class="flex-shrink-0 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <span class="ml-3 text-sm text-green-700 font-medium">Campaign plans created</span>
+              <% else %>
+                <div class="flex-shrink-0 w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center">
+                  <span class="text-xs text-gray-500">2</span>
+                </div>
+                <%= link_to "Create your first campaign plan", new_campaign_plan_path, 
+                    class: "ml-3 text-sm text-blue-700 hover:text-blue-900 font-medium underline" %>
+              <% end %>
+            </div>
+            
+            <div class="flex items-center">
+              <% if Current.user.journeys.any? %>
+                <div class="flex-shrink-0 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <span class="ml-3 text-sm text-green-700 font-medium">Customer journeys defined</span>
+              <% else %>
+                <div class="flex-shrink-0 w-5 h-5 bg-gray-300 rounded-full flex items-center justify-center">
+                  <span class="text-xs text-gray-500">3</span>
+                </div>
+                <%= link_to "Create customer journeys", new_journey_path, 
+                    class: "ml-3 text-sm text-blue-700 hover:text-blue-900 font-medium underline" %>
+              <% end %>
+            </div>
+            
+            <div class="flex items-center">
+              <div class="flex-shrink-0 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                <span class="text-xs text-white">4</span>
+              </div>
+              <span class="ml-3 text-sm text-blue-700 font-medium">Generate AI-powered content (you are here!)</span>
+            </div>
+          </div>
+          
+          <% if Current.user.campaign_plans.any? %>
+            <div class="mt-4 pt-4 border-t border-blue-200">
+              <p class="text-xs text-blue-600 mb-2">💡 Pro tip: Content performs better when guided by customer journeys and brand consistency!</p>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

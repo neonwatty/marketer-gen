@@ -22,6 +22,8 @@ class User < ApplicationRecord
   ROLES = %w[marketer team_member admin].freeze
 
   validates :role, inclusion: { in: ROLES }
+  validates :email_address, presence: true, uniqueness: { case_sensitive: false }, 
+            format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email address" }
   validates :first_name, length: { maximum: 50 }
   validates :last_name, length: { maximum: 50 }
   validates :phone, format: { with: /\A[\+]?[1-9][\d\s\-\(\)]{7,15}\z/, message: "must be a valid phone number" }, allow_blank: true

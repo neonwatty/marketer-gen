@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_28_211820) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_29_172113) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -547,6 +547,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_28_211820) do
     t.text "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "target_audience"
     t.index ["campaign_type"], name: "index_journeys_on_campaign_type"
     t.index ["status"], name: "index_journeys_on_status"
     t.index ["template_type"], name: "index_journeys_on_template_type"
