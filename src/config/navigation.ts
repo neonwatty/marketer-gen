@@ -1,13 +1,12 @@
 import { 
   BarChart3, 
   FolderOpen, 
-  Home, 
+  GitBranch,  Home, 
   type LucideIcon, 
   Megaphone, 
   Plus, 
   Settings, 
-  Users,
-  GitBranch} from 'lucide-react'
+  Users} from 'lucide-react'
 
 export interface NavigationItem {
   name: string

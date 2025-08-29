@@ -1,26 +1,25 @@
 'use client'
 
 import { Suspense, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import dynamic from 'next/dynamic'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-import { ArrowLeft, AlertCircle, CheckCircle, Sparkles } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, ArrowLeft, CheckCircle, Sparkles } from 'lucide-react'
+import { z } from 'zod'
 
 import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
-import { JourneyTemplate, JourneyIndustry, JourneyCategory, getIndustryDisplayName, getCategoryDisplayName } from '@/lib/types/journey'
-import { Badge } from '@/components/ui/badge'
+import { getCategoryDisplayName,getIndustryDisplayName, JourneyCategory, JourneyIndustry, JourneyTemplate } from '@/lib/types/journey'
 
 // Lazy load JourneyBuilder since it imports heavy ReactFlow dependencies
 const JourneyBuilder = dynamic(

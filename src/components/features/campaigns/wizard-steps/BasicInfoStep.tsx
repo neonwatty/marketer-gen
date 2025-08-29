@@ -2,8 +2,7 @@
 
 import { useFormContext } from 'react-hook-form'
 
-import { CalendarIcon } from 'lucide-react'
-
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   FormControl,
   FormDescription,
@@ -81,13 +80,11 @@ export function BasicInfoStep() {
               <FormItem>
                 <FormLabel>Start Date</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <Input
-                      type="date"
-                      {...field}
-                    />
-                    <CalendarIcon className="absolute right-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  </div>
+                  <DatePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select campaign start date"
+                  />
                 </FormControl>
                 <FormDescription>
                   When should this campaign begin?
@@ -104,13 +101,11 @@ export function BasicInfoStep() {
               <FormItem>
                 <FormLabel>End Date</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <Input
-                      type="date"
-                      {...field}
-                    />
-                    <CalendarIcon className="absolute right-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  </div>
+                  <DatePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select campaign end date"
+                  />
                 </FormControl>
                 <FormDescription>
                   When should this campaign end?

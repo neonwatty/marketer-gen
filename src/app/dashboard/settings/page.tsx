@@ -1,14 +1,14 @@
 import { Metadata } from 'next'
 
-import { User, Bell, Shield, CreditCard, Users, Settings } from 'lucide-react'
+import { Bell, CreditCard, Settings,Shield, User, Users } from 'lucide-react'
 
 import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Checkbox } from '@/components/ui/checkbox'
 
 export const metadata: Metadata = {
   title: 'Settings | Dashboard',

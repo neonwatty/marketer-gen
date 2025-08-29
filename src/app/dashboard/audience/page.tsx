@@ -1,13 +1,12 @@
 import { Metadata } from 'next'
-import Link from 'next/link'
 
-import { Plus, Users, Filter, Search } from 'lucide-react'
+import { Filter, Plus, Search,Users } from 'lucide-react'
 
 import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 
 export const metadata: Metadata = {
   title: 'Audience | Dashboard',

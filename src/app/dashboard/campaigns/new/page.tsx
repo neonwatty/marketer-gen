@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 
 import { ArrowLeft } from 'lucide-react'
+import { toast } from 'sonner'
 
-import { CampaignWizard, type CampaignFormData } from '@/components/features/campaigns/CampaignWizard'
+import { type CampaignFormData,CampaignWizard } from '@/components/features/campaigns/CampaignWizard'
 import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Button } from '@/components/ui/button'
 
@@ -25,19 +25,32 @@ export default function NewCampaignPage() {
     setIsCreating(true)
     
     // Show loading toast
-    const loadingToast = toast.loading('Creating your campaign...')
+    const loadingToast = toast.loading('Creating your campaign...', {
+      description: 'Setting up your campaign structure and templates',
+    })
     
     try {
       // TODO: Replace with actual API call
       console.log('Creating campaign:', data)
       
-      // Simulate API call
+      // Simulate API call with validation
+      if (!data.name?.trim()) {
+        throw new Error('Campaign name is required')
+      }
+      if (!data.startDate || !data.endDate) {
+        throw new Error('Campaign dates are required')
+      }
+      if (new Date(data.startDate) >= new Date(data.endDate)) {
+        throw new Error('End date must be after start date')
+      }
+      
       await new Promise(resolve => setTimeout(resolve, 2000))
       
       // Dismiss loading toast and show success
       toast.dismiss(loadingToast)
       toast.success('Campaign created successfully!', {
-        description: `"${data.name}" is now ready to launch.`,
+        description: `"${data.name}" is now ready to launch. You can view it in your campaigns dashboard.`,
+        duration: 5000,
       })
       
       // Navigate to campaigns list
@@ -45,10 +58,21 @@ export default function NewCampaignPage() {
     } catch (error) {
       console.error('Error creating campaign:', error)
       
-      // Dismiss loading toast and show error
+      // Dismiss loading toast and show specific error
       toast.dismiss(loadingToast)
-      toast.error('Failed to create campaign', {
-        description: 'Please try again or contact support if the problem persists.',
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      const isValidationError = errorMessage.includes('required') || errorMessage.includes('date')
+      
+      toast.error(isValidationError ? 'Campaign validation failed' : 'Failed to create campaign', {
+        description: isValidationError 
+          ? `${errorMessage}. Please check your inputs and try again.`
+          : 'There was a problem saving your campaign. Please try again or contact support if the issue persists.',
+        duration: isValidationError ? 4000 : 6000,
+        action: !isValidationError ? {
+          label: 'Retry',
+          onClick: () => handleSubmit(data)
+        } : undefined,
       })
     } finally {
       setIsCreating(false)

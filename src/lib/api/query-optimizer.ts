@@ -1,4 +1,5 @@
 import { PrismaClient } from '@/generated/prisma'
+
 import { withQueryMetrics } from '../database'
 
 // Query optimization utilities

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+import { checkPerformanceAlerts, exportMetrics, getSystemHealth, withRequestMonitoring } from '@/lib/api/monitoring'
 import { checkDatabaseHealth } from '@/lib/database'
-import { getSystemHealth, checkPerformanceAlerts, exportMetrics, withRequestMonitoring } from '@/lib/api/monitoring'
 
 // Enhanced health check endpoint
 export const GET = withRequestMonitoring(async (): Promise<NextResponse> => {

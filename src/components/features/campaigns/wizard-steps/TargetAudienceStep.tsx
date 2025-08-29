@@ -109,11 +109,24 @@ export function TargetAudienceStep() {
                                       : [...currentValue, segment.value]
                                     field.onChange(newValue)
                                   }}
+                                  role="button"
+                                  tabIndex={0}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault()
+                                      const newValue = isSelected
+                                        ? currentValue.filter((v: string) => v !== segment.value)
+                                        : [...currentValue, segment.value]
+                                      field.onChange(newValue)
+                                    }
+                                  }}
                                 >
                                   <div className="flex items-start gap-3">
                                     <Checkbox
                                       checked={isSelected}
-                                      className="mt-0.5"
+                                      className="mt-0.5 pointer-events-none"
+                                      onChange={() => {}} 
+                                      aria-hidden="true"
                                     />
                                     <div className="flex-1 min-w-0">
                                       <div className="font-medium text-sm">{segment.label}</div>

@@ -6,12 +6,7 @@ import { CheckCircle2, Mail,RefreshCw, Rocket, Target, TrendingUp, Users } from 
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 
@@ -103,7 +98,46 @@ const journeyTemplates: JourneyTemplate[] = [
   },
 ]
 
-export function TemplateSelectionStep() {
+function TemplateSkeletonCard() {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-9 w-9 rounded-lg" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <div className="flex gap-2">
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <Skeleton className="h-12 w-full" />
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+          <div className="flex gap-1">
+            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="h-5 w-20 rounded-full" />
+            <Skeleton className="h-5 w-14 rounded-full" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+interface TemplateSelectionStepProps {
+  isLoading?: boolean
+}
+
+export function TemplateSelectionStep({ isLoading = false }: TemplateSelectionStepProps) {
   const { control, watch, setValue } = useFormContext()
   const selectedTemplateId = watch('templateId')
 
@@ -117,7 +151,12 @@ export function TemplateSelectionStep() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {journeyTemplates.map((template) => {
+        {isLoading ? (
+          Array.from({ length: 6 }, (_, i) => (
+            <TemplateSkeletonCard key={i} />
+          ))
+        ) : (
+          journeyTemplates.map((template) => {
           const isSelected = selectedTemplateId === template.id
           const Icon = template.icon
 
@@ -125,8 +164,8 @@ export function TemplateSelectionStep() {
             <Card
               key={template.id}
               className={cn(
-                'cursor-pointer transition-all hover:shadow-md',
-                isSelected && 'ring-2 ring-primary ring-offset-2'
+                'cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] relative z-10 group',
+                isSelected && 'ring-2 ring-primary ring-offset-2 shadow-lg'
               )}
               onClick={() => {
                 console.log('Direct template click:', template.id)
@@ -137,8 +176,8 @@ export function TemplateSelectionStep() {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-primary/10 p-2">
-                      <Icon className="h-5 w-5 text-primary" />
+                    <div className="rounded-lg bg-primary/10 p-2 group-hover:bg-primary/20 transition-colors">
+                      <Icon className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
                     </div>
                     <div>
                       <CardTitle className="text-base">{template.name}</CardTitle>
@@ -200,7 +239,7 @@ export function TemplateSelectionStep() {
               </CardContent>
             </Card>
           )
-        })}
+        }))}
       </div>
 
       {selectedTemplateId && (

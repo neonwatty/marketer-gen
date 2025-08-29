@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { z } from 'zod'
+
 import { Prisma } from '@/generated/prisma'
 
 // Custom API error class
@@ -82,7 +84,7 @@ export const handleApiError = (
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     let message = 'Database operation failed'
     let statusCode = 500
-    let code = error.code
+    const code = error.code
 
     switch (error.code) {
       case 'P2002':

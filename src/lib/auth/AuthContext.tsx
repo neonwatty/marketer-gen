@@ -1,7 +1,7 @@
 'use client'
 
-import { createContext, type ReactNode,useContext, useState } from 'react'
-import { useSession, signIn as nextAuthSignIn } from 'next-auth/react'
+import { createContext, type ReactNode, useContext, useState } from 'react'
+import {useSession } from 'next-auth/react'
 
 import { type User } from '@/lib/types'
 

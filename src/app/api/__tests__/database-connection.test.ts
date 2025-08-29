@@ -1,7 +1,6 @@
 /**
  * @jest-environment node
  */
-import { PrismaClient } from '@prisma/client'
 
 import { GET } from '../health/route'
 

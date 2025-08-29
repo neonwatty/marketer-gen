@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+
 import { Copy, Eye, Filter, Search, Settings, Sparkles, Star, Users } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -10,14 +11,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { JourneyTemplate } from '@/lib/types/journey'
-
 // Import utility functions
 import {
   getCategoryDisplayName,
   getIndustryDisplayName,
 } from '@/lib/types/journey'
 
+import type { JourneyTemplate } from '@/lib/types/journey'
 // Import types separately to avoid issues
 import type {
   JourneyCategoryValue,

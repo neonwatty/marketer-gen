@@ -1,21 +1,21 @@
 import Link from 'next/link'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
+  ArrowRight,
   BarChart3, 
-  Zap, 
+  CheckCircle,
+  Mail,
+  MessageSquare, 
+  Play,
+  Sparkles,
   Target, 
   TrendingUp, 
   Users, 
-  MessageSquare, 
-  Mail,
-  Sparkles,
-  ArrowRight,
-  CheckCircle,
-  Play
-} from 'lucide-react'
+  Zap} from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Home() {
   return (

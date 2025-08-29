@@ -33,6 +33,7 @@ export function DashboardSidebar() {
     <Sidebar 
       variant="inset" 
       collapsible="icon"
+      className="lg:flex hidden md:flex"
       aria-label="Dashboard navigation sidebar"
     >
       <SidebarHeader className="border-b border-sidebar-border">

@@ -2,7 +2,7 @@
 
 import 'reactflow/dist/style.css'
 
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useEffect,useState } from 'react'
 import {
   addEdge,
   Background,
@@ -15,10 +15,6 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState,
-  applyNodeChanges,
-  applyEdgeChanges,
-  type NodeChange,
-  type EdgeChange,
 } from 'reactflow'
 
 import { Sparkles } from 'lucide-react'
@@ -31,7 +27,7 @@ import { JourneyStageNode } from './JourneyStageNode'
 import { JourneyTemplateCustomizer } from './JourneyTemplateCustomizer'
 import { JourneyTemplateGallery } from './JourneyTemplateGallery'
 import { JourneyToolbar } from './JourneyToolbar'
-import { StageConfigurationPanel, EnhancedJourneyStage } from './StageConfigurationPanel'
+import { EnhancedJourneyStage,StageConfigurationPanel } from './StageConfigurationPanel'
 
 export interface JourneyStage {
   id: string

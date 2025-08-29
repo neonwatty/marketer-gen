@@ -1,11 +1,11 @@
 'use client'
 
-import { useCallback, useState, useMemo, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef,useState } from 'react'
 import * as React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-
 import * as z from 'zod'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -103,35 +103,57 @@ export function CampaignWizard({
   initialData,
   isLoading = false 
 }: CampaignWizardProps) {
-  const [currentStep, setCurrentStep] = useState(0)
+  const [currentStep, setCurrentStep] = useState(() => {
+    // In test environments, always start at step 0
+    if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+      const saved = localStorage.getItem('campaign-wizard-step')
+      return saved ? parseInt(saved, 10) : 0
+    }
+    return 0
+  })
   const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastSavedDataRef = useRef<string | null>(null)
 
-  const defaultFormValues = {
-    name: initialData?.name || '',
-    description: initialData?.description || '',
-    startDate: initialData?.startDate || '',
-    endDate: initialData?.endDate || '',
-    templateId: initialData?.templateId || '',
-    isDraft: initialData?.isDraft ?? true,
-    targetAudience: {
-      demographics: {
-        ageRange: initialData?.targetAudience?.demographics?.ageRange || [],
-        gender: initialData?.targetAudience?.demographics?.gender || [],
-        locations: initialData?.targetAudience?.demographics?.locations || [],
+  const defaultFormValues = useMemo(() => {
+    let savedData: Partial<CampaignFormData> = {}
+    
+    if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+      try {
+        const saved = localStorage.getItem('campaign-wizard-data')
+        if (saved) {
+          savedData = JSON.parse(saved)
+        }
+      } catch (error) {
+        console.warn('Failed to parse saved campaign data:', error)
+      }
+    }
+
+    return {
+      name: initialData?.name || savedData?.name || '',
+      description: initialData?.description || savedData?.description || '',
+      startDate: initialData?.startDate || savedData?.startDate || '',
+      endDate: initialData?.endDate || savedData?.endDate || '',
+      templateId: initialData?.templateId || savedData?.templateId || '',
+      isDraft: initialData?.isDraft ?? savedData?.isDraft ?? true,
+      targetAudience: {
+        demographics: {
+          ageRange: initialData?.targetAudience?.demographics?.ageRange || savedData?.targetAudience?.demographics?.ageRange || [],
+          gender: initialData?.targetAudience?.demographics?.gender || savedData?.targetAudience?.demographics?.gender || [],
+          locations: initialData?.targetAudience?.demographics?.locations || savedData?.targetAudience?.demographics?.locations || [],
+        },
+        segments: initialData?.targetAudience?.segments || savedData?.targetAudience?.segments || [],
+        estimatedSize: initialData?.targetAudience?.estimatedSize || savedData?.targetAudience?.estimatedSize || 0,
       },
-      segments: initialData?.targetAudience?.segments || [],
-      estimatedSize: initialData?.targetAudience?.estimatedSize || 0,
-    },
-    goals: {
-      primary: initialData?.goals?.primary || '',
-      budget: initialData?.goals?.budget ?? 0,
-      targetConversions: initialData?.goals?.targetConversions ?? 1,
-      targetEngagementRate: initialData?.goals?.targetEngagementRate ?? 0,
-    },
-  }
+      goals: {
+        primary: initialData?.goals?.primary || savedData?.goals?.primary || '',
+        budget: initialData?.goals?.budget ?? savedData?.goals?.budget ?? 0,
+        targetConversions: initialData?.goals?.targetConversions ?? savedData?.goals?.targetConversions ?? 1,
+        targetEngagementRate: initialData?.goals?.targetEngagementRate ?? savedData?.goals?.targetEngagementRate ?? 0,
+      },
+    }
+  }, [initialData])
 
   const form = useForm({
     resolver: zodResolver(campaignFormSchema),
@@ -201,20 +223,37 @@ export function CampaignWizard({
 
   const handleStepClick = (stepIndex: number) => {
     setCurrentStep(stepIndex)
+    if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+      localStorage.setItem('campaign-wizard-step', stepIndex.toString())
+    }
   }
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(prev => prev + 1)
+      const nextStep = currentStep + 1
+      setCurrentStep(nextStep)
+      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+        localStorage.setItem('campaign-wizard-step', nextStep.toString())
+      }
     } else {
-      // Final submission
-      form.handleSubmit((data) => onSubmit(data as CampaignFormData))()
+      // Final submission - clear saved data on success
+      form.handleSubmit((data) => {
+        onSubmit(data as CampaignFormData)
+        if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+          localStorage.removeItem('campaign-wizard-step')
+          localStorage.removeItem('campaign-wizard-data')
+        }
+      })()
     }
   }
 
   const handlePrevious = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1)
+      const prevStep = currentStep - 1
+      setCurrentStep(prevStep)
+      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+        localStorage.setItem('campaign-wizard-step', prevStep.toString())
+      }
     }
   }
 
@@ -241,11 +280,16 @@ export function CampaignWizard({
         setHasUnsavedChanges(false)
         lastSavedDataRef.current = JSON.stringify(formData)
         
-        // Show subtle auto-save notification
-        toast.success('Draft auto-saved', {
-          duration: 2000,
-          description: `Auto-saved at ${new Date().toLocaleTimeString()}`,
-        })
+        // Show subtle auto-save notification - only for the first few saves to not overwhelm
+        if (!lastAutoSave || (new Date().getTime() - lastAutoSave.getTime()) > 300000) { // Show every 5 minutes max
+          toast.success('Draft auto-saved', {
+            duration: 1500,
+            description: `Auto-saved at ${new Date().toLocaleTimeString()}`,
+            style: {
+              fontSize: '14px',
+            }
+          })
+        }
       } catch (error) {
         console.error('Auto-save failed:', error)
         toast.error('Auto-save failed', {
@@ -258,7 +302,7 @@ export function CampaignWizard({
     }
   }, [onSaveDraft, hasUnsavedChanges, form])
 
-  // Auto-save effect
+  // Auto-save effect with localStorage persistence
   useEffect(() => {
     // Clear existing timeout
     if (autoSaveTimeoutRef.current) {
@@ -280,6 +324,11 @@ export function CampaignWizard({
     if (hasChanges !== hasUnsavedChanges) {
       setHasUnsavedChanges(hasChanges)
       console.log('Auto-save: Changes detected:', hasChanges)
+    }
+
+    // Save to localStorage for persistence
+    if (hasChanges && typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
+      localStorage.setItem('campaign-wizard-data', currentDataString)
     }
 
     // Set up new auto-save timeout if there are changes
@@ -322,18 +371,18 @@ export function CampaignWizard({
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Create New Campaign</span>
-              {/* Auto-save status indicator */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {/* Enhanced auto-save status indicator */}
+              <div className="flex items-center gap-2 text-sm">
                 {hasUnsavedChanges && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2 px-2 py-1 bg-yellow-50 border border-yellow-200 rounded-full">
                     <div className="h-2 w-2 bg-yellow-500 rounded-full animate-pulse" />
-                    <span>Unsaved changes</span>
+                    <span className="text-yellow-700 font-medium">Unsaved changes</span>
                   </div>
                 )}
                 {lastAutoSave && !hasUnsavedChanges && (
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2 px-2 py-1 bg-green-50 border border-green-200 rounded-full">
                     <div className="h-2 w-2 bg-green-500 rounded-full" />
-                    <span>Auto-saved at {lastAutoSave.toLocaleTimeString()}</span>
+                    <span className="text-green-700 font-medium">Auto-saved at {lastAutoSave.toLocaleTimeString()}</span>
                   </div>
                 )}
               </div>

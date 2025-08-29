@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
 
+import { BarChart3, DollarSign,TrendingUp, Users } from 'lucide-react'
+
 import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChart3, TrendingUp, Users, DollarSign } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Analytics | Dashboard',
