@@ -39,8 +39,8 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="text-center max-w-4xl mx-auto">
+      <section className="container mx-auto px-4 py-16 md:py-24 max-w-7xl">
+        <div className="text-center max-w-5xl mx-auto">
           <Badge variant="outline" className="mb-4">
             <Sparkles className="h-3 w-3 mr-1" />
             AI-Powered Marketing Platform
@@ -49,7 +49,7 @@ export default function Home() {
             Build Powerful Marketing 
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Campaigns</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 mb-8 max-w-4xl mx-auto">
             Create, manage, and optimize your marketing campaigns with AI-powered insights. 
             From customer journeys to content generation, everything you need in one platform.
           </p>
@@ -69,12 +69,12 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
+      <section className="container mx-auto px-4 py-16 max-w-7xl">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Everything You Need to Succeed
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-5xl mx-auto">
             Comprehensive tools for modern marketing teams to create, execute, and measure campaigns
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function Home() {
 
       {/* Benefits Section */}
       <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h3 className="text-3xl font-bold text-gray-900 mb-6">
@@ -209,7 +209,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">

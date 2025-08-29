@@ -11,7 +11,7 @@ export function AuthLayout({ children, className, showLogo = true }: AuthLayoutP
   return (
     <div className={`min-h-screen bg-background flex flex-col ${className || ''}`}>
       <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+        <div className="max-w-2xl w-full space-y-8">
           {showLogo && (
             <div className="text-center">
               <h1 className="text-2xl font-bold text-foreground">Marketer Gen</h1>
