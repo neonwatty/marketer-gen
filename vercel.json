@@ -5,7 +5,8 @@
   "installCommand": "npm ci",
   "functions": {
     "src/app/api/**/*.ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024
     }
   },
   "crons": [
@@ -14,8 +15,10 @@
       "schedule": "0 */6 * * *"
     }
   ],
-  "regions": ["iad1"],
+  "regions": ["iad1", "cle1"],
   "framework": "nextjs",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/(.*)",

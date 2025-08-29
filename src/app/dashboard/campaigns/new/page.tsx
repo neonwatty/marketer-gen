@@ -2,12 +2,38 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 
 import { ArrowLeft } from 'lucide-react'
 
-import { type CampaignFormData,CampaignWizard } from '@/components/features/campaigns/CampaignWizard'
+import { type CampaignFormData } from '@/components/features/campaigns/CampaignWizard'
 import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+
+// Lazy load CampaignWizard since it imports heavy react-hook-form dependencies
+const CampaignWizard = dynamic(
+  () => import('@/components/features/campaigns/CampaignWizard').then(mod => ({ default: mod.CampaignWizard })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="space-y-6">
+          <Skeleton className="h-16 w-full" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+          </div>
+          <Skeleton className="h-48 w-full" />
+        </div>
+      </div>
+    )
+  }
+)
 
 // Note: This would normally be generated on the server side
 // export const metadata: Metadata = {

@@ -30,9 +30,15 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Create nextjs user
+# Security updates and cleanup
+RUN apk update && apk upgrade && apk add --no-cache dumb-init && rm -rf /var/cache/apk/*
+
+# Create nextjs user with restricted permissions
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+# Set up security-focused directory permissions
+RUN mkdir -p /app/.next && chown -R nextjs:nodejs /app
 
 # Copy the built application
 COPY --from=builder /app/public ./public
@@ -52,4 +58,9 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["node", "server.js"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node healthcheck.js || exit 1
+
+# Use dumb-init for proper signal handling
+CMD ["dumb-init", "node", "server.js"]

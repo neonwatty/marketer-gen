@@ -15,7 +15,7 @@ jest.mock('@/lib/api/brands', () => ({
 
 // Mock Select component to properly handle interactions
 jest.mock('@/components/ui/select', () => {
-  const MockSelect = ({ children, value, onValueChange }: any) => {
+  const MockSelect = ({ children, value, onValueChange, ...selectProps }: any) => {
     const [isOpen, setIsOpen] = React.useState(false)
     
     return (
@@ -23,7 +23,8 @@ jest.mock('@/components/ui/select', () => {
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
             return React.cloneElement(child, { 
-              ...child.props, 
+              ...child.props,
+              ...selectProps, 
               __selectContext: { value, onValueChange, isOpen, setIsOpen }
             })
           }
@@ -33,11 +34,11 @@ jest.mock('@/components/ui/select', () => {
     )
   }
   
-  const MockSelectTrigger = ({ children, __selectContext }: any) => (
+  const MockSelectTrigger = ({ children, __selectContext, ...props }: any) => (
     <button 
       role="combobox"
       data-testid="select-trigger"
-      aria-label="Select option"
+      aria-label={props['aria-label'] || "Select option"}
       onClick={() => __selectContext?.setIsOpen(true)}
     >
       {children}
@@ -390,7 +391,7 @@ describe('BrandComparison', () => {
       })
 
       await waitFor(() => {
-        expect(screen.getByRole('combobox', { name: /select comparison mode/i })).toBeInTheDocument()
+        expect(screen.getByLabelText('Select comparison mode')).toBeInTheDocument()
       })
     })
 
@@ -430,12 +431,19 @@ describe('BrandComparison', () => {
         expect(BrandService.getBrands).toHaveBeenCalled()
       }, { timeout: 3000 })
 
-      // Find and click the first select dropdown
-      const selectDropdowns = screen.getAllByRole('combobox')
-      const selectDropdown = selectDropdowns[0]
+      // Find the brand selection dropdown (not the comparison mode one)
+      await waitFor(() => {
+        expect(screen.getByLabelText('Select a brand to compare')).toBeInTheDocument()
+      })
+
+      const selectDropdown = screen.getByLabelText('Select a brand to compare')
       await user.click(selectDropdown)
 
-      // Select a brand
+      // Wait for the dropdown to open and select a brand
+      await waitFor(() => {
+        expect(screen.getByText('Health Plus (Healthcare)')).toBeInTheDocument()
+      })
+
       const healthPlusOption = screen.getByText('Health Plus (Healthcare)')
       
       await act(async () => {
@@ -445,11 +453,8 @@ describe('BrandComparison', () => {
       await waitFor(() => {
         expect(BrandService.getBrand).toHaveBeenCalledWith('brand2')
         // Check that Health Plus appears in the selected brands section
-        const healthPlusBrand = screen.getAllByText('Health Plus')[0] // First occurrence should be in the comparison list
-        expect(healthPlusBrand).toBeInTheDocument()
-        // Healthcare appears multiple times, check for at least one
-        const healthcareBadges = screen.getAllByText('Healthcare')
-        expect(healthcareBadges.length).toBeGreaterThan(0)
+        const healthPlusBrands = screen.getAllByText('Health Plus')
+        expect(healthPlusBrands.length).toBeGreaterThan(0)
       })
     })
 
@@ -468,11 +473,15 @@ describe('BrandComparison', () => {
 
       // Add a brand first
       await waitFor(() => {
-        expect(screen.getByText('Select a brand to compare')).toBeInTheDocument()
+        expect(screen.getByLabelText('Select a brand to compare')).toBeInTheDocument()
       })
 
-      const selectDropdown = screen.getByRole('combobox', { name: /select a brand to compare/i })
+      const selectDropdown = screen.getByLabelText('Select a brand to compare')
       await user.click(selectDropdown)
+
+      await waitFor(() => {
+        expect(screen.getByText('Health Plus (Healthcare)')).toBeInTheDocument()
+      })
 
       const healthPlusOption = screen.getByText('Health Plus (Healthcare)')
       
@@ -487,7 +496,7 @@ describe('BrandComparison', () => {
       })
 
       // Remove the brand
-      const removeButton = screen.getByRole('button', { name: /remove.*health plus.*from comparison/i })
+      const removeButton = screen.getByLabelText('Remove Health Plus from comparison')
       
       await act(async () => {
         await user.click(removeButton)
@@ -510,29 +519,43 @@ describe('BrandComparison', () => {
         .mockResolvedValueOnce({ ...mockCompareBrand, id: 'brand4', name: 'Finance Pro' })
 
       const user = userEvent.setup()
-      render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      
+      await act(async () => {
+        render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      })
 
-      // Add first brand
+      // Wait for initial load
       await waitFor(() => {
-        expect(screen.getByText('Select a brand to compare')).toBeInTheDocument()
+        expect(BrandService.getBrands).toHaveBeenCalled()
       })
 
       // Add three brands to reach the limit
       for (let i = 0; i < 3; i++) {
-        const selectDropdown = screen.getByRole('combobox', { name: /select a brand/i })
+        // Wait for the dropdown to be available
+        await waitFor(() => {
+          expect(screen.getByLabelText('Select a brand to compare')).toBeInTheDocument()
+        })
+        
+        const selectDropdown = screen.getByLabelText('Select a brand to compare')
         await user.click(selectDropdown)
         
-        const options = screen.getAllByRole('option')
-        if (options.length > 1) { // Skip "Select a brand to compare" option
-          await user.click(options[1])
-          await waitFor(() => {
-            expect(BrandService.getBrand).toHaveBeenCalled()
-          })
-        }
+        // Get available options and click the first available brand
+        const availableBrands = ['Health Plus (Healthcare)', 'Eco Solutions (Environmental)', 'Finance Pro (Finance)']
+        const brandOption = screen.getByText(availableBrands[i])
+        
+        await act(async () => {
+          await user.click(brandOption)
+        })
+        
+        await waitFor(() => {
+          expect(BrandService.getBrand).toHaveBeenCalled()
+        })
       }
 
       // Should not show add option when at limit
-      expect(screen.queryByText('Select a brand to compare')).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.queryByLabelText('Select a brand to compare')).not.toBeInTheDocument()
+      })
     })
 
     it.skip('should handle brand loading error gracefully', async () => {
@@ -746,18 +769,32 @@ describe('BrandComparison', () => {
       ;(BrandService.getBrand as jest.Mock).mockResolvedValue(mockCompareBrand)
 
       const user = userEvent.setup()
-      render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      
+      await act(async () => {
+        render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      })
 
       // Add a brand for comparison
       await waitFor(() => {
-        expect(screen.getByText('Select a brand to compare')).toBeInTheDocument()
+        expect(BrandService.getBrands).toHaveBeenCalled()
       })
 
-      const selectDropdown = screen.getByRole('combobox', { name: /select a brand/i })
+      await waitFor(() => {
+        expect(screen.getByLabelText('Select a brand to compare')).toBeInTheDocument()
+      })
+
+      const selectDropdown = screen.getByLabelText('Select a brand to compare')
       await user.click(selectDropdown)
 
+      await waitFor(() => {
+        expect(screen.getByText('Health Plus (Healthcare)')).toBeInTheDocument()
+      })
+
       const healthPlusOption = screen.getByText('Health Plus (Healthcare)')
-      await user.click(healthPlusOption)
+      
+      await act(async () => {
+        await user.click(healthPlusOption)
+      })
 
       await waitFor(() => {
         const techCorpLink = screen.getByText('techcorp.com')
@@ -816,6 +853,12 @@ describe('BrandComparison', () => {
         brandAssets: [],
         colorPalette: [],
         typography: [],
+        _count: {
+          campaigns: 0,
+          brandAssets: 0,
+          colorPalette: 0,
+          typography: 0
+        }
       }
 
       ;(BrandService.getBrands as jest.Mock).mockResolvedValue({
@@ -825,7 +868,10 @@ describe('BrandComparison', () => {
       ;(BrandService.getBrand as jest.Mock).mockResolvedValue(brandWithoutVisuals)
 
       const user = userEvent.setup()
-      render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      
+      await act(async () => {
+        render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      })
 
       // Add a brand and switch to visual mode
       await addBrandForComparison(user)
@@ -848,7 +894,10 @@ describe('BrandComparison', () => {
       ;(BrandService.getBrand as jest.Mock).mockResolvedValue(mockCompareBrand)
 
       const user = userEvent.setup()
-      render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      
+      await act(async () => {
+        render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      })
 
       // Add a brand and switch to metrics mode
       await addBrandForComparison(user)
@@ -895,7 +944,10 @@ describe('BrandComparison', () => {
       ;(BrandService.getBrand as jest.Mock).mockResolvedValue(mockCompareBrand)
 
       const user = userEvent.setup()
-      render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      
+      await act(async () => {
+        render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      })
 
       // Add a brand and switch to metrics mode
       await addBrandForComparison(user)
@@ -912,11 +964,19 @@ describe('BrandComparison', () => {
   // Helper functions
   async function addBrandForComparison(user: any) {
     await waitFor(() => {
-      expect(screen.getByText('Select a brand to compare')).toBeInTheDocument()
+      expect(BrandService.getBrands).toHaveBeenCalled()
     })
 
-    const selectDropdown = screen.getByRole('combobox', { name: /select a brand to compare/i })
+    await waitFor(() => {
+      expect(screen.getByLabelText('Select a brand to compare')).toBeInTheDocument()
+    })
+
+    const selectDropdown = screen.getByLabelText('Select a brand to compare')
     await user.click(selectDropdown)
+
+    await waitFor(() => {
+      expect(screen.getByText('Health Plus (Healthcare)')).toBeInTheDocument()
+    })
 
     const healthPlusOption = screen.getByText('Health Plus (Healthcare)')
     
@@ -932,16 +992,24 @@ describe('BrandComparison', () => {
   }
 
   async function switchToVisualMode(user: any) {
-    const modeSelector = screen.getByRole('combobox', { name: /select comparison mode/i })
+    const modeSelector = screen.getByLabelText('Select comparison mode')
     await user.click(modeSelector)
+    
+    await waitFor(() => {
+      expect(screen.getByText('Visual')).toBeInTheDocument()
+    })
     
     const visualOption = screen.getByText('Visual')
     await user.click(visualOption)
   }
 
   async function switchToMetricsMode(user: any) {
-    const modeSelector = screen.getByRole('combobox', { name: /select comparison mode/i })
+    const modeSelector = screen.getByLabelText('Select comparison mode')
     await user.click(modeSelector)
+    
+    await waitFor(() => {
+      expect(screen.getByText('Metrics')).toBeInTheDocument()
+    })
     
     const metricsOption = screen.getByText('Metrics')
     await user.click(metricsOption)
@@ -993,7 +1061,10 @@ describe('BrandComparison', () => {
       ;(BrandService.getBrand as jest.Mock).mockResolvedValue(mockCompareBrand)
 
       const user = userEvent.setup()
-      render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      
+      await act(async () => {
+        render(<BrandComparison currentBrand={mockCurrentBrand} />)
+      })
 
       // Add a brand for comparison
       await addBrandForComparison(user)

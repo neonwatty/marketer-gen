@@ -46,7 +46,7 @@
       "name": "Journey Stage Configuration Panel",
       "description": "Implement the StageConfigurationPanel component for editing journey stages, including content types, messaging suggestions, channels, and timing configuration.",
       "parent": "1.0",
-      "status": "pending", 
+      "status": "completed", 
       "priority": 1,
       "dependencies": ["1.1"],
       "files": [
@@ -66,7 +66,7 @@
       "name": "Visual Journey Builder Canvas",
       "description": "Enhance the JourneyBuilder component with ReactFlow to provide visual journey editing, stage connections, and real-time updates.",
       "parent": "1.0",
-      "status": "pending",
+      "status": "completed",
       "priority": 1, 
       "dependencies": ["1.2"],
       "files": [

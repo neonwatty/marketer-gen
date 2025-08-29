@@ -22,12 +22,17 @@ jest.mock('@/components/ui/dialog', () => {
   const MockDialog = ({ children, open, onOpenChange }: any) => {
     const [isOpen, setIsOpen] = React.useState(open || false)
     
+    // Sync internal state with external open prop
+    React.useEffect(() => {
+      setIsOpen(open || false)
+    }, [open])
+    
     // Create a context to share dialog state with children
     const dialogContext = {
       isOpen,
-      setIsOpen: (open: boolean) => {
-        setIsOpen(open)
-        onOpenChange?.(open)
+      setIsOpen: (newOpen: boolean) => {
+        setIsOpen(newOpen)
+        onOpenChange?.(newOpen)
       }
     }
     
@@ -35,9 +40,17 @@ jest.mock('@/components/ui/dialog', () => {
       <div data-testid="ui-dialog" data-open={isOpen}>
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            // Filter out our internal prop from DOM elements
-            const { __dialogContext, ...otherProps } = child.props
-            return React.cloneElement(child, { ...otherProps, __dialogContext: dialogContext })
+            // Only pass __dialogContext to components that need it, not DOM elements
+            const isComponent = typeof child.type === 'function' || 
+                               (typeof child.type === 'string' && child.type.startsWith('Mock'))
+            
+            if (isComponent) {
+              return React.cloneElement(child, { ...child.props, __dialogContext: dialogContext })
+            } else {
+              // For DOM elements, filter out internal props
+              const { __dialogContext, ...cleanProps } = child.props
+              return React.cloneElement(child, cleanProps)
+            }
           }
           return child
         })}
@@ -75,7 +88,17 @@ jest.mock('@/components/ui/dialog', () => {
       <div data-testid="ui-dialog-content">
         {React.Children.map(children, (child) => {
           if (React.isValidElement(child)) {
-            return React.cloneElement(child, { ...child.props, __dialogContext })
+            // Only pass __dialogContext to components that need it, not DOM elements
+            const isComponent = typeof child.type === 'function' || 
+                               (typeof child.type === 'string' && child.type.startsWith('Mock'))
+            
+            if (isComponent) {
+              return React.cloneElement(child, { ...child.props, __dialogContext })
+            } else {
+              // For DOM elements, filter out internal props
+              const { __dialogContext: _, ...cleanProps } = child.props
+              return React.cloneElement(child, cleanProps)
+            }
           }
           return child
         })}
@@ -87,13 +110,20 @@ jest.mock('@/components/ui/dialog', () => {
     <div data-testid="ui-dialog-footer">
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child) && child.props.children === 'Cancel') {
+          // Filter out internal props for DOM elements
+          const { __dialogContext: _, ...cleanProps } = child.props
           return React.cloneElement(child, {
-            ...child.props,
+            ...cleanProps,
             onClick: (e: any) => {
               __dialogContext?.setIsOpen(false)
               child.props.onClick?.(e)
             }
           })
+        }
+        // Filter out internal props for all child elements
+        if (React.isValidElement(child)) {
+          const { __dialogContext: _, ...cleanProps } = child.props
+          return React.cloneElement(child, cleanProps)
         }
         return child
       })}
@@ -108,6 +138,70 @@ jest.mock('@/components/ui/dialog', () => {
     DialogHeader: ({ children }: any) => <div data-testid="ui-dialog-header">{children}</div>,
     DialogTitle: ({ children }: any) => <div data-testid="ui-dialog-title">{children}</div>,
     DialogTrigger: MockDialogTrigger,
+  }
+})
+
+// Mock Select components
+jest.mock('@/components/ui/select', () => {
+  const MockSelect = ({ children, value, onValueChange }: any) => {
+    return (
+      <div data-testid="ui-select" data-value={value}>
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            return React.cloneElement(child, { ...child.props, onValueChange })
+          }
+          return child
+        })}
+      </div>
+    )
+  }
+
+  const MockSelectTrigger = ({ children, onValueChange }: any) => (
+    <button 
+      role="combobox" 
+      data-testid="ui-select-trigger"
+      aria-expanded="false"
+      aria-controls="select-content"
+      aria-label="Select template"
+      onClick={() => {
+        // Simulate opening the dropdown - do nothing for now
+      }}
+    >
+      {children}
+    </button>
+  )
+
+  const MockSelectValue = ({ placeholder }: any) => (
+    <span data-testid="ui-select-value">{placeholder || 'Select...'}</span>
+  )
+
+  const MockSelectContent = ({ children, onValueChange }: any) => (
+    <div data-testid="ui-select-content">
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child, { ...child.props, onValueChange })
+        }
+        return child
+      })}
+    </div>
+  )
+
+  const MockSelectItem = ({ children, value, onValueChange }: any) => (
+    <button
+      data-testid="ui-select-item"
+      data-value={value}
+      onClick={() => onValueChange?.(value)}
+    >
+      {children}
+    </button>
+  )
+
+  return {
+    Select: MockSelect,
+    SelectTrigger: MockSelectTrigger,
+    SelectValue: MockSelectValue,
+    SelectContent: MockSelectContent,
+    SelectItem: MockSelectItem,
   }
 })
 
@@ -451,7 +545,7 @@ describe('ApprovalWorkflow', () => {
       const submitButton = submitButtons[1] // The submit button inside the dialog
       await user.click(submitButton)
 
-      expect(defaultProps.onCreateWorkflow).toHaveBeenCalledWith('', 'template-1', undefined)
+      expect(defaultProps.onCreateWorkflow).toHaveBeenCalledWith('new-content', 'template-1', undefined)
     })
 
     it('should disable submit button when required fields are empty', async () => {
@@ -495,7 +589,7 @@ describe('ApprovalWorkflow', () => {
       await user.click(approveButton)
 
       expect(screen.getByText('Approve Content')).toBeInTheDocument()
-      expect(screen.getByText('Add comments about the approval...')).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Add comments about the approval...')).toBeInTheDocument()
     })
 
     it('should open rejection dialog when reject button is clicked', async () => {
@@ -506,7 +600,7 @@ describe('ApprovalWorkflow', () => {
       await user.click(rejectButton)
 
       expect(screen.getByText('Reject Content')).toBeInTheDocument()
-      expect(screen.getByText('Explain the reasons for rejection...')).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Explain the reasons for rejection...')).toBeInTheDocument()
     })
 
     it('should open request changes dialog when request changes button is clicked', async () => {
@@ -516,18 +610,28 @@ describe('ApprovalWorkflow', () => {
       const requestChangesButton = screen.getByRole('button', { name: /request changes/i })
       await user.click(requestChangesButton)
 
-      expect(screen.getByText('Request Changes')).toBeInTheDocument()
-      expect(screen.getByText('Describe the required changes...')).toBeInTheDocument()
+      expect(screen.getAllByText('Request Changes')[0]).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Describe the required changes...')).toBeInTheDocument()
     })
 
     it('should call onApprove when approval is submitted', async () => {
       const user = userEvent.setup()
       render(<ApprovalWorkflow {...defaultProps} />)
 
-      const approveButton = screen.getByRole('button', { name: /approve/i })
+      const approveButtons = screen.getAllByRole('button', { name: /approve/i })
+      const approveButton = approveButtons[0] // First approve button (outside dialog)
       await user.click(approveButton)
 
-      const submitButton = screen.getByRole('button', { name: /approve/i })
+      // Wait for dialog to open and find the submit button inside dialog
+      await waitFor(() => {
+        expect(screen.getByText('Approve Content')).toBeInTheDocument()
+      })
+
+      const submitButtons = screen.getAllByRole('button', { name: /approve/i })
+      const submitButton = submitButtons.find(button => 
+        button.className.includes('bg-green-600') && 
+        button.closest('[data-testid="ui-dialog-content"]')
+      ) || submitButtons[1] // Fallback to second button
       await user.click(submitButton)
 
       expect(defaultProps.onApprove).toHaveBeenCalledWith('workflow-1', 'step-1', undefined)
@@ -537,13 +641,22 @@ describe('ApprovalWorkflow', () => {
       const user = userEvent.setup()
       render(<ApprovalWorkflow {...defaultProps} />)
 
-      const rejectButton = screen.getByRole('button', { name: /reject/i })
+      const rejectButtons = screen.getAllByRole('button', { name: /reject/i })
+      const rejectButton = rejectButtons[0] // First reject button (outside dialog)
       await user.click(rejectButton)
+
+      await waitFor(() => {
+        expect(screen.getByText('Reject Content')).toBeInTheDocument()
+      })
 
       const commentTextarea = screen.getByPlaceholderText('Explain the reasons for rejection...')
       await user.type(commentTextarea, 'Content needs improvement')
 
-      const submitButton = screen.getByRole('button', { name: /reject/i })
+      const submitButtons = screen.getAllByRole('button', { name: /reject/i })
+      const submitButton = submitButtons.find(button => 
+        button.className.includes('bg-red-600') && 
+        button.closest('[data-testid="ui-dialog-content"]')
+      ) || submitButtons[1] // Fallback to second button
       await user.click(submitButton)
 
       expect(defaultProps.onReject).toHaveBeenCalledWith('workflow-1', 'step-1', 'Content needs improvement')
@@ -553,13 +666,22 @@ describe('ApprovalWorkflow', () => {
       const user = userEvent.setup()
       render(<ApprovalWorkflow {...defaultProps} />)
 
-      const requestChangesButton = screen.getByRole('button', { name: /request changes/i })
+      const requestChangesButtons = screen.getAllByRole('button', { name: /request changes/i })
+      const requestChangesButton = requestChangesButtons[0] // First request changes button (outside dialog)
       await user.click(requestChangesButton)
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Request Changes')[0]).toBeInTheDocument()
+      })
 
       const commentTextarea = screen.getByPlaceholderText('Describe the required changes...')
       await user.type(commentTextarea, 'Please update the introduction')
 
-      const submitButton = screen.getByRole('button', { name: /request changes/i })
+      const submitButtons = screen.getAllByRole('button', { name: /request changes/i })
+      const submitButton = submitButtons.find(button => 
+        button.className.includes('bg-yellow-600') && 
+        button.closest('[data-testid="ui-dialog-content"]')
+      ) || submitButtons[1] // Fallback to second button
       await user.click(submitButton)
 
       expect(defaultProps.onRequestChanges).toHaveBeenCalledWith('workflow-1', 'step-1', 'Please update the introduction')
@@ -569,10 +691,20 @@ describe('ApprovalWorkflow', () => {
       const user = userEvent.setup()
       render(<ApprovalWorkflow {...defaultProps} />)
 
-      const rejectButton = screen.getByRole('button', { name: /reject/i })
+      const rejectButtons = screen.getAllByRole('button', { name: /reject/i })
+      const rejectButton = rejectButtons[0] // First reject button (outside dialog)
       await user.click(rejectButton)
 
-      const submitButton = screen.getByRole('button', { name: /reject/i })
+      await waitFor(() => {
+        expect(screen.getByText('Reject Content')).toBeInTheDocument()
+      })
+
+      const submitButtons = screen.getAllByRole('button', { name: /reject/i })
+      const submitButton = submitButtons.find(button => 
+        button.className.includes('bg-red-600') && 
+        button.closest('[data-testid="ui-dialog-content"]')
+      ) || submitButtons[1] // Fallback to second button
+      
       expect(submitButton).toBeDisabled()
 
       const commentTextarea = screen.getByPlaceholderText('Explain the reasons for rejection...')

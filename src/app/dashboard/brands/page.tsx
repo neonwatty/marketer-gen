@@ -2,15 +2,42 @@
 
 import * as React from "react"
 import { useEffect,useState } from "react"
+import dynamic from 'next/dynamic'
 
 import { BarChart3, Eye,FileText, Image, Plus, Search, Settings } from "lucide-react"
 
 import { 
-  BrandAnalytics, 
   BrandAssetLibrary, 
   BrandComparison, 
   BrandGuidelines, 
   BrandOverview} from "@/components/features/brand"
+import { Skeleton } from "@/components/ui/skeleton"
+
+// Lazy load BrandAnalytics since it imports heavy Recharts dependencies
+const BrandAnalytics = dynamic(
+  () => import("@/components/features/brand").then(mod => ({ default: mod.BrandAnalytics })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5" />
+          <Skeleton className="h-8 w-48" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+        <Skeleton className="h-64 w-full" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Skeleton className="h-48" />
+          <Skeleton className="h-48" />
+        </div>
+      </div>
+    )
+  }
+)
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"

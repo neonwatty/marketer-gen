@@ -2,7 +2,7 @@
 
 import 'reactflow/dist/style.css'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import {
   addEdge,
   Background,
@@ -15,6 +15,10 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState,
+  applyNodeChanges,
+  applyEdgeChanges,
+  type NodeChange,
+  type EdgeChange,
 } from 'reactflow'
 
 import { Sparkles } from 'lucide-react'
@@ -27,7 +31,7 @@ import { JourneyStageNode } from './JourneyStageNode'
 import { JourneyTemplateCustomizer } from './JourneyTemplateCustomizer'
 import { JourneyTemplateGallery } from './JourneyTemplateGallery'
 import { JourneyToolbar } from './JourneyToolbar'
-import { StageConfigurationPanel } from './StageConfigurationPanel'
+import { StageConfigurationPanel, EnhancedJourneyStage } from './StageConfigurationPanel'
 
 export interface JourneyStage {
   id: string
@@ -142,11 +146,123 @@ export function JourneyBuilder() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [draggedNode, setDraggedNode] = useState<Node | null>(null)
   
   // Template functionality state
   const [showTemplateGallery, setShowTemplateGallery] = useState(false)
   const [showTemplateCustomizer, setShowTemplateCustomizer] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<JourneyTemplate | null>(null)
+
+  // Move node with keyboard arrows
+  const moveNodeWithKeyboard = useCallback((nodeId: string, direction: string) => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === nodeId) {
+          let newX = node.position.x
+          let newY = node.position.y
+          const step = 20 // Grid snap size
+
+          switch (direction) {
+            case 'ArrowLeft':
+              newX -= step
+              break
+            case 'ArrowRight':
+              newX += step
+              break
+            case 'ArrowUp':
+              newY -= step
+              break
+            case 'ArrowDown':
+              newY += step
+              break
+          }
+
+          return {
+            ...node,
+            position: { x: newX, y: newY },
+          }
+        }
+        return node
+      })
+    )
+  }, [setNodes])
+
+  const onDeleteStage = useCallback(
+    (nodeId: string) => {
+      setNodes((nds) => nds.filter((node) => node.id !== nodeId))
+      setEdges((eds) =>
+        eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
+      )
+      if (selectedNode?.id === nodeId) {
+        setSelectedNode(null)
+        setIsConfigPanelOpen(false)
+      }
+    },
+    [setNodes, setEdges, selectedNode]
+  )
+
+  // Keyboard shortcuts and accessibility
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle shortcuts when not in an input field
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return
+      }
+
+      switch (event.key) {
+        case 'Delete':
+        case 'Backspace':
+          if (selectedNode) {
+            event.preventDefault()
+            onDeleteStage(selectedNode.id)
+          }
+          break
+        case 'Escape':
+          event.preventDefault()
+          setSelectedNode(null)
+          setIsConfigPanelOpen(false)
+          break
+        case 'c':
+          if (event.ctrlKey || event.metaKey) {
+            event.preventDefault()
+            // TODO: Copy selected node
+          }
+          break
+        case 'v':
+          if (event.ctrlKey || event.metaKey) {
+            event.preventDefault()
+            // TODO: Paste node
+          }
+          break
+        case 'z':
+          if (event.ctrlKey || event.metaKey) {
+            event.preventDefault()
+            // TODO: Undo/Redo functionality
+          }
+          break
+        case 'ArrowLeft':
+        case 'ArrowRight':
+        case 'ArrowUp':
+        case 'ArrowDown':
+          if (selectedNode) {
+            event.preventDefault()
+            moveNodeWithKeyboard(selectedNode.id, event.key)
+          }
+          break
+        case 'Enter':
+        case ' ':
+          if (selectedNode) {
+            event.preventDefault()
+            setIsConfigPanelOpen(true)
+          }
+          break
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selectedNode, onDeleteStage, moveNodeWithKeyboard])
 
   const onConnect = useCallback(
     (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -158,23 +274,140 @@ export function JourneyBuilder() {
     setIsConfigPanelOpen(true)
   }, [])
 
-  const onNodeDragStop = useCallback((_event: React.MouseEvent, node: Node) => {
-    // Auto-arrange nodes if they get too close to each other
+  // Enhanced drag handlers with visual feedback
+  const onNodeDragStart = useCallback((_event: React.MouseEvent, node: Node) => {
+    setIsDragging(true)
+    setDraggedNode(node)
+  }, [])
+
+  const onNodeDrag = useCallback((_event: React.MouseEvent, node: Node) => {
+    // Real-time position updates during drag
     setNodes((nds) =>
       nds.map((n) => {
         if (n.id === node.id) {
           return {
             ...n,
-            position: {
-              x: Math.round(node.position.x / 20) * 20, // Snap to grid
-              y: Math.round(node.position.y / 20) * 20,
+            data: {
+              ...n.data,
+              isDragging: true,
             },
           }
         }
-        return n
+        return {
+          ...n,
+          data: {
+            ...n.data,
+            isDragging: false,
+          },
+        }
       })
     )
   }, [setNodes])
+
+  const onNodeDragStop = useCallback((_event: React.MouseEvent, node: Node) => {
+    setIsDragging(false)
+    setDraggedNode(null)
+    
+    // Enhanced auto-arrangement with collision detection
+    setNodes((nds) => {
+      const updatedNodes = nds.map((n) => {
+        if (n.id === node.id) {
+          const snappedX = Math.round(node.position.x / 20) * 20
+          const snappedY = Math.round(node.position.y / 20) * 20
+          
+          // Check for collisions with other nodes
+          const hasCollision = nds.some((otherNode) => {
+            if (otherNode.id === n.id) return false
+            const distance = Math.sqrt(
+              Math.pow(snappedX - otherNode.position.x, 2) + 
+              Math.pow(snappedY - otherNode.position.y, 2)
+            )
+            return distance < 300 // Minimum distance between nodes
+          })
+          
+          // If collision detected, find alternative position
+          let finalX = snappedX
+          let finalY = snappedY
+          
+          if (hasCollision) {
+            // Try positions in a spiral pattern to avoid overlaps
+            const spiralPositions = [
+              { x: 0, y: -320 }, { x: 320, y: 0 }, { x: 0, y: 320 }, { x: -320, y: 0 },
+              { x: 320, y: -320 }, { x: 320, y: 320 }, { x: -320, y: 320 }, { x: -320, y: -320 }
+            ]
+            
+            for (const offset of spiralPositions) {
+              const testX = snappedX + offset.x
+              const testY = snappedY + offset.y
+              const testCollision = nds.some((otherNode) => {
+                if (otherNode.id === n.id) return false
+                const distance = Math.sqrt(
+                  Math.pow(testX - otherNode.position.x, 2) + 
+                  Math.pow(testY - otherNode.position.y, 2)
+                )
+                return distance < 300
+              })
+              
+              if (!testCollision) {
+                finalX = testX
+                finalY = testY
+                break
+              }
+            }
+          }
+          
+          return {
+            ...n,
+            position: { x: finalX, y: finalY },
+            data: {
+              ...n.data,
+              isDragging: false,
+            },
+          }
+        }
+        return {
+          ...n,
+          data: {
+            ...n.data,
+            isDragging: false,
+          },
+        }
+      })
+      
+      // Auto-arrange edges after node movement
+      autoArrangeConnections(updatedNodes)
+      
+      return updatedNodes
+    })
+  }, [setNodes])
+
+  // Helper function to auto-arrange connections based on node positions
+  const autoArrangeConnections = useCallback((nodeList: Node[]) => {
+    setEdges((currentEdges) => {
+      return currentEdges.map((edge) => {
+        const sourceNode = nodeList.find(n => n.id === edge.source)
+        const targetNode = nodeList.find(n => n.id === edge.target)
+        
+        if (sourceNode && targetNode) {
+          // Update edge styling based on connection distance
+          const distance = Math.sqrt(
+            Math.pow(targetNode.position.x - sourceNode.position.x, 2) + 
+            Math.pow(targetNode.position.y - sourceNode.position.y, 2)
+          )
+          
+          return {
+            ...edge,
+            animated: distance > 400, // Only animate longer connections
+            style: {
+              stroke: distance > 600 ? '#ef4444' : '#22c55e', // Red for long, green for short
+              strokeWidth: Math.max(1, Math.min(3, 600 / distance)), // Thicker for shorter connections
+            },
+          }
+        }
+        return edge
+      })
+    })
+  }, [setEdges])
 
   const onAddStage = useCallback(
     (stageType: JourneyStage['type']) => {
@@ -200,7 +433,7 @@ export function JourneyBuilder() {
   )
 
   const onUpdateStage = useCallback(
-    (nodeId: string, updatedData: Partial<JourneyStage>) => {
+    (nodeId: string, updatedData: Partial<EnhancedJourneyStage>) => {
       setNodes((nds) =>
         nds.map((node) =>
           node.id === nodeId
@@ -210,20 +443,6 @@ export function JourneyBuilder() {
       )
     },
     [setNodes]
-  )
-
-  const onDeleteStage = useCallback(
-    (nodeId: string) => {
-      setNodes((nds) => nds.filter((node) => node.id !== nodeId))
-      setEdges((eds) =>
-        eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId)
-      )
-      if (selectedNode?.id === nodeId) {
-        setSelectedNode(null)
-        setIsConfigPanelOpen(false)
-      }
-    },
-    [setNodes, setEdges, selectedNode]
   )
 
   // Template handling functions
@@ -303,7 +522,35 @@ export function JourneyBuilder() {
           </div>
         </CardHeader>
         <CardContent className="h-full p-0">
-          <div className="relative h-full">
+          <div 
+            className="relative h-full"
+            role="application"
+            aria-label="Journey Builder Canvas"
+            aria-describedby="journey-instructions"
+          >
+            {/* Screen reader instructions */}
+            <div id="journey-instructions" className="sr-only">
+              Use arrow keys to move selected nodes. Press Enter or Space to configure a node. 
+              Press Delete to remove selected node. Press Escape to deselect.
+            </div>
+            
+            {/* Keyboard shortcuts help */}
+            <div 
+              className={`absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm border rounded-lg p-3 text-xs transition-opacity duration-200 ${
+                selectedNode ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+              role="tooltip"
+              aria-live="polite"
+            >
+              <h4 className="font-semibold mb-1">Keyboard Shortcuts</h4>
+              <ul className="space-y-0.5 text-muted-foreground">
+                <li>↑↓←→ Move node</li>
+                <li>Enter/Space Configure</li>
+                <li>Delete Remove node</li>
+                <li>Escape Deselect</li>
+              </ul>
+            </div>
+
             <JourneyToolbar onAddStage={onAddStage} />
             
             <ReactFlow
@@ -313,15 +560,22 @@ export function JourneyBuilder() {
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               onNodeClick={onNodeClick}
+              onNodeDragStart={onNodeDragStart}
+              onNodeDrag={onNodeDrag}
               onNodeDragStop={onNodeDragStop}
               nodeTypes={nodeTypes}
               fitView
               snapToGrid={true}
               snapGrid={[20, 20]}
-              className="h-full"
+              className={`h-full transition-all duration-200 ${
+                isDragging ? 'cursor-grabbing' : 'cursor-default'
+              }`}
               nodeOrigin={[0.5, 0.5]}
               minZoom={0.2}
               maxZoom={2}
+              proOptions={{ hideAttribution: true }}
+              aria-label="Interactive journey building canvas"
+              tabIndex={0}
             >
               <Controls />
               <MiniMap />

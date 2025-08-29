@@ -197,9 +197,12 @@ export function ApprovalWorkflow({
   }
 
   const handleCreateWorkflow = () => {
-    if (newWorkflowData.contentId && newWorkflowData.templateId) {
+    if (newWorkflowData.contentTitle.trim() && newWorkflowData.templateId) {
+      // Generate contentId from title (simple slug-like transformation)
+      const contentId = newWorkflowData.contentTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || `content-${Date.now()}`
+      
       onCreateWorkflow(
-        newWorkflowData.contentId,
+        contentId,
         newWorkflowData.templateId,
         newWorkflowData.dueDate ? new Date(newWorkflowData.dueDate) : undefined
       )

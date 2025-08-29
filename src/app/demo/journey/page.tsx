@@ -1,6 +1,28 @@
 'use client'
 
-import { JourneyBuilder } from '@/components/features/journey'
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
+
+// Lazy load JourneyBuilder since it imports heavy ReactFlow dependencies
+const JourneyBuilder = dynamic(
+  () => import('@/components/features/journey').then(mod => ({ default: mod.JourneyBuilder })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[600px] border border-border rounded-lg p-4">
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <div className="grid grid-cols-3 gap-4">
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+          </div>
+          <Skeleton className="h-48 w-full" />
+        </div>
+      </div>
+    )
+  }
+)
 
 export default function JourneyDemoPage() {
   return (
