@@ -41,7 +41,10 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-2xl">
+      <Card 
+        className="w-full max-w-2xl" 
+        style={{ maxWidth: '672px', width: '100%', minWidth: '320px' }}
+      >
         <CardHeader>
           <CardTitle>Demo Sign In</CardTitle>
           <CardDescription>
@@ -61,6 +64,7 @@ export default function SignInPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="demo@example.com"
                 required
+                style={{ width: '100%', minWidth: '280px' }}
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
