@@ -47,3 +47,6 @@
 .tfq/
 
 /config/credentials/test.key
+
+# Playwright MCP directory
+.playwright-mcp/
