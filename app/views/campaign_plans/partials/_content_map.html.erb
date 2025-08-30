@@ -19,7 +19,6 @@
               <%= channel %>
             </h3>
             <button class="content-map-toggle text-gray-400 hover:text-gray-600 transition-colors" 
-                    onclick="toggleContentSection(this)" 
                     aria-label="Toggle content details">
               <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -27,7 +26,7 @@
             </button>
           </div>
           
-          <div class="content-details space-y-4" style="display: none;">
+          <div class="content-details space-y-4 hidden">
             <!-- Content Types -->
             <div class="bg-gray-50 rounded-md p-3">
               <h4 class="text-sm font-medium text-gray-900 mb-2">Recommended Content Types</h4>
@@ -108,14 +107,3 @@
   </div>
 </div>
 
-<script>
-function toggleContentSection(button) {
-  const contentDetails = button.closest('.content-map-platform').querySelector('.content-details');
-  const isVisible = contentDetails.style.display !== 'none';
-  
-  contentDetails.style.display = isVisible ? 'none' : 'block';
-  
-  const icon = button.querySelector('svg');
-  icon.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
-}
-</script>

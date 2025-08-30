@@ -3,7 +3,7 @@
 <% if @campaign_plan.generating? %>
   <!-- Real-time Progress Tracker -->
   <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6"
-       data-controller="progress-tracker"
+       data-controller="progress-tracker progress-bar"
        data-progress-tracker-task-id-value="<%= @campaign_plan.id %>"
        data-progress-tracker-endpoint-value="/api/v1/progress/campaign_plans/<%= @campaign_plan.id %>"
        data-progress-tracker-refresh-interval-value="1500"
@@ -33,7 +33,7 @@
       <div class="w-full bg-blue-200 rounded-full h-3">
         <div class="h-3 bg-blue-600 rounded-full transition-all duration-300 ease-out"
              data-progress-tracker-target="progressBar"
-             style="width: <%= @campaign_plan.generation_progress_percentage %>%"></div>
+             data-progress-width="<%= @campaign_plan.generation_progress_percentage %>"></div>
       </div>
     </div>
 
@@ -113,22 +113,6 @@
     </div>
   </div>
 
-  <!-- JavaScript for auto-refresh and completion handling -->
-  <script>
-    document.addEventListener('progress-tracker:taskCompleted', (event) => {
-      const { status, data } = event.detail;
-      
-      if (status === 'completed') {
-        // Show success notification
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      } else if (status === 'failed') {
-        // Show error state
-        console.error('Campaign generation failed:', data);
-      }
-    });
-  </script>
 
 <% elsif @campaign_plan.failed? %>
   <!-- Error State -->

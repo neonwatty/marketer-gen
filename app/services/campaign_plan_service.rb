@@ -55,17 +55,6 @@ class CampaignPlanService < ApplicationService
     end
   end
 
-  private
-
-  def update_progress(step, percentage, message, estimated_time)
-    @campaign_plan.update_generation_progress(
-      step: step,
-      percentage: percentage,
-      message: message,
-      estimated_time: estimated_time
-    )
-  end
-
   def regenerate_plan
     return failure_result('Campaign plan cannot be regenerated') unless @campaign_plan.can_be_regenerated?
 
@@ -85,6 +74,18 @@ class CampaignPlanService < ApplicationService
 
     generate_plan
   end
+
+  private
+
+  def update_progress(step, percentage, message, estimated_time)
+    @campaign_plan.update_generation_progress(
+      step: step,
+      percentage: percentage,
+      message: message,
+      estimated_time: estimated_time
+    )
+  end
+
 
   def update_plan_parameters(params)
     begin
@@ -169,6 +170,16 @@ class CampaignPlanService < ApplicationService
     strategic_rationale = response[:strategic_rationale] || response['strategic_rationale']
     content_mapping = response[:content_mapping] || response['content_mapping']
 
+    # Apply content size limits to prevent excessive content
+    summary = truncate_content(summary, 2000) if summary.is_a?(String)
+    strategy = truncate_strategy_content(strategy)
+    timeline = truncate_timeline_content(timeline)
+    assets = truncate_assets_content(assets)
+    content_strategy = truncate_content_hash(content_strategy, 1500)
+    creative_approach = truncate_content_hash(creative_approach, 1500)
+    strategic_rationale = truncate_content_hash(strategic_rationale, 1500)
+    content_mapping = truncate_content_mapping(content_mapping)
+
     # Update the campaign plan with generated content
     @campaign_plan.update!(
       generated_summary: summary,
@@ -223,5 +234,87 @@ class CampaignPlanService < ApplicationService
       message: message,
       errors: errors
     }
+  end
+
+  # Content truncation methods to prevent excessive page rendering
+  def truncate_content(content, max_length)
+    return content unless content.is_a?(String)
+    content.length > max_length ? "#{content[0..max_length]}..." : content
+  end
+
+  def truncate_content_hash(content_hash, max_length)
+    return content_hash unless content_hash.is_a?(Hash)
+    
+    truncated = {}
+    content_hash.each do |key, value|
+      if value.is_a?(String)
+        truncated[key] = truncate_content(value, max_length)
+      elsif value.is_a?(Array)
+        truncated[key] = value.first(10) # Limit arrays to 10 items
+      else
+        truncated[key] = value
+      end
+    end
+    truncated
+  end
+
+  def truncate_strategy_content(strategy)
+    return strategy unless strategy.is_a?(Hash)
+    
+    truncated = {}
+    strategy.each do |key, value|
+      case key.to_s
+      when 'description'
+        truncated[key] = truncate_content(value, 3000)
+      when 'phases', 'channels'
+        truncated[key] = value.is_a?(Array) ? value.first(8) : value
+      when 'budget_allocation'
+        truncated[key] = value.is_a?(Hash) ? value : value
+      else
+        truncated[key] = value.is_a?(String) ? truncate_content(value, 1000) : value
+      end
+    end
+    truncated
+  end
+
+  def truncate_timeline_content(timeline)
+    return timeline unless timeline.is_a?(Array)
+    
+    # Limit timeline to 20 items and truncate activity descriptions
+    timeline.first(20).map do |item|
+      if item.is_a?(Hash) && item[:activity]
+        item.merge(activity: truncate_content(item[:activity].to_s, 200))
+      elsif item.is_a?(Hash) && item['activity']
+        item.merge('activity' => truncate_content(item['activity'].to_s, 200))
+      else
+        item
+      end
+    end
+  end
+
+  def truncate_assets_content(assets)
+    return assets unless assets.is_a?(Array)
+    
+    # Limit to 15 assets and truncate descriptions
+    assets.first(15).map do |asset|
+      asset.is_a?(String) ? truncate_content(asset, 150) : asset
+    end
+  end
+
+  def truncate_content_mapping(content_mapping)
+    return content_mapping unless content_mapping.is_a?(Array)
+    
+    # Limit content mapping to 10 items
+    content_mapping.first(10).map do |mapping|
+      if mapping.is_a?(Hash)
+        truncated = {}
+        mapping.each do |key, value|
+          truncated[key] = value.is_a?(String) ? truncate_content(value, 500) : value
+        end
+        truncated
+      else
+        mapping
+      end
+    end
   end
 end

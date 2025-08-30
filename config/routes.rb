@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   
   resources :campaign_plans do
     member do
+      get :generate
       post :generate
       post :regenerate
       patch :archive

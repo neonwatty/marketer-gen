@@ -372,6 +372,56 @@ class CampaignPlan < ApplicationRecord
     update!(status: 'archived')
   end
 
+  def plan_analytics
+    {
+      campaign_type: campaign_type,
+      objective: objective,
+      status: status,
+      has_content: has_generated_content?,
+      generation_progress: generation_progress,
+      created_days_ago: created_at ? ((Time.current - created_at) / 1.day).round(1) : nil,
+      last_updated: updated_at,
+      content_sections: {
+        summary: generated_summary.present?,
+        strategy: generated_strategy.present?,
+        timeline: generated_timeline.present?,
+        assets: generated_assets.present?,
+        content_strategy: safe_field_present?(:content_strategy),
+        creative_approach: safe_field_present?(:creative_approach),
+        strategic_rationale: safe_field_present?(:strategic_rationale),
+        content_mapping: safe_field_present?(:content_mapping)
+      }
+    }
+  end
+
+  def analytics_stale?
+    return false unless analytics_enabled?
+    return true unless analytics_last_updated_at
+
+    # Consider analytics stale if not updated in 24 hours
+    analytics_last_updated_at < 24.hours.ago
+  end
+
+  def analytics_summary
+    return {} unless analytics_enabled?
+
+    {
+      basic_analytics: plan_analytics,
+      engagement_data: parsed_engagement_metrics,
+      performance_data: parsed_performance_data,
+      roi_data: parsed_roi_tracking,
+      analytics_last_updated: analytics_last_updated_at,
+      execution_status: execution_analytics_summary
+    }
+  end
+
+  def has_analytics_data?
+    analytics_enabled? && 
+    (engagement_metrics.present? || 
+     performance_data.present? || 
+     roi_tracking.present?)
+  end
+
   private
 
   def broadcast_progress_update
@@ -412,41 +462,8 @@ class CampaignPlan < ApplicationRecord
     end
   end
 
-  def plan_analytics
-    {
-      campaign_type: campaign_type,
-      objective: objective,
-      status: status,
-      has_content: has_generated_content?,
-      generation_progress: generation_progress,
-      created_days_ago: created_at ? ((Time.current - created_at) / 1.day).round(1) : nil,
-      last_updated: updated_at,
-      content_sections: {
-        summary: generated_summary.present?,
-        strategy: generated_strategy.present?,
-        timeline: generated_timeline.present?,
-        assets: generated_assets.present?,
-        content_strategy: safe_field_present?(:content_strategy),
-        creative_approach: safe_field_present?(:creative_approach),
-        strategic_rationale: safe_field_present?(:strategic_rationale),
-        content_mapping: safe_field_present?(:content_mapping)
-      }
-    }
-  end
 
   # Enhanced analytics methods
-  def analytics_summary
-    return {} unless analytics_enabled?
-
-    {
-      basic_analytics: plan_analytics,
-      engagement_data: parsed_engagement_metrics,
-      performance_data: parsed_performance_data,
-      roi_data: parsed_roi_tracking,
-      analytics_last_updated: analytics_last_updated_at,
-      execution_status: execution_analytics_summary
-    }
-  end
 
   def parsed_engagement_metrics
     return {} unless engagement_metrics.present?
@@ -496,9 +513,6 @@ class CampaignPlan < ApplicationRecord
     [progress, 100].min
   end
 
-  def has_analytics_data?
-    engagement_metrics.present? || performance_data.present? || roi_tracking.present?
-  end
 
   def refresh_analytics!
     return false unless analytics_enabled?
@@ -515,13 +529,6 @@ class CampaignPlan < ApplicationRecord
     end
   end
 
-  def analytics_stale?
-    return false unless analytics_enabled?
-    return true unless analytics_last_updated_at
-
-    # Consider analytics stale if not updated in 24 hours
-    analytics_last_updated_at < 24.hours.ago
-  end
 
   # Plan execution tracking methods
   def start_execution!

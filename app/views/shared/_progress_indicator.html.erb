@@ -57,7 +57,7 @@
   base_color = status_colors[status] || status_colors["pending"]
 %>
 
-<div class="progress-indicator <%= size_classes[:container] %>">
+<div class="progress-indicator <%= size_classes[:container] %>" data-controller="progress-bar">
   <!-- Progress Bar -->
   <% if show_percentage %>
     <div class="mb-4">
@@ -73,7 +73,7 @@
                         when 'active' then 'bg-blue-600'
                         else 'bg-gray-400'
                         end %>"
-             style="width: <%= progress_percentage %>%"></div>
+             data-progress-width="<%= progress_percentage %>"></div>
       </div>
     </div>
   <% end %>

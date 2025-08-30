@@ -2,6 +2,81 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
+# Create Users from test fixtures
+puts "Creating Users..."
+
+password_digest = BCrypt::Password.create("password")
+
+users_data = [
+  {
+    email_address: "user1@example.com",
+    password_digest: password_digest,
+    role: "marketer",
+    first_name: "Test",
+    last_name: "User"
+  },
+  {
+    email_address: "user_one@example.com",
+    password_digest: password_digest,
+    role: "marketer",
+    first_name: "Test",
+    last_name: "User"
+  },
+  {
+    email_address: "user2@example.com",
+    password_digest: password_digest,
+    role: "team_member",
+    first_name: "Second",
+    last_name: "User"
+  },
+  {
+    email_address: "user_two@example.com",
+    password_digest: password_digest,
+    role: "team_member",
+    first_name: "Second",
+    last_name: "User"
+  },
+  {
+    email_address: "marketer@example.com",
+    password_digest: password_digest,
+    role: "marketer",
+    first_name: "Mark",
+    last_name: "Eter"
+  },
+  {
+    email_address: "team@example.com",
+    password_digest: password_digest,
+    role: "team_member",
+    first_name: "Team",
+    last_name: "Member"
+  },
+  {
+    email_address: "admin@example.com",
+    password_digest: password_digest,
+    role: "admin",
+    first_name: "Admin",
+    last_name: "User"
+  },
+  {
+    email_address: "user3@example.com",
+    password_digest: password_digest,
+    role: "team_member",
+    first_name: "Third",
+    last_name: "User"
+  }
+]
+
+users_data.each do |user_attrs|
+  User.find_or_create_by!(email_address: user_attrs[:email_address]) do |user|
+    user.password_digest = user_attrs[:password_digest]
+    user.role = user_attrs[:role]
+    user.first_name = user_attrs[:first_name]
+    user.last_name = user_attrs[:last_name]
+  end
+end
+
+puts "✓ Users created successfully!"
+
 # Journey Templates for different campaign types
 puts "Creating Journey Templates..."
 

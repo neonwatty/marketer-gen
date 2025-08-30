@@ -24,7 +24,10 @@ export default class extends Controller {
   }
 
   disconnect() {
-    document.removeEventListener('click', this.hideSuggestions.bind(this))
+    // Clean up event listeners on disconnect
+    if (this.boundHandleOutsideClick) {
+      document.removeEventListener('click', this.boundHandleOutsideClick, { capture: true })
+    }
   }
 
   async loadInitialSuggestions() {
@@ -52,8 +55,9 @@ export default class extends Controller {
       this.showSuggestions(this.suggestions)
     }
     
-    // Hide suggestions when clicking outside
-    document.addEventListener('click', this.hideSuggestions.bind(this))
+    // Hide suggestions when clicking outside - use bound method for proper removal
+    this.boundHandleOutsideClick = this.handleOutsideClick.bind(this)
+    document.addEventListener('click', this.boundHandleOutsideClick, { capture: true })
   }
 
   inputBlur(event) {
@@ -63,6 +67,13 @@ export default class extends Controller {
         this.hideSuggestions()
       }
     }, 150)
+  }
+
+  // Hide suggestions when clicking outside the component
+  handleOutsideClick(event) {
+    if (!this.element.contains(event.target)) {
+      this.hideSuggestions()
+    }
   }
 
   async inputKeyup(event) {
@@ -154,9 +165,37 @@ export default class extends Controller {
 
     if (this.hasSuggestionsListTarget) {
       this.suggestionsListTarget.innerHTML = suggestionsHtml
+      this.adjustSuggestionsPosition()
       this.suggestionsListTarget.classList.remove('hidden')
       this.isVisible = true
       this.currentFocus = -1
+    }
+  }
+  
+  adjustSuggestionsPosition() {
+    if (!this.hasSuggestionsListTarget) return
+    
+    const suggestionsList = this.suggestionsListTarget
+    const inputRect = this.inputTarget.getBoundingClientRect()
+    const viewportHeight = window.innerHeight
+    const suggestionsHeight = 200 // Approximate max height
+    
+    // Check if suggestions would extend below viewport or overlap important elements
+    const spaceBelow = viewportHeight - inputRect.bottom
+    const spaceAbove = inputRect.top
+    
+    if (spaceBelow < suggestionsHeight && spaceAbove > suggestionsHeight) {
+      // Show suggestions above input
+      suggestionsList.style.bottom = '100%'
+      suggestionsList.style.top = 'auto'
+      suggestionsList.style.marginTop = '0'
+      suggestionsList.style.marginBottom = '0.25rem'
+    } else {
+      // Show suggestions below input (default)
+      suggestionsList.style.top = '100%'
+      suggestionsList.style.bottom = 'auto'
+      suggestionsList.style.marginTop = '0.25rem'
+      suggestionsList.style.marginBottom = '0'
     }
   }
 
@@ -166,7 +205,12 @@ export default class extends Controller {
       this.isVisible = false
       this.currentFocus = -1
     }
-    document.removeEventListener('click', this.hideSuggestions.bind(this))
+    
+    // Remove the event listener properly
+    if (this.boundHandleOutsideClick) {
+      document.removeEventListener('click', this.boundHandleOutsideClick, { capture: true })
+      this.boundHandleOutsideClick = null
+    }
   }
 
   showLoading() {

@@ -70,7 +70,7 @@ class JourneyTemplateSelectionTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-template-selector-target='guidedQuestions']"
     assert_select "h3", /What type of campaign are you planning/
-    assert_select "button[type='submit']", count: JourneyTemplate::CAMPAIGN_TYPES.length
+    assert_select "[data-template-selector-target='guidedQuestions'] button[type='submit']", count: JourneyTemplate::CAMPAIGN_TYPES.length
   end
 
   test "should filter templates by campaign type" do

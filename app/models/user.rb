@@ -71,14 +71,14 @@ class User < ApplicationRecord
 
   def notification_preferences
     prefs = super || default_notification_preferences
-    # Convert string values to boolean for consistency
-    prefs.transform_values { |v| v == true || v == "true" }
+    # Ensure keys are strings and values are boolean for consistency
+    prefs.stringify_keys.transform_values { |v| v == true || v == "true" }
   end
 
   def notification_preferences=(value)
-    # Convert string values to boolean when setting
+    # Convert string values to boolean and ensure string keys when setting
     if value.is_a?(Hash)
-      value = value.transform_values { |v| v == true || v == "true" }
+      value = value.stringify_keys.transform_values { |v| v == true || v == "true" }
     end
     super(value)
   end
