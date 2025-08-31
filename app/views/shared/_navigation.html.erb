@@ -87,6 +87,18 @@
               <% end %>
               
               <% if Current.user&.admin? %>
+                <%= link_to admin_analytics_index_path, 
+                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors", 
+                    role: "menuitem", 
+                    tabindex: "-1" do %>
+                  <div class="flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>Demo Analytics</span>
+                  </div>
+                <% end %>
+                
                 <%= link_to rails_admin_path, 
                     class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors", 
                     role: "menuitem", 

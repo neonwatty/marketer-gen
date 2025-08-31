@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_29_173607) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_31_174124) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -417,6 +417,36 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_173607) do
     t.index ["generated_content_id", "version_number"], name: "idx_on_generated_content_id_version_number_7f2182d7fb", unique: true
     t.index ["generated_content_id"], name: "index_content_versions_on_generated_content_id"
     t.index ["timestamp"], name: "index_content_versions_on_timestamp"
+  end
+
+  create_table "demo_analytics", force: :cascade do |t|
+    t.string "workflow_key", null: false
+    t.integer "user_id"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.integer "duration"
+    t.integer "steps_completed", default: 0
+    t.integer "total_steps"
+    t.text "user_agent"
+    t.string "ip_address"
+    t.decimal "completion_rate", precision: 5, scale: 4
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["started_at"], name: "index_demo_analytics_on_started_at"
+    t.index ["user_id"], name: "index_demo_analytics_on_user_id"
+    t.index ["workflow_key", "started_at"], name: "index_demo_analytics_on_workflow_key_and_started_at"
+    t.index ["workflow_key"], name: "index_demo_analytics_on_workflow_key"
+  end
+
+  create_table "demo_progresses", force: :cascade do |t|
+    t.integer "demo_analytic_id", null: false
+    t.integer "step_number"
+    t.string "step_title"
+    t.datetime "completed_at"
+    t.integer "time_spent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["demo_analytic_id"], name: "index_demo_progresses_on_demo_analytic_id"
   end
 
   create_table "execution_schedules", force: :cascade do |t|
@@ -927,6 +957,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_29_173607) do
   add_foreign_key "content_feedbacks", "users", column: "reviewer_user_id"
   add_foreign_key "content_versions", "generated_contents"
   add_foreign_key "content_versions", "users", column: "changed_by_id"
+  add_foreign_key "demo_analytics", "users"
+  add_foreign_key "demo_progresses", "demo_analytics"
   add_foreign_key "execution_schedules", "campaign_plans"
   add_foreign_key "execution_schedules", "users", column: "created_by_id"
   add_foreign_key "execution_schedules", "users", column: "updated_by_id"

@@ -183,21 +183,41 @@
         
         if (tourData.success) {
           this.currentTour = workflowKey;
+          this.currentAnalyticsId = tourData.analytics_id;
+          this.currentStepStartTime = Date.now();
           
           // Initialize and start Intro.js tour
-          introJs()
-            .setOptions({
+          const intro = introJs();
+          intro.setOptions({
               ...tourData.tour_config.options,
               steps: tourData.tour_config.steps
             })
             .onstart(() => {
               this.onTourStart(workflowKey);
             })
+            .onbeforechange((targetElement) => {
+              // Track previous step completion
+              if (this.currentAnalyticsId && this.currentStepStartTime) {
+                const currentStep = intro._currentStep;
+                const timeSpent = Math.floor((Date.now() - this.currentStepStartTime) / 1000);
+                
+                if (currentStep > 0) {
+                  this.trackStepCompletion(
+                    currentStep,
+                    tourData.tour_config.steps[currentStep - 1]?.title || `Step ${currentStep}`,
+                    timeSpent
+                  );
+                }
+              }
+              
+              // Reset timer for next step
+              this.currentStepStartTime = Date.now();
+            })
             .oncomplete(() => {
               this.onTourComplete(workflowKey);
             })
             .onexit(() => {
-              this.onTourExit(workflowKey);
+              this.onTourExit(workflowKey, intro._currentStep || 0);
             })
             .start();
             
@@ -232,21 +252,45 @@
     
     onTourStart(workflowKey) {
       console.log(`Started tour: ${workflowKey}`);
-      // Track analytics
-      this.trackEvent('demo_started', workflowKey);
     }
     
     onTourComplete(workflowKey) {
-      // Track completion
-      this.trackEvent('demo_completed', workflowKey);
+      // Track final completion
+      this.trackAnalyticsEvent('completed');
       
       // Show success message
       this.showSuccessMessage(`✅ Demo completed! You experienced "${this.workflows[workflowKey].title}"`);
     }
     
-    onTourExit(workflowKey) {
-      console.log(`Exited tour: ${workflowKey}`);
-      this.trackEvent('demo_exited', workflowKey);
+    onTourExit(workflowKey, currentStep) {
+      console.log(`Exited tour: ${workflowKey} at step ${currentStep}`);
+      this.trackAnalyticsEvent('exited', currentStep);
+    }
+    
+    trackStepCompletion(stepNumber, stepTitle, timeSpent) {
+      if (this.currentAnalyticsId) {
+        this.trackAnalyticsEvent('step_completed', stepNumber, stepTitle, timeSpent);
+      }
+    }
+    
+    trackAnalyticsEvent(event, stepNumber = null, stepTitle = null, timeSpent = null) {
+      if (!this.currentAnalyticsId) return;
+      
+      fetch('/demos/track_completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          analytics_id: this.currentAnalyticsId,
+          event: event,
+          step_number: stepNumber,
+          step_title: stepTitle,
+          time_spent: timeSpent,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(error => console.log('Analytics tracking failed:', error));
     }
     
     showSuccessMessage(message) {
@@ -272,21 +316,6 @@
       }, 5000);
     }
     
-    trackEvent(event, workflowKey) {
-      // Track in backend
-      fetch('/demos/track_completion', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({
-          workflow_key: workflowKey,
-          event: event,
-          timestamp: new Date().toISOString()
-        })
-      }).catch(error => console.log('Analytics tracking failed:', error));
-    }
   }
   
   // Initialize demo controller when page loads

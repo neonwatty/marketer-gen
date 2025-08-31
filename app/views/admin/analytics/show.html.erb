@@ -1,0 +1,198 @@
+<div class="admin-analytics-detail">
+  <div class="header mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Demo Session Details</h1>
+        <p class="text-gray-600">Session ID: <%= @analytic.id %></p>
+      </div>
+      <%= link_to 'Back to Dashboard', admin_analytics_index_path, 
+          class: 'px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors' %>
+    </div>
+  </div>
+
+  <!-- Session Overview -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <div class="bg-white p-6 rounded-lg shadow border">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">📋 Session Overview</h2>
+      <% config = TourGeneratorService::WORKFLOW_CONFIGS[@analytic.workflow_key] %>
+      
+      <dl class="grid grid-cols-1 gap-4">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Workflow</dt>
+          <dd class="mt-1 flex items-center space-x-2">
+            <span class="text-lg"><%= config[:icon] %></span>
+            <div>
+              <p class="text-sm font-medium text-gray-900"><%= config[:title] %></p>
+              <p class="text-xs text-gray-600"><%= config[:description] %></p>
+            </div>
+          </dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">User</dt>
+          <dd class="mt-1">
+            <% if @analytic.user %>
+              <div>
+                <p class="text-sm font-medium text-gray-900"><%= @analytic.user.full_name %></p>
+                <p class="text-xs text-gray-600"><%= @analytic.user.email %></p>
+              </div>
+            <% else %>
+              <span class="text-sm text-gray-500">Anonymous User</span>
+            <% end %>
+          </dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Status</dt>
+          <dd class="mt-1">
+            <% if @analytic.completed? %>
+              <span class="inline-flex px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                ✅ Completed
+              </span>
+            <% else %>
+              <span class="inline-flex px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+                ⏳ In Progress / Abandoned
+              </span>
+            <% end %>
+          </dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Progress</dt>
+          <dd class="mt-1">
+            <div class="flex items-center space-x-2 mb-1">
+              <div class="w-24 bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: <%= @analytic.completion_percentage %>%"></div>
+              </div>
+              <span class="text-sm text-gray-600"><%= @analytic.completion_percentage %>%</span>
+            </div>
+            <p class="text-xs text-gray-500">
+              <%= @analytic.steps_completed %> of <%= @analytic.total_steps %> steps completed
+            </p>
+          </dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Started At</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <%= @analytic.started_at.strftime("%B %d, %Y at %I:%M %p") %>
+          </dd>
+        </div>
+        
+        <% if @analytic.completed_at %>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Completed At</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              <%= @analytic.completed_at.strftime("%B %d, %Y at %I:%M %p") %>
+            </dd>
+          </div>
+        <% end %>
+        
+        <% if @analytic.duration %>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Total Duration</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              <%= pluralize(@analytic.duration, 'second') %>
+            </dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+
+    <!-- Technical Details -->
+    <div class="bg-white p-6 rounded-lg shadow border">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">🔧 Technical Details</h2>
+      
+      <dl class="grid grid-cols-1 gap-4">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">IP Address</dt>
+          <dd class="mt-1 text-sm text-gray-900 font-mono">
+            <%= @analytic.ip_address || 'Not recorded' %>
+          </dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">User Agent</dt>
+          <dd class="mt-1 text-xs text-gray-900 font-mono break-all">
+            <%= @analytic.user_agent || 'Not recorded' %>
+          </dd>
+        </div>
+        
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Completion Rate</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <%= (@analytic.completion_rate * 100).round(2) if @analytic.completion_rate %>%
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Step-by-Step Progress -->
+  <div class="bg-white rounded-lg shadow border">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-900">📊 Step-by-Step Progress</h2>
+    </div>
+    <div class="p-6">
+      <% if @analytic.demo_progresses.any? %>
+        <div class="space-y-4">
+          <% @analytic.demo_progresses.ordered.each_with_index do |progress, index| %>
+            <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                  <%= progress.step_number %>
+                </div>
+              </div>
+              <div class="flex-grow">
+                <p class="text-sm font-medium text-gray-900"><%= progress.step_title %></p>
+                <p class="text-xs text-gray-500">
+                  Completed at <%= progress.completed_at.strftime("%I:%M:%S %p") %>
+                </p>
+              </div>
+              <div class="flex-shrink-0 text-right">
+                <p class="text-sm font-medium text-gray-900">
+                  <%= progress.time_spent_formatted %>
+                </p>
+                <p class="text-xs text-gray-500">time spent</p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <!-- Progress Summary -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center">
+              <p class="text-2xl font-bold text-blue-600"><%= @analytic.demo_progresses.count %></p>
+              <p class="text-sm text-gray-600">Steps Completed</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-green-600">
+                <%= @analytic.demo_progresses.sum(&:time_spent_seconds) %>s
+              </p>
+              <p class="text-sm text-gray-600">Total Time on Steps</p>
+            </div>
+            <div class="text-center">
+              <% avg_time = @analytic.demo_progresses.any? ? @analytic.demo_progresses.sum(&:time_spent_seconds) / @analytic.demo_progresses.count : 0 %>
+              <p class="text-2xl font-bold text-purple-600"><%= avg_time.round(1) %>s</p>
+              <p class="text-sm text-gray-600">Avg. Time per Step</p>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="text-center py-8">
+          <p class="text-gray-500">No step progress recorded for this session.</p>
+          <p class="text-sm text-gray-400 mt-2">This could indicate the demo was started but not progressed.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+.admin-analytics-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+</style>

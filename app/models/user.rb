@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :assigned_milestones, class_name: 'ProjectMilestone', foreign_key: 'assigned_to_id', dependent: :nullify
   has_many :completed_milestones, class_name: 'ProjectMilestone', foreign_key: 'completed_by_id', dependent: :nullify
   has_many :compliance_requirements, dependent: :destroy
+  has_many :demo_analytics, dependent: :destroy
   has_one_attached :avatar
 
   ROLES = %w[marketer team_member admin].freeze

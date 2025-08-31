@@ -1,0 +1,187 @@
+<div class="admin-analytics-dashboard">
+  <div class="header mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">📊 Demo Analytics Dashboard</h1>
+    <p class="text-gray-600">Interactive demo performance and user engagement metrics</p>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-lg shadow border">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Total Demos Started</p>
+          <p class="text-3xl font-bold text-gray-900"><%= @stats[:total_demos] %></p>
+        </div>
+        <div class="p-3 bg-blue-100 rounded-full">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow border">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Demos Completed</p>
+          <p class="text-3xl font-bold text-green-600"><%= @stats[:completed_demos] %></p>
+        </div>
+        <div class="p-3 bg-green-100 rounded-full">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow border">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Completion Rate</p>
+          <p class="text-3xl font-bold text-purple-600"><%= @stats[:completion_rate] %>%</p>
+        </div>
+        <div class="p-3 bg-purple-100 rounded-full">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow border">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Avg. Time (sec)</p>
+          <p class="text-3xl font-bold text-orange-600"><%= @stats[:average_completion_time] %></p>
+        </div>
+        <div class="p-3 bg-orange-100 rounded-full">
+          <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Workflows -->
+  <div class="bg-white p-6 rounded-lg shadow border mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">🔥 Most Popular Workflows</h2>
+    <div class="space-y-3">
+      <% @stats[:popular_workflows].each do |workflow_key, count| %>
+        <% config = TourGeneratorService::WORKFLOW_CONFIGS[workflow_key] %>
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl"><%= config[:icon] %></span>
+            <div>
+              <p class="font-medium text-gray-900"><%= config[:title] %></p>
+              <p class="text-sm text-gray-600"><%= config[:description] %></p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-lg font-bold text-gray-900"><%= count %></p>
+            <p class="text-sm text-gray-600">demos</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Recent Analytics -->
+  <div class="bg-white rounded-lg shadow border">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-900">📈 Recent Demo Sessions</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Workflow</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Started</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% @analytics.each do |analytic| %>
+            <% config = TourGeneratorService::WORKFLOW_CONFIGS[analytic.workflow_key] %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div class="flex items-center space-x-3">
+                  <span class="text-lg"><%= config[:icon] %></span>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900"><%= config[:title] %></p>
+                    <p class="text-xs text-gray-500"><%= analytic.workflow_key %></p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <% if analytic.user %>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900"><%= analytic.user.full_name %></p>
+                    <p class="text-xs text-gray-500"><%= analytic.user.email %></p>
+                  </div>
+                <% else %>
+                  <span class="text-sm text-gray-500">Anonymous</span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4">
+                <% if analytic.completed? %>
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                    ✅ Completed
+                  </span>
+                <% else %>
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">
+                    ⏳ In Progress
+                  </span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center space-x-2">
+                  <div class="w-16 bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: <%= analytic.completion_percentage %>%"></div>
+                  </div>
+                  <span class="text-sm text-gray-600"><%= analytic.completion_percentage %>%</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">
+                  <%= analytic.steps_completed %>/<%= analytic.total_steps %> steps
+                </p>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                <%= time_ago_in_words(analytic.started_at) %> ago
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                <% if analytic.duration %>
+                  <%= pluralize(analytic.duration, 'second') %>
+                <% else %>
+                  -
+                <% end %>
+              </td>
+              <td class="px-6 py-4">
+                <%= link_to 'View Details', admin_analytic_path(analytic), 
+                    class: 'text-blue-600 hover:text-blue-800 text-sm font-medium' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      
+      <% if @analytics.empty? %>
+        <div class="text-center py-8">
+          <p class="text-gray-500">No demo sessions recorded yet.</p>
+          <p class="text-sm text-gray-400 mt-2">Analytics will appear here once users start taking demos.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+.admin-analytics-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+</style>

@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  workflow_key: MyString
+  user: one
+  started_at: 2025-08-31 10:41:20
+  completed_at: 2025-08-31 10:41:20
+  duration: 1
+  steps_completed: 1
+  total_steps: 1
+  user_agent: MyText
+  ip_address: MyString
+  completion_rate: 9.99
+
+two:
+  workflow_key: MyString
+  user: two
+  started_at: 2025-08-31 10:41:20
+  completed_at: 2025-08-31 10:41:20
+  duration: 1
+  steps_completed: 1
+  total_steps: 1
+  user_agent: MyText
+  ip_address: MyString
+  completion_rate: 9.99

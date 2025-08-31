@@ -89,6 +89,12 @@ Rails.application.routes.draw do
     end
   end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
+  
+  # Admin analytics dashboard
+  namespace :admin do
+    resources :analytics, only: [:index, :show]
+  end
+  
   root "home#index"
   
   # Interactive demo tours
