@@ -66,6 +66,8 @@ gem "anthropic", "~> 0.3"
 # Environment variables from .env file
 gem "dotenv-rails", "~> 3.1"
 
+# Interactive guided tours and product demos (using npm package instead of gem due to Thor version conflict)
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

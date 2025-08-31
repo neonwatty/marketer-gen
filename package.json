@@ -5,6 +5,7 @@
     "build:css": "sass ./app/assets/stylesheets/application.sass.scss:./app/assets/builds/application.css ./app/assets/stylesheets/rails_admin.scss:./app/assets/builds/rails_admin.css --no-source-map --load-path=node_modules"
   },
   "dependencies": {
+    "intro.js": "^7.2.0",
     "rails_admin": "^3.3.0",
     "sass": "^1.90.0"
   },

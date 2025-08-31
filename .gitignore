@@ -50,3 +50,10 @@
 
 # Playwright MCP directory
 .playwright-mcp/
+
+# Playwright test results and reports
+test-results/
+test-results.json
+playwright-report/
+playwright-reports/
+debug-*.png

@@ -91,6 +91,14 @@ Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   root "home#index"
   
+  # Interactive demo tours
+  resources :demos, only: [:index] do
+    collection do
+      get :start_tour
+      post :track_completion
+    end
+  end
+
   # Help and documentation
   get "help", to: "pages#help", as: :help_page
   

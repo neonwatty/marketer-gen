@@ -1,0 +1,106 @@
+=> Booting Puma
+=> Rails 8.0.2 application starting in development 
+=> Run `bin/rails server --help` for more startup options
+Puma starting in single mode...
+* Puma version: 6.6.0 ("Return to Forever")
+* Ruby version: ruby 3.4.2 (2025-02-15 revision d2930f8e7a) +YJIT +PRISM [arm64-darwin24]
+*  Min threads: 3
+*  Max threads: 3
+*  Environment: development
+*          PID: 17518
+* Listening on http://127.0.0.1:3001
+* Listening on http://[::1]:3001
+Use Ctrl-C to stop
+Started HEAD "/demos" for ::1 at 2025-08-31 10:38:35 -0700
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='MarketerGen'*/[0m
+Processing by DemosController#index as */*
+  Rendering layout layouts/application.html.erb
+  Rendering demos/index.html.erb within layouts/application
+  Rendered demos/index.html.erb within layouts/application (Duration: 1.3ms | GC: 0.0ms)
+  Rendered shared/_navigation.html.erb (Duration: 2.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 35.4ms | GC: 0.0ms)
+Completed 200 OK in 131ms (Views: 37.4ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/demos/start_tour?workflow=social-content" for ::1 at 2025-08-31 10:38:45 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "social-content"}
+/Users/jeremywatt/Desktop/marketer-gen/app/services/playwright_to_tour_converter.rb:188: warning: character class has ']' without escape: /\[name="[^[]*\[([^\]]+)\]"\]/
+Completed 500 Internal Server Error in 40ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  
+SyntaxError (/Users/jeremywatt/Desktop/marketer-gen/app/services/playwright_to_tour_converter.rb:188: syntax error found
+  186 |       # Extract field name from various selector patterns
+  187 |       case selector
+> 188 |       when /\[name="[^[]*\[([^\]]+)\]"\]/
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ empty char-class
+  189 |         $1
+  190 |       when /\[name="([^"]+)"\]/
+):
+  
+app/services/playwright_to_tour_converter.rb:188: syntax error found
+app/services/tour_generator_service.rb:20:in 'TourGeneratorService.generate_tour_config'
+app/services/tour_generator_service.rb:12:in 'block in TourGeneratorService.generate'
+app/services/tour_generator_service.rb:11:in 'TourGeneratorService.generate'
+app/controllers/demos_controller.rb:20:in 'DemosController#start_tour'
+Started GET "/demos/start_tour?workflow=social-content" for ::1 at 2025-08-31 10:38:58 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "social-content"}
+Completed 200 OK in 48ms (Views: 0.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/demos/start_tour?workflow=social-content" for ::1 at 2025-08-31 10:39:15 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "social-content"}
+Completed 200 OK in 45ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/demos/start_tour?workflow=journey-ai" for ::1 at 2025-08-31 10:39:15 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "journey-ai"}
+Completed 200 OK in 44ms (Views: 0.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 4.8ms)
+
+
+Started GET "/demos/start_tour?workflow=campaign-intelligence" for ::1 at 2025-08-31 10:39:15 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "campaign-intelligence"}
+Completed 200 OK in 41ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.9ms)
+
+
+Started GET "/demos/start_tour?workflow=content-optimization" for ::1 at 2025-08-31 10:39:15 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "content-optimization"}
+Completed 200 OK in 46ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.3ms)
+
+
+Started GET "/demos/start_tour?workflow=email-content" for ::1 at 2025-08-31 10:39:15 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "email-content"}
+Completed 200 OK in 41ms (Views: 0.3ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.4ms)
+
+
+Started GET "/demos/start_tour?workflow=brand-processing" for ::1 at 2025-08-31 10:39:15 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "brand-processing"}
+Completed 200 OK in 41ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 1.4ms)
+
+
+Started GET "/demos/start_tour?workflow=campaign-generation" for ::1 at 2025-08-31 10:39:15 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "campaign-generation"}
+Completed 200 OK in 40ms (Views: 0.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/demos/start_tour?workflow=api-integration" for ::1 at 2025-08-31 10:39:15 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "api-integration"}
+Completed 200 OK in 39ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/demos/start_tour?workflow=journey-ai" for ::1 at 2025-08-31 10:39:22 -0700
+Processing by DemosController#start_tour as */*
+  Parameters: {"workflow" => "journey-ai"}
+Completed 200 OK in 42ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+

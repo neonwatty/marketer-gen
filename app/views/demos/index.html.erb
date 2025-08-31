@@ -1,0 +1,401 @@
+<div class="demo-landing-page">
+  <!-- Hero Section -->
+  <header class="hero-section bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <div class="container mx-auto px-4 py-16 text-center">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6">
+        🤖 Experience AI Marketing in Action
+      </h1>
+      <p class="text-xl md:text-2xl mb-8">
+        Interactive demos showcasing real AI workflows that power modern marketing campaigns
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 mb-8">
+        <span class="bg-white/20 px-4 py-2 rounded-full text-sm">
+          8 Interactive Workflows
+        </span>
+        <span class="bg-white/20 px-4 py-2 rounded-full text-sm">
+          Real AI Demonstrations  
+        </span>
+        <span class="bg-white/20 px-4 py-2 rounded-full text-sm">
+          3-6 Minutes Each
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Workflow Selection Grid -->
+  <section class="workflow-selection py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">
+        Choose Your AI Journey
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <% @workflows.each do |workflow_key, config| %>
+          <div class="workflow-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 relative overflow-hidden border border-gray-100" 
+               data-workflow="<%= workflow_key %>">
+            
+            <!-- Card Header -->
+            <div class="card-header p-6 text-center border-b bg-gradient-to-br from-gray-50 to-gray-100">
+              <div class="text-4xl mb-4"><%= config[:icon] %></div>
+              <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                <%= config[:title] %>
+              </h3>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                <%= config[:description] %>
+              </p>
+            </div>
+            
+            <!-- Card Meta -->
+            <div class="card-meta p-4">
+              <div class="flex justify-between items-center mb-4">
+                <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full font-medium">
+                  ⏱ <%= config[:duration] %>
+                </span>
+                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full font-medium">
+                  <%= config[:difficulty] %>
+                </span>
+              </div>
+              
+              <!-- Tags -->
+              <div class="flex flex-wrap gap-1 mb-4">
+                <% config[:tags].each do |tag| %>
+                  <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                    #<%= tag %>
+                  </span>
+                <% end %>
+              </div>
+              
+              <!-- CTA Button -->
+              <button class="start-demo-btn w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+                      onclick="startTour('<%= workflow_key %>')">
+                ▶ Start Interactive Demo
+              </button>
+            </div>
+            
+            <!-- Preview Overlay (Hidden by default) -->
+            <div class="preview-overlay absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"
+                 style="display: none;">
+              <div class="text-center text-white p-4">
+                <div class="w-16 h-12 bg-gray-200 rounded mb-4 mx-auto flex items-center justify-center">
+                  <span class="text-gray-600 text-xs">Preview</span>
+                </div>
+                <p class="text-sm">Click to start this workflow demo</p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start Options -->
+  <section class="quick-start py-12 bg-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-2xl font-bold mb-8 text-gray-800">🚀 Quick Start Options</h2>
+      
+      <div class="flex flex-col md:flex-row justify-center gap-6">
+        <button onclick="startRandomTour()" 
+                class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors transform hover:scale-105">
+          🎲 Surprise Me! (Random Demo)
+        </button>
+        
+        <button onclick="startGuidedPath()" 
+                class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors transform hover:scale-105">
+          🗺 Guided Tour (All Features)
+        </button>
+        
+        <button onclick="showDeveloperDemo()" 
+                class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors transform hover:scale-105">
+          👩‍💻 Developer Walkthrough
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50" style="display: none;">
+    <div class="text-center text-white">
+      <div class="loading-spinner w-12 h-12 border-4 border-white border-opacity-30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-lg">Loading AI Demo...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Include Intro.js CSS -->
+<%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.css" %>
+
+<!-- Demo Controller JavaScript -->
+<script type="module">
+  import introJs from "intro.js";
+  
+  class DemoController {
+    constructor() {
+      this.workflows = <%= raw @workflows.to_json %>;
+      this.currentTour = null;
+      this.setupCardInteractions();
+    }
+    
+    setupCardInteractions() {
+      // Hover preview effects for workflow cards
+      document.querySelectorAll('.workflow-card').forEach(card => {
+        card.addEventListener('mouseenter', (e) => {
+          this.showPreview(e.currentTarget);
+        });
+        
+        card.addEventListener('mouseleave', (e) => {
+          this.hidePreview(e.currentTarget);
+        });
+      });
+    }
+    
+    showPreview(cardElement) {
+      const overlay = cardElement.querySelector('.preview-overlay');
+      if (overlay) {
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.add('opacity-100'), 50);
+      }
+    }
+    
+    hidePreview(cardElement) {
+      const overlay = cardElement.querySelector('.preview-overlay');
+      if (overlay) {
+        overlay.classList.remove('opacity-100');
+        setTimeout(() => overlay.style.display = 'none', 300);
+      }
+    }
+    
+    showLoadingState() {
+      document.getElementById('loading-overlay').style.display = 'flex';
+    }
+    
+    hideLoadingState() {
+      document.getElementById('loading-overlay').style.display = 'none';
+    }
+    
+    async startTour(workflowKey) {
+      try {
+        // Show loading state
+        this.showLoadingState();
+        
+        // Load tour configuration
+        const response = await fetch(`/demos/start_tour?workflow=${workflowKey}`);
+        const tourData = await response.json();
+        
+        if (tourData.success) {
+          this.currentTour = workflowKey;
+          
+          // Initialize and start Intro.js tour
+          introJs()
+            .setOptions({
+              ...tourData.tour_config.options,
+              steps: tourData.tour_config.steps
+            })
+            .onstart(() => {
+              this.onTourStart(workflowKey);
+            })
+            .oncomplete(() => {
+              this.onTourComplete(workflowKey);
+            })
+            .onexit(() => {
+              this.onTourExit(workflowKey);
+            })
+            .start();
+            
+        } else {
+          console.error('Failed to load tour:', tourData.error);
+          this.showErrorMessage('Failed to start demo. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error starting tour:', error);
+        this.showErrorMessage('An error occurred while starting the demo.');
+      } finally {
+        this.hideLoadingState();
+      }
+    }
+    
+    startRandomTour() {
+      const workflowKeys = Object.keys(this.workflows);
+      const randomKey = workflowKeys[Math.floor(Math.random() * workflowKeys.length)];
+      this.startTour(randomKey);
+    }
+    
+    startGuidedPath() {
+      // Sequential tour through beginner → intermediate → advanced workflows
+      const guidedSequence = ['social-content', 'email-content', 'journey-ai', 'content-optimization'];
+      this.showMessage('🗺 Starting guided tour through all major AI features...');
+      this.startTour(guidedSequence[0]);
+    }
+    
+    showDeveloperDemo() {
+      this.startTour('api-integration');
+    }
+    
+    onTourStart(workflowKey) {
+      console.log(`Started tour: ${workflowKey}`);
+      // Track analytics
+      this.trackEvent('demo_started', workflowKey);
+    }
+    
+    onTourComplete(workflowKey) {
+      // Track completion
+      this.trackEvent('demo_completed', workflowKey);
+      
+      // Show success message
+      this.showSuccessMessage(`✅ Demo completed! You experienced "${this.workflows[workflowKey].title}"`);
+    }
+    
+    onTourExit(workflowKey) {
+      console.log(`Exited tour: ${workflowKey}`);
+      this.trackEvent('demo_exited', workflowKey);
+    }
+    
+    showSuccessMessage(message) {
+      this.showNotification(message, 'bg-green-500');
+    }
+    
+    showErrorMessage(message) {
+      this.showNotification(message, 'bg-red-500');
+    }
+    
+    showMessage(message) {
+      this.showNotification(message, 'bg-blue-500');
+    }
+    
+    showNotification(message, bgClass) {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 ${bgClass} text-white p-4 rounded-lg shadow-lg z-50 max-w-sm`;
+      notification.innerHTML = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+    }
+    
+    trackEvent(event, workflowKey) {
+      // Track in backend
+      fetch('/demos/track_completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          workflow_key: workflowKey,
+          event: event,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(error => console.log('Analytics tracking failed:', error));
+    }
+  }
+  
+  // Initialize demo controller when page loads
+  window.demoController = new DemoController();
+  
+  // Global functions for button onclick handlers
+  window.startTour = (workflowKey) => window.demoController.startTour(workflowKey);
+  window.startRandomTour = () => window.demoController.startRandomTour();
+  window.startGuidedPath = () => window.demoController.startGuidedPath();
+  window.showDeveloperDemo = () => window.demoController.showDeveloperDemo();
+</script>
+
+<!-- Custom Demo Styling -->
+<style>
+  .demo-landing-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  .hero-section {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.1;
+  }
+  
+  .workflow-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .workflow-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .start-demo-btn {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .start-demo-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .start-demo-btn:hover::before {
+    left: 100%;
+  }
+  
+  .preview-overlay {
+    backdrop-filter: blur(10px);
+  }
+  
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Intro.js Custom Styling */
+  :global(.introjs-tooltip) {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    color: #f1f5f9 !important;
+  }
+  
+  :global(.introjs-tooltip-header) {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px 12px 0 0 !important;
+  }
+  
+  :global(.introjs-tooltiptext) {
+    color: #f1f5f9 !important;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+  }
+  
+  :global(.introjs-button) {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 10px 16px !important;
+    transition: all 0.2s !important;
+  }
+  
+  :global(.introjs-button:hover) {
+    background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%) !important;
+    transform: translateY(-1px) !important;
+  }
+</style>
