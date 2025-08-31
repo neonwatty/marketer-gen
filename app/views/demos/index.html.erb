@@ -67,14 +67,13 @@
               
               <!-- CTA Button -->
               <button class="start-demo-btn w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
-                      onclick="startTour('<%= workflow_key %>')">
+                      data-workflow="<%= workflow_key %>">
                 ▶ Start Interactive Demo
               </button>
             </div>
             
             <!-- Preview Overlay (Hidden by default) -->
-            <div class="preview-overlay absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl"
-                 style="display: none;">
+            <div class="preview-overlay absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl hidden">
               <div class="text-center text-white p-4">
                 <div class="w-16 h-12 bg-gray-200 rounded mb-4 mx-auto flex items-center justify-center">
                   <span class="text-gray-600 text-xs">Preview</span>
@@ -94,29 +93,34 @@
       <h2 class="text-2xl font-bold mb-8 text-gray-800">🚀 Quick Start Options</h2>
       
       <div class="flex flex-col md:flex-row justify-center gap-6">
-        <button onclick="startRandomTour()" 
+        <button data-action="random-tour"
                 class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors transform hover:scale-105">
           🎲 Surprise Me! (Random Demo)
         </button>
         
-        <button onclick="startGuidedPath()" 
+        <button data-action="guided-path"
                 class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors transform hover:scale-105">
           🗺 Guided Tour (All Features)
         </button>
         
-        <button onclick="showDeveloperDemo()" 
+        <button data-action="developer-demo"
                 class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors transform hover:scale-105">
           👩‍💻 Developer Walkthrough
+        </button>
+        
+        <button data-action="debug-info"
+                class="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors transform hover:scale-105">
+          🔍 Debug Info
         </button>
       </div>
     </div>
   </section>
 
   <!-- Demo Anchor Point (hidden, used for intro.js tours) -->
-  <div id="demo-anchor" style="display: none;"></div>
+  <div id="demo-anchor" class="hidden"></div>
 
   <!-- Loading Overlay -->
-  <div id="loading-overlay" class="loading-overlay fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50" style="display: none;">
+  <div id="loading-overlay" class="loading-overlay fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
     <div class="text-center text-white">
       <div class="loading-spinner w-12 h-12 border-4 border-white border-opacity-30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
       <p class="text-lg">Loading AI Demo...</p>
@@ -124,18 +128,23 @@
   </div>
 </div>
 
-<!-- Include Intro.js CSS and JS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js"></script>
+<!-- Include Intro.js CSS and JS with nonce -->
+<%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.css", nonce: true %>
+<%= javascript_include_tag "https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js", nonce: true %>
 
 <!-- Demo Controller JavaScript -->
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   
   class DemoController {
     constructor() {
+      console.log('DemoController constructor called');
+      console.log('Workflows data:', <%= raw @workflows.to_json %>);
+      
       this.workflows = <%= raw @workflows.to_json %>;
       this.currentTour = null;
       this.setupCardInteractions();
+      
+      console.log('DemoController constructor completed');
     }
     
     setupCardInteractions() {
@@ -149,12 +158,48 @@
           this.hidePreview(e.currentTarget);
         });
       });
+      
+      // Demo button click handlers
+      document.querySelectorAll('.start-demo-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          const workflowKey = e.currentTarget.getAttribute('data-workflow');
+          if (workflowKey) {
+            this.startTour(workflowKey);
+          }
+        });
+      });
+      
+      // Quick start button handlers
+      document.querySelectorAll('[data-action]').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          const action = e.currentTarget.getAttribute('data-action');
+          switch (action) {
+            case 'random-tour':
+              this.startRandomTour();
+              break;
+            case 'guided-path':
+              this.startGuidedPath();
+              break;
+            case 'developer-demo':
+              this.showDeveloperDemo();
+              break;
+            case 'debug-info':
+              console.log('Test button clicked');
+              console.log('introJs available:', typeof introJs);
+              console.log('demoController:', window.demoController);
+              break;
+          }
+        });
+      });
     }
     
     showPreview(cardElement) {
       const overlay = cardElement.querySelector('.preview-overlay');
       if (overlay) {
-        overlay.style.display = 'flex';
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
         setTimeout(() => overlay.classList.add('opacity-100'), 50);
       }
     }
@@ -163,16 +208,23 @@
       const overlay = cardElement.querySelector('.preview-overlay');
       if (overlay) {
         overlay.classList.remove('opacity-100');
-        setTimeout(() => overlay.style.display = 'none', 300);
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+          overlay.classList.remove('flex');
+        }, 300);
       }
     }
     
     showLoadingState() {
-      document.getElementById('loading-overlay').style.display = 'flex';
+      const loadingOverlay = document.getElementById('loading-overlay');
+      loadingOverlay.classList.remove('hidden');
+      loadingOverlay.classList.add('flex');
     }
     
     hideLoadingState() {
-      document.getElementById('loading-overlay').style.display = 'none';
+      const loadingOverlay = document.getElementById('loading-overlay');
+      loadingOverlay.classList.add('hidden');
+      loadingOverlay.classList.remove('flex');
     }
     
     async startTour(workflowKey) {
@@ -348,21 +400,37 @@
     
   }
   
-  // Initialize demo controller when page loads
-  document.addEventListener('DOMContentLoaded', function() {
+  // Initialize demo controller
+  function initializeDemoController() {
+    console.log('Attempting to initialize demo controller...');
+    
     // Check if introJs is available
     if (typeof introJs === 'undefined') {
       console.error('Intro.js is not loaded!');
+      setTimeout(initializeDemoController, 100); // Retry after 100ms
       return;
     }
     
-    window.demoController = new DemoController();
-    console.log('Demo controller initialized successfully');
-  });
+    try {
+      window.demoController = new DemoController();
+      console.log('Demo controller initialized successfully');
+    } catch (error) {
+      console.error('Error initializing demo controller:', error);
+    }
+  }
   
-  // Global functions for button onclick handlers
+  // Try to initialize immediately, then on DOMContentLoaded, then as fallback
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeDemoController);
+  } else {
+    initializeDemoController();
+  }
+  
+  // Also try after a short delay as fallback
+  setTimeout(initializeDemoController, 500);
+  
+  // Keep global functions as fallback for any remaining onclick handlers
   window.startTour = (workflowKey) => {
-    console.log('startTour called with:', workflowKey);
     if (window.demoController) {
       window.demoController.startTour(workflowKey);
     } else {
