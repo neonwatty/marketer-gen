@@ -1,117 +1,218 @@
-<testsuites id="" name="" tests="4" failures="1" skipped="3" errors="0" time="31.521768">
-<testsuite name="ai-workflows/test-social-content.spec.js" timestamp="2025-08-31T16:59:40.390Z" hostname="ai-workflows" tests="4" failures="1" skipped="3" time="29.743" errors="0">
-<testcase name="AI Social Media Content Creation Workflow › should generate Twitter content with proper optimization" classname="ai-workflows/test-social-content.spec.js" time="29.743">
-<failure message="test-social-content.spec.js:46:5 should generate Twitter content with proper optimization" type="FAILURE">
-<![CDATA[  [ai-workflows] › ai-workflows/test-social-content.spec.js:46:5 › AI Social Media Content Creation Workflow › should generate Twitter content with proper optimization 
-
-    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('input[name="generated_content[title]"]') to be visible
-
-
-      67 |       try {
-      68 |         // Wait for form to be ready
-    > 69 |         await page.waitForSelector('input[name="generated_content[title]"]', { timeout: 10000 });
-         |                    ^
-      70 |         await page.fill('input[name="generated_content[title]"]', contentData.title);
-      71 |         console.log(`✅ Form title filled successfully`);
-      72 |       } catch (error) {
-        at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/error-context.md
-
-    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
-    ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/trace.zip
-    Usage:
-
-        npx playwright show-trace ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/trace.zip
-
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
-
-    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('input[name="generated_content[title]"]') to be visible
-
-
-      67 |       try {
-      68 |         // Wait for form to be ready
-    > 69 |         await page.waitForSelector('input[name="generated_content[title]"]', { timeout: 10000 });
-         |                    ^
-      70 |         await page.fill('input[name="generated_content[title]"]', contentData.title);
-      71 |         console.log(`✅ Form title filled successfully`);
-      72 |       } catch (error) {
-        at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/error-context.md
-
-    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
-    ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/trace.zip
-    Usage:
-
-        npx playwright show-trace ../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/trace.zip
-
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-]]>
-</failure>
-<system-out>
-<![CDATA[Test user created: test-1756659581524-dueda@example.com
-Testing Twitter content generation...
-🔄 Navigating to content creation form...
-✅ Successfully navigated to: http://localhost:3000/generated_contents/new
-🔄 Filling form with title: Twitter Test Post
-❌ Form filling failed: page.waitForSelector: Timeout 10000ms exceeded.
-Call log:
-[2m  - waiting for locator('input[name="generated_content[title]"]') to be visible[22m
-
-Page title: Action Controller: Exception caught
-No logout button found, may already be logged out
-
-[[ATTACHMENT|../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/test-failed-1.png]]
-
-[[ATTACHMENT|../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/video.webm]]
-
-[[ATTACHMENT|../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/error-context.md]]
-
-[[ATTACHMENT|../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/trace.zip]]
-Test user created: test-1756659597146-zjtfwrs@example.com
-Testing Twitter content generation...
-🔄 Navigating to content creation form...
-✅ Successfully navigated to: http://localhost:3000/generated_contents/new
-🔄 Filling form with title: Twitter Test Post
-❌ Form filling failed: page.waitForSelector: Timeout 10000ms exceeded.
-Call log:
-[2m  - waiting for locator('input[name="generated_content[title]"]') to be visible[22m
-
-Page title: Action Controller: Exception caught
-No logout button found, may already be logged out
-
-[[ATTACHMENT|../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/test-failed-1.png]]
-
-[[ATTACHMENT|../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/video.webm]]
-
-[[ATTACHMENT|../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/error-context.md]]
-
-[[ATTACHMENT|../test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/trace.zip]]
-]]>
-</system-out>
+<testsuites id="" name="" tests="58" failures="0" skipped="58" errors="0" time="0.06211500000000001">
+<testsuite name="ai-workflows/test-api-integration.spec.js" timestamp="2025-08-31T22:40:38.807Z" hostname="ai-workflows" tests="12" failures="0" skipped="12" time="0" errors="0">
+<testcase name="AI API Integration Testing › should generate social media content via API" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should generate email content via API" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should generate ad copy via API" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should generate landing page content via API" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should handle API authentication and authorization" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should validate API request parameters" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should apply brand context in API requests" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should handle API rate limiting and errors gracefully" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should support batch content generation" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should provide API health check endpoint" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should handle concurrent API requests efficiently" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI API Integration Testing › should provide comprehensive API error messages" classname="ai-workflows/test-api-integration.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="ai-workflows/test-brand-processing.spec.js" timestamp="2025-08-31T22:40:38.807Z" hostname="ai-workflows" tests="6" failures="0" skipped="6" time="0" errors="0">
+<testcase name="AI Brand Identity Processing Workflow › should create brand identity and process materials with AI" classname="ai-workflows/test-brand-processing.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Brand Identity Processing Workflow › should handle file upload for brand materials" classname="ai-workflows/test-brand-processing.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Brand Identity Processing Workflow › should extract different brand voice characteristics" classname="ai-workflows/test-brand-processing.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Brand Identity Processing Workflow › should provide brand compliance validation" classname="ai-workflows/test-brand-processing.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Brand Identity Processing Workflow › should handle multiple brand identities per user" classname="ai-workflows/test-brand-processing.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Brand Identity Processing Workflow › should activate and deactivate brand identities" classname="ai-workflows/test-brand-processing.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="ai-workflows/test-campaign-generation.spec.js" timestamp="2025-08-31T22:40:38.807Z" hostname="ai-workflows" tests="4" failures="0" skipped="4" time="0" errors="0">
+<testcase name="AI Campaign Plan Generation Workflow › should complete full campaign generation workflow" classname="ai-workflows/test-campaign-generation.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Plan Generation Workflow › should handle campaign generation failures gracefully" classname="ai-workflows/test-campaign-generation.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Plan Generation Workflow › should preserve form data during generation process" classname="ai-workflows/test-campaign-generation.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Plan Generation Workflow › should handle concurrent campaign generations" classname="ai-workflows/test-campaign-generation.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="ai-workflows/test-campaign-intelligence.spec.js" timestamp="2025-08-31T22:40:38.807Z" hostname="ai-workflows" tests="7" failures="0" skipped="7" time="0" errors="0">
+<testcase name="AI Campaign Intelligence Workflow › should generate comprehensive market analysis" classname="ai-workflows/test-campaign-intelligence.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Intelligence Workflow › should provide industry-specific intelligence" classname="ai-workflows/test-campaign-intelligence.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Intelligence Workflow › should generate competitor analysis with actionable insights" classname="ai-workflows/test-campaign-intelligence.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Intelligence Workflow › should provide performance predictions and success metrics" classname="ai-workflows/test-campaign-intelligence.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Intelligence Workflow › should provide optimization recommendations" classname="ai-workflows/test-campaign-intelligence.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Intelligence Workflow › should export intelligence reports" classname="ai-workflows/test-campaign-intelligence.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Campaign Intelligence Workflow › should handle intelligence regeneration and updates" classname="ai-workflows/test-campaign-intelligence.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="ai-workflows/test-content-optimization.spec.js" timestamp="2025-08-31T22:40:38.807Z" hostname="ai-workflows" tests="6" failures="0" skipped="6" time="0" errors="0">
+<testcase name="AI Content Optimization &amp; Variants Workflow › should optimize existing content for better performance" classname="ai-workflows/test-content-optimization.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Content Optimization &amp; Variants Workflow › should generate A/B testing variants" classname="ai-workflows/test-content-optimization.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Content Optimization &amp; Variants Workflow › should provide performance optimization suggestions" classname="ai-workflows/test-content-optimization.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Content Optimization &amp; Variants Workflow › should optimize content for specific platforms" classname="ai-workflows/test-content-optimization.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Content Optimization &amp; Variants Workflow › should provide content scoring and improvement metrics" classname="ai-workflows/test-content-optimization.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Content Optimization &amp; Variants Workflow › should handle bulk optimization operations" classname="ai-workflows/test-content-optimization.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="ai-workflows/test-email-content.spec.js" timestamp="2025-08-31T22:40:38.807Z" hostname="ai-workflows" tests="7" failures="0" skipped="7" time="0" errors="0">
+<testcase name="AI Email Campaign Content Workflow › should generate complete email campaign with subject and body" classname="ai-workflows/test-email-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Email Campaign Content Workflow › should generate different email types appropriately" classname="ai-workflows/test-email-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Email Campaign Content Workflow › should generate personalized email content" classname="ai-workflows/test-email-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Email Campaign Content Workflow › should generate email series with consistent messaging" classname="ai-workflows/test-email-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Email Campaign Content Workflow › should generate appropriate CTAs based on email purpose" classname="ai-workflows/test-email-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Email Campaign Content Workflow › should handle A/B testing for email optimization" classname="ai-workflows/test-email-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Email Campaign Content Workflow › should maintain professional email formatting" classname="ai-workflows/test-email-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="ai-workflows/test-journey-ai.spec.js" timestamp="2025-08-31T22:40:38.807Z" hostname="ai-workflows" tests="7" failures="0" skipped="7" time="0" errors="0">
+<testcase name="AI Journey Creation and Suggestions Workflow › should provide AI suggestions for journey creation" classname="ai-workflows/test-journey-ai.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Journey Creation and Suggestions Workflow › should provide context-appropriate journey templates" classname="ai-workflows/test-journey-ai.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Journey Creation and Suggestions Workflow › should suggest content types for each journey stage" classname="ai-workflows/test-journey-ai.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Journey Creation and Suggestions Workflow › should provide channel recommendations for journey steps" classname="ai-workflows/test-journey-ai.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Journey Creation and Suggestions Workflow › should adapt suggestions based on target audience" classname="ai-workflows/test-journey-ai.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Journey Creation and Suggestions Workflow › should provide timing and sequence recommendations" classname="ai-workflows/test-journey-ai.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Journey Creation and Suggestions Workflow › should suggest journey optimization based on performance data" classname="ai-workflows/test-journey-ai.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+</testsuite>
+<testsuite name="ai-workflows/test-social-content.spec.js" timestamp="2025-08-31T22:40:38.807Z" hostname="ai-workflows" tests="9" failures="0" skipped="9" time="0" errors="0">
+<testcase name="AI Social Media Content Creation Workflow › should generate Twitter content with proper optimization" classname="ai-workflows/test-social-content.spec.js" time="0">
+<skipped>
+</skipped>
 </testcase>
 <testcase name="AI Social Media Content Creation Workflow › should generate LinkedIn content with proper optimization" classname="ai-workflows/test-social-content.spec.js" time="0">
 <skipped>
@@ -122,6 +223,26 @@ No logout button found, may already be logged out
 </skipped>
 </testcase>
 <testcase name="AI Social Media Content Creation Workflow › should generate Instagram content with proper optimization" classname="ai-workflows/test-social-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Social Media Content Creation Workflow › should handle different content format variants" classname="ai-workflows/test-social-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Social Media Content Creation Workflow › should generate content within campaign context" classname="ai-workflows/test-social-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Social Media Content Creation Workflow › should handle content generation errors gracefully" classname="ai-workflows/test-social-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Social Media Content Creation Workflow › should support content variants and A/B testing" classname="ai-workflows/test-social-content.spec.js" time="0">
+<skipped>
+</skipped>
+</testcase>
+<testcase name="AI Social Media Content Creation Workflow › should maintain content quality across multiple generations" classname="ai-workflows/test-social-content.spec.js" time="0">
 <skipped>
 </skipped>
 </testcase>

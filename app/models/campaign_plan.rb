@@ -618,10 +618,6 @@ class CampaignPlan < ApplicationRecord
     service.sync_with_external_platforms
   end
   
-  def mark_generation_started!
-    update!(status: 'generating', metadata: (metadata || {}).merge(generation_started_at: Time.current))
-  end
-  
   def mark_generation_completed!
     update!(
       status: 'completed',

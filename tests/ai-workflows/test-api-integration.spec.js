@@ -226,14 +226,17 @@ test.describe('AI API Integration Testing', () => {
   test('should validate API request parameters', async ({ request }) => {
     console.log('Testing API parameter validation...');
 
-    // Test missing required parameters
+    // Test missing required parameters (no content_generation param)
     const incompleteResponse = await request.post('/api/v1/content_generation/social_media', {
       headers: apiHeaders,
-      data: {} // Empty request
+      data: {
+        // Missing content_generation parameter entirely
+        other_param: 'value'
+      }
     });
 
     // Should return validation error
-    expect([400, 422]).toContain(incompleteResponse.status());
+    expect([422, 400]).toContain(incompleteResponse.status());
 
     // Test invalid parameters
     const invalidResponse = await request.post('/api/v1/content_generation/social_media', {
@@ -409,20 +412,27 @@ test.describe('AI API Integration Testing', () => {
 
     expect(response.status()).toBe(200);
     
-    const healthData = await response.json();
+    const response_body = await response.json();
+    
+    // Validate response structure
+    expect(response_body).toHaveProperty('success', true);
+    expect(response_body).toHaveProperty('data');
+    
+    const healthData = response_body.data;
     
     // Validate health check response
-    expect(healthData).toHaveProperty('llm_enabled');
+    expect(healthData).toHaveProperty('status');
     expect(healthData).toHaveProperty('provider');
     
-    if (healthData.llm_enabled) {
+    if (healthData.provider) {
       expect(['openai', 'mock', 'real']).toContain(healthData.provider);
     }
 
     console.log('API health status:', {
-      llmEnabled: healthData.llm_enabled,
+      success: response_body.success,
+      status: healthData.status,
       provider: healthData.provider,
-      status: healthData.status || 'healthy'
+      responseTime: healthData.response_time
     });
   });
 

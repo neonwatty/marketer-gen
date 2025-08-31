@@ -9,10 +9,8 @@
     "globalTimeout": 0,
     "grep": {},
     "grepInvert": null,
-    "maxFailures": 1,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "maxFailures": 0,
+    "metadata": {},
     "preserveOutput": "always",
     "reporter": [
       [
@@ -44,9 +42,7 @@
         "outputDir": "/Users/jeremywatt/Desktop/marketer-gen/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "ai-workflows",
         "name": "ai-workflows",
         "testDir": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows",
@@ -54,7 +50,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 300000
       }
     ],
     "shard": null,
@@ -79,6 +75,1105 @@
   },
   "suites": [
     {
+      "title": "ai-workflows/test-api-integration.spec.js",
+      "file": "ai-workflows/test-api-integration.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "AI API Integration Testing",
+          "file": "ai-workflows/test-api-integration.spec.js",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should generate social media content via API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-05b6c52950a218f64685",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 41,
+              "column": 3
+            },
+            {
+              "title": "should generate email content via API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-90f3efb720718e466f65",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 91,
+              "column": 3
+            },
+            {
+              "title": "should generate ad copy via API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-af76a5f81f91e9ff1b92",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 121,
+              "column": 3
+            },
+            {
+              "title": "should generate landing page content via API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-d146af4b87cf642756a0",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 161,
+              "column": 3
+            },
+            {
+              "title": "should handle API authentication and authorization",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-0f3a44cf09179d668c2a",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 196,
+              "column": 3
+            },
+            {
+              "title": "should validate API request parameters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-f8f6d8b37c9d6e422175",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 226,
+              "column": 3
+            },
+            {
+              "title": "should apply brand context in API requests",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-7be6ff7eabb30912019f",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 272,
+              "column": 3
+            },
+            {
+              "title": "should handle API rate limiting and errors gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-b9811781073960f648af",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 321,
+              "column": 3
+            },
+            {
+              "title": "should support batch content generation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-c531090820b0ad9b2708",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 364,
+              "column": 3
+            },
+            {
+              "title": "should provide API health check endpoint",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-c94ec9059f5a9593bee8",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 404,
+              "column": 3
+            },
+            {
+              "title": "should handle concurrent API requests efficiently",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-6055d1c72bb06cac1ce5",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 439,
+              "column": 3
+            },
+            {
+              "title": "should provide comprehensive API error messages",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e83d02b4694edaafa8a8-9b9f44eaa7be4c57a59e",
+              "file": "ai-workflows/test-api-integration.spec.js",
+              "line": 492,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "ai-workflows/test-brand-processing.spec.js",
+      "file": "ai-workflows/test-brand-processing.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "AI Brand Identity Processing Workflow",
+          "file": "ai-workflows/test-brand-processing.spec.js",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should create brand identity and process materials with AI",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de69babfd6423e5cacc-05c0c371c75b1f7768e8",
+              "file": "ai-workflows/test-brand-processing.spec.js",
+              "line": 44,
+              "column": 3
+            },
+            {
+              "title": "should handle file upload for brand materials",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de69babfd6423e5cacc-aa47711cb59d05d53df5",
+              "file": "ai-workflows/test-brand-processing.spec.js",
+              "line": 188,
+              "column": 3
+            },
+            {
+              "title": "should extract different brand voice characteristics",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de69babfd6423e5cacc-2adad7732a567ec062c3",
+              "file": "ai-workflows/test-brand-processing.spec.js",
+              "line": 254,
+              "column": 3
+            },
+            {
+              "title": "should provide brand compliance validation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de69babfd6423e5cacc-e42aad7fa6841acd996e",
+              "file": "ai-workflows/test-brand-processing.spec.js",
+              "line": 333,
+              "column": 3
+            },
+            {
+              "title": "should handle multiple brand identities per user",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de69babfd6423e5cacc-a24c99ee4b7f7d1660cd",
+              "file": "ai-workflows/test-brand-processing.spec.js",
+              "line": 404,
+              "column": 3
+            },
+            {
+              "title": "should activate and deactivate brand identities",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5de69babfd6423e5cacc-49ddcbe3b669f4a54f0c",
+              "file": "ai-workflows/test-brand-processing.spec.js",
+              "line": 454,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "ai-workflows/test-campaign-generation.spec.js",
+      "file": "ai-workflows/test-campaign-generation.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "AI Campaign Plan Generation Workflow",
+          "file": "ai-workflows/test-campaign-generation.spec.js",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should complete full campaign generation workflow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e5e0a710b5f3102ef068-dcb063ec3138cdca98bf",
+              "file": "ai-workflows/test-campaign-generation.spec.js",
+              "line": 76,
+              "column": 3
+            },
+            {
+              "title": "should handle campaign generation failures gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e5e0a710b5f3102ef068-9cc09e510a781f31382d",
+              "file": "ai-workflows/test-campaign-generation.spec.js",
+              "line": 421,
+              "column": 3
+            },
+            {
+              "title": "should preserve form data during generation process",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e5e0a710b5f3102ef068-45a5afcdd8b78f33ba11",
+              "file": "ai-workflows/test-campaign-generation.spec.js",
+              "line": 466,
+              "column": 3
+            },
+            {
+              "title": "should handle concurrent campaign generations",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e5e0a710b5f3102ef068-dd2f9695b0b98c4fd404",
+              "file": "ai-workflows/test-campaign-generation.spec.js",
+              "line": 506,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "ai-workflows/test-campaign-intelligence.spec.js",
+      "file": "ai-workflows/test-campaign-intelligence.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "AI Campaign Intelligence Workflow",
+          "file": "ai-workflows/test-campaign-intelligence.spec.js",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should generate comprehensive market analysis",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "6fd5c68e95ca5379d828-4d885f71a871a2a9fcff",
+              "file": "ai-workflows/test-campaign-intelligence.spec.js",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "should provide industry-specific intelligence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "6fd5c68e95ca5379d828-e5dc292e1085195c1cc4",
+              "file": "ai-workflows/test-campaign-intelligence.spec.js",
+              "line": 155,
+              "column": 3
+            },
+            {
+              "title": "should generate competitor analysis with actionable insights",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "6fd5c68e95ca5379d828-886c94d0bd395b62b5ce",
+              "file": "ai-workflows/test-campaign-intelligence.spec.js",
+              "line": 223,
+              "column": 3
+            },
+            {
+              "title": "should provide performance predictions and success metrics",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "6fd5c68e95ca5379d828-845a15307b556185c1ce",
+              "file": "ai-workflows/test-campaign-intelligence.spec.js",
+              "line": 296,
+              "column": 3
+            },
+            {
+              "title": "should provide optimization recommendations",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "6fd5c68e95ca5379d828-26ee085d8b919b1face5",
+              "file": "ai-workflows/test-campaign-intelligence.spec.js",
+              "line": 369,
+              "column": 3
+            },
+            {
+              "title": "should export intelligence reports",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "6fd5c68e95ca5379d828-c9994230c76ff02ccaa4",
+              "file": "ai-workflows/test-campaign-intelligence.spec.js",
+              "line": 444,
+              "column": 3
+            },
+            {
+              "title": "should handle intelligence regeneration and updates",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "6fd5c68e95ca5379d828-684eba6eaeefe08f3321",
+              "file": "ai-workflows/test-campaign-intelligence.spec.js",
+              "line": 512,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "ai-workflows/test-content-optimization.spec.js",
+      "file": "ai-workflows/test-content-optimization.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "AI Content Optimization & Variants Workflow",
+          "file": "ai-workflows/test-content-optimization.spec.js",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should optimize existing content for better performance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "16df3c4c03bddeccff9c-44527549d64482ea6852",
+              "file": "ai-workflows/test-content-optimization.spec.js",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "should generate A/B testing variants",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "16df3c4c03bddeccff9c-365ced8a5bcc73bd52a7",
+              "file": "ai-workflows/test-content-optimization.spec.js",
+              "line": 151,
+              "column": 3
+            },
+            {
+              "title": "should provide performance optimization suggestions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "16df3c4c03bddeccff9c-051a1d17f8ea81348ac2",
+              "file": "ai-workflows/test-content-optimization.spec.js",
+              "line": 247,
+              "column": 3
+            },
+            {
+              "title": "should optimize content for specific platforms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "16df3c4c03bddeccff9c-962125c48543e5a50c1c",
+              "file": "ai-workflows/test-content-optimization.spec.js",
+              "line": 322,
+              "column": 3
+            },
+            {
+              "title": "should provide content scoring and improvement metrics",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "16df3c4c03bddeccff9c-357d543f69359a634174",
+              "file": "ai-workflows/test-content-optimization.spec.js",
+              "line": 387,
+              "column": 3
+            },
+            {
+              "title": "should handle bulk optimization operations",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "16df3c4c03bddeccff9c-317aa24e9cd1381ba82e",
+              "file": "ai-workflows/test-content-optimization.spec.js",
+              "line": 475,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "ai-workflows/test-email-content.spec.js",
+      "file": "ai-workflows/test-email-content.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "AI Email Campaign Content Workflow",
+          "file": "ai-workflows/test-email-content.spec.js",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should generate complete email campaign with subject and body",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "18cd793473dc0e81971f-0f5044fd4119bb38ad28",
+              "file": "ai-workflows/test-email-content.spec.js",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "should generate different email types appropriately",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "18cd793473dc0e81971f-2d85af19ee9617db64cb",
+              "file": "ai-workflows/test-email-content.spec.js",
+              "line": 141,
+              "column": 3
+            },
+            {
+              "title": "should generate personalized email content",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "18cd793473dc0e81971f-bdff9de0074ca97aef13",
+              "file": "ai-workflows/test-email-content.spec.js",
+              "line": 190,
+              "column": 3
+            },
+            {
+              "title": "should generate email series with consistent messaging",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "18cd793473dc0e81971f-3299ae5bc929e2786f68",
+              "file": "ai-workflows/test-email-content.spec.js",
+              "line": 242,
+              "column": 3
+            },
+            {
+              "title": "should generate appropriate CTAs based on email purpose",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "18cd793473dc0e81971f-7e8cfc0d1077a2cdaab8",
+              "file": "ai-workflows/test-email-content.spec.js",
+              "line": 305,
+              "column": 3
+            },
+            {
+              "title": "should handle A/B testing for email optimization",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "18cd793473dc0e81971f-5b91f1efae88af7b42ad",
+              "file": "ai-workflows/test-email-content.spec.js",
+              "line": 360,
+              "column": 3
+            },
+            {
+              "title": "should maintain professional email formatting",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "18cd793473dc0e81971f-69f2ab67efc98f19df88",
+              "file": "ai-workflows/test-email-content.spec.js",
+              "line": 430,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "ai-workflows/test-journey-ai.spec.js",
+      "file": "ai-workflows/test-journey-ai.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "AI Journey Creation and Suggestions Workflow",
+          "file": "ai-workflows/test-journey-ai.spec.js",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should provide AI suggestions for journey creation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3c4fef62990bd668c920-884ad8c5afa4e9b998fc",
+              "file": "ai-workflows/test-journey-ai.spec.js",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "should provide context-appropriate journey templates",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3c4fef62990bd668c920-384689d581c0d47f30f5",
+              "file": "ai-workflows/test-journey-ai.spec.js",
+              "line": 134,
+              "column": 3
+            },
+            {
+              "title": "should suggest content types for each journey stage",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3c4fef62990bd668c920-a8c5646d5ef711710b47",
+              "file": "ai-workflows/test-journey-ai.spec.js",
+              "line": 183,
+              "column": 3
+            },
+            {
+              "title": "should provide channel recommendations for journey steps",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3c4fef62990bd668c920-75536c9086a1eefed733",
+              "file": "ai-workflows/test-journey-ai.spec.js",
+              "line": 248,
+              "column": 3
+            },
+            {
+              "title": "should adapt suggestions based on target audience",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3c4fef62990bd668c920-261b268de8ef343b4425",
+              "file": "ai-workflows/test-journey-ai.spec.js",
+              "line": 301,
+              "column": 3
+            },
+            {
+              "title": "should provide timing and sequence recommendations",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3c4fef62990bd668c920-db5c9762f78404cfd7bb",
+              "file": "ai-workflows/test-journey-ai.spec.js",
+              "line": 355,
+              "column": 3
+            },
+            {
+              "title": "should suggest journey optimization based on performance data",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3c4fef62990bd668c920-7e32d3abb74655d7e427",
+              "file": "ai-workflows/test-journey-ai.spec.js",
+              "line": 414,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "ai-workflows/test-social-content.spec.js",
       "file": "ai-workflows/test-social-content.spec.js",
       "column": 0,
@@ -93,184 +1188,17 @@
           "specs": [
             {
               "title": "should generate Twitter content with proper optimization",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 300000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "ai-workflows",
                   "projectName": "ai-workflows",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 15274,
-                      "error": {
-                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n",
-                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20",
-                        "location": {
-                          "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
-                          "column": 20,
-                          "line": 69
-                        },
-                        "snippet": "  67 |       try {\n  68 |         // Wait for form to be ready\n> 69 |         await page.waitForSelector('input[name=\"generated_content[title]\"]', { timeout: 10000 });\n     |                    ^\n  70 |         await page.fill('input[name=\"generated_content[title]\"]', contentData.title);\n  71 |         console.log(`✅ Form title filled successfully`);\n  72 |       } catch (error) {"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
-                            "column": 20,
-                            "line": 69
-                          },
-                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n\n  67 |       try {\n  68 |         // Wait for form to be ready\n> 69 |         await page.waitForSelector('input[name=\"generated_content[title]\"]', { timeout: 10000 });\n     |                    ^\n  70 |         await page.fill('input[name=\"generated_content[title]\"]', contentData.title);\n  71 |         console.log(`✅ Form title filled successfully`);\n  72 |       } catch (error) {\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "Test user created: test-1756659581524-dueda@example.com\n"
-                        },
-                        {
-                          "text": "Testing Twitter content generation...\n"
-                        },
-                        {
-                          "text": "🔄 Navigating to content creation form...\n"
-                        },
-                        {
-                          "text": "✅ Successfully navigated to: http://localhost:3000/generated_contents/new\n"
-                        },
-                        {
-                          "text": "🔄 Filling form with title: Twitter Test Post\n"
-                        },
-                        {
-                          "text": "❌ Form filling failed: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n"
-                        },
-                        {
-                          "text": "Page title: Action Controller: Exception caught\n"
-                        },
-                        {
-                          "text": "No logout button found, may already be logged out\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-08-31T16:59:40.593Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
-                        "column": 20,
-                        "line": 69
-                      }
-                    },
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 14469,
-                      "error": {
-                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n",
-                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20",
-                        "location": {
-                          "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
-                          "column": 20,
-                          "line": 69
-                        },
-                        "snippet": "  67 |       try {\n  68 |         // Wait for form to be ready\n> 69 |         await page.waitForSelector('input[name=\"generated_content[title]\"]', { timeout: 10000 });\n     |                    ^\n  70 |         await page.fill('input[name=\"generated_content[title]\"]', contentData.title);\n  71 |         console.log(`✅ Form title filled successfully`);\n  72 |       } catch (error) {"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
-                            "column": 20,
-                            "line": 69
-                          },
-                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n\n  67 |       try {\n  68 |         // Wait for form to be ready\n> 69 |         await page.waitForSelector('input[name=\"generated_content[title]\"]', { timeout: 10000 });\n     |                    ^\n  70 |         await page.fill('input[name=\"generated_content[title]\"]', contentData.title);\n  71 |         console.log(`✅ Form title filled successfully`);\n  72 |       } catch (error) {\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "Test user created: test-1756659597146-zjtfwrs@example.com\n"
-                        },
-                        {
-                          "text": "Testing Twitter content generation...\n"
-                        },
-                        {
-                          "text": "🔄 Navigating to content creation form...\n"
-                        },
-                        {
-                          "text": "✅ Successfully navigated to: http://localhost:3000/generated_contents/new\n"
-                        },
-                        {
-                          "text": "🔄 Filling form with title: Twitter Test Post\n"
-                        },
-                        {
-                          "text": "❌ Form filling failed: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n"
-                        },
-                        {
-                          "text": "Page title: Action Controller: Exception caught\n"
-                        },
-                        {
-                          "text": "No logout button found, may already be logged out\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2025-08-31T16:59:56.798Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
-                        "column": 20,
-                        "line": 69
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "696a19e84c126bfcd4bb-aedb5192ae4372e02b3f",
@@ -284,7 +1212,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 300000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "ai-workflows",
@@ -304,7 +1232,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 300000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "ai-workflows",
@@ -324,7 +1252,7 @@
               "tags": [],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 300000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "ai-workflows",
@@ -337,23 +1265,119 @@
               "file": "ai-workflows/test-social-content.spec.js",
               "line": 46,
               "column": 5
+            },
+            {
+              "title": "should handle different content format variants",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-139a9dcdf9ed31b17290",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 192,
+              "column": 3
+            },
+            {
+              "title": "should generate content within campaign context",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-e8fabe4017effef47c91",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 244,
+              "column": 3
+            },
+            {
+              "title": "should handle content generation errors gracefully",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-2b622e315389e8f0a161",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 303,
+              "column": 3
+            },
+            {
+              "title": "should support content variants and A/B testing",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-da3b77fda8bfd7ba68e0",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 340,
+              "column": 3
+            },
+            {
+              "title": "should maintain content quality across multiple generations",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 300000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-ff627097d92a6cb3cd1c",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 388,
+              "column": 3
             }
           ]
         }
       ]
     }
   ],
-  "errors": [
-    {
-      "message": "\u001b[31mTesting stopped early after 1 maximum allowed failures.\u001b[39m"
-    }
-  ],
+  "errors": [],
   "stats": {
-    "startTime": "2025-08-31T16:59:40.064Z",
-    "duration": 31521.768,
+    "startTime": "2025-08-31T22:40:38.745Z",
+    "duration": 62.11500000000001,
     "expected": 0,
-    "skipped": 3,
-    "unexpected": 1,
+    "skipped": 58,
+    "unexpected": 0,
     "flaky": 0
   }
 }

@@ -11,7 +11,7 @@ module Api
       skip_before_action :require_authentication
       skip_before_action :verify_authenticity_token
       before_action :validate_request_format
-      before_action :authenticate_api_user
+      before_action :authenticate_api_user, except: [:health]
       before_action :check_rate_limit, except: [:health]
       
       rescue_from JSON::ParserError, with: :handle_json_parse_error

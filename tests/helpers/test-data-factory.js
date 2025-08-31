@@ -266,6 +266,7 @@ Target Audience:
       ad_copy: {
         platform: 'google_ads',
         ad_type: 'search',
+        objective: 'conversions',
         target_keyword: 'marketing automation'
       },
       landing_page: {
