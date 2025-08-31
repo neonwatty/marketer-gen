@@ -112,6 +112,9 @@
     </div>
   </section>
 
+  <!-- Demo Anchor Point (hidden, used for intro.js tours) -->
+  <div id="demo-anchor" style="display: none;"></div>
+
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="loading-overlay fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50" style="display: none;">
     <div class="text-center text-white">
@@ -121,12 +124,12 @@
   </div>
 </div>
 
-<!-- Include Intro.js CSS -->
-<%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.css" %>
+<!-- Include Intro.js CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js"></script>
 
 <!-- Demo Controller JavaScript -->
-<script type="module">
-  import introJs from "intro.js";
+<script>
   
   class DemoController {
     constructor() {
@@ -173,24 +176,51 @@
     }
     
     async startTour(workflowKey) {
+      console.log('Starting tour for workflow:', workflowKey);
+      
       try {
+        // Check if introJs is available
+        if (typeof introJs === 'undefined') {
+          throw new Error('Intro.js library is not loaded');
+        }
+        
         // Show loading state
         this.showLoadingState();
         
         // Load tour configuration
+        console.log('Fetching tour configuration...');
         const response = await fetch(`/demos/start_tour?workflow=${workflowKey}`);
         const tourData = await response.json();
+        
+        console.log('Tour data received:', tourData);
         
         if (tourData.success) {
           this.currentTour = workflowKey;
           this.currentAnalyticsId = tourData.analytics_id;
           this.currentStepStartTime = Date.now();
           
+          // Convert steps to demo-friendly format (no specific elements needed)
+          const demoSteps = tourData.tour_config.steps.map((step, index) => ({
+            intro: step.intro,
+            position: 'auto',
+            tooltipClass: 'ai-demo-tooltip'
+          }));
+          
+          console.log('Demo steps prepared:', demoSteps);
+          
           // Initialize and start Intro.js tour
           const intro = introJs();
           intro.setOptions({
-              ...tourData.tour_config.options,
-              steps: tourData.tour_config.steps
+              showProgress: true,
+              showBullets: false,
+              exitOnOverlayClick: false,
+              exitOnEsc: true,
+              nextLabel: "Next →",
+              prevLabel: "← Back",
+              doneLabel: "🎉 Complete Demo!",
+              tooltipClass: "ai-demo-tooltip",
+              highlightClass: "ai-demo-highlight",
+              steps: demoSteps
             })
             .onstart(() => {
               this.onTourStart(workflowKey);
@@ -204,7 +234,7 @@
                 if (currentStep > 0) {
                   this.trackStepCompletion(
                     currentStep,
-                    tourData.tour_config.steps[currentStep - 1]?.title || `Step ${currentStep}`,
+                    tourData.tour_config.steps[currentStep - 1]?.intro || `Step ${currentStep}`,
                     timeSpent
                   );
                 }
@@ -319,13 +349,30 @@
   }
   
   // Initialize demo controller when page loads
-  window.demoController = new DemoController();
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check if introJs is available
+    if (typeof introJs === 'undefined') {
+      console.error('Intro.js is not loaded!');
+      return;
+    }
+    
+    window.demoController = new DemoController();
+    console.log('Demo controller initialized successfully');
+  });
   
   // Global functions for button onclick handlers
-  window.startTour = (workflowKey) => window.demoController.startTour(workflowKey);
-  window.startRandomTour = () => window.demoController.startRandomTour();
-  window.startGuidedPath = () => window.demoController.startGuidedPath();
-  window.showDeveloperDemo = () => window.demoController.showDeveloperDemo();
+  window.startTour = (workflowKey) => {
+    console.log('startTour called with:', workflowKey);
+    if (window.demoController) {
+      window.demoController.startTour(workflowKey);
+    } else {
+      console.error('Demo controller not initialized');
+      alert('Demo system not ready. Please refresh the page and try again.');
+    }
+  };
+  window.startRandomTour = () => window.demoController?.startRandomTour();
+  window.startGuidedPath = () => window.demoController?.startGuidedPath();
+  window.showDeveloperDemo = () => window.demoController?.showDeveloperDemo();
 </script>
 
 <!-- Custom Demo Styling -->
