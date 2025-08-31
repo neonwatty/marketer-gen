@@ -73,7 +73,7 @@
             </div>
             
             <!-- Preview Overlay (Hidden by default) -->
-            <div class="preview-overlay absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl hidden">
+            <div class="preview-overlay absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-xl hidden pointer-events-none">
               <div class="text-center text-white p-4">
                 <div class="w-16 h-12 bg-gray-200 rounded mb-4 mx-auto flex items-center justify-center">
                   <span class="text-gray-600 text-xs">Preview</span>
@@ -129,7 +129,7 @@
 </div>
 
 <!-- Include Intro.js CSS and JS with nonce -->
-<%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.css", nonce: true %>
+<%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.css", nonce: true %>
 <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js", nonce: true %>
 
 <!-- Demo Controller JavaScript -->
@@ -198,8 +198,8 @@
     showPreview(cardElement) {
       const overlay = cardElement.querySelector('.preview-overlay');
       if (overlay) {
-        overlay.classList.remove('hidden');
-        overlay.classList.add('flex');
+        overlay.classList.remove('hidden', 'pointer-events-none');
+        overlay.classList.add('flex', 'pointer-events-auto');
         setTimeout(() => overlay.classList.add('opacity-100'), 50);
       }
     }
@@ -207,7 +207,8 @@
     hidePreview(cardElement) {
       const overlay = cardElement.querySelector('.preview-overlay');
       if (overlay) {
-        overlay.classList.remove('opacity-100');
+        overlay.classList.remove('opacity-100', 'pointer-events-auto');
+        overlay.classList.add('pointer-events-none');
         setTimeout(() => {
           overlay.classList.add('hidden');
           overlay.classList.remove('flex');
