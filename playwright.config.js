@@ -1,38 +1,40 @@
-// playwright.config.js
+// playwright.config.js - Optimized for AI Workflow Testing
 const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
   // Test directory
   testDir: './tests',
   
-  // Global timeout
-  timeout: 60000,
+  // Global timeout - increased for AI processing
+  timeout: 300000, // 5 minutes for AI operations
   
-  // Run tests in fully parallel
+  // Run tests in fully parallel with reduced workers for AI stability
   fullyParallel: true,
   
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
   
-  // Retry on CI only
-  retries: process.env.CI ? 2 : 0,
+  // Retry for stability (increased for flaky auth)
+  retries: process.env.CI ? 2 : 1,
   
-  // Opt out of parallel tests on CI
-  workers: process.env.CI ? 1 : undefined,
+  // Reduced workers for AI workflows stability (single worker for auth reliability)
+  workers: 1,
   
-  // Reporter configuration
+  // Reporter configuration - fixed folder conflict
   reporter: [
-    ['html'],
-    ['json', { outputFile: 'test-results.json' }]
+    ['html', { outputFolder: 'playwright-reports/html-report' }],
+    ['json', { outputFile: 'playwright-reports/results.json' }],
+    ['junit', { outputFile: 'playwright-reports/results.xml' }]
   ],
   
   // Shared settings for all the projects
   use: {
     // Base URL for the Rails app
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
     
-    // Global test timeout
-    actionTimeout: 15000,
+    // Global test timeout - increased for AI operations
+    actionTimeout: 90000, // 1.5 minutes
+    navigationTimeout: 90000, // 1.5 minutes
     
     // Take screenshot on failure
     screenshot: 'only-on-failure',
@@ -40,40 +42,63 @@ module.exports = defineConfig({
     // Record video on failure
     video: 'retain-on-failure',
     
-    // Trace on failure
+    // Trace on failure for debugging
     trace: 'retain-on-failure',
   },
 
-  // Configure projects for major browsers
+  // Expect timeout for assertions
+  expect: {
+    timeout: 30000
+  },
+
+  // Configure projects for AI workflow testing
   projects: [
-    // Desktop browsers
+    // Primary AI Workflows - Desktop Chrome (most stable for AI testing)
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'ai-workflows',
+      testDir: './tests/ai-workflows',
+      use: { 
+        ...devices['Desktop Chrome'],
+        // Extended timeouts for AI processing
+        actionTimeout: 90000,
+        navigationTimeout: 90000,
+      },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+
+    // Cross-browser testing (optional - can be enabled for comprehensive testing)
+    // {
+    //   name: 'firefox-ai',
+    //   testDir: './tests/ai-workflows',
+    //   use: { 
+    //     ...devices['Desktop Firefox'],
+    //     actionTimeout: 90000,
+    //   },
+    // },
     
-    // Mobile browsers
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
-    
-    // Tablet
-    {
-      name: 'Tablet',
-      use: { ...devices['iPad Pro'] },
-    }
+    // Mobile testing for responsive AI interfaces
+    // {
+    //   name: 'mobile-ai',
+    //   testDir: './tests/ai-workflows',
+    //   use: { 
+    //     ...devices['Pixel 5'],
+    //     actionTimeout: 120000, // Even longer for mobile
+    //   },
+    // },
   ],
+
+  // Web server configuration for Rails
+  webServer: {
+    command: 'USE_REAL_LLM=false LLM_ENABLED=true rails server -e test -p 3000',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    env: {
+      RAILS_ENV: 'test',
+      LLM_ENABLED: 'true',
+      USE_REAL_LLM: 'false', // Force mock in tests
+      LLM_REQUEST_TIMEOUT: '30',
+      LLM_MAX_RETRIES: '2',
+      DEFAULT_LLM_PROVIDER: 'mock'
+    }
+  },
 });

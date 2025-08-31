@@ -86,7 +86,11 @@ class MockLlmService
     # Apply brand context to content generation
     headline, description, cta = generate_ad_parts(ad_type, platform, objective, brand_context)
 
+    # Combine parts into single content field for API compatibility
+    combined_content = "#{headline}\n\n#{description}\n\n#{cta}"
+    
     {
+      content: combined_content,
       headline: headline,
       description: description,
       call_to_action: cta,
@@ -116,7 +120,11 @@ class MockLlmService
     # Apply brand context to content generation
     headline, subheadline, body, cta = generate_landing_page_parts(page_type, objective, key_features, brand_context)
 
+    # Combine parts into single content field for API compatibility
+    combined_content = "#{headline}\n\n#{subheadline}\n\n#{body}\n\n#{cta}"
+    
     {
+      content: combined_content,
       headline: headline,
       subheadline: subheadline,
       body: body,
@@ -168,24 +176,36 @@ class MockLlmService
     # Convert to hash to ensure consistent access
     params = params.to_h if params.respond_to?(:to_h)
     
-    original_content = params[:original_content] || params['original_content'] || 'Original content'
+    base_content = params[:base_content] || params[:original_content] || params['base_content'] || params['original_content'] || 'Original content'
     content_type = params[:content_type] || params['content_type'] || 'social_media'
     variant_count = [params[:variant_count] || params['variant_count'] || 3, 10].min # Max 10 variants
+    platforms = params[:platforms] || params['platforms'] || ['linkedin', 'twitter', 'facebook']
 
-    variations = generate_variations(original_content, content_type, variant_count)
+    variations = generate_variations(base_content, content_type, variant_count)
 
-    variations.map.with_index do |content, index|
-      {
-        content: content,
-        variant_number: index + 1,
-        strategy: variation_strategies[index % variation_strategies.length],
-        metadata: {
-          content_type: content_type,
-          generated_at: Time.current,
-          service: 'mock'
+    # Return in format expected by tests
+    {
+      variations: variations.map.with_index do |content, index|
+        {
+          content: content,
+          platform: platforms[index % platforms.length],
+          variant_number: index + 1,
+          strategy: variation_strategies[index % variation_strategies.length],
+          metadata: {
+            content_type: content_type,
+            generated_at: Time.current,
+            service: 'mock'
+          }
         }
+      end,
+      metadata: {
+        base_content: base_content,
+        content_type: content_type,
+        total_variations: variant_count,
+        generated_at: Time.current,
+        service: 'mock'
       }
-    end
+    }
   end
 
   def optimize_content(params)

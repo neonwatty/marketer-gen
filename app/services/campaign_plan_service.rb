@@ -18,31 +18,31 @@ class CampaignPlanService < ApplicationService
     begin
       # Step 1: Analyzing Requirements (0-15%)
       update_progress(0, 5, 'Analyzing campaign requirements...', '2-3 minutes')
-      sleep(0.5) # Simulate processing time
+      # Removed sleep for test performance
       
       # Step 2: Gathering Brand Context (15-35%)
       update_progress(1, 20, 'Gathering brand context and guidelines...', '90 seconds')
       brand_context = gather_brand_context
-      sleep(0.5)
+      # Removed sleep for test performance
 
       # Step 3: Generating Strategy (35-60%)
       update_progress(2, 45, 'Generating campaign strategy...', '60 seconds')
       llm_params = prepare_llm_parameters(brand_context)
-      sleep(0.5)
+      # Removed sleep for test performance
 
       # Step 4: Creating Content Plan (60-80%)
       update_progress(3, 70, 'Creating detailed content plan...', '45 seconds')
       llm_response = llm_service.generate_campaign_plan(llm_params)
-      sleep(0.5)
+      # Removed sleep for test performance
 
       # Step 5: Building Timeline (80-95%)
       update_progress(4, 85, 'Building campaign timeline...', '20 seconds')
       process_llm_response(llm_response)
-      sleep(0.5)
+      # Removed sleep for test performance
 
       # Step 6: Finalizing Assets (95-100%)
       update_progress(5, 95, 'Finalizing campaign assets...', '10 seconds')
-      sleep(0.5)
+      # Removed sleep for test performance
 
       @campaign_plan.mark_generation_completed!
       success_result('Campaign plan generated successfully', @campaign_plan)

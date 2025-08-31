@@ -129,17 +129,22 @@ module LlmServiceContainer
   end
 
   def get_provider_service(provider_name)
-    # For now, this would return a provider-specific service instance
-    # This is where real LLM provider implementations would be instantiated
-    # TODO: Implement actual provider services (OpenAI, Anthropic, etc.)
+    # Get provider-specific service configuration
+    provider_config = Rails.application.config.llm_providers[provider_name]
+    return nil unless provider_config && provider_config[:enabled]
     
-    # Placeholder: return mock service with provider context
+    # Map provider names to service classes
+    service_mapping = {
+      openai: :openai,
+      anthropic: :anthropic
+    }
+    
+    service_key = service_mapping[provider_name]
+    return nil unless service_key && @services[service_key]
+    
+    # Create instance with provider configuration
     @instances ||= {}
-    @instances["#{provider_name}_service".to_sym] ||= begin
-      mock_instance = @services[:mock]&.new
-      mock_instance.instance_variable_set(:@provider_name, provider_name) if mock_instance
-      mock_instance
-    end
+    @instances["#{provider_name}_service".to_sym] ||= @services[service_key].new(provider_config)
   end
 
   def circuit_breaker_allows?(provider_name)
@@ -274,7 +279,11 @@ Rails.application.configure do
     # Register the mock LLM service
     LlmServiceContainer.register(:mock, MockLlmService)
     
-    # TODO: Register real LLM services when implemented
-    # LlmServiceContainer.register(:real, RealLlmService)
+    # Register real LLM provider services
+    LlmServiceContainer.register(:openai, LlmProviders::OpenaiProvider)
+    # LlmServiceContainer.register(:anthropic, LlmProviders::AnthropicProvider)  # TODO: Implement Anthropic provider
+    
+    # Register real service as primary OpenAI provider
+    LlmServiceContainer.register(:real, LlmProviders::OpenaiProvider)
   end
 end

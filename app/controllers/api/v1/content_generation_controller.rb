@@ -12,6 +12,10 @@ module Api
       skip_before_action :verify_authenticity_token
       before_action :validate_request_format
       before_action :authenticate_api_user
+      before_action :check_rate_limit, except: [:health]
+      
+      rescue_from JSON::ParserError, with: :handle_json_parse_error
+      rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
       
       # Generate social media content
       # POST /api/v1/content_generation/social_media
@@ -125,6 +129,36 @@ module Api
 
       private
 
+      def check_rate_limit
+        begin
+          @rate_limiter = ApiRateLimitingService.new(
+            platform: 'content_generation_api',
+            endpoint: action_name,
+            customer_id: current_user.id,
+            strategy: :balanced
+          )
+          
+          # Execute rate limit check without actual API call
+          @rate_limiter.execute_request { true }
+        rescue ApiRateLimitingService::RateLimitExceeded => e
+          render json: {
+            success: false,
+            error: 'Rate limit exceeded',
+            message: e.message,
+            retry_after: 60
+          }, status: :too_many_requests
+          return false
+        rescue ApiRateLimitingService::QuotaExceeded => e
+          render json: {
+            success: false,
+            error: 'API quota exceeded',
+            message: e.message
+          }, status: :too_many_requests
+          return false
+        end
+        true
+      end
+
       def authenticate_api_user
         # Use the standard authentication but return JSON error instead of redirect
         unless authenticated?
@@ -142,9 +176,12 @@ module Api
         unless request.format.json?
           render json: { 
             success: false, 
-            error: 'Only JSON format is supported' 
+            error: 'Only JSON format is supported',
+            message: 'Please set Content-Type: application/json header'
           }, status: :not_acceptable
+          return false
         end
+        true
       end
 
       def handle_generation_error(error, operation)
@@ -161,6 +198,8 @@ module Api
         status = case error
                  when ArgumentError, ActionController::ParameterMissing
                    :bad_request
+                 when ActionController::UnpermittedParameters
+                   :unprocessable_entity
                  when StandardError
                    :internal_server_error
                  else
@@ -169,36 +208,65 @@ module Api
 
         render json: error_response, status: status
       end
+      
+      def handle_json_parse_error(error)
+        render json: {
+          success: false,
+          error: 'Invalid JSON format',
+          message: 'Request body contains malformed JSON'
+        }, status: :bad_request
+      end
+      
+      def handle_parameter_missing(error)
+        render json: {
+          success: false,
+          error: 'Missing required parameter',
+          message: error.message,
+          details: 'content_generation parameter is required'
+        }, status: :unprocessable_entity
+      end
 
       # Parameter sanitization methods
       def social_media_params
-        params.require(:content_generation).permit(
+        content_generation_params = params[:content_generation]
+        raise ActionController::ParameterMissing.new('content_generation') unless content_generation_params
+        
+        permitted = content_generation_params.permit(
           :platform, :tone, :topic, :character_limit,
           brand_context: {},
           targeting: {}
-        ).tap do |permitted|
-          permitted[:brand_context] = parse_brand_context if params.dig(:content_generation, :brand_context)
-        end
+        )
+        
+        permitted[:brand_context] = parse_brand_context if content_generation_params[:brand_context]
+        permitted
       end
 
       def email_params
-        params.require(:content_generation).permit(
+        content_generation_params = params[:content_generation]
+        raise ActionController::ParameterMissing.new('content_generation') unless content_generation_params
+        
+        permitted = content_generation_params.permit(
           :email_type, :subject, :tone,
           brand_context: {},
           personalization: []
-        ).tap do |permitted|
-          permitted[:brand_context] = parse_brand_context if params.dig(:content_generation, :brand_context)
-        end
+        )
+        
+        permitted[:brand_context] = parse_brand_context if content_generation_params[:brand_context]
+        permitted
       end
 
       def ad_copy_params
-        params.require(:content_generation).permit(
+        content_generation_params = params[:content_generation]
+        raise ActionController::ParameterMissing.new('content_generation') unless content_generation_params
+        
+        permitted = content_generation_params.permit(
           :ad_type, :platform, :objective,
           brand_context: {},
           target_audience: {}
-        ).tap do |permitted|
-          permitted[:brand_context] = parse_brand_context if params.dig(:content_generation, :brand_context)
-        end
+        )
+        
+        permitted[:brand_context] = parse_brand_context if content_generation_params[:brand_context]
+        permitted
       end
 
       def landing_page_params
@@ -223,9 +291,12 @@ module Api
       end
 
       def variations_params
-        params.require(:content_generation).permit(
-          :original_content, :content_type, :variant_count,
-          variation_strategies: []
+        content_generation_params = params[:content_generation]
+        raise ActionController::ParameterMissing.new('content_generation') unless content_generation_params
+        
+        content_generation_params.permit(
+          :base_content, :original_content, :content_type, :variant_count,
+          platforms: [], variation_strategies: []
         )
       end
 

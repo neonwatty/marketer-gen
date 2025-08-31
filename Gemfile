@@ -59,6 +59,13 @@ gem "securerandom"
 gem "faraday"
 gem "faraday-retry"
 
+# LLM API clients for AI content generation
+gem "ruby-openai", "~> 7.3"
+gem "anthropic", "~> 0.3"
+
+# Environment variables from .env file
+gem "dotenv-rails", "~> 3.1"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

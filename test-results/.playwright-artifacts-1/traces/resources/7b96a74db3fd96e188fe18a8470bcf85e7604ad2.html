@@ -1,0 +1,279 @@
+<!-- BEGIN app/views/layouts/application.html.erb --><!DOCTYPE html>
+<html>
+  <head>
+    <title>Marketer Gen</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="_afik70mIx0Aa1jcveskLFz4kxdjwwufxYum6EryQFnn-WrAL-kaX8xzygXmaZ6crTpyERWVuaIRg6JjaZNERQ" />
+    <meta name="csp-nonce" content="gV19r5jgb/dv/eQ4EX4l3g==" />
+
+    
+
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <link rel="stylesheet" href="/assets/application-1c488535.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/campaign_plan_visualization-b5284c19.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/rails_admin-f74c8fa0.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/tailwind-700116b7.css" data-turbo-track="reload" />
+    <script type="importmap" data-turbo-track="reload" nonce="gV19r5jgb/dv/eQ4EX4l3g==">{
+  "imports": {
+    "application": "/assets/application-bfcdf840.js",
+    "@hotwired/turbo-rails": "/assets/turbo.min-3a2e143f.js",
+    "@hotwired/stimulus": "/assets/stimulus.min-4b1e420e.js",
+    "@hotwired/stimulus-loading": "/assets/stimulus-loading-1fc53fe7.js",
+    "controllers/application": "/assets/controllers/application-3affb389.js",
+    "controllers/auto_submit_controller": "/assets/controllers/auto_submit_controller-682c774c.js",
+    "controllers/bulk_actions_controller": "/assets/controllers/bulk_actions_controller-42549131.js",
+    "controllers/dismiss_controller": "/assets/controllers/dismiss_controller-b1890cef.js",
+    "controllers/dropdown_controller": "/assets/controllers/dropdown_controller-889a91f0.js",
+    "controllers/file_upload_controller": "/assets/controllers/file_upload_controller-d5fd3e7f.js",
+    "controllers/form_validation_controller": "/assets/controllers/form_validation_controller-d4929f47.js",
+    "controllers/hello_controller": "/assets/controllers/hello_controller-708796bd.js",
+    "controllers": "/assets/controllers/index-ee64e1f1.js",
+    "controllers/journey_builder_controller": "/assets/controllers/journey_builder_controller-72bfda9f.js",
+    "controllers/journey_compare_controller": "/assets/controllers/journey_compare_controller-d5716ec0.js",
+    "controllers/journey_form_controller": "/assets/controllers/journey_form_controller-97ba070a.js",
+    "controllers/journey_step_form_controller": "/assets/controllers/journey_step_form_controller-6a582b50.js",
+    "controllers/journey_suggestions_controller": "/assets/controllers/journey_suggestions_controller-f8602e13.js",
+    "controllers/mobile_menu_controller": "/assets/controllers/mobile_menu_controller-a5809f36.js",
+    "controllers/modal_controller": "/assets/controllers/modal_controller-11271973.js",
+    "controllers/onboarding_checklist_controller": "/assets/controllers/onboarding_checklist_controller-81755693.js",
+    "controllers/progress_bar_controller": "/assets/controllers/progress_bar_controller-85e1fd7a.js",
+    "controllers/progress_tracker_controller": "/assets/controllers/progress_tracker_controller-53c9bbc8.js",
+    "controllers/smart_suggestions_controller": "/assets/controllers/smart_suggestions_controller-e3350e7e.js",
+    "controllers/template_form_controller": "/assets/controllers/template_form_controller-2e1c3330.js",
+    "controllers/template_selector_controller": "/assets/controllers/template_selector_controller-cba9edcb.js",
+    "controllers/tooltip_controller": "/assets/controllers/tooltip_controller-fc08b706.js"
+  }
+}</script>
+<link rel="modulepreload" href="/assets/application-bfcdf840.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/turbo.min-3a2e143f.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/stimulus-loading-1fc53fe7.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/application-3affb389.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/auto_submit_controller-682c774c.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/bulk_actions_controller-42549131.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/dismiss_controller-b1890cef.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/dropdown_controller-889a91f0.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/file_upload_controller-d5fd3e7f.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/form_validation_controller-d4929f47.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/hello_controller-708796bd.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/index-ee64e1f1.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/journey_builder_controller-72bfda9f.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/journey_compare_controller-d5716ec0.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/journey_form_controller-97ba070a.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/journey_step_form_controller-6a582b50.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/journey_suggestions_controller-f8602e13.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/mobile_menu_controller-a5809f36.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/modal_controller-11271973.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/onboarding_checklist_controller-81755693.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/progress_bar_controller-85e1fd7a.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/progress_tracker_controller-53c9bbc8.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/smart_suggestions_controller-e3350e7e.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/template_form_controller-2e1c3330.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/template_selector_controller-cba9edcb.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<link rel="modulepreload" href="/assets/controllers/tooltip_controller-fc08b706.js" nonce="gV19r5jgb/dv/eQ4EX4l3g==">
+<script type="module" nonce="gV19r5jgb/dv/eQ4EX4l3g==">import "application"</script>
+  </head>
+
+  <body class="bg-gray-50">
+    <!-- BEGIN app/views/shared/_navigation.html.erb --><nav class="bg-white shadow-sm border-b border-gray-200 fixed top-0 w-full z-50" data-controller="mobile-menu">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <!-- Logo and main navigation -->
+      <div class="flex">
+        <div class="flex-shrink-0 flex items-center">
+          <a class="flex items-center space-x-2" href="/">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm">MG</span>
+            </div>
+            <span class="text-xl font-bold text-gray-900">Marketer Gen</span>
+</a>        </div>
+        
+      </div>
+
+      <!-- Right side navigation -->
+      <div class="flex items-center space-x-4">
+        <!-- Help link -->
+        <a class="text-gray-700 hover:text-blue-600 p-2 rounded-lg transition-colors" title="Help &amp; Documentation" href="/help">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+</a>          <!-- Authentication links -->
+          <div class="flex items-center space-x-4">
+            <a class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors" href="/session/new">Sign In</a>
+            <a class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors" href="/sign_up">Sign Up</a>
+          </div>
+
+        <!-- Mobile menu button -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+</nav><!-- END app/views/shared/_navigation.html.erb -->
+    <main class="container mx-auto mt-20 px-5 py-8">
+      
+      <!-- BEGIN app/views/registrations/new.html.erb --><div class="mx-auto max-w-md mt-4 px-4 sm:px-0">
+  <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-900">Sign Up</h1>
+
+  <form data-controller="form-validation" data-action="submit-&gt;form-validation#submit" data-form-validation-server-validation-value="true" data-form-validation-debounce-value="300" action="/sign_up" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="WCjQ_oSyCzhX0EPeVGMlhb7jx-QGrt95VcsqtBmthnQ1kAXGv2jdKYHUJb98-GYqmXpvtyUP55O5FoTAZAhrXA" autocomplete="off" />
+
+    <!-- BEGIN app/views/shared/_field_with_validation.html.erb -->
+
+<div class="form-field-wrapper mb-4">
+  <!-- Label -->
+  <label class="block text-sm font-medium text-gray-700 mb-1" for="user_email_address">
+    Email Address
+      <span class="text-red-500">*</span>
+</label>  
+  <!-- Field Container with Icon -->
+  <div class="relative">
+    <!-- Input Field -->
+    <input required="required" placeholder="email@example.com" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" data-form-validation-target="field" data-server-validation="true" data-table-name="users" data-field-name="email_address" data-user-scoped="false" type="email" name="user[email_address]" id="user_email_address" />
+    
+    <!-- Validation Icons Container -->
+    <div class="validation-icons absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+      <!-- Loading Icon -->
+      <div class="validation-icon loading hidden">
+        <svg class="w-5 h-5 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+      
+      <!-- Success Icon -->
+      <div class="validation-icon success hidden">
+        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+      
+      <!-- Error Icon -->
+      <div class="validation-icon error hidden">
+        <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Validation Feedback -->
+  <div class="validation-feedback mt-1 min-h-[20px]"></div>
+  
+  <!-- Help Text -->
+    <div class="mt-1 text-sm text-gray-500">
+      We&#39;ll use this to sign you in
+    </div>
+</div><!-- END app/views/shared/_field_with_validation.html.erb -->
+
+    <!-- BEGIN app/views/shared/_field_with_validation.html.erb -->
+
+<div class="form-field-wrapper mb-4">
+  <!-- Label -->
+  <label class="block text-sm font-medium text-gray-700 mb-1" for="user_password">
+    Password
+      <span class="text-red-500">*</span>
+</label>  
+  <!-- Field Container with Icon -->
+  <div class="relative">
+    <!-- Input Field -->
+    <input required="required" placeholder="Enter your password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" data-form-validation-target="field" type="password" name="user[password]" id="user_password" />
+    
+    <!-- Validation Icons Container -->
+    <div class="validation-icons absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+      <!-- Loading Icon -->
+      <div class="validation-icon loading hidden">
+        <svg class="w-5 h-5 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+      
+      <!-- Success Icon -->
+      <div class="validation-icon success hidden">
+        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+      
+      <!-- Error Icon -->
+      <div class="validation-icon error hidden">
+        <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Validation Feedback -->
+  <div class="validation-feedback mt-1 min-h-[20px]"></div>
+  
+  <!-- Help Text -->
+    <div class="mt-1 text-sm text-gray-500">
+      Minimum 8 characters
+    </div>
+</div><!-- END app/views/shared/_field_with_validation.html.erb -->
+
+    <!-- BEGIN app/views/shared/_field_with_validation.html.erb -->
+
+<div class="form-field-wrapper mb-4">
+  <!-- Label -->
+  <label class="block text-sm font-medium text-gray-700 mb-1" for="user_password_confirmation">
+    Password Confirmation
+      <span class="text-red-500">*</span>
+</label>  
+  <!-- Field Container with Icon -->
+  <div class="relative">
+    <!-- Input Field -->
+    <input required="required" placeholder="Confirm your password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors" data-form-validation-target="field" type="password" name="user[password_confirmation]" id="user_password_confirmation" />
+    
+    <!-- Validation Icons Container -->
+    <div class="validation-icons absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+      <!-- Loading Icon -->
+      <div class="validation-icon loading hidden">
+        <svg class="w-5 h-5 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+      
+      <!-- Success Icon -->
+      <div class="validation-icon success hidden">
+        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+      
+      <!-- Error Icon -->
+      <div class="validation-icon error hidden">
+        <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Validation Feedback -->
+  <div class="validation-feedback mt-1 min-h-[20px]"></div>
+  
+  <!-- Help Text -->
+    <div class="mt-1 text-sm text-gray-500">
+      Must match your password above
+    </div>
+</div><!-- END app/views/shared/_field_with_validation.html.erb -->
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+      <input type="submit" name="commit" value="Sign Up" data-form-validation-target="submit" data-disable-with="Sign Up" class="w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-colors text-center" />
+      <a class="text-center sm:text-left block font-bold text-sm text-blue-500 hover:text-blue-800 transition-colors" href="/session/new">Sign In</a>
+    </div>
+</form></div><!-- END app/views/registrations/new.html.erb -->
+    </main>
+  </body>
+</html>
+<!-- END app/views/layouts/application.html.erb -->

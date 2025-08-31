@@ -1,0 +1,39 @@
+=> Booting Puma
+=> Rails 8.0.2 application starting in test 
+=> Run `bin/rails server --help` for more startup options
+Puma starting in single mode...
+* Puma version: 6.6.0 ("Return to Forever")
+* Ruby version: ruby 3.4.2 (2025-02-15 revision d2930f8e7a) +YJIT +PRISM [arm64-darwin24]
+*  Min threads: 3
+*  Max threads: 3
+*  Environment: test
+*          PID: 59992
+Exiting
+/Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:342:in 'TCPServer#initialize': Address already in use - bind(2) for "0.0.0.0" port 3001 (Errno::EADDRINUSE)
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:342:in 'IO.new'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:342:in 'Puma::Binder#add_tcp_listener'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:171:in 'block in Puma::Binder#parse'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:154:in 'Array#each'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:154:in 'Puma::Binder#parse'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/runner.rb:175:in 'Puma::Runner#load_and_bind'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/single.rb:44:in 'Puma::Single#run'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/launcher.rb:203:in 'Puma::Launcher#run'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/rack/handler/puma.rb:79:in 'Puma::RackHandler#run'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/rackup-2.2.1/lib/rackup/server.rb:341:in 'Rackup::Server#start'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/commands/server/server_command.rb:38:in 'Rails::Server#start'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/commands/server/server_command.rb:145:in 'block in Rails::Command::ServerCommand#perform'
+	from <internal:kernel>:91:in 'Kernel#tap'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/commands/server/server_command.rb:136:in 'Rails::Command::ServerCommand#perform'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/thor-1.3.2/lib/thor/command.rb:28:in 'Thor::Command#run'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/thor-1.3.2/lib/thor/invocation.rb:127:in 'Thor::Invocation#invoke_command'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/command/base.rb:178:in 'Rails::Command::Base#invoke_command'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/thor-1.3.2/lib/thor.rb:538:in 'Thor.dispatch'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/command/base.rb:73:in 'Rails::Command::Base.perform'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/command.rb:65:in 'block in Rails::Command.invoke'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/command.rb:143:in 'Rails::Command.with_argv'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/command.rb:63:in 'Rails::Command.invoke'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/railties-8.0.2/lib/rails/commands.rb:18:in '<main>'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'Kernel.require'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'block (2 levels) in Kernel#replace_require'
+	from /Users/jeremywatt/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bootsnap-1.18.6/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:30:in 'Kernel#require'
+	from bin/rails:4:in '<main>'

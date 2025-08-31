@@ -1,0 +1,148 @@
+<!-- BEGIN app/views/layouts/application.html.erb --><!DOCTYPE html>
+<html>
+  <head>
+    <title>Marketer Gen</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="4LKbByw15PTbUOQo7KgVZWoXzbUrs9vtYK6TZ1LK6QX67BNUvvrdthdIdvG3Kq_Vm9Uss13ladC0ppfscavtGQ" />
+    <meta name="csp-nonce" content="H+GOCp5o3B2DymuaasMbfA==" />
+
+    
+
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <link rel="stylesheet" href="/assets/application-1c488535.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/campaign_plan_visualization-b5284c19.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/rails_admin-f74c8fa0.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/tailwind-700116b7.css" data-turbo-track="reload" />
+    <script type="importmap" data-turbo-track="reload" nonce="H+GOCp5o3B2DymuaasMbfA==">{
+  "imports": {
+    "application": "/assets/application-bfcdf840.js",
+    "@hotwired/turbo-rails": "/assets/turbo.min-3a2e143f.js",
+    "@hotwired/stimulus": "/assets/stimulus.min-4b1e420e.js",
+    "@hotwired/stimulus-loading": "/assets/stimulus-loading-1fc53fe7.js",
+    "controllers/application": "/assets/controllers/application-3affb389.js",
+    "controllers/auto_submit_controller": "/assets/controllers/auto_submit_controller-682c774c.js",
+    "controllers/bulk_actions_controller": "/assets/controllers/bulk_actions_controller-42549131.js",
+    "controllers/dismiss_controller": "/assets/controllers/dismiss_controller-b1890cef.js",
+    "controllers/dropdown_controller": "/assets/controllers/dropdown_controller-889a91f0.js",
+    "controllers/file_upload_controller": "/assets/controllers/file_upload_controller-d5fd3e7f.js",
+    "controllers/form_validation_controller": "/assets/controllers/form_validation_controller-d4929f47.js",
+    "controllers/hello_controller": "/assets/controllers/hello_controller-708796bd.js",
+    "controllers": "/assets/controllers/index-ee64e1f1.js",
+    "controllers/journey_builder_controller": "/assets/controllers/journey_builder_controller-72bfda9f.js",
+    "controllers/journey_compare_controller": "/assets/controllers/journey_compare_controller-d5716ec0.js",
+    "controllers/journey_form_controller": "/assets/controllers/journey_form_controller-97ba070a.js",
+    "controllers/journey_step_form_controller": "/assets/controllers/journey_step_form_controller-6a582b50.js",
+    "controllers/journey_suggestions_controller": "/assets/controllers/journey_suggestions_controller-f8602e13.js",
+    "controllers/mobile_menu_controller": "/assets/controllers/mobile_menu_controller-a5809f36.js",
+    "controllers/modal_controller": "/assets/controllers/modal_controller-11271973.js",
+    "controllers/onboarding_checklist_controller": "/assets/controllers/onboarding_checklist_controller-81755693.js",
+    "controllers/progress_bar_controller": "/assets/controllers/progress_bar_controller-85e1fd7a.js",
+    "controllers/progress_tracker_controller": "/assets/controllers/progress_tracker_controller-53c9bbc8.js",
+    "controllers/smart_suggestions_controller": "/assets/controllers/smart_suggestions_controller-e3350e7e.js",
+    "controllers/template_form_controller": "/assets/controllers/template_form_controller-2e1c3330.js",
+    "controllers/template_selector_controller": "/assets/controllers/template_selector_controller-cba9edcb.js",
+    "controllers/tooltip_controller": "/assets/controllers/tooltip_controller-fc08b706.js"
+  }
+}</script>
+<link rel="modulepreload" href="/assets/application-bfcdf840.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/turbo.min-3a2e143f.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/stimulus.min-4b1e420e.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/stimulus-loading-1fc53fe7.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/application-3affb389.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/auto_submit_controller-682c774c.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/bulk_actions_controller-42549131.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/dismiss_controller-b1890cef.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/dropdown_controller-889a91f0.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/file_upload_controller-d5fd3e7f.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/form_validation_controller-d4929f47.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/hello_controller-708796bd.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/index-ee64e1f1.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/journey_builder_controller-72bfda9f.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/journey_compare_controller-d5716ec0.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/journey_form_controller-97ba070a.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/journey_step_form_controller-6a582b50.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/journey_suggestions_controller-f8602e13.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/mobile_menu_controller-a5809f36.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/modal_controller-11271973.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/onboarding_checklist_controller-81755693.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/progress_bar_controller-85e1fd7a.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/progress_tracker_controller-53c9bbc8.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/smart_suggestions_controller-e3350e7e.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/template_form_controller-2e1c3330.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/template_selector_controller-cba9edcb.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<link rel="modulepreload" href="/assets/controllers/tooltip_controller-fc08b706.js" nonce="H+GOCp5o3B2DymuaasMbfA==">
+<script type="module" nonce="H+GOCp5o3B2DymuaasMbfA==">import "application"</script>
+  </head>
+
+  <body class="bg-gray-50">
+    <!-- BEGIN app/views/shared/_navigation.html.erb --><nav class="bg-white shadow-sm border-b border-gray-200 fixed top-0 w-full z-50" data-controller="mobile-menu">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <!-- Logo and main navigation -->
+      <div class="flex">
+        <div class="flex-shrink-0 flex items-center">
+          <a class="flex items-center space-x-2" href="/">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm">MG</span>
+            </div>
+            <span class="text-xl font-bold text-gray-900">Marketer Gen</span>
+</a>        </div>
+        
+      </div>
+
+      <!-- Right side navigation -->
+      <div class="flex items-center space-x-4">
+        <!-- Help link -->
+        <a class="text-gray-700 hover:text-blue-600 p-2 rounded-lg transition-colors" title="Help &amp; Documentation" href="/help">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+</a>          <!-- Authentication links -->
+          <div class="flex items-center space-x-4">
+            <a class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors" href="/session/new">Sign In</a>
+            <a class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors" href="/sign_up">Sign Up</a>
+          </div>
+
+        <!-- Mobile menu button -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+</nav><!-- END app/views/shared/_navigation.html.erb -->
+    <main class="container mx-auto mt-20 px-5 py-8">
+      
+      <!-- BEGIN app/views/sessions/new.html.erb --><div class="mx-auto max-w-md px-4 sm:px-0">
+
+
+  <h1 class="font-bold text-2xl sm:text-4xl text-center text-gray-900 mb-8">Sign in</h1>
+
+  <form class="contents" action="http://localhost:3000/session" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="ondP-MJgFr_xKf6UKDd-PawytDckdBXtLD5uYMh5TPdCGMJU6wMUjzrOvyNBIvyiVxpVhmnU6MaQDPFfVaEPzA" autocomplete="off" />
+    <div class="my-5">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="email_address">Email Address</label>
+      <input required="required" autofocus="autofocus" autocomplete="email" placeholder="Enter your email address" aria_label="Email address" class="block shadow-sm rounded-md border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2 mt-2 w-full" type="email" name="email_address" id="email_address" />
+    </div>
+
+    <div class="my-5">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+      <input required="required" autocomplete="current-password" placeholder="Enter your password" maxlength="72" aria_label="Password" class="block shadow-sm rounded-md border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2 mt-2 w-full" size="72" type="password" name="password" id="password" />
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0 sm:gap-4">
+      <input type="submit" name="commit" value="Sign in" class="w-full sm:w-auto text-center rounded-md px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors" data-disable-with="Sign in" />
+
+      <a class="text-center sm:text-left text-sm text-gray-700 underline hover:no-underline transition-colors" href="/passwords/new">Forgot password?</a>
+    </div>
+</form></div>
+<!-- END app/views/sessions/new.html.erb -->
+    </main>
+  </body>
+</html>
+<!-- END app/views/layouts/application.html.erb -->

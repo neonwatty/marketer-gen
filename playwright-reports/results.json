@@ -1,0 +1,359 @@
+{
+  "config": {
+    "configFile": "/Users/jeremywatt/Desktop/marketer-gen/playwright.config.js",
+    "rootDir": "/Users/jeremywatt/Desktop/marketer-gen/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 1,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-reports/html-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-reports/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "playwright-reports/results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/jeremywatt/Desktop/marketer-gen/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "ai-workflows",
+        "name": "ai-workflows",
+        "testDir": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 1,
+    "webServer": {
+      "command": "USE_REAL_LLM=false LLM_ENABLED=true rails server -e test -p 3000",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000,
+      "env": {
+        "RAILS_ENV": "test",
+        "LLM_ENABLED": "true",
+        "USE_REAL_LLM": "false",
+        "LLM_REQUEST_TIMEOUT": "30",
+        "LLM_MAX_RETRIES": "2",
+        "DEFAULT_LLM_PROVIDER": "mock"
+      }
+    }
+  },
+  "suites": [
+    {
+      "title": "ai-workflows/test-social-content.spec.js",
+      "file": "ai-workflows/test-social-content.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "AI Social Media Content Creation Workflow",
+          "file": "ai-workflows/test-social-content.spec.js",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should generate Twitter content with proper optimization",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15274,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20",
+                        "location": {
+                          "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
+                          "column": 20,
+                          "line": 69
+                        },
+                        "snippet": "  67 |       try {\n  68 |         // Wait for form to be ready\n> 69 |         await page.waitForSelector('input[name=\"generated_content[title]\"]', { timeout: 10000 });\n     |                    ^\n  70 |         await page.fill('input[name=\"generated_content[title]\"]', contentData.title);\n  71 |         console.log(`✅ Form title filled successfully`);\n  72 |       } catch (error) {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
+                            "column": 20,
+                            "line": 69
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n\n  67 |       try {\n  68 |         // Wait for form to be ready\n> 69 |         await page.waitForSelector('input[name=\"generated_content[title]\"]', { timeout: 10000 });\n     |                    ^\n  70 |         await page.fill('input[name=\"generated_content[title]\"]', contentData.title);\n  71 |         console.log(`✅ Form title filled successfully`);\n  72 |       } catch (error) {\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Test user created: test-1756659581524-dueda@example.com\n"
+                        },
+                        {
+                          "text": "Testing Twitter content generation...\n"
+                        },
+                        {
+                          "text": "🔄 Navigating to content creation form...\n"
+                        },
+                        {
+                          "text": "✅ Successfully navigated to: http://localhost:3000/generated_contents/new\n"
+                        },
+                        {
+                          "text": "🔄 Filling form with title: Twitter Test Post\n"
+                        },
+                        {
+                          "text": "❌ Form filling failed: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n"
+                        },
+                        {
+                          "text": "Page title: Action Controller: Exception caught\n"
+                        },
+                        {
+                          "text": "No logout button found, may already be logged out\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-31T16:59:40.593Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
+                        "column": 20,
+                        "line": 69
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 14469,
+                      "error": {
+                        "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20",
+                        "location": {
+                          "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
+                          "column": 20,
+                          "line": 69
+                        },
+                        "snippet": "  67 |       try {\n  68 |         // Wait for form to be ready\n> 69 |         await page.waitForSelector('input[name=\"generated_content[title]\"]', { timeout: 10000 });\n     |                    ^\n  70 |         await page.fill('input[name=\"generated_content[title]\"]', contentData.title);\n  71 |         console.log(`✅ Form title filled successfully`);\n  72 |       } catch (error) {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
+                            "column": 20,
+                            "line": 69
+                          },
+                          "message": "TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n\n  67 |       try {\n  68 |         // Wait for form to be ready\n> 69 |         await page.waitForSelector('input[name=\"generated_content[title]\"]', { timeout: 10000 });\n     |                    ^\n  70 |         await page.fill('input[name=\"generated_content[title]\"]', contentData.title);\n  71 |         console.log(`✅ Form title filled successfully`);\n  72 |       } catch (error) {\n    at /Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js:69:20"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Test user created: test-1756659597146-zjtfwrs@example.com\n"
+                        },
+                        {
+                          "text": "Testing Twitter content generation...\n"
+                        },
+                        {
+                          "text": "🔄 Navigating to content creation form...\n"
+                        },
+                        {
+                          "text": "✅ Successfully navigated to: http://localhost:3000/generated_contents/new\n"
+                        },
+                        {
+                          "text": "🔄 Filling form with title: Twitter Test Post\n"
+                        },
+                        {
+                          "text": "❌ Form filling failed: page.waitForSelector: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[name=\"generated_content[title]\"]') to be visible\u001b[22m\n\n"
+                        },
+                        {
+                          "text": "Page title: Action Controller: Exception caught\n"
+                        },
+                        {
+                          "text": "No logout button found, may already be logged out\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-08-31T16:59:56.798Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/jeremywatt/Desktop/marketer-gen/test-results/test-social-content-AI-Soc-d0a10-nt-with-proper-optimization-ai-workflows-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/jeremywatt/Desktop/marketer-gen/tests/ai-workflows/test-social-content.spec.js",
+                        "column": 20,
+                        "line": 69
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-aedb5192ae4372e02b3f",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 46,
+              "column": 5
+            },
+            {
+              "title": "should generate LinkedIn content with proper optimization",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-78762d7590cc2ca19386",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 46,
+              "column": 5
+            },
+            {
+              "title": "should generate Facebook content with proper optimization",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-79f5affafdbae3cdc856",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 46,
+              "column": 5
+            },
+            {
+              "title": "should generate Instagram content with proper optimization",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "ai-workflows",
+                  "projectName": "ai-workflows",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "696a19e84c126bfcd4bb-0dc246d387da811ee4b7",
+              "file": "ai-workflows/test-social-content.spec.js",
+              "line": 46,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "message": "\u001b[31mTesting stopped early after 1 maximum allowed failures.\u001b[39m"
+    }
+  ],
+  "stats": {
+    "startTime": "2025-08-31T16:59:40.064Z",
+    "duration": 31521.768,
+    "expected": 0,
+    "skipped": 3,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

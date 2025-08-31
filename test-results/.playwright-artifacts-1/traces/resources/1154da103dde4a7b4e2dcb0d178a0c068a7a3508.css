@@ -1,0 +1,181 @@
+/* Campaign Plan Visualization Styles */
+
+/* Content Map Interactive Elements */
+.content-map-platform {
+  transition: all 0.3s ease;
+}
+
+.content-map-platform:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.content-map-toggle {
+  transition: all 0.2s ease;
+}
+
+.content-details {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Timeline Visualization Styles */
+.timeline-container {
+  position: relative;
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.timeline-item {
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.timeline-item.active {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+.timeline-item:hover {
+  opacity: 1;
+}
+
+.timeline-node {
+  z-index: 10;
+}
+
+.timeline-card {
+  transition: all 0.3s ease;
+}
+
+.timeline-card:hover {
+  transform: translateX(4px);
+}
+
+.timeline-progress {
+  z-index: 5;
+}
+
+/* Creative Approach Grid */
+.creative-element {
+  transition: all 0.2s ease;
+}
+
+.creative-element:hover {
+  transform: translateY(-1px);
+}
+
+/* Strategic Rationale Expandable Sections */
+.strategic-section {
+  transition: all 0.3s ease;
+}
+
+.strategic-section:hover {
+  background-color: rgba(249, 250, 251, 0.8);
+}
+
+/* Responsive Design Enhancements */
+@media (max-width: 768px) {
+  .timeline-container {
+    max-height: 600px;
+  }
+  
+  .timeline-item {
+    margin-bottom: 1rem;
+  }
+  
+  .timeline-card {
+    padding: 0.75rem;
+  }
+  
+  .content-map-platform {
+    margin-bottom: 1rem;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .timeline-node div {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+  }
+  
+  .timeline-content {
+    padding-left: 0.5rem;
+  }
+  
+  .flex-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Accessibility Improvements */
+.timeline-item:focus-within,
+.content-map-platform:focus-within {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+button:focus {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Animation for timeline progress */
+@keyframes fillProgress {
+  from {
+    height: 0%;
+  }
+  to {
+    height: var(--progress-height);
+  }
+}
+
+.timeline-progress.animated {
+  animation: fillProgress 0.5s ease-out;
+}
+
+/* Loading states */
+.loading-placeholder {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Print styles */
+@media print {
+  .timeline-container {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  .content-details {
+    display: block !important;
+  }
+  
+  button {
+    display: none;
+  }
+  
+  .bg-gray-50,
+  .bg-blue-50,
+  .bg-green-50,
+  .bg-yellow-50,
+  .bg-purple-50 {
+    background-color: #f9fafb !important;
+  }
+}
