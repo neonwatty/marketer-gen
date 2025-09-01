@@ -618,27 +618,6 @@ class CampaignPlan < ApplicationRecord
     service.sync_with_external_platforms
   end
   
-  def mark_generation_completed!
-    update!(
-      status: 'completed',
-      metadata: (metadata || {}).merge(
-        generation_completed_at: Time.current,
-        generation_duration: metadata&.dig('generation_started_at') ? 
-          Time.current - Time.parse(metadata['generation_started_at'].to_s) : nil
-      )
-    )
-  end
-  
-  def mark_generation_failed!(error_message = nil)
-    update!(
-      status: 'failed',
-      metadata: (metadata || {}).merge(
-        generation_failed_at: Time.current,
-        error_message: error_message
-      )
-    )
-  end
-  
   # Collaboration and approval methods
   def approval_draft?
     approval_status == 'draft'
