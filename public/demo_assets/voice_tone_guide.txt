@@ -1,0 +1,109 @@
+TECHFLOW SOLUTIONS - VOICE & TONE GUIDE
+
+BRAND VOICE ATTRIBUTES
+========================
+
+1. PROFESSIONAL
+We are experts in our field and communicate with authority.
+DO: "Our platform processes 10 million transactions daily with 99.99% uptime."
+DON'T: "We handle lots of stuff really well!"
+
+2. APPROACHABLE
+We're friendly and accessible, never intimidating.
+DO: "Let's explore how we can help streamline your workflow."
+DON'T: "You must implement our solution immediately."
+
+3. CLEAR
+We explain complex concepts in simple terms.
+DO: "Automation means your team spends less time on repetitive tasks."
+DON'T: "Leverage synergistic paradigms for optimal throughput."
+
+4. CONFIDENT
+We believe in our product and speak with conviction.
+DO: "TechFlow will transform how your team works."
+DON'T: "TechFlow might possibly help improve things."
+
+5. HELPFUL
+We focus on solving problems and providing value.
+DO: "Here's how to get started in 3 simple steps..."
+DON'T: "Figure it out yourself."
+
+TONE VARIATIONS BY CONTEXT
+===========================
+
+MARKETING CONTENT
+- Enthusiastic and inspiring
+- Focus on possibilities and transformation
+- Use aspirational language
+Example: "Imagine a workplace where repetitive tasks handle themselves."
+
+SUPPORT DOCUMENTATION
+- Patient and thorough
+- Step-by-step clarity
+- Anticipate user questions
+Example: "If you see this error, here's exactly what to do..."
+
+SALES COMMUNICATIONS
+- Consultative and solution-focused
+- Emphasize ROI and business value
+- Use social proof and data
+Example: "Companies like yours see 40% productivity gains within 60 days."
+
+INTERNAL COMMUNICATIONS
+- Direct and efficient
+- Collaborative tone
+- Action-oriented
+Example: "Team, here's what we need to accomplish this sprint..."
+
+ERROR MESSAGES
+- Apologetic but solution-focused
+- Clear about what went wrong
+- Provide next steps
+Example: "We couldn't process that request. Please check your connection and try again."
+
+SOCIAL MEDIA
+- Conversational and engaging
+- Industry thought leadership
+- Community-focused
+Example: "What's your biggest workflow challenge? Let's discuss!"
+
+WRITING STYLE GUIDELINES
+=========================
+
+SENTENCE STRUCTURE
+- Vary sentence length for readability
+- Lead with the most important information
+- Use active voice predominantly
+- Keep paragraphs to 3-4 sentences max
+
+WORD CHOICE
+- Use "you" and "your" to address readers
+- Choose simple words over complex ones
+- Be specific rather than vague
+- Avoid buzzwords and jargon
+
+FORMATTING
+- Use bullet points for lists
+- Bold key information
+- Include relevant headers
+- Add white space for readability
+
+INCLUSIVE LANGUAGE
+- Gender-neutral pronouns (they/them for singular)
+- Avoid idioms that don't translate
+- Consider global audience
+- Accessibility-first approach
+
+COMMON PHRASES TO USE
+- "Let's explore..."
+- "Here's how..."
+- "You'll be able to..."
+- "Together, we can..."
+- "Your success is our priority"
+
+PHRASES TO AVOID
+- "Obviously..."
+- "As everyone knows..."
+- "It's simple/easy..." (can be patronizing)
+- "Just..." (minimizes effort)
+- "Failed/Failure" (use "unable to" instead)

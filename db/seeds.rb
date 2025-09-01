@@ -7,7 +7,15 @@ puts "Creating Users..."
 
 password_digest = BCrypt::Password.create("password")
 
+# Add demo user at the beginning
 users_data = [
+  {
+    email_address: "demo@example.com",
+    password_digest: password_digest,
+    role: "marketer",
+    first_name: "Demo",
+    last_name: "User"
+  },
   {
     email_address: "user1@example.com",
     password_digest: password_digest,
@@ -744,3 +752,433 @@ JourneyTemplate.find_or_create_by!(
 end
 
 puts "✓ Journey Templates created successfully!"
+
+# =============================================================================
+# DEMO USER COMPLETE SETUP
+# =============================================================================
+
+puts "\n" + "="*60
+puts "Setting up DEMO USER with complete example data..."
+puts "="*60 + "\n"
+
+# Get or create demo user
+demo_user = User.find_by(email_address: "demo@example.com")
+
+if demo_user
+  puts "Found demo user: #{demo_user.email_address}"
+  
+  # =============================================================================
+  # BRAND IDENTITY SETUP
+  # =============================================================================
+  
+  puts "\n📁 Creating Brand Identity for demo user..."
+  
+  # Create main brand identity
+  brand_identity = BrandIdentity.find_or_create_by!(
+    user: demo_user,
+    name: "TechFlow Solutions"
+  ) do |brand|
+    brand.description = "Leading B2B SaaS platform for workflow automation and digital transformation. We help enterprises streamline operations and boost productivity."
+    brand.brand_voice = "Professional, innovative, and approachable. We speak with authority about technology while remaining accessible to all skill levels."
+    brand.tone_guidelines = "Confident but not arrogant. Educational without being condescending. Focus on solutions and outcomes. Use data to support claims."
+    brand.messaging_framework = "Core Message: Automate Today, Innovate Tomorrow. Value Props: 70% reduction in manual tasks, Enterprise-grade security, Seamless integrations, Expert support 24/7. Primary Colors: #0066CC (TechFlow Blue), #FF6B35 (Innovation Orange)"
+    brand.restrictions = "Do not use competitor names negatively. Avoid technical jargon in marketing materials. No unsubstantiated claims. Maintain professional tone in all communications."
+    brand.is_active = true
+    brand.status = 'active'
+    brand.processed_guidelines = {
+      'voice' => {
+        'professional' => 'Expert authority in field',
+        'approachable' => 'Friendly and accessible',
+        'clear' => 'Simple explanations for complex concepts'
+      },
+      'tone' => {
+        'marketing' => 'Enthusiastic and inspiring',
+        'support' => 'Patient and thorough',
+        'sales' => 'Consultative and solution-focused'
+      },
+      'restrictions' => [
+        'No competitor disparagement',
+        'Avoid excessive jargon',
+        'Substantiate all claims',
+        'Professional tone required'
+      ],
+      'messaging' => {
+        'tagline' => 'Automate Today, Innovate Tomorrow',
+        'value_propositions' => [
+          '70% reduction in manual work',
+          'Enterprise-grade security',
+          'Seamless integrations',
+          '24/7 expert support'
+        ]
+      },
+      'files_processed' => {
+        'count' => 3
+      }
+    }
+  end
+  
+  # Attach brand materials if files exist
+  if File.exist?(Rails.root.join('public', 'demo_assets', 'brand_guidelines.txt'))
+    ['brand_guidelines.txt', 'voice_tone_guide.txt', 'style_guide.txt'].each do |filename|
+      file_path = Rails.root.join('public', 'demo_assets', filename)
+      if File.exist?(file_path) && !brand_identity.brand_materials.any? { |m| m.filename.to_s == filename }
+        brand_identity.brand_materials.attach(
+          io: File.open(file_path),
+          filename: filename,
+          content_type: 'text/plain'
+        )
+        puts "  ✓ Attached #{filename}"
+      end
+    end
+  end
+  
+  puts "  ✓ Brand Identity created: #{brand_identity.name}"
+  
+  # =============================================================================
+  # JOURNEYS SETUP
+  # =============================================================================
+  
+  puts "\n🚀 Creating Journeys for demo user..."
+  
+  # Journey 1: Active Product Launch
+  journey1 = Journey.find_or_create_by!(
+    user: demo_user,
+    name: "Q1 2025 Product Launch"
+  ) do |j|
+    j.description = "Launch campaign for our new AI-powered analytics feature"
+    j.campaign_type = 'awareness'
+    j.status = 'active'
+    j.template_type = 'custom'
+    j.stages = ['pre-launch', 'launch week', 'post-launch', 'retention']
+    j.metadata = {
+      'start_date' => '2025-01-15',
+      'end_date' => '2025-04-15',
+      'budget' => 50000,
+      'target_reach' => 100000
+    }
+  end
+  
+  # Add journey steps
+  [
+    { title: 'Teaser Campaign', description: 'Social media teasers', sequence_order: 1, status: 'completed', stage: 'pre-launch', step_type: 'social_post', channel: 'social_media' },
+    { title: 'Email Announcement', description: 'Launch announcement to subscribers', sequence_order: 2, status: 'completed', stage: 'launch week', step_type: 'email', channel: 'email' },
+    { title: 'Product Demo Webinar', description: 'Live demonstration', sequence_order: 3, status: 'active', stage: 'launch week', step_type: 'webinar', channel: 'webinar' },
+    { title: 'Customer Onboarding', description: 'New user onboarding sequence', sequence_order: 4, status: 'draft', stage: 'post-launch', step_type: 'email', channel: 'email' }
+  ].each do |step_data|
+    JourneyStep.find_or_create_by!(
+      journey: journey1,
+      title: step_data[:title]
+    ) do |step|
+      step.description = step_data[:description]
+      step.sequence_order = step_data[:sequence_order]
+      step.status = step_data[:status]
+      step.step_type = step_data[:step_type]
+      step.channel = step_data[:channel]
+      step.settings = { 'stage' => step_data[:stage] }
+    end
+  end
+  
+  puts "  ✓ Created journey: #{journey1.name} (#{journey1.journey_steps.count} steps)"
+  
+  # Journey 2: Completed Lead Generation
+  journey2 = Journey.find_or_create_by!(
+    user: demo_user,
+    name: "Winter Lead Generation Campaign"
+  ) do |j|
+    j.description = "Q4 2024 lead generation campaign - Successfully generated 500+ qualified leads"
+    j.campaign_type = 'consideration'
+    j.status = 'completed'
+    j.template_type = 'email'
+    j.stages = ['awareness', 'nurture', 'qualification', 'handoff']
+    j.metadata = {
+      'completion_date' => '2024-12-31',
+      'leads_generated' => 523,
+      'conversion_rate' => '12.5%'
+    }
+  end
+  
+  puts "  ✓ Created journey: #{journey2.name}"
+  
+  # Journey 3: Draft Re-engagement
+  journey3 = Journey.find_or_create_by!(
+    user: demo_user,
+    name: "Customer Win-Back Initiative"
+  ) do |j|
+    j.description = "Re-engage dormant customers from 2024"
+    j.campaign_type = 'retention'
+    j.status = 'draft'
+    j.template_type = 'email'
+    j.stages = ['analysis', 'outreach', 'incentive', 'follow-up']
+  end
+  
+  puts "  ✓ Created journey: #{journey3.name}"
+  
+  # =============================================================================
+  # CAMPAIGN PLANS SETUP
+  # =============================================================================
+  
+  puts "\n📋 Creating Campaign Plans for demo user..."
+  
+  # Campaign Plan 1: Completed Product Launch
+  campaign1 = CampaignPlan.find_or_create_by!(
+    user: demo_user,
+    name: "Q1 2025 AI Analytics Launch"
+  ) do |plan|
+    plan.description = "Comprehensive launch campaign for our new AI-powered analytics feature targeting enterprise customers"
+    plan.campaign_type = 'product_launch'
+    plan.objective = 'customer_acquisition'
+    plan.status = 'completed'
+    plan.approval_status = 'approved'
+    plan.target_audience = 'Enterprise IT decision makers, Data analysts, CTOs at companies with 500+ employees'
+    plan.budget_constraints = '50000'
+    plan.timeline_constraints = '3 months (Jan-Mar 2025)'
+    plan.brand_context = brand_identity.id.to_s
+    plan.generated_summary = "Launch our revolutionary AI analytics feature to enterprise market through multi-channel campaign focusing on ROI and competitive advantages."
+    plan.generated_strategy = {
+      'positioning' => 'Market leader in AI-powered business intelligence',
+      'key_messages' => ['70% faster insights', 'No-code AI models', 'Enterprise security'],
+      'channels' => ['Email', 'LinkedIn', 'Webinars', 'Content marketing'],
+      'tactics' => [
+        'Pre-launch teasers',
+        'Launch week blitz',
+        'Customer success stories',
+        'Competitive comparisons'
+      ]
+    }
+    plan.generated_timeline = {
+      'phases' => [
+        { 'name' => 'Pre-launch', 'duration' => '4 weeks', 'activities' => ['Teasers', 'Email warmup'] },
+        { 'name' => 'Launch', 'duration' => '1 week', 'activities' => ['Announcement', 'Webinar', 'PR'] },
+        { 'name' => 'Amplification', 'duration' => '6 weeks', 'activities' => ['Content series', 'Case studies'] },
+        { 'name' => 'Conversion', 'duration' => '2 weeks', 'activities' => ['Offers', 'Follow-up'] }
+      ]
+    }
+    plan.generated_assets = [
+      'Launch announcement email',
+      'Product demo video',
+      'Comparison guide',
+      'ROI calculator',
+      'Case study template'
+    ]
+    plan.approved_by = demo_user
+    plan.approved_at = 1.week.ago
+  end
+  
+  puts "  ✓ Created campaign plan: #{campaign1.name}"
+  
+  # Campaign Plan 2: In Progress Lead Gen
+  campaign2 = CampaignPlan.find_or_create_by!(
+    user: demo_user,
+    name: "Spring 2025 Lead Generation"
+  ) do |plan|
+    plan.description = "Generate 1000 qualified B2B leads through content marketing and webinars"
+    plan.campaign_type = 'lead_generation'
+    plan.objective = 'lead_generation'
+    plan.status = 'completed'
+    plan.approval_status = 'approved'
+    plan.target_audience = 'Mid-market B2B companies in technology and finance sectors'
+    plan.budget_constraints = '30000'
+    plan.timeline_constraints = '2 months'
+    plan.generated_summary = "Multi-touch lead generation campaign leveraging educational content and thought leadership."
+    plan.generated_strategy = {
+      'approach' => 'Educational content funnel',
+      'lead_magnets' => ['Industry report', 'ROI calculator', 'Best practices guide'],
+      'nurture_sequence' => '10-email automation',
+      'qualification_criteria' => ['Company size', 'Budget', 'Timeline', 'Authority']
+    }
+  end
+  
+  puts "  ✓ Created campaign plan: #{campaign2.name}"
+  
+  # Campaign Plan 3: Draft Brand Awareness
+  campaign3 = CampaignPlan.find_or_create_by!(
+    user: demo_user,
+    name: "2025 Brand Awareness Initiative"
+  ) do |plan|
+    plan.description = "Increase brand recognition and thought leadership position in the market"
+    plan.campaign_type = 'brand_awareness'
+    plan.objective = 'brand_awareness'
+    plan.status = 'draft'
+    plan.approval_status = 'draft'
+    plan.target_audience = 'Tech industry professionals and business leaders'
+    plan.budget_constraints = '75000'
+    plan.timeline_constraints = '6 months'
+  end
+  
+  puts "  ✓ Created campaign plan: #{campaign3.name}"
+  
+  # =============================================================================
+  # GENERATED CONTENT SETUP
+  # =============================================================================
+  
+  puts "\n✍️  Creating Generated Content examples..."
+  
+  # Email Content 1: Welcome Series
+  content1 = GeneratedContent.find_or_create_by!(
+    campaign_plan: campaign1,
+    created_by: demo_user,
+    title: "Welcome to TechFlow - Your Journey Starts Here"
+  ) do |content|
+    content.content_type = 'email'
+    content.format_variant = 'standard'
+    content.status = 'published'
+    content.version_number = 1
+    content.body_content = "Subject: Welcome to TechFlow! 🚀 Your automation journey begins now\n\nDear [First Name],\n\nThank you for joining TechFlow Solutions! You've just taken the first step toward transforming how your team works.\n\nOver the next few days, we'll show you how to:\n✅ Set up your first automation in under 5 minutes\n✅ Connect your existing tools seamlessly\n✅ Save hours of manual work every week\n\nYour Success Checklist:\n1. Complete your profile setup (2 min)\n2. Connect your first integration (3 min)\n3. Create your first automation (5 min)\n\nNeed help getting started? Our team is here for you 24/7.\n\nBest regards,\nThe TechFlow Team\n\nP.S. Reply to this email with any questions - we read and respond to every message!"
+    content.metadata = {
+      'campaign' => 'onboarding',
+      'performance' => { 'open_rate' => '68%', 'click_rate' => '24%' }
+    }
+  end
+  
+  puts "  ✓ Created content: #{content1.title}"
+  
+  # Social Media Content
+  content2 = GeneratedContent.find_or_create_by!(
+    campaign_plan: campaign1,
+    created_by: demo_user,
+    title: "LinkedIn Launch Announcement"
+  ) do |content|
+    content.content_type = 'social_post'
+    content.format_variant = 'medium'
+    content.status = 'approved'
+    content.version_number = 2
+    content.body_content = "🎉 Big News! Introducing TechFlow AI Analytics\n\nWe're thrilled to announce our most requested feature is now live!\n\n🤖 What's New:\n• AI-powered insights in seconds, not hours\n• No-code predictive models anyone can build\n• Real-time anomaly detection\n• Natural language queries - just ask your data\n\n💡 Early customers are seeing:\n• 70% reduction in analysis time\n• 3x more insights discovered\n• 50% improvement in forecast accuracy\n\nSee it in action → [link]\n\n#AI #Analytics #DataScience #Innovation #B2B #SaaS"
+    content.approved_by_id = demo_user.id
+    content.metadata = {
+      'platform' => 'linkedin',
+      'engagement' => { 'likes' => 245, 'shares' => 67, 'comments' => 23 }
+    }
+  end
+  
+  puts "  ✓ Created content: #{content2.title}"
+  
+  # Blog Article
+  content3 = GeneratedContent.find_or_create_by!(
+    campaign_plan: campaign2,
+    created_by: demo_user,
+    title: "The Complete Guide to Workflow Automation in 2025"
+  ) do |content|
+    content.content_type = 'blog_article'
+    content.format_variant = 'long'
+    content.status = 'published'
+    content.version_number = 1
+    content.body_content = "# The Complete Guide to Workflow Automation in 2025\n\n## Introduction\n\nIn today's fast-paced business environment, workflow automation isn't just a luxury—it's a necessity. Companies that embrace automation are seeing unprecedented gains in productivity, accuracy, and employee satisfaction.\n\n## What is Workflow Automation?\n\nWorkflow automation uses technology to complete repetitive tasks without human intervention. By connecting your tools and creating intelligent workflows, you can focus on strategic work while routine tasks handle themselves.\n\n## Key Benefits\n\n### 1. Time Savings\nThe average knowledge worker spends 60% of their time on repetitive tasks. Automation can reclaim up to 70% of this time, freeing your team for creative and strategic work.\n\n### 2. Error Reduction\nManual data entry has an error rate of 1-5%. Automated workflows reduce this to nearly zero, ensuring data accuracy across all systems.\n\n### 3. Scalability\nAutomated workflows scale effortlessly. Whether processing 10 or 10,000 transactions, the effort remains the same.\n\n## Getting Started with Automation\n\n### Step 1: Identify Repetitive Tasks\nStart by documenting tasks that:\n- Occur regularly\n- Follow consistent rules\n- Involve data transfer between systems\n- Take significant time but require little decision-making\n\n### Step 2: Map Your Current Process\nDocument each step in your current workflow. This helps identify:\n- Bottlenecks\n- Unnecessary steps\n- Optimization opportunities\n\n### Step 3: Choose the Right Tools\nLook for automation platforms that offer:\n- No-code/low-code interfaces\n- Pre-built integrations\n- Scalability\n- Security compliance\n\n## Real-World Success Stories\n\n### Case Study 1: TechCorp\nTechCorp automated their invoice processing, reducing processing time from 3 days to 30 minutes and eliminating late payment fees.\n\n### Case Study 2: Marketing Pro\nMarketing Pro automated their lead nurturing, increasing qualified leads by 150% while reducing manual effort by 80%.\n\n## Common Automation Mistakes to Avoid\n\n1. **Automating broken processes** - Fix the process first, then automate\n2. **Over-complicating workflows** - Start simple and iterate\n3. **Neglecting testing** - Always test thoroughly before full deployment\n4. **Forgetting the human element** - Keep humans in the loop for exceptions\n\n## The Future of Automation\n\nAs we move through 2025, expect to see:\n- AI-enhanced automation that learns and adapts\n- Voice-activated workflow triggers\n- Predictive automation that anticipates needs\n- Deeper integration with emerging technologies\n\n## Conclusion\n\nWorkflow automation is no longer optional—it's essential for staying competitive. Start small, measure results, and scale gradually. The journey to full automation begins with a single workflow.\n\n**Ready to start automating?** Contact our team for a personalized automation assessment."
+    content.metadata = {
+      'seo_keywords' => ['workflow automation', 'business automation', 'productivity'],
+      'read_time' => '8 minutes',
+      'performance' => { 'views' => 3420, 'avg_time_on_page' => '6:45' }
+    }
+  end
+  
+  puts "  ✓ Created content: #{content3.title}"
+  
+  # Ad Copy
+  content4 = GeneratedContent.find_or_create_by!(
+    campaign_plan: campaign1,
+    created_by: demo_user,
+    title: "Google Ads - AI Analytics Launch"
+  ) do |content|
+    content.content_type = 'ad_copy'
+    content.format_variant = 'short'
+    content.status = 'approved'
+    content.version_number = 3
+    content.body_content = "Headline 1: AI Analytics in Seconds\nHeadline 2: No Code Required\nHeadline 3: Enterprise Ready\n\nDescription 1: Transform your data into insights with TechFlow AI. Get predictions, detect anomalies, and make better decisions—all without writing code.\n\nDescription 2: Join 500+ companies already using TechFlow to automate analytics. Start free trial today. Setup in 5 minutes."
+    content.approved_by_id = demo_user.id
+    content.metadata = {
+      'platform' => 'google_ads',
+      'performance' => { 'ctr' => '3.2%', 'conversions' => 47 }
+    }
+  end
+  
+  puts "  ✓ Created content: #{content4.title}"
+  
+  # Landing Page Copy
+  content5 = GeneratedContent.find_or_create_by!(
+    campaign_plan: campaign2,
+    created_by: demo_user,
+    title: "Lead Magnet Landing Page - ROI Calculator"
+  ) do |content|
+    content.content_type = 'landing_page'
+    content.format_variant = 'standard'
+    content.status = 'published'
+    content.version_number = 1
+    content.body_content = "# Calculate Your Automation ROI in 60 Seconds\n\n## See How Much Time and Money You Could Save\n\nEvery minute your team spends on repetitive tasks is a minute not spent on growth. Our ROI calculator shows you exactly what automation could mean for your bottom line.\n\n### What You'll Discover:\n✓ Hours saved per week through automation\n✓ Annual cost savings potential\n✓ ROI timeline for your investment\n✓ Custom recommendations for your industry\n\n### Trusted by 500+ Companies\n\n\"We saved 30 hours per week and saw ROI in just 2 months.\" - Sarah J., Operations Director\n\n### Get Your Free ROI Report\n\n[Form]\nFirst Name*\nLast Name*\nWork Email*\nCompany Name*\nTeam Size*\nIndustry*\n\n[CTA Button: Calculate My ROI →]\n\n### What Happens Next?\n1. Instant ROI calculation based on your inputs\n2. Personalized automation roadmap\n3. Free consultation with our automation experts\n4. No credit card required\n\n### Privacy Promise\nYour information is secure and will never be shared. Unsubscribe anytime."
+    content.metadata = {
+      'conversion_rate' => '24%',
+      'form_completions' => 892
+    }
+  end
+  
+  puts "  ✓ Created content: #{content5.title}"
+  
+  # More content pieces
+  content6 = GeneratedContent.find_or_create_by!(
+    campaign_plan: campaign2,
+    created_by: demo_user,
+    title: "Webinar Follow-up Email"
+  ) do |content|
+    content.content_type = 'email'
+    content.format_variant = 'medium'
+    content.status = 'in_review'
+    content.version_number = 2
+    content.body_content = "Subject: Your webinar recording + exclusive bonus inside\n\nHi [First Name],\n\nThank you for attending our webinar 'Automating Your Way to 10x Growth'!\n\nAs promised, here are your resources:\n\n📹 Webinar Recording: [Link]\n📊 Slide Deck: [Link]\n📝 Automation Checklist: [Link]\n\n**Exclusive Attendee Bonus:**\nGet 30% off TechFlow Pro for the next 48 hours with code WEBINAR30\n\n[Claim Your Discount]\n\nKey Takeaways from Today:\n• The 5-step automation framework\n• How CompanyX saved $2M with workflow automation\n• Quick wins you can implement this week\n\nQuestions? Reply to this email or book a 1-on-1 demo: [Calendar Link]\n\nBest,\nThe TechFlow Team"
+  end
+  
+  puts "  ✓ Created content: #{content6.title}"
+  
+  # =============================================================================
+  # PERSONAS SETUP
+  # =============================================================================
+  
+  puts "\n👥 Creating Personas for demo user..."
+  
+  persona1 = Persona.find_or_create_by!(
+    user: demo_user,
+    name: "Enterprise IT Decision Maker"
+  ) do |p|
+    p.description = "Senior IT executives at large enterprises responsible for digital transformation initiatives"
+    p.demographics = { 'age_range' => '35-55', 'job_titles' => ['CTO', 'VP of IT', 'IT Director'], 'company_size' => '1000+' }
+    p.characteristics = { 'motivations' => ['Innovation', 'Efficiency', 'ROI'], 'challenges' => ['Legacy systems', 'Change management'] }
+    p.behavioral_traits = { 'decision_style' => 'Analytical', 'buying_process' => 'Committee-based', 'research_heavy' => true }
+    p.goals = ['Modernize tech stack', 'Reduce operational costs', 'Improve team productivity']
+    p.pain_points = ['Integration complexity', 'Security concerns', 'Budget constraints']
+    p.preferred_channels = ['Email', 'LinkedIn', 'Webinars', 'Whitepapers']
+    p.content_preferences = { 'format' => 'detailed', 'tone' => 'professional', 'evidence' => 'data-driven' }
+    p.is_active = true
+  end
+  
+  puts "  ✓ Created persona: #{persona1.name}"
+  
+  persona2 = Persona.find_or_create_by!(
+    user: demo_user,
+    name: "Mid-Market Operations Manager"
+  ) do |p|
+    p.description = "Operations professionals at growing companies looking to scale efficiently"
+    p.demographics = { 'age_range' => '28-45', 'job_titles' => ['Operations Manager', 'Process Manager'], 'company_size' => '100-1000' }
+    p.characteristics = { 'motivations' => ['Efficiency', 'Growth', 'Team success'], 'challenges' => ['Limited resources', 'Scaling issues'] }
+    p.behavioral_traits = { 'decision_style' => 'Practical', 'buying_process' => 'Team-input', 'values' => ['ROI', 'Ease of use'] }
+    p.goals = ['Streamline operations', 'Reduce manual work', 'Improve accuracy']
+    p.pain_points = ['Too many manual processes', 'Data silos', 'Lack of visibility']
+    p.preferred_channels = ['Email', 'Blog', 'Case studies', 'Product demos']
+    p.content_preferences = { 'format' => 'practical', 'tone' => 'straightforward', 'evidence' => 'case-studies' }
+    p.is_active = true
+  end
+  
+  puts "  ✓ Created persona: #{persona2.name}"
+  
+  puts "\n" + "="*60
+  puts "✅ DEMO USER SETUP COMPLETE!"
+  puts "="*60
+  puts "\nDemo user credentials:"
+  puts "  Email: demo@example.com"
+  puts "  Password: password"
+  puts "\nCreated:"
+  puts "  • 1 Brand Identity (TechFlow Solutions)"
+  puts "  • 3 Journeys (various stages)"
+  puts "  • 3 Campaign Plans"
+  puts "  • 6 Generated Content pieces"
+  puts "  • 2 Personas"
+  puts "\nYou can now log in and explore all features with realistic data!"
+else
+  puts "⚠️  Demo user not found. Please ensure demo@example.com exists."
+end
