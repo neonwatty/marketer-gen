@@ -5,7 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
-import { prisma } from "./database";
+import { prisma } from "./db";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
               // Development-only demo users - use real database users
               if (credentials?.email === "john@acmecorp.com" || credentials?.email === "demo@example.com") {
                 return {
-                  id: "cmex5tk0g0000nut8k2n73lrb", // John Smith's real ID
+                  id: "cmf1u4bys0000nu7ocf0fb7vu", // John Smith's real ID from current database
                   email: "john@acmecorp.com",
                   name: "John Smith",
                   image: null,
@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
               }
               if (credentials?.email === "sarah@techstartup.com") {
                 return {
-                  id: "cmex5tk0j0001nut8t8kvga70", // Sarah Johnson's real ID
+                  id: "cmf1u4byz0001nu7ok0ztx2t1", // Sarah Johnson's real ID from current database
                   email: "sarah@techstartup.com",
                   name: "Sarah Johnson",
                   image: null,

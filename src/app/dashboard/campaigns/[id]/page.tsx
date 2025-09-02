@@ -1,9 +1,11 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getServerSession } from 'next-auth/next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { prisma } from '@/lib/database'
+import { prisma } from '@/lib/db'
+import { authOptions } from '@/lib/auth'
 
 interface CampaignPageProps {
   params: Promise<{
@@ -13,9 +15,16 @@ interface CampaignPageProps {
 
 async function getCampaign(id: string) {
   try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.id) {
+      return null
+    }
+    
     const campaign = await prisma.campaign.findFirst({
       where: {
         id,
+        userId: session.user.id,
         deletedAt: null
       },
       select: {
@@ -252,11 +261,23 @@ export default async function CampaignPage({ params }: CampaignPageProps) {
             </div>
             {campaign.journeys && campaign.journeys.length > 0 && (
               <div>
-                <p className="text-sm font-medium">Recent Journeys</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Recent Journeys</p>
+                  {campaign.journeys.length > 3 && (
+                    <button className="text-xs text-blue-600 hover:text-blue-800 hover:underline">
+                      View All ({campaign.journeys.length})
+                    </button>
+                  )}
+                </div>
                 <div className="space-y-2">
                   {campaign.journeys.slice(0, 3).map((journey: any) => (
                     <div key={journey.id} className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Journey {journey.id.slice(-6)}</span>
+                      <a 
+                        href={`/dashboard/journeys/${journey.id}`}
+                        className="text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        Journey {journey.id.slice(-6)}
+                      </a>
                       <Badge variant="outline" className="text-xs">
                         {journey.status}
                       </Badge>
