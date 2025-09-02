@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, type ReactNode, useContext, useState } from 'react'
-import {useSession } from 'next-auth/react'
+import {useSession, signOut as nextAuthSignOut } from 'next-auth/react'
 
 import { type User } from '@/lib/types'
 
@@ -91,18 +91,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signOut = async () => {
     try {
       setError(null)
-      // Placeholder implementation
       console.log('Sign out attempted')
       
-      // In the future, this will use NextAuth signOut
-      // await nextAuthSignOut({ redirect: false })
+      // Clear session via our API endpoint first
+      await fetch('/api/clear-session', {
+        method: 'GET',
+        credentials: 'include'
+      })
       
-      // For now, just log the attempt
-      setError('Authentication is not currently active. This is a placeholder implementation.')
+      // Then use NextAuth signOut with redirect
+      await nextAuthSignOut({ 
+        callbackUrl: '/auth/signin'
+      })
+      
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Sign out failed'
-      setError(message)
-      throw new Error(message)
+      console.error('Sign out error:', err)
+      // If NextAuth fails, force redirect
+      window.location.href = '/auth/signin'
     }
   }
 

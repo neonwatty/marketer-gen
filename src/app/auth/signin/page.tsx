@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 
 export default function SignInPage() {
-  const [email, setEmail] = useState('demo@example.com')
+  const [email, setEmail] = useState('john@acmecorp.com')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
@@ -41,14 +41,11 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card 
-        className="w-full max-w-2xl" 
-        style={{ maxWidth: '672px', width: '100%', minWidth: '320px' }}
-      >
+      <Card className="w-full max-w-lg mx-auto" style={{ minWidth: '400px' }}>
         <CardHeader>
           <CardTitle>Demo Sign In</CardTitle>
           <CardDescription>
-            Development-only demo authentication. Use demo@example.com to sign in.
+            Development-only demo authentication. Use john@acmecorp.com or sarah@techstartup.com to sign in.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -62,9 +59,9 @@ export default function SignInPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="demo@example.com"
+                placeholder="john@acmecorp.com or sarah@techstartup.com"
                 required
-                style={{ width: '100%', minWidth: '280px' }}
+                className="w-full"
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
@@ -74,7 +71,7 @@ export default function SignInPage() {
           <p className="mt-4 text-xs text-gray-500 text-center">
             This is a development-only authentication system.
             <br />
-            Use "demo@example.com" to access the application.
+            Use "john@acmecorp.com" or "sarah@techstartup.com" to access the demo data.
           </p>
         </CardContent>
       </Card>

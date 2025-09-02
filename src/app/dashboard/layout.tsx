@@ -1,5 +1,6 @@
 import { DashboardHeader } from '@/components/features/dashboard/DashboardHeader'
 import { DashboardSidebar } from '@/components/features/dashboard/DashboardSidebar'
+import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 interface DashboardLayoutProps {
@@ -21,15 +22,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
             <SidebarTrigger className="-ml-1" />
             <div className="h-4 w-px bg-border" />
+            <DashboardBreadcrumb />
             <div className="ml-auto">
               <DashboardHeader />
             </div>
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 p-4 md:p-6 lg:p-8 bg-muted/10">
+          <div className="flex-1 p-4 md:p-6 lg:p-8 bg-muted/10">
             {children}
-          </main>
+          </div>
         </SidebarInset>
       </div>
     </SidebarProvider>

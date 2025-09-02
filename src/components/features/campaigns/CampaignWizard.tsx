@@ -15,6 +15,7 @@ import { GoalsKPIsStep } from './wizard-steps/GoalsKPIsStep'
 import { ReviewStep } from './wizard-steps/ReviewStep'
 import { TargetAudienceStep } from './wizard-steps/TargetAudienceStep'
 import { TemplateSelectionStep } from './wizard-steps/TemplateSelectionStep'
+import { ContentGenerationStep } from './wizard-steps/ContentGenerationStep'
 import { CampaignWizardNav, type WizardStep } from './CampaignWizardNav'
 
 // Define the complete form schema
@@ -50,17 +51,48 @@ const campaignFormSchema = z.object({
     targetEngagementRate: z.number().min(0).max(100, 'Rate must be 0-100%'),
   }),
   
+  // Generated Content
+  generatedContent: z.array(z.object({
+    id: z.string(),
+    type: z.string(),
+    stage: z.string(),
+    content: z.string(),
+    variants: z.array(z.any()).optional(),
+    compliance: z.object({
+      isCompliant: z.boolean(),
+      score: z.number(),
+      violations: z.array(z.string()),
+    }),
+    metadata: z.object({
+      generatedAt: z.string(),
+      wordCount: z.number(),
+      charCount: z.number(),
+    }),
+  })).optional(),
+  
+  // Brand ID for content generation
+  brandId: z.string().optional(),
+  
   // Additional settings
   isDraft: z.boolean(),
 })
 
 export type CampaignFormData = z.infer<typeof campaignFormSchema>
 
+interface Brand {
+  id: string
+  name: string
+  tagline?: string
+  voiceDescription?: string
+}
+
 interface CampaignWizardProps {
   onSubmit: (data: CampaignFormData) => Promise<void> | void
   onSaveDraft?: (data: Partial<CampaignFormData>) => Promise<void> | void
   initialData?: Partial<CampaignFormData>
   isLoading?: boolean
+  brands: Brand[]
+  quickMode?: boolean // Enable quick creation mode for testing
 }
 
 const wizardSteps: WizardStep[] = [
@@ -90,6 +122,13 @@ const wizardSteps: WizardStep[] = [
     isCompleted: false,
   },
   {
+    id: 'content',
+    title: 'AI Content Generation',
+    description: 'Generate brand-aligned content for your campaign',
+    isCompleted: false,
+    isOptional: true,
+  },
+  {
     id: 'review',
     title: 'Review',
     description: 'Review and confirm your campaign settings',
@@ -101,7 +140,9 @@ export function CampaignWizard({
   onSubmit, 
   onSaveDraft,
   initialData,
-  isLoading = false 
+  isLoading = false,
+  brands,
+  quickMode = false
 }: CampaignWizardProps) {
   const [currentStep, setCurrentStep] = useState(() => {
     // In test environments, always start at step 0
@@ -133,9 +174,9 @@ export function CampaignWizard({
     return {
       name: initialData?.name || savedData?.name || '',
       description: initialData?.description || savedData?.description || '',
-      startDate: initialData?.startDate || savedData?.startDate || '',
-      endDate: initialData?.endDate || savedData?.endDate || '',
-      templateId: initialData?.templateId || savedData?.templateId || '',
+      startDate: initialData?.startDate || savedData?.startDate || new Date().toISOString().split('T')[0],
+      endDate: initialData?.endDate || savedData?.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      templateId: initialData?.templateId || savedData?.templateId || 'email-marketing',
       isDraft: initialData?.isDraft ?? savedData?.isDraft ?? true,
       targetAudience: {
         demographics: {
@@ -147,11 +188,13 @@ export function CampaignWizard({
         estimatedSize: initialData?.targetAudience?.estimatedSize || savedData?.targetAudience?.estimatedSize || 0,
       },
       goals: {
-        primary: initialData?.goals?.primary || savedData?.goals?.primary || '',
-        budget: initialData?.goals?.budget ?? savedData?.goals?.budget ?? 0,
+        primary: initialData?.goals?.primary || savedData?.goals?.primary || 'brand-awareness',
+        budget: initialData?.goals?.budget ?? savedData?.goals?.budget ?? 1000,
         targetConversions: initialData?.goals?.targetConversions ?? savedData?.goals?.targetConversions ?? 1,
         targetEngagementRate: initialData?.goals?.targetEngagementRate ?? savedData?.goals?.targetEngagementRate ?? 0,
       },
+      generatedContent: initialData?.generatedContent || savedData?.generatedContent || [],
+      brandId: initialData?.brandId || savedData?.brandId || '',
     }
   }, [initialData])
 
@@ -184,7 +227,9 @@ export function CampaignWizard({
         return true
       case 3: // Goals & KPIs
         return !!(goalsPrimary && (goalsBudget || goalsBudget === 0) && goalsBudget >= 0)
-      case 4: // Review
+      case 4: // Content Generation (optional)
+        return true
+      case 5: // Review
         return isValid
       default:
         return false
@@ -208,7 +253,10 @@ export function CampaignWizard({
         case 3: // Goals & KPIs
           isCompleted = !!(goalsPrimary && (goalsBudget || goalsBudget === 0) && goalsBudget >= 0)
           break
-        case 4: // Review
+        case 4: // Content Generation (optional)
+          isCompleted = true
+          break
+        case 5: // Review
           isCompleted = isValid
           break
         default:
@@ -358,6 +406,8 @@ export function CampaignWizard({
       case 3:
         return <GoalsKPIsStep />
       case 4:
+        return <ContentGenerationStep brands={brands} />
+      case 5:
         return <ReviewStep onSaveDraft={handleSaveDraft} />
       default:
         return null
@@ -366,11 +416,11 @@ export function CampaignWizard({
 
   return (
     <FormProvider {...form}>
-      <div className="mx-auto max-w-4xl space-y-8">
+      <div className="mx-auto max-w-4xl space-y-8" data-testid="campaign-form">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Create New Campaign</span>
+              <span>Campaign Wizard</span>
               {/* Enhanced auto-save status indicator */}
               <div className="flex items-center gap-2 text-sm">
                 {hasUnsavedChanges && (
@@ -395,7 +445,7 @@ export function CampaignWizard({
               onStepClick={handleStepClick}
               onNext={handleNext}
               onPrevious={handlePrevious}
-              isNextDisabled={!validateStep(currentStep) || isLoading}
+              isNextDisabled={quickMode ? (!name || !description || isLoading) : (!validateStep(currentStep) || isLoading)}
               isPreviousDisabled={currentStep === 0 || isLoading}
             />
           </CardContent>

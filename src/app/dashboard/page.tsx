@@ -1,7 +1,5 @@
 import { Metadata } from 'next'
 
-import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
-
 export const metadata: Metadata = {
   title: 'Dashboard | Marketer Gen',
   description: 'Marketing campaign dashboard overview',
@@ -13,12 +11,6 @@ export const metadata: Metadata = {
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
-      <DashboardBreadcrumb 
-        items={[
-          { label: 'Dashboard', href: '/dashboard' }
-        ]} 
-      />
-      
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>

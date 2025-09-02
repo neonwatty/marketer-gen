@@ -20,22 +20,11 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     
-    // Validate query parameters
-    const queryValidation = campaignQuerySchema.safeParse({
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      status: searchParams.get('status'),
-      brandId: searchParams.get('brandId')
-    })
-
-    if (!queryValidation.success) {
-      return NextResponse.json(
-        { error: 'Invalid query parameters', details: queryValidation.error.format() },
-        { status: 400 }
-      )
-    }
-
-    const { page, limit, status, brandId } = queryValidation.data
+    // Get query parameters with defaults
+    const page = parseInt(searchParams.get('page') || '1', 10)
+    const limit = parseInt(searchParams.get('limit') || '10', 10)
+    const status = searchParams.get('status') || undefined
+    const brandId = searchParams.get('brandId') || undefined
     const skip = (page - 1) * limit
 
     const where = {
@@ -70,6 +59,11 @@ export async function GET(request: NextRequest) {
               id: true,
               status: true,
               createdAt: true,
+              _count: {
+                select: {
+                  content: { where: { deletedAt: null } }
+                }
+              }
             },
             where: { deletedAt: null },
             take: 10, // Limit for performance

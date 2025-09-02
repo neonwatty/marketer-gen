@@ -42,7 +42,7 @@ export default function RootLayout({
             <QueryProvider>
               {children}
               <ToastProvider />
-              <PerformanceScript />
+              {process.env.NODE_ENV === 'production' && <PerformanceScript />}
             </QueryProvider>
           </AuthProvider>
         </SessionProvider>

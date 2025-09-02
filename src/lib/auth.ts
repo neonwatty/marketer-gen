@@ -17,15 +17,28 @@ export const authOptions: NextAuthOptions = {
             id: "demo",
             name: "Demo User",
             credentials: {
-              email: { label: "Email", type: "email", placeholder: "demo@example.com" },
+              email: { 
+                label: "Email", 
+                type: "email", 
+                placeholder: "john@acmecorp.com or sarah@techstartup.com" 
+              },
             },
             async authorize(credentials) {
-              // Development-only demo user
-              if (credentials?.email === "demo@example.com") {
+              // Development-only demo users - use real database users
+              if (credentials?.email === "john@acmecorp.com" || credentials?.email === "demo@example.com") {
                 return {
-                  id: "demo-user-id",
-                  email: "demo@example.com",
-                  name: "Demo User",
+                  id: "cmex5tk0g0000nut8k2n73lrb", // John Smith's real ID
+                  email: "john@acmecorp.com",
+                  name: "John Smith",
+                  image: null,
+                  role: "ADMIN",
+                };
+              }
+              if (credentials?.email === "sarah@techstartup.com") {
+                return {
+                  id: "cmex5tk0j0001nut8t8kvga70", // Sarah Johnson's real ID
+                  email: "sarah@techstartup.com",
+                  name: "Sarah Johnson",
                   image: null,
                   role: "USER",
                 };

@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth/next'
 import { z } from "zod"
 
 import { authOptions } from '@/lib/auth'
-import { prisma } from "@/lib/database"
+import { prisma } from "@/lib/db"
 
 // Query parameter validation schema
 const BrandQuerySchema = z.object({
@@ -54,9 +54,19 @@ export async function GET(request: NextRequest) {
   try {
     session = await getServerSession(authOptions)
     
-    // For MVP development - allow access without authentication
-    // In production, this should require authentication
-    const userId = session?.user?.id || 'demo-user'
+    // Check authentication
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { 
+          error: 'Unauthorized',
+          message: 'Authentication required',
+          timestamp: new Date().toISOString()
+        }, 
+        { status: 401 }
+      )
+    }
+    
+    const userId = session.user.id
 
     const { searchParams } = new URL(request.url)
     
@@ -85,8 +95,7 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {
       deletedAt: null,
-      // For MVP - show all brands regardless of user, in production filter by userId
-      // userId: userId,
+      userId: userId,
     }
 
     if (search) {

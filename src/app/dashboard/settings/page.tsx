@@ -2,7 +2,6 @@ import { Metadata } from 'next'
 
 import { Bell, CreditCard, Settings,Shield, User, Users } from 'lucide-react'
 
-import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -21,13 +20,6 @@ export const metadata: Metadata = {
 export default function SettingsPage() {
   return (
     <div className="space-y-6">
-      <DashboardBreadcrumb 
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Settings', href: '/dashboard/settings' }
-        ]} 
-      />
-      
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>

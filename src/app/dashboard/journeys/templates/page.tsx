@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 
 import { ArrowLeft, Plus } from 'lucide-react'
 
-import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { JourneyTemplateGallery } from '@/components/features/journey/JourneyTemplateGallery'
 import { Button } from '@/components/ui/button'
 import { JourneyTemplate } from '@/lib/types/journey'
@@ -28,14 +27,6 @@ export default function JourneyTemplatesPage() {
 
   return (
     <div className="space-y-6">
-      <DashboardBreadcrumb 
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Journeys', href: '/dashboard/journeys' },
-          { label: 'Templates', href: '/dashboard/journeys/templates' }
-        ]} 
-      />
-      
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

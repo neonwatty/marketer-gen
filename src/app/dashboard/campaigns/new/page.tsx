@@ -7,7 +7,6 @@ import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { type CampaignFormData,CampaignWizard } from '@/components/features/campaigns/CampaignWizard'
-import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Button } from '@/components/ui/button'
 
 // Note: This would normally be generated on the server side
@@ -107,14 +106,6 @@ export default function NewCampaignPage() {
 
   return (
     <div className="space-y-6">
-      <DashboardBreadcrumb 
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Campaigns', href: '/dashboard/campaigns' },
-          { label: 'Create New', href: '/dashboard/campaigns/new' }
-        ]} 
-      />
-      
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -140,6 +131,8 @@ export default function NewCampaignPage() {
         onSubmit={handleSubmit}
         onSaveDraft={handleSaveDraft}
         isLoading={isCreating || isSavingDraft}
+        brands={[]}
+        quickMode={true}
       />
     </div>
   )

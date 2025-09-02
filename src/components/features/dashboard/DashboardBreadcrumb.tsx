@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -117,7 +118,7 @@ export function DashboardBreadcrumb({
               const isLast = actualIndex === lastItemIndex
               
               return (
-                <div key={actualIndex} className="flex items-center">
+                <React.Fragment key={actualIndex}>
                   <BreadcrumbItem>
                     {isLast ? (
                       <BreadcrumbPage className="font-medium text-foreground">
@@ -137,7 +138,7 @@ export function DashboardBreadcrumb({
                     )}
                   </BreadcrumbItem>
                   {!isLast && <BreadcrumbSeparator />}
-                </div>
+                </React.Fragment>
               )
             })}
           </>
@@ -147,7 +148,7 @@ export function DashboardBreadcrumb({
             const isLast = index === lastItemIndex
             
             return (
-              <div key={index} className="flex items-center">
+              <React.Fragment key={index}>
                 <BreadcrumbItem>
                   {isLast ? (
                     <BreadcrumbPage className="font-medium text-foreground">
@@ -167,7 +168,7 @@ export function DashboardBreadcrumb({
                   )}
                 </BreadcrumbItem>
                 {!isLast && <BreadcrumbSeparator />}
-              </div>
+              </React.Fragment>
             )
           })
         )}

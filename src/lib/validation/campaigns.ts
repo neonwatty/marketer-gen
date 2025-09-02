@@ -49,10 +49,10 @@ export const duplicateCampaignSchema = z.object({
 })
 
 export const campaignQuerySchema = z.object({
-  page: z.string().regex(/^\d+$/).transform(Number).refine(n => n > 0, 'Page must be positive').optional().default(1),
-  limit: z.string().regex(/^\d+$/).transform(Number).refine(n => n > 0 && n <= 100, 'Limit must be between 1 and 100').optional().default(10),
+  page: z.union([z.string(), z.null()]).optional().transform(val => val && val !== null ? parseInt(val, 10) : 1).refine(n => n > 0, 'Page must be positive'),
+  limit: z.union([z.string(), z.null()]).optional().transform(val => val && val !== null ? parseInt(val, 10) : 10).refine(n => n > 0 && n <= 100, 'Limit must be between 1 and 100'),
   status: z.nativeEnum(CampaignStatus).optional(),
-  brandId: z.string().optional()
+  brandId: z.union([z.string(), z.null()]).optional()
 })
 
 export const journeyTemplateRequestSchema = z.object({

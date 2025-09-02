@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect,useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { LoadingButton } from '@/components/ui/loading-button'
 
@@ -8,132 +9,101 @@ import { CampaignDataTable } from '../campaigns/CampaignDataTable'
 
 import { type Campaign } from './CampaignCard'
 
-// Mock data for demonstration
-const mockCampaigns: Campaign[] = [
-  {
-    id: '1',
-    title: 'Summer Product Launch',
-    description: 'Comprehensive marketing campaign for our new summer collection featuring social media, email, and content marketing.',
-    status: 'active',
-    metrics: {
-      engagementRate: 4.2,
-      conversionRate: 2.8,
-      contentPieces: 24,
-      totalReach: 125000,
-      activeUsers: 8900,
-    },
-    progress: 68,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20'),
-  },
-  {
-    id: '2',
-    title: 'Q1 Newsletter Campaign',
-    description: 'Monthly newsletter series targeting existing customers with product updates and exclusive offers.',
-    status: 'completed',
-    metrics: {
-      engagementRate: 6.1,
-      conversionRate: 4.5,
-      contentPieces: 12,
-      totalReach: 45000,
-      activeUsers: 3200,
-    },
-    progress: 100,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-18'),
-  },
-  {
-    id: '3',
-    title: 'Brand Awareness Initiative',
-    description: 'Multi-channel brand awareness campaign focusing on increasing visibility among target demographics.',
-    status: 'draft',
-    metrics: {
-      engagementRate: 0,
-      conversionRate: 0,
-      contentPieces: 8,
-    },
-    progress: 15,
-    createdAt: new Date('2024-01-22'),
-    updatedAt: new Date('2024-01-22'),
-  },
-  {
-    id: '4',
-    title: 'Customer Retention Program',
-    description: 'Ongoing loyalty program with personalized content and exclusive rewards for repeat customers.',
-    status: 'paused',
-    metrics: {
-      engagementRate: 3.7,
-      conversionRate: 5.2,
-      contentPieces: 16,
-      totalReach: 28000,
-      activeUsers: 2100,
-    },
-    progress: 42,
-    createdAt: new Date('2023-12-10'),
-    updatedAt: new Date('2024-01-15'),
-  },
-  {
-    id: '5',
-    title: 'Social Media Boost',
-    description: 'Intensive social media campaign with daily posts, stories, and engagement activities across platforms.',
-    status: 'active',
-    metrics: {
-      engagementRate: 8.3,
-      conversionRate: 1.9,
-      contentPieces: 45,
-      totalReach: 89000,
-      activeUsers: 12500,
-    },
-    progress: 85,
-    createdAt: new Date('2024-01-08'),
-    updatedAt: new Date('2024-01-21'),
-  },
-  {
-    id: '6',
-    title: 'Holiday Retrospective',
-    description: 'Analysis and follow-up campaign based on holiday season performance and customer feedback.',
-    status: 'archived',
-    metrics: {
-      engagementRate: 5.4,
-      conversionRate: 3.1,
-      contentPieces: 18,
-      totalReach: 67000,
-      activeUsers: 4800,
-    },
-    progress: 100,
-    createdAt: new Date('2023-11-20'),
-    updatedAt: new Date('2024-01-05'),
-  },
-]
-
 export function CampaignExample() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [refreshing, setRefreshing] = useState(false)
 
   const handleView = (id: string) => {
     console.log('View campaign:', id)
+    router.push(`/dashboard/campaigns/${id}`)
   }
 
   const handleEdit = (id: string) => {
     console.log('Edit campaign:', id)
+    router.push(`/dashboard/campaigns/${id}?mode=edit`)
   }
 
   const handleDuplicate = (id: string) => {
     console.log('Duplicate campaign:', id)
+    // For now, just log - could implement duplication logic later
   }
 
   const handleArchive = (id: string) => {
     console.log('Archive campaign:', id)
+    // For now, just log - could implement archive logic later
   }
 
-  // Simulate initial data loading
+  // Fetch real campaign data
   useEffect(() => {
     const loadCampaigns = async () => {
       setIsLoading(true)
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      setCampaigns(mockCampaigns)
+      try {
+        const response = await fetch('/api/campaigns', {
+          credentials: 'include',
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          // Transform database campaigns to match the Campaign interface
+          const transformedCampaigns: Campaign[] = data.campaigns.map((campaign: any) => {
+            // Calculate real progress based on content completion
+            const calculateProgress = (campaign: any) => {
+              if (campaign.status === 'COMPLETED') return 100
+              
+              // Get journey count and content count for this campaign
+              const journeyCount = campaign._count?.journeys || 0
+              const contentCount = campaign.journeys?.reduce((total: number, journey: any) => 
+                total + (journey._count?.content || 0), 0) || 0
+              
+              // Base progress calculation
+              let baseProgress = 0
+              
+              // Campaign setup phase (0-25%)
+              if (campaign.name && campaign.purpose) baseProgress += 15
+              if (campaign.goals) baseProgress += 10
+              
+              // Journey creation phase (25-50%)  
+              if (journeyCount > 0) baseProgress += 25
+              
+              // Content creation phase (50-90%)
+              const expectedContentPieces = Math.max(journeyCount * 3, 5) // Expect 3 pieces per journey, minimum 5
+              const contentProgress = Math.min((contentCount / expectedContentPieces) * 40, 40)
+              baseProgress += contentProgress
+              
+              // Activation phase (90-100%)
+              if (campaign.status === 'ACTIVE') baseProgress += 10
+              
+              return Math.min(Math.max(baseProgress, 0), 100)
+            }
+            
+            return {
+              id: campaign.id,
+              title: campaign.name,
+              description: campaign.purpose || `${campaign.brand?.name} campaign`,
+              status: campaign.status?.toLowerCase() || 'draft',
+              metrics: {
+                engagementRate: Math.random() * 10, // Mock metrics for now
+                conversionRate: Math.random() * 5,
+                contentPieces: campaign._count?.journeys || 0,
+                totalReach: Math.floor(Math.random() * 100000),
+                activeUsers: Math.floor(Math.random() * 10000),
+              },
+              progress: calculateProgress(campaign),
+              createdAt: new Date(campaign.createdAt),
+              updatedAt: new Date(campaign.updatedAt),
+            }
+          })
+          setCampaigns(transformedCampaigns)
+        } else {
+          console.warn('Failed to fetch campaigns, using fallback data')
+          setCampaigns([]) // Use empty array if API fails
+        }
+      } catch (error) {
+        console.error('Error fetching campaigns:', error)
+        setCampaigns([]) // Use empty array if API fails
+      }
       setIsLoading(false)
     }
     
@@ -142,9 +112,66 @@ export function CampaignExample() {
 
   const handleRefresh = async () => {
     setRefreshing(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setCampaigns(mockCampaigns)
+    try {
+      const response = await fetch('/api/campaigns', {
+        credentials: 'include',
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        const transformedCampaigns: Campaign[] = data.campaigns.map((campaign: any) => {
+          // Calculate real progress based on content completion
+          const calculateProgress = (campaign: any) => {
+            if (campaign.status === 'COMPLETED') return 100
+            
+            // Get journey count and content count for this campaign
+            const journeyCount = campaign._count?.journeys || 0
+            const contentCount = campaign.journeys?.reduce((total: number, journey: any) => 
+              total + (journey._count?.content || 0), 0) || 0
+            
+            // Base progress calculation
+            let baseProgress = 0
+            
+            // Campaign setup phase (0-25%)
+            if (campaign.name && campaign.purpose) baseProgress += 15
+            if (campaign.goals) baseProgress += 10
+            
+            // Journey creation phase (25-50%)  
+            if (journeyCount > 0) baseProgress += 25
+            
+            // Content creation phase (50-90%)
+            const expectedContentPieces = Math.max(journeyCount * 3, 5) // Expect 3 pieces per journey, minimum 5
+            const contentProgress = Math.min((contentCount / expectedContentPieces) * 40, 40)
+            baseProgress += contentProgress
+            
+            // Activation phase (90-100%)
+            if (campaign.status === 'ACTIVE') baseProgress += 10
+            
+            return Math.min(Math.max(baseProgress, 0), 100)
+          }
+          
+          return {
+            id: campaign.id,
+            title: campaign.name,
+            description: campaign.purpose || `${campaign.brand?.name} campaign`,
+            status: campaign.status?.toLowerCase() || 'draft',
+            metrics: {
+              engagementRate: Math.random() * 10,
+              conversionRate: Math.random() * 5,
+              contentPieces: campaign._count?.journeys || 0,
+              totalReach: Math.floor(Math.random() * 100000),
+              activeUsers: Math.floor(Math.random() * 10000),
+            },
+            progress: calculateProgress(campaign),
+            createdAt: new Date(campaign.createdAt),
+            updatedAt: new Date(campaign.updatedAt),
+          }
+        })
+        setCampaigns(transformedCampaigns)
+      }
+    } catch (error) {
+      console.error('Error refreshing campaigns:', error)
+    }
     setRefreshing(false)
   }
 

@@ -2,7 +2,6 @@ import { Metadata } from 'next'
 
 import { BarChart3, DollarSign,TrendingUp, Users } from 'lucide-react'
 
-import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export const metadata: Metadata = {
@@ -16,13 +15,6 @@ export const metadata: Metadata = {
 export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
-      <DashboardBreadcrumb 
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Analytics', href: '/dashboard/analytics' }
-        ]} 
-      />
-      
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>

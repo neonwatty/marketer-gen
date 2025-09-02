@@ -9,7 +9,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, ArrowLeft, CheckCircle, Sparkles } from 'lucide-react'
 import { z } from 'zod'
 
-import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -165,14 +164,6 @@ function NewJourneyContent() {
 
   return (
     <div className="space-y-6">
-      <DashboardBreadcrumb 
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Journeys', href: '/dashboard/journeys' },
-          { label: 'Create New', href: '/dashboard/journeys/new' }
-        ]} 
-      />
-      
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button

@@ -10,7 +10,7 @@ test.describe('Responsive Design', () => {
     
     // Sidebar should be visible
     await expect(page.getByText('Navigation')).toBeVisible();
-    await expect(page.getByText('Marketer Gen')).toBeVisible();
+    await expect(page.getByText('Marketer Gen').first()).toBeVisible();
     
     // Search should be visible in header
     await expect(page.getByPlaceholder('Search campaigns...')).toBeVisible();
@@ -92,7 +92,7 @@ test.describe('Responsive Design', () => {
       await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
       
       // User menu should always be accessible
-      const userMenuTrigger = page.locator('[role="button"]').filter({ has: page.locator('[role="img"]') }).last();
+      const userMenuTrigger = page.getByRole('button', { name: /Open user menu.*Demo User/ });
       await expect(userMenuTrigger).toBeVisible();
       
       // Navigation to campaigns should work

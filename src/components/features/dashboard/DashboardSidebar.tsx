@@ -34,10 +34,11 @@ export function DashboardSidebar() {
       variant="inset" 
       collapsible="icon"
       className="lg:flex hidden md:flex"
+      role="navigation"
       aria-label="Dashboard navigation sidebar"
     >
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-4 py-2" role="banner">
+        <div className="flex items-center gap-2 px-4 py-2">
           <div 
             className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground"
             aria-hidden="true"

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useEffect,useState } from "react"
+import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
 import { BarChart3, Eye,FileText, Image, Plus, Search, Settings } from "lucide-react"
@@ -48,6 +49,7 @@ import { BrandService } from "@/lib/api/brands"
 import { BrandSummary,BrandWithRelations } from "@/lib/types/brand"
 
 export default function BrandDashboardPage() {
+  const router = useRouter()
   const [brands, setBrands] = useState<BrandSummary[]>([])
   const [selectedBrand, setSelectedBrand] = useState<BrandWithRelations | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -97,8 +99,7 @@ export default function BrandDashboardPage() {
   }
 
   const handleCreateBrand = () => {
-    // TODO: Open create brand modal
-    console.log("Create new brand")
+    router.push('/dashboard/brands/new')
   }
 
   if (isLoading && brands.length === 0) {
@@ -130,9 +131,9 @@ export default function BrandDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Brand Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Brands</h1>
           <p className="text-muted-foreground">
-            Manage your brand profiles and assets
+            Brand management and asset library
           </p>
         </div>
         <Button onClick={handleCreateBrand} className="gap-2">
@@ -218,7 +219,11 @@ function BrandCard({
   onSelect: (brandId: string) => void
 }) {
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => onSelect(brand.id)}>
+    <Card 
+      className="hover:shadow-md transition-shadow cursor-pointer" 
+      onClick={() => onSelect(brand.id)}
+      data-testid="brand-card"
+    >
       <CardContent className="p-6">
         <div className="space-y-4">
           {/* Brand Header */}

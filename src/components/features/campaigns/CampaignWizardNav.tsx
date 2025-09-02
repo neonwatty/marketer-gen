@@ -127,6 +127,7 @@ export function CampaignWizardNav({
         <Button
           onClick={onNext}
           disabled={isNextDisabled}
+          data-testid={isLastStep ? 'create-campaign-final' : 'wizard-next'}
         >
           {isLastStep ? 'Create Campaign' : nextLabel}
         </Button>

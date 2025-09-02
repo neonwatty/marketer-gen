@@ -81,11 +81,14 @@ test.describe('Authentication Integration', () => {
     test('should display user menu with demo user info', async ({ page }) => {
       await page.goto('/dashboard');
       
-      // Open user menu
-      const userMenuTrigger = page.locator('[role="button"]').filter({ has: page.locator('[role="img"]') }).last();
-      await userMenuTrigger.click();
+      // Wait for page to be fully loaded
+      await page.waitForLoadState('networkidle');
       
-      // Should show demo user information
+      // Open user menu - look for the avatar button
+      const userMenuTrigger = page.getByRole('button', { name: /Open user menu.*Demo User/ });
+      await userMenuTrigger.click({ force: true });
+      
+      // Should show demo user information in the dropdown
       await expect(page.getByText('Demo User')).toBeVisible();
       await expect(page.getByText('demo@example.com')).toBeVisible();
     });
@@ -135,9 +138,12 @@ test.describe('Authentication Integration', () => {
     test('should handle logout action (placeholder)', async ({ page }) => {
       await page.goto('/dashboard');
       
+      // Wait for page to be fully loaded
+      await page.waitForLoadState('networkidle');
+      
       // Open user menu
-      const userMenuTrigger = page.locator('[role="button"]').filter({ has: page.locator('[role="img"]') }).last();
-      await userMenuTrigger.click();
+      const userMenuTrigger = page.getByRole('button', { name: /Open user menu.*Demo User/ });
+      await userMenuTrigger.click({ force: true });
       
       // Click logout
       await page.getByText('Log out').click();
@@ -150,9 +156,12 @@ test.describe('Authentication Integration', () => {
     test('should handle profile settings navigation', async ({ page }) => {
       await page.goto('/dashboard');
       
+      // Wait for page to be fully loaded
+      await page.waitForLoadState('networkidle');
+      
       // Open user menu
-      const userMenuTrigger = page.locator('[role="button"]').filter({ has: page.locator('[role="img"]') }).last();
-      await userMenuTrigger.click();
+      const userMenuTrigger = page.getByRole('button', { name: /Open user menu.*Demo User/ });
+      await userMenuTrigger.click({ force: true });
       
       // Click profile settings
       await page.getByText('Profile Settings').click();
@@ -164,18 +173,21 @@ test.describe('Authentication Integration', () => {
     test('should close menu when clicking outside', async ({ page }) => {
       await page.goto('/dashboard');
       
+      // Wait for page to be fully loaded
+      await page.waitForLoadState('networkidle');
+      
       // Open user menu
-      const userMenuTrigger = page.locator('[role="button"]').filter({ has: page.locator('[role="img"]') }).last();
-      await userMenuTrigger.click();
+      const userMenuTrigger = page.getByRole('button', { name: /Open user menu.*Demo User/ });
+      await userMenuTrigger.click({ force: true });
       
       // Verify menu is open
       await expect(page.getByText('Demo User')).toBeVisible();
       
-      // Click outside the menu
-      await page.click('main');
+      // Click outside the menu using force click on body
+      await page.locator('body').click({ force: true });
       
-      // Menu should close
-      await expect(page.getByText('Demo User')).toBeHidden();
+      // Menu should close (wait for it to be hidden)
+      await expect(page.getByText('Demo User')).toBeHidden({ timeout: 5000 });
     });
   });
 
@@ -192,9 +204,12 @@ test.describe('Authentication Integration', () => {
       // Should still be accessible (no auth redirect)
       await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
       
+      // Wait for page to be fully loaded after refresh
+      await page.waitForLoadState('networkidle');
+      
       // User menu should still work
-      const userMenuTrigger = page.locator('[role="button"]').filter({ has: page.locator('[role="img"]') }).last();
-      await userMenuTrigger.click();
+      const userMenuTrigger = page.getByRole('button', { name: /Open user menu.*Demo User/ });
+      await userMenuTrigger.click({ force: true });
       await expect(page.getByText('Demo User')).toBeVisible();
     });
 

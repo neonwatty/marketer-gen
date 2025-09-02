@@ -3,7 +3,6 @@ import Link from 'next/link'
 
 import { FileText, Filter, Plus, Search, Star, Zap } from 'lucide-react'
 
-import { DashboardBreadcrumb } from '@/components/features/dashboard/DashboardBreadcrumb'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,13 +19,6 @@ export const metadata: Metadata = {
 export default function TemplatesPage() {
   return (
     <div className="space-y-6">
-      <DashboardBreadcrumb 
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Templates', href: '/dashboard/templates' }
-        ]} 
-      />
-      
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

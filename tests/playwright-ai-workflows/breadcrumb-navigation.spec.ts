@@ -9,15 +9,16 @@ test.describe('Breadcrumb Navigation', () => {
     await expect(breadcrumbNav).toBeVisible();
     
     // Dashboard page should show just "Dashboard"
-    await expect(page.getByText('Dashboard')).toBeVisible();
+    await expect(breadcrumbNav.getByText('Dashboard')).toBeVisible();
   });
 
   test('should display hierarchical breadcrumbs on campaigns page', async ({ page }) => {
     await page.goto('/dashboard/campaigns');
     
     // Should show Dashboard > Campaigns
-    await expect(page.getByText('Dashboard')).toBeVisible();
-    await expect(page.getByText('Campaigns')).toBeVisible();
+    const breadcrumbNav = page.locator('nav[aria-label="breadcrumb"]').or(page.locator('[role="navigation"]')).first();
+    await expect(breadcrumbNav.getByText('Dashboard')).toBeVisible();
+    await expect(breadcrumbNav.getByText('Campaigns')).toBeVisible();
     
     // Dashboard should be clickable link
     const dashboardLink = page.getByRole('link', { name: 'Dashboard' });
@@ -82,15 +83,16 @@ test.describe('Breadcrumb Navigation', () => {
   test('should show current page as non-clickable', async ({ page }) => {
     await page.goto('/dashboard/campaigns');
     
-    // "Campaigns" should be the current page and not a link
-    const campaignsText = page.getByText('Campaigns').last();
+    // Find the breadcrumb container
+    const breadcrumbNav = page.locator('nav[aria-label*="breadcrumb"]').first();
     
-    // The current page item should not be a link
-    const campaignsAsLink = page.getByRole('link', { name: 'Campaigns' });
+    // "Campaigns" should be marked as the current page (BreadcrumbPage component)
+    const campaignsPage = breadcrumbNav.locator('[data-slot="breadcrumb-page"]');
+    await expect(campaignsPage).toContainText('Campaigns');
     
-    // Either campaigns text exists without being a link, or there are multiple instances
-    // where one is a link (in sidebar) and one is not (in breadcrumb)
-    await expect(campaignsText).toBeVisible();
+    // Dashboard should be a clickable link in breadcrumbs
+    const dashboardLink = breadcrumbNav.getByRole('link', { name: 'Dashboard' });
+    await expect(dashboardLink).toBeVisible();
   });
 
   test('should work on mobile devices', async ({ page }) => {
@@ -98,8 +100,10 @@ test.describe('Breadcrumb Navigation', () => {
     await page.goto('/dashboard/campaigns');
     
     // Breadcrumbs should still be visible and functional on mobile
-    await expect(page.getByText('Dashboard')).toBeVisible();
-    await expect(page.getByText('Campaigns')).toBeVisible();
+    // Check that breadcrumb content exists (may be in different container on mobile)
+    await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible();
+    const campaignsPage = page.locator('[data-slot="breadcrumb-page"]');
+    await expect(campaignsPage).toContainText('Campaigns');
     
     // Links should still work
     await page.getByRole('link', { name: 'Dashboard' }).click();
@@ -111,8 +115,9 @@ test.describe('Breadcrumb Navigation', () => {
     await page.goto('/dashboard/campaigns/campaign-with-very-long-name-that-might-overflow');
     
     // Breadcrumbs should still be visible
-    await expect(page.getByText('Dashboard')).toBeVisible();
-    await expect(page.getByText('Campaigns')).toBeVisible();
+    const breadcrumbNav = page.locator('nav[aria-label="breadcrumb"]').or(page.locator('[role="navigation"]')).first();
+    await expect(breadcrumbNav.getByText('Dashboard')).toBeVisible();
+    await expect(breadcrumbNav.getByText('Campaigns')).toBeVisible();
     
     // Container should handle overflow properly
     const breadcrumbContainer = page.locator('nav').first();
