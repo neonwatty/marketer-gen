@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Service for generating all content pieces for a campaign plan in bulk
-class BulkContentGenerationService < ApplicationService
+class BulkContentGenerationService
   
   def initialize(campaign_plan)
     @campaign_plan = campaign_plan
@@ -11,14 +11,14 @@ class BulkContentGenerationService < ApplicationService
   end
 
   def generate_all
-    return failure_result('Campaign plan must be completed') unless @campaign_plan.completed?
-    return failure_result('Campaign plan has no generated assets list') unless @campaign_plan.generated_assets.present?
+    return { success: false, error: 'Campaign plan must be completed' } unless @campaign_plan.completed?
+    return { success: false, error: 'Campaign plan has no generated assets list' } unless @campaign_plan.generated_assets.present?
     
     begin
       content_types = determine_content_types
       
       if content_types.empty?
-        return failure_result('No content types could be determined from campaign assets')
+        return { success: false, error: 'No content types could be determined from campaign assets' }
       end
       
       # Generate content for each type
@@ -29,16 +29,18 @@ class BulkContentGenerationService < ApplicationService
       if @errors.any?
         partial_success_result
       else
-        success_result("Successfully generated #{@generated_contents.count} content pieces", {
+        {
+          success: true,
+          message: "Successfully generated #{@generated_contents.count} content pieces",
           contents: @generated_contents,
           count: @generated_contents.count
-        })
+        }
       end
       
     rescue StandardError => e
       Rails.logger.error "Bulk content generation failed: #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
-      failure_result("Failed to generate content: #{e.message}")
+      { success: false, error: "Failed to generate content: #{e.message}" }
     end
   end
 

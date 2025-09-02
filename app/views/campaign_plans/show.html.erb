@@ -49,9 +49,10 @@
         <% if @campaign_plan.completed? %>
           <!-- Generate All Content Button -->
           <% if !@campaign_plan.generated_contents.exists? %>
-            <%= link_to generate_all_content_campaign_plan_path(@campaign_plan), method: :post,
+            <%= button_to generate_all_content_campaign_plan_path(@campaign_plan),
+                method: :post,
                 class: "bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center gap-2",
-                data: { confirm: "This will generate all content pieces for this campaign. Continue?" } do %>
+                data: { turbo_confirm: "This will generate all content pieces for this campaign. Continue?" } do %>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
@@ -308,9 +309,10 @@
                   Your campaign plan is complete. Now you can generate all the content pieces 
                   (emails, social posts, blog articles, etc.) based on your campaign strategy.
                 </p>
-                <%= link_to generate_all_content_campaign_plan_path(@campaign_plan), method: :post,
+                <%= button_to generate_all_content_campaign_plan_path(@campaign_plan),
+                    method: :post,
                     class: "inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition duration-200",
-                    data: { confirm: "This will generate all content pieces for this campaign. Continue?" } do %>
+                    data: { turbo_confirm: "This will generate all content pieces for this campaign. Continue?" } do %>
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                   </svg>
