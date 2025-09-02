@@ -15,7 +15,7 @@ class JourneyPerformanceTracker
       user_id: @user.id,
       brand_identity_id: @brand_identity&.id,
       step_type: step.step_type,
-      channels: step.channels,
+      channels: [step.channel].compact,
       performance_metrics: {
         engagement_rate: metrics[:engagement_rate],
         conversion_rate: metrics[:conversion_rate],
@@ -82,7 +82,7 @@ class JourneyPerformanceTracker
     recommendations = []
 
     # Recommend high-performing step types
-    if patterns[:best_performing_step_types].any?
+    if patterns[:best_performing_step_types] && patterns[:best_performing_step_types].any?
       recommendations << {
         type: :step_type,
         priority: :high,
@@ -93,7 +93,7 @@ class JourneyPerformanceTracker
     end
 
     # Recommend optimal channels
-    if patterns[:channel_effectiveness].any?
+    if patterns[:channel_effectiveness] && patterns[:channel_effectiveness].any?
       best_channel = patterns[:channel_effectiveness].max_by { |c| c[:effectiveness_score] }
       recommendations << {
         type: :channel,
@@ -105,7 +105,7 @@ class JourneyPerformanceTracker
     end
 
     # Brand compliance recommendations
-    if patterns[:brand_compliance_impact][:correlation] > 0.7
+    if patterns[:brand_compliance_impact] && patterns[:brand_compliance_impact][:correlation] && patterns[:brand_compliance_impact][:correlation] > 0.7
       recommendations << {
         type: :brand_compliance,
         priority: :high,
@@ -151,7 +151,7 @@ class JourneyPerformanceTracker
     {
       step_attributes: {
         type: step.step_type,
-        channels: step.channels,
+        channels: [step.channel].compact,
         timing: step.timing_trigger_type,
         content_length: step.description&.length,
         ai_generated: step.ai_generated,

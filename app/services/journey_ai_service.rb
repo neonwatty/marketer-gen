@@ -14,7 +14,7 @@ class JourneyAiService < ApplicationService
   end
 
   # Generate brand-consistent journey step suggestions using AI
-  def generate_intelligent_suggestions(limit: 5)
+  def generate_intelligent_suggestions(limit: 5, stage: nil)
     unless llm_service_available?
       return {
         success: false,
@@ -42,7 +42,7 @@ class JourneyAiService < ApplicationService
         brand_compliance_score: calculate_overall_compliance(validated_suggestions),
         metadata: {
           llm_model: @options[:llm_model] || 'default',
-          brand_applied: @brand_context[:brand][:id].present?,
+          brand_applied: !!(@brand_context[:brand] && @brand_context[:brand][:id].present?),
           generation_time: Time.current
         }
       }
@@ -375,14 +375,17 @@ class JourneyAiService < ApplicationService
       suggestion[:title] ||= "New Journey Step"
       suggestion[:description] ||= "AI-generated step for your journey"
       
+      # Map channels to suggested_channels for consistency
+      suggestion[:suggested_channels] = suggestion[:channels] || suggestion[:suggested_channels] || []
+      
       # Add brand compliance score
       suggestion[:brand_compliance_score] = calculate_brand_compliance(suggestion)
       
       # Add implementation details
       suggestion[:implementation_notes] = generate_implementation_notes(suggestion)
       
-      # Validate against existing steps
-      suggestion[:unique] = !step_already_exists?(suggestion[:step_type])
+      # Validate against existing steps (but allow different titles)
+      suggestion[:unique] = !step_already_exists_with_same_title?(suggestion)
       
       suggestion
     end.select { |s| s[:unique] }
@@ -474,6 +477,12 @@ class JourneyAiService < ApplicationService
   def step_already_exists?(step_type)
     @brand_context[:journey][:existing_steps].any? do |step|
       step[:step_type] == step_type
+    end
+  end
+
+  def step_already_exists_with_same_title?(suggestion)
+    @brand_context[:journey][:existing_steps].any? do |step|
+      step[:title]&.downcase == suggestion[:title]&.downcase
     end
   end
 

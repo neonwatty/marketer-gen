@@ -227,7 +227,16 @@ class JourneysController < ApplicationController
     suggestions = if ai_powered
       # Use AI-powered suggestions with brand context
       ai_service = JourneyAiService.new(@journey, Current.user)
-      ai_suggestions = ai_service.generate_intelligent_suggestions(limit: limit, stage: current_stage)
+      ai_result = ai_service.generate_intelligent_suggestions(limit: limit, stage: current_stage)
+      
+      # Extract suggestions from the result
+      ai_suggestions = if ai_result.is_a?(Hash) && ai_result[:suggestions]
+        ai_result[:suggestions]
+      elsif ai_result.is_a?(Array)
+        ai_result
+      else
+        []
+      end
       
       # Track AI generation for analytics
       track_ai_suggestion_generation(ai_suggestions) if ai_suggestions.any?
@@ -318,11 +327,10 @@ class JourneysController < ApplicationController
       
       # Create journey step from AI suggestion
       step = @journey.journey_steps.build(
-        name: suggestion['title'],
+        title: suggestion['title'],
         description: suggestion['description'],
         step_type: suggestion['step_type'],
-        channels: suggestion['channels'] || [],
-        timing_trigger_type: parse_timing(suggestion['timing']),
+        channel: suggestion['channel'] || suggestion['channels']&.first,
         ai_generated: true,
         brand_compliance_score: suggestion['brand_compliance_score'],
         ai_metadata: {
@@ -353,7 +361,7 @@ class JourneysController < ApplicationController
       Rails.logger.error "Failed to apply AI suggestion: #{e.message}"
       respond_to do |format|
         format.html { redirect_to @journey, alert: 'Failed to apply suggestion. Please try again.' }
-        format.json { render json: { error: e.message }, status: :internal_server_error }
+        format.json { render json: { error: e.message }, status: :unprocessable_entity }
       end
     end
   end

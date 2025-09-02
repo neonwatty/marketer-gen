@@ -66,19 +66,19 @@ class JourneyBrandContextBuilder < ApplicationService
   end
 
   def build_brand_variants_context
-    return [] unless brand_identity.brand_variants.any?
+    return { active_adaptations: [] } unless brand_identity&.brand_variants&.any?
 
-    brand_identity.brand_variants.map do |variant|
-      {
-        id: variant.id,
-        name: variant.name,
-        target_audience: variant.target_audience,
-        tone_adjustments: variant.tone_adjustments,
-        messaging_adjustments: variant.messaging_adjustments,
-        channel_preferences: variant.channel_preferences,
-        active: variant.is_active
-      }
-    end
+    {
+      active_adaptations: brand_identity.brand_variants.active.map do |variant|
+        {
+          id: variant.id,
+          name: variant.name,
+          type: variant.adaptation_type,
+          context: variant.adaptation_context,
+          performance_score: variant.effectiveness_score
+        }
+      end
+    }
   end
 
   def build_journey_context
@@ -116,18 +116,13 @@ class JourneyBrandContextBuilder < ApplicationService
 
   def build_generic_context
     {
-      brand: {
-        name: "Generic Brand",
-        voice: "Professional",
-        tone_guidelines: "Clear, concise, and helpful",
-        messaging_framework: "Focus on value and benefits",
-        restrictions: []
-      },
+      brand: nil,
       brand_assets: {},
       brand_variants: [],
       journey: build_journey_context,
       historical_performance: {},
-      industry_context: {}
+      industry_context: {},
+      generic_context: "No specific brand identity"
     }
   end
 
@@ -301,7 +296,7 @@ class JourneyBrandContextBuilder < ApplicationService
     return {} unless brand_identity
 
     {
-      average_engagement: calculate_average_engagement,
+      average_engagement: calculate_average_engagement_rate,
       top_performing_types: identify_top_content_types,
       optimal_length: calculate_optimal_content_length,
       best_posting_times: identify_best_timing
@@ -409,7 +404,7 @@ class JourneyBrandContextBuilder < ApplicationService
     }
   end
 
-  def calculate_average_engagement
+  def calculate_average_engagement_rate
     # Calculate from historical data
     "4.2%"
   end
@@ -440,6 +435,42 @@ class JourneyBrandContextBuilder < ApplicationService
       typography: { heading: "sans-serif", body: "sans-serif" },
       spacing: { unit: "8px" },
       imagery: { style: "modern" }
+    }
+  end
+
+  def calculate_average_engagement(steps)
+    return 0 if steps.empty?
+    
+    engagement_rates = steps.map do |step|
+      step.performance_metrics&.dig('engagement_rate').to_f
+    end.compact
+    
+    return 0 if engagement_rates.empty?
+    engagement_rates.sum / engagement_rates.size
+  end
+
+  def identify_best_performing_channels(steps)
+    return [] if steps.empty?
+    
+    channel_performance = steps.select(&:channel).group_by(&:channel)
+                               .transform_values do |channel_steps|
+      avg_engagement = channel_steps.map { |s| 
+        metrics = s.performance_metrics || {}
+        metrics['engagement_rate'].to_f 
+      }.sum / channel_steps.size
+      { avg_performance: avg_engagement, count: channel_steps.size }
+    end
+    
+    channel_performance.sort_by { |_, v| -v[:avg_performance] }
+                      .map { |channel, data| data.merge(channel: channel) }
+  end
+
+  def extract_adaptation_rules(variants)
+    return {} if variants.empty?
+    
+    {
+      tone_adaptations: variants.select { |v| v.adaptation_type == 'tone_adaptation' }.map(&:name),
+      channel_optimizations: variants.select { |v| v.adaptation_type == 'channel_optimization' }.map(&:name)
     }
   end
 end
