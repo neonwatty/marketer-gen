@@ -152,12 +152,18 @@ class JourneyAiService < ApplicationService
   end
 
   def initialize_llm_service
-    # Use mock service in test/development, real service in production
+    # Use mock service in test/development unless USE_REAL_LLM is set
     if Rails.env.test? || (Rails.env.development? && !ENV['USE_REAL_LLM'])
       MockLlmService.new
+    elsif ENV['OPENAI_API_KEY'].present? || ENV['ANTHROPIC_API_KEY'].present?
+      # Initialize real LLM service with available API key
+      LlmService.new(
+        model: Rails.application.config.ai_journey_models[:suggestions]
+      )
     else
-      # Initialize real LLM service (OpenAI, Claude, etc.)
-      LlmService.new(api_key: Rails.application.credentials.dig(:openai, :api_key))
+      # Fall back to mock service if no API keys configured
+      Rails.logger.warn "No LLM API key configured, using mock service"
+      MockLlmService.new
     end
   end
 
