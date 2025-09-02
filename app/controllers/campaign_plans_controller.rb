@@ -2,8 +2,8 @@ class CampaignPlansController < ApplicationController
   include Authentication
   
   before_action :require_authentication
-  before_action :set_campaign_plan, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan, :refresh_analytics, :analytics_report, :sync_external_analytics, :start_execution, :complete_execution]
-  before_action :ensure_owner, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan, :refresh_analytics, :analytics_report, :sync_external_analytics, :start_execution, :complete_execution]
+  before_action :set_campaign_plan, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan, :refresh_analytics, :analytics_report, :sync_external_analytics, :start_execution, :complete_execution, :generate_all_content, :content_status]
+  before_action :ensure_owner, only: [:show, :edit, :update, :destroy, :generate, :regenerate, :archive, :export_pdf, :export_presentation, :share_plan, :refresh_analytics, :analytics_report, :sync_external_analytics, :start_execution, :complete_execution, :generate_all_content, :content_status]
   
   def index
     @campaign_plans = Current.user.campaign_plans
@@ -230,6 +230,53 @@ class CampaignPlansController < ApplicationController
       redirect_to @campaign_plan, notice: 'Campaign execution completed! Final analytics have been recorded.'
     else
       redirect_to @campaign_plan, alert: 'Failed to complete execution. It may have already been completed.'
+    end
+  end
+
+  # Bulk content generation
+  def generate_all_content
+    unless @campaign_plan.completed?
+      return redirect_to @campaign_plan, alert: 'Campaign plan must be completed before generating content.'
+    end
+
+    # Check if content already exists
+    if @campaign_plan.generated_contents.exists?
+      return redirect_to @campaign_plan, alert: 'Content has already been generated for this campaign. You can regenerate individual pieces if needed.'
+    end
+
+    # Start bulk content generation
+    result = BulkContentGenerationService.new(@campaign_plan).generate_all
+
+    if result[:success]
+      redirect_to @campaign_plan, notice: "Successfully queued generation of #{result[:count]} content pieces. They will appear below as they're completed."
+    else
+      redirect_to @campaign_plan, alert: "Failed to generate content: #{result[:error]}"
+    end
+  end
+
+  def content_status
+    @generated_contents = @campaign_plan.generated_contents
+      .includes(:created_by, :approver)
+      .order(created_at: :desc)
+
+    respond_to do |format|
+      format.json { 
+        render json: {
+          total: @generated_contents.count,
+          by_status: @generated_contents.group(:status).count,
+          by_type: @generated_contents.group(:content_type).count,
+          contents: @generated_contents.map do |content|
+            {
+              id: content.id,
+              title: content.title,
+              content_type: content.content_type,
+              status: content.status,
+              created_at: content.created_at,
+              path: generated_content_path(content)
+            }
+          end
+        }
+      }
     end
   end
   

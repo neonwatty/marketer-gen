@@ -18,6 +18,8 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from ActionDispatch::Http::Parameters::ParseError, with: :handle_parameter_parse_error
   rescue_from ActionController::InvalidAuthenticityToken, with: :handle_csrf_error
+  rescue_from ActionController::RoutingError, with: :handle_routing_error
+  rescue_from ActiveRecord::RecordNotFound, with: :handle_record_not_found
 
   private
 
@@ -42,6 +44,26 @@ class ApplicationController < ActionController::Base
       render json: { error: 'Invalid authenticity token' }, status: :unprocessable_entity
     else
       redirect_to new_session_path, alert: 'Security verification failed. Please try again.'
+    end
+  end
+
+  def handle_routing_error
+    Rails.logger.warn "Routing error from IP: #{request.remote_ip}, Path: #{request.path}"
+    
+    if request.xhr? || request.format.json?
+      render json: { error: 'Route not found' }, status: :not_found
+    else
+      redirect_to root_path, alert: 'The page you were looking for does not exist.'
+    end
+  end
+
+  def handle_record_not_found
+    Rails.logger.warn "Record not found from IP: #{request.remote_ip}, Path: #{request.path}"
+    
+    if request.xhr? || request.format.json?
+      render json: { error: 'Record not found' }, status: :not_found
+    else
+      redirect_to root_path, alert: 'The record you were looking for could not be found.'
     end
   end
 

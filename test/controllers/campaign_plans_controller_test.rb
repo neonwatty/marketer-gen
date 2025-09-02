@@ -370,6 +370,75 @@ class CampaignPlansControllerTest < ActionDispatch::IntegrationTest
     assert_match @campaign_plan.name, response.body
   end
 
+  test "should generate all content for completed campaign" do
+    # Create a fresh campaign with no existing content
+    fresh_campaign = @user.campaign_plans.create!(
+      name: 'Fresh Campaign',
+      campaign_type: 'product_launch',
+      objective: 'sales_growth',
+      target_audience: 'Young professionals',
+      status: 'completed',
+      generated_summary: 'Test summary',
+      generated_strategy: 'Test strategy',
+      generated_timeline: 'Test timeline',
+      generated_assets: ['Email campaigns', 'Social media posts']
+    )
+    
+    # Mock the LLM service to return test content
+    mock_service_result = {
+      success: true,
+      count: 2,
+      contents: []
+    }
+    
+    BulkContentGenerationService.any_instance.stubs(:generate_all).returns(mock_service_result)
+    
+    post generate_all_content_campaign_plan_url(fresh_campaign)
+    
+    assert_redirected_to fresh_campaign
+    assert_match(/Successfully queued generation/, flash[:notice])
+    assert_match(/2 content pieces/, flash[:notice])
+  end
+
+  test "should not generate content for incomplete campaign" do
+    @campaign_plan.update!(status: 'draft')
+    
+    assert_no_difference 'GeneratedContent.count' do
+      post generate_all_content_campaign_plan_url(@campaign_plan)
+    end
+    
+    assert_redirected_to @campaign_plan
+    assert_match /must be completed/, flash[:alert]
+  end
+
+  test "should not regenerate content if already exists" do
+    # Mark campaign as completed
+    @campaign_plan.update!(
+      status: 'completed',
+      generated_summary: 'Test summary',
+      generated_strategy: 'Test strategy',
+      generated_timeline: 'Test timeline',
+      generated_assets: ['Email campaigns']
+    )
+    
+    # Create existing content
+    @campaign_plan.generated_contents.create!(
+      title: 'Existing content',
+      body_content: 'This is a test content that should be long enough to pass the validation. ' * 3,
+      content_type: 'email',
+      format_variant: 'standard',
+      status: 'draft',
+      created_by: @user
+    )
+    
+    assert_no_difference 'GeneratedContent.count' do
+      post generate_all_content_campaign_plan_url(@campaign_plan)
+    end
+    
+    assert_redirected_to @campaign_plan
+    assert_match /already been generated/, flash[:alert]
+  end
+
   # Strategic fields integration tests
   test "should display strategic fields in campaign plan analytics" do
     # Set up campaign plan with strategic content
@@ -594,5 +663,38 @@ class CampaignPlansControllerTest < ActionDispatch::IntegrationTest
     
     assert_response :success
     assert_select "h1", @campaign_plan.name
+  end
+
+  # Analytics refresh tests
+  test "should refresh analytics when analytics is enabled" do
+    @campaign_plan.update!(analytics_enabled: true)
+    
+    post refresh_analytics_campaign_plan_url(@campaign_plan)
+    assert_redirected_to campaign_plan_url(@campaign_plan)
+    assert_equal 'Analytics data refreshed successfully.', flash[:notice]
+  end
+
+  test "should not refresh analytics when analytics is disabled" do
+    @campaign_plan.update!(analytics_enabled: false)
+    
+    post refresh_analytics_campaign_plan_url(@campaign_plan)
+    assert_redirected_to campaign_plan_url(@campaign_plan)
+    assert_equal 'Analytics is not enabled for this campaign plan.', flash[:alert]
+  end
+
+  test "should require authentication for refresh analytics" do
+    sign_out
+    post refresh_analytics_campaign_plan_url(@campaign_plan)
+    assert_redirected_to new_session_path
+  end
+
+  test "should not allow refreshing analytics for other users plans" do
+    other_user = users(:admin_user)
+    other_plan = campaign_plans(:generating_plan)
+    other_plan.update!(user: other_user)
+    
+    post refresh_analytics_campaign_plan_url(other_plan)
+    assert_redirected_to campaign_plans_path
+    assert_equal 'You can only access your own campaign plans.', flash[:alert]
   end
 end

@@ -35,6 +35,18 @@
 
       <!-- Right side navigation -->
       <div class="flex items-center space-x-4">
+        <!-- Demo Tour link -->
+        <button type="button"
+                class="text-gray-700 hover:text-blue-600 p-2 rounded-lg transition-colors flex items-center gap-1"
+                title="Start Demo Tour"
+                data-controller="demo"
+                data-action="click->demo#startTour">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          <span class="hidden md:inline text-sm font-medium">Demo</span>
+        </button>
+        
         <!-- Help link -->
         <%= link_to help_page_path, 
             class: "text-gray-700 hover:text-blue-600 p-2 rounded-lg transition-colors",

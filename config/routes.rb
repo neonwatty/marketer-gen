@@ -40,6 +40,8 @@ Rails.application.routes.draw do
       post :sync_external_analytics
       post :start_execution
       post :complete_execution
+      post :generate_all_content
+      get :content_status
     end
     
     # Campaign Intelligence routes

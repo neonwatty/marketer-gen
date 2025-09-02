@@ -1,5 +1,6 @@
 class Api::V1::ValidationsController < ApplicationController
-  before_action :require_authentication
+  skip_before_action :require_authentication, only: [:users_email_address]
+  before_action :require_authentication, except: [:users_email_address]
   skip_before_action :verify_authenticity_token
   
   # Generic validation endpoint

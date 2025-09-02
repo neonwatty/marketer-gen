@@ -394,6 +394,10 @@ class CampaignPlan < ApplicationRecord
     }
   end
 
+  def analytics_enabled?
+    analytics_enabled
+  end
+
   def analytics_stale?
     return false unless analytics_enabled?
     return true unless analytics_last_updated_at
@@ -420,6 +424,21 @@ class CampaignPlan < ApplicationRecord
     (engagement_metrics.present? || 
      performance_data.present? || 
      roi_tracking.present?)
+  end
+
+  def refresh_analytics!
+    return false unless analytics_enabled?
+
+    service = PlanAnalyticsService.new(self)
+    result = service.call
+    
+    if result[:success]
+      touch(:analytics_last_updated_at)
+      true
+    else
+      Rails.logger.error "Failed to refresh analytics for plan #{id}: #{result[:error]}"
+      false
+    end
   end
 
   private
@@ -512,23 +531,6 @@ class CampaignPlan < ApplicationRecord
     progress = (elapsed_days / planned_duration * 100).round(1)
     [progress, 100].min
   end
-
-
-  def refresh_analytics!
-    return false unless analytics_enabled?
-
-    service = PlanAnalyticsService.new(self)
-    result = service.call
-    
-    if result[:success]
-      touch(:analytics_last_updated_at)
-      true
-    else
-      Rails.logger.error "Failed to refresh analytics for plan #{id}: #{result[:error]}"
-      false
-    end
-  end
-
 
   # Plan execution tracking methods
   def start_execution!

@@ -872,4 +872,32 @@ class CampaignPlanTest < ActiveSupport::TestCase
     assert_includes needs_analysis, never_analyzed
     assert_not_includes needs_analysis, previously_analyzed
   end
+
+  # Analytics tests
+  test "analytics_enabled? should return true when analytics_enabled is true" do
+    @campaign_plan.analytics_enabled = true
+    assert @campaign_plan.analytics_enabled?
+  end
+
+  test "analytics_enabled? should return false when analytics_enabled is false" do
+    @campaign_plan.analytics_enabled = false
+    assert_not @campaign_plan.analytics_enabled?
+  end
+
+  test "refresh_analytics! should return false when analytics not enabled" do
+    @campaign_plan.analytics_enabled = false
+    # refresh_analytics! is a public method, should work
+    result = @campaign_plan.refresh_analytics!
+    assert_not result
+  end
+
+  test "analytics_summary should return empty hash when analytics not enabled" do
+    @campaign_plan.analytics_enabled = false
+    assert_equal({}, @campaign_plan.analytics_summary)
+  end
+
+  test "has_analytics_data? should return false when analytics not enabled" do
+    @campaign_plan.analytics_enabled = false
+    assert_not @campaign_plan.has_analytics_data?
+  end
 end
