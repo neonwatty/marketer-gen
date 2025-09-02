@@ -87,13 +87,11 @@ class JourneyBrandContextBuilder < ApplicationService
       name: journey.name,
       campaign_type: journey.campaign_type,
       target_audience: journey.target_audience,
-      objectives: journey.objectives || [],
+      description: journey.description || '',
       current_stage: journey.stages&.first,
       stages: journey.stages || [],
       existing_steps: serialize_existing_steps,
-      budget_range: journey.budget_range,
-      timeline: journey.timeline,
-      success_metrics: journey.success_metrics
+      metadata: journey.metadata || {}
     }
   end
 
@@ -239,7 +237,7 @@ class JourneyBrandContextBuilder < ApplicationService
     GeneratedContent.joins(:campaign_plan)
                    .where(campaign_plans: { user_id: user.id })
                    .where(status: 'published')
-                   .where('performance_score > ?', 80)
+                   .order(created_at: :desc)
                    .limit(5)
                    .pluck(:title, :content_type, :body_content)
                    .map do |title, type, content|
@@ -275,10 +273,10 @@ class JourneyBrandContextBuilder < ApplicationService
     journey.journey_steps.map do |step|
       {
         id: step.id,
-        name: step.name,
+        title: step.title,
         step_type: step.step_type,
-        channels: step.channels,
-        position: step.position,
+        channels: step.channels || [],
+        position: step.sequence_order,
         timing_trigger_type: step.timing_trigger_type
       }
     end
@@ -287,13 +285,13 @@ class JourneyBrandContextBuilder < ApplicationService
   def find_similar_successful_journeys
     Journey.where(campaign_type: journey.campaign_type)
            .where(user_id: user.id)
-           .where('performance_score > ?', 75)
+           .where(status: 'completed')
            .limit(3)
            .map do |j|
       {
         id: j.id,
         name: j.name,
-        performance_score: j.performance_score,
+        performance_score: j.ai_performance_score || 0,
         key_steps: j.journey_steps.pluck(:step_type)
       }
     end
