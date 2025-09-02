@@ -23,5 +23,13 @@ module MarketerGen
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    
+    # AI Journey Features Configuration
+    config.ai_journey_suggestions_enabled = true
+    config.ai_journey_models = {
+      suggestions: 'gpt-3.5-turbo',
+      content_generation: 'gpt-4',
+      brand_analysis: 'gpt-3.5-turbo'
+    }
   end
 end
