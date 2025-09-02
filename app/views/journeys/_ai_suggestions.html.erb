@@ -1,0 +1,328 @@
+<!-- AI-Powered Journey Suggestions with Brand Integration -->
+<div class="ai-suggestions-container" data-controller="ai-journey">
+  <!-- Brand Context Panel -->
+  <% if current_user.active_brand_identity %>
+    <div class="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 mb-6">
+      <div class="flex items-start gap-4">
+        <% if current_user.active_brand_identity.logo_files.attached? %>
+          <div class="flex-shrink-0">
+            <%= image_tag current_user.active_brand_identity.logo_files.first, 
+                class: "h-12 w-auto object-contain",
+                alt: current_user.active_brand_identity.name %>
+          </div>
+        <% end %>
+        
+        <div class="flex-1">
+          <h3 class="text-sm font-semibold text-gray-900 mb-1">
+            Active Brand: <%= current_user.active_brand_identity.name %>
+          </h3>
+          <p class="text-xs text-gray-600">
+            <strong>Voice:</strong> <%= truncate(current_user.active_brand_identity.brand_voice, length: 100) %>
+          </p>
+          <div class="flex items-center gap-4 mt-2">
+            <% if current_user.active_brand_identity.processed_guidelines&.dig("colors", "primary") %>
+              <div class="flex items-center gap-1">
+                <span class="text-xs text-gray-500">Brand Colors:</span>
+                <div class="flex gap-1">
+                  <% (current_user.active_brand_identity.processed_guidelines["colors"].values.first(4) rescue []).each do |color| %>
+                    <div class="w-4 h-4 rounded border border-gray-300" 
+                         style="background-color: <%= color %>" 
+                         title="<%= color %>"></div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <div class="flex-shrink-0">
+          <%= link_to "Change Brand", brand_identities_path, 
+              class: "text-xs text-purple-600 hover:text-purple-700" %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <p class="text-sm text-amber-800">
+          No brand identity active. AI suggestions will use generic guidelines.
+          <%= link_to "Set up brand identity", new_brand_identity_path, class: "underline font-medium" %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- AI Suggestions Header -->
+  <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center gap-3">
+      <div class="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900">AI-Powered Suggestions</h2>
+        <p class="text-xs text-gray-500">Personalized for your brand and campaign goals</p>
+      </div>
+    </div>
+    
+    <button type="button"
+            class="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+            data-action="click->ai-journey#refreshSuggestions">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      Generate New Suggestions
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="hidden" data-ai-journey-target="loading">
+    <div class="bg-white rounded-lg border border-gray-200 p-8">
+      <div class="flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-600 text-sm">AI is analyzing your journey and brand context...</p>
+        <p class="text-gray-400 text-xs mt-1">This may take a few seconds</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suggestions Grid -->
+  <div class="grid gap-4" data-ai-journey-target="suggestions">
+    <% @suggestions.each_with_index do |suggestion, index| %>
+      <div class="bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-200"
+           data-suggestion-id="<%= index %>">
+        
+        <!-- Suggestion Header -->
+        <div class="border-b border-gray-100 px-5 py-3">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2 py-0.5 text-xs font-medium rounded-full
+                  <%= case suggestion[:step_type]
+                      when 'email' then 'bg-blue-100 text-blue-700'
+                      when 'social_post' then 'bg-pink-100 text-pink-700'
+                      when 'content_piece' then 'bg-green-100 text-green-700'
+                      when 'webinar' then 'bg-purple-100 text-purple-700'
+                      when 'landing_page' then 'bg-orange-100 text-orange-700'
+                      else 'bg-gray-100 text-gray-700'
+                      end %>">
+                  <%= suggestion[:step_type].humanize %>
+                </span>
+                
+                <% if suggestion[:priority] == 'high' %>
+                  <span class="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+                    High Priority
+                  </span>
+                <% end %>
+                
+                <% if suggestion[:timing].present? %>
+                  <span class="text-xs text-gray-500">
+                    <svg class="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <%= suggestion[:timing] %>
+                  </span>
+                <% end %>
+              </div>
+              
+              <h3 class="font-semibold text-gray-900">
+                <%= suggestion[:title] %>
+              </h3>
+            </div>
+            
+            <!-- Brand Compliance Score -->
+            <% if suggestion[:brand_compliance_score] %>
+              <div class="flex flex-col items-center ml-4">
+                <div class="relative w-16 h-16">
+                  <svg class="transform -rotate-90 w-16 h-16">
+                    <circle cx="32" cy="32" r="28" 
+                            stroke="currentColor" 
+                            stroke-width="4" 
+                            fill="none"
+                            class="text-gray-200" />
+                    <circle cx="32" cy="32" r="28" 
+                            stroke="currentColor" 
+                            stroke-width="4" 
+                            fill="none"
+                            stroke-dasharray="<%= 2 * Math::PI * 28 %>"
+                            stroke-dashoffset="<%= 2 * Math::PI * 28 * (1 - suggestion[:brand_compliance_score] / 100.0) %>"
+                            class="<%= suggestion[:brand_compliance_score] >= 80 ? 'text-green-500' : 
+                                       suggestion[:brand_compliance_score] >= 60 ? 'text-yellow-500' : 
+                                       'text-red-500' %>" />
+                  </svg>
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-sm font-bold text-gray-900">
+                      <%= suggestion[:brand_compliance_score] %>%
+                    </span>
+                  </div>
+                </div>
+                <span class="text-xs text-gray-500 mt-1">Brand Match</span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Suggestion Content -->
+        <div class="px-5 py-4">
+          <p class="text-gray-600 text-sm mb-3">
+            <%= suggestion[:description] %>
+          </p>
+          
+          <% if suggestion[:brand_alignment].present? %>
+            <div class="bg-purple-50 rounded-lg p-3 mb-3">
+              <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                  <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100-4h-.09A1.65 1.65 0 0010 4.65a1.65 1.65 0 00-.33-1.82A1.65 1.65 0 108 1.18 1.65 1.65 0 005 3.65 1.65 1.65 0 003.17 5H4zm1 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                </svg>
+                <div class="flex-1">
+                  <p class="text-xs font-medium text-purple-900 mb-1">Brand Alignment</p>
+                  <p class="text-xs text-purple-700">
+                    <%= suggestion[:brand_alignment] %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          
+          <!-- Channels & Resources -->
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <% if suggestion[:channels].present? %>
+              <div>
+                <p class="text-xs font-medium text-gray-700 mb-1">Channels</p>
+                <div class="flex flex-wrap gap-1">
+                  <% suggestion[:channels].each do |channel| %>
+                    <span class="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+                      <%= channel.humanize %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            
+            <% if suggestion[:estimated_effort] %>
+              <div>
+                <p class="text-xs font-medium text-gray-700 mb-1">Effort Required</p>
+                <div class="flex items-center gap-1">
+                  <% effort_level = suggestion[:estimated_effort].to_s.downcase %>
+                  <% (1..3).each do |i| %>
+                    <div class="w-2 h-2 rounded-full <%= i <= (['low', 'medium', 'high'].index(effort_level) + 1) ? 'bg-purple-500' : 'bg-gray-200' %>"></div>
+                  <% end %>
+                  <span class="text-xs text-gray-600 ml-1"><%= effort_level.capitalize %></span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+          <% if suggestion[:content_outline].present? %>
+            <div class="bg-gray-50 rounded-lg p-3 mb-4">
+              <p class="text-xs font-medium text-gray-700 mb-1">Content Outline</p>
+              <p class="text-xs text-gray-600">
+                <%= suggestion[:content_outline] %>
+              </p>
+            </div>
+          <% end %>
+          
+          <% if suggestion[:success_metrics].present? %>
+            <div class="flex items-center gap-2 mb-4">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <p class="text-xs text-gray-500">
+                Success Metrics: <%= suggestion[:success_metrics].join(', ') %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="border-t border-gray-100 px-5 py-3 bg-gray-50">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <%= button_to apply_ai_suggestion_journey_path(@journey),
+                  method: :post,
+                  params: { 
+                    suggestion_index: index,
+                    suggestion_data: suggestion.to_json 
+                  },
+                  class: "flex items-center gap-2 px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition-colors",
+                  data: { 
+                    turbo_confirm: "Apply this AI suggestion to your journey?",
+                    action: "click->ai-journey#applySuggestion"
+                  } do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Apply to Journey
+              <% end %>
+              
+              <button type="button"
+                      class="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+                      data-action="click->ai-journey#customizeSuggestion"
+                      data-suggestion-index="<%= index %>">
+                Customize
+              </button>
+            </div>
+            
+            <div class="flex items-center gap-1">
+              <button type="button" 
+                      class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                      title="This suggestion is helpful"
+                      data-action="click->ai-journey#provideFeedback"
+                      data-feedback="helpful"
+                      data-suggestion-index="<%= index %>">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+              </button>
+              
+              <button type="button"
+                      class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      title="This suggestion needs improvement"
+                      data-action="click->ai-journey#provideFeedback"
+                      data-feedback="needs-improvement"
+                      data-suggestion-index="<%= index %>">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Empty State -->
+  <% if @suggestions.empty? %>
+    <div class="bg-white rounded-lg border border-gray-200 p-8">
+      <div class="text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No AI Suggestions Yet</h3>
+        <p class="text-gray-500 mb-4">Click "Generate New Suggestions" to get AI-powered recommendations for your journey.</p>
+        <button type="button"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+                data-action="click->ai-journey#refreshSuggestions">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Generate AI Suggestions
+        </button>
+      </div>
+    </div>
+  <% end %>
+</div>

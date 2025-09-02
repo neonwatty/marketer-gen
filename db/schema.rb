@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_02_153331) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_02_163000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -599,6 +599,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_153331) do
     t.decimal "brand_compliance_score", precision: 3, scale: 2
     t.decimal "ai_performance_score", precision: 3, scale: 2
     t.json "ai_metadata", default: {}
+    t.json "performance_metrics"
+    t.datetime "last_performance_update"
+    t.string "stage"
     t.index ["ai_generated"], name: "index_journey_steps_on_ai_generated"
     t.index ["brand_compliance_score"], name: "index_journey_steps_on_brand_compliance_score"
     t.index ["channel"], name: "index_journey_steps_on_channel"
@@ -644,9 +647,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_02_153331) do
     t.integer "ai_suggestions_count", default: 0
     t.integer "ai_applied_count", default: 0
     t.decimal "brand_consistency_score", precision: 3, scale: 2
+    t.float "ai_performance_score"
+    t.datetime "last_ai_analysis"
+    t.json "ai_insights"
+    t.json "ai_learning_data"
     t.index ["ai_optimization_enabled"], name: "index_journeys_on_ai_optimization_enabled"
     t.index ["brand_consistency_score"], name: "index_journeys_on_brand_consistency_score"
     t.index ["campaign_type"], name: "index_journeys_on_campaign_type"
+    t.index ["last_ai_analysis"], name: "index_journeys_on_last_ai_analysis"
     t.index ["status"], name: "index_journeys_on_status"
     t.index ["template_type"], name: "index_journeys_on_template_type"
     t.index ["user_id", "name"], name: "index_journeys_on_user_id_and_name"

@@ -1,6 +1,7 @@
 class JourneysController < ApplicationController
   before_action :require_authentication
-  before_action :set_journey, only: [:show, :edit, :update, :destroy, :reorder_steps, :suggestions, :duplicate, :archive]
+  before_action :set_journey, only: [:show, :edit, :update, :destroy, :reorder_steps, :suggestions, :duplicate, :archive, 
+                                       :apply_ai_suggestion, :ai_feedback, :ai_optimization_insights, :enable_ai_optimization, :generate_with_ai]
 
   def index
     authorize Journey
@@ -215,37 +216,54 @@ class JourneysController < ApplicationController
     stage_param = params[:stage].is_a?(Array) ? params[:stage].first : params[:stage]
     current_stage = stage_param || @journey.stages&.first
     
-    # Initialize suggestion service with AI support
-    suggestion_service = JourneySuggestionService.new(
-      campaign_type: @journey.campaign_type,
-      template_type: @journey.template_type,
-      current_stage: current_stage,
-      existing_steps: existing_steps,
-      user: Current.user,
-      journey: @journey
-    )
-    
     # Get suggestions with safe limit parameter handling
     limit = params[:limit].is_a?(Array) ? params[:limit].first : params[:limit]
     limit = limit&.to_i || 5
-    suggestions = suggestion_service.suggest_steps(limit: limit)
     
-    # Enhance suggestions with additional details
-    enhanced_suggestions = suggestions.map do |suggestion|
-      channels = suggestion_service.suggest_channels_for_step(suggestion[:step_type])
-      content = suggestion_service.suggest_content_for_step(suggestion[:step_type], current_stage)
+    # Check if AI is enabled and brand identity exists
+    ai_powered = Rails.application.config.ai_journey_suggestions_enabled && 
+                 Current.user.active_brand_identity.present?
+    
+    suggestions = if ai_powered
+      # Use AI-powered suggestions with brand context
+      ai_service = JourneyAiService.new(@journey, Current.user)
+      ai_suggestions = ai_service.generate_intelligent_suggestions(limit: limit, stage: current_stage)
       
-      suggestion.merge(
-        suggested_channels: channels,
-        content_suggestions: content
+      # Track AI generation for analytics
+      track_ai_suggestion_generation(ai_suggestions) if ai_suggestions.any?
+      
+      ai_suggestions
+    else
+      # Fall back to rule-based suggestions
+      suggestion_service = JourneySuggestionService.new(
+        campaign_type: @journey.campaign_type,
+        template_type: @journey.template_type,
+        current_stage: current_stage,
+        existing_steps: existing_steps,
+        user: Current.user,
+        journey: @journey
       )
+      
+      suggestions = suggestion_service.suggest_steps(limit: limit)
+      
+      # Enhance suggestions with additional details
+      suggestions.map do |suggestion|
+        channels = suggestion_service.suggest_channels_for_step(suggestion[:step_type])
+        content = suggestion_service.suggest_content_for_step(suggestion[:step_type], current_stage)
+        
+        suggestion.merge(
+          suggested_channels: channels,
+          content_suggestions: content
+        )
+      end
     end
     
     render json: {
-      suggestions: enhanced_suggestions,
+      suggestions: suggestions,
       current_stage: current_stage,
       available_stages: @journey.stages,
-      campaign_type: @journey.campaign_type
+      campaign_type: @journey.campaign_type,
+      ai_powered: ai_powered
     }
   end
 
@@ -281,6 +299,146 @@ class JourneysController < ApplicationController
       redirect_to journeys_path, notice: 'Journey archived successfully.'
     else
       redirect_to @journey, alert: 'Journey cannot be archived in its current state.'
+    end
+  end
+
+  # AI-powered journey actions
+
+  def apply_ai_suggestion
+    authorize @journey, :update?
+    
+    suggestion_data = params[:suggestion_data] || params[:suggestion]
+    
+    if suggestion_data.blank?
+      return render json: { error: 'No suggestion data provided' }, status: :bad_request
+    end
+    
+    begin
+      suggestion = JSON.parse(suggestion_data) rescue suggestion_data
+      
+      # Create journey step from AI suggestion
+      step = @journey.journey_steps.build(
+        name: suggestion['title'],
+        description: suggestion['description'],
+        step_type: suggestion['step_type'],
+        channels: suggestion['channels'] || [],
+        timing_trigger_type: parse_timing(suggestion['timing']),
+        ai_generated: true,
+        brand_compliance_score: suggestion['brand_compliance_score'],
+        ai_metadata: {
+          original_suggestion: suggestion,
+          applied_at: Time.current,
+          model_used: Rails.application.config.ai_journey_models[:suggestions]
+        }
+      )
+      
+      if step.save
+        # Track AI application
+        @journey.increment!(:ai_applied_count)
+        
+        # Record in AI suggestions table
+        record_ai_suggestion_application(suggestion, step)
+        
+        respond_to do |format|
+          format.html { redirect_to @journey, notice: 'AI suggestion applied successfully!' }
+          format.json { render json: { success: true, step_id: step.id } }
+        end
+      else
+        respond_to do |format|
+          format.html { redirect_to @journey, alert: "Failed to apply suggestion: #{step.errors.full_messages.join(', ')}" }
+          format.json { render json: { error: step.errors.full_messages }, status: :unprocessable_entity }
+        end
+      end
+    rescue StandardError => e
+      Rails.logger.error "Failed to apply AI suggestion: #{e.message}"
+      respond_to do |format|
+        format.html { redirect_to @journey, alert: 'Failed to apply suggestion. Please try again.' }
+        format.json { render json: { error: e.message }, status: :internal_server_error }
+      end
+    end
+  end
+
+  def ai_feedback
+    authorize @journey, :show?
+    
+    suggestion_index = params[:suggestion_index]
+    feedback = params[:feedback]
+    
+    if suggestion_index.blank? || feedback.blank?
+      return render json: { error: 'Missing required parameters' }, status: :bad_request
+    end
+    
+    # Record feedback for learning
+    record_feedback(suggestion_index, feedback)
+    
+    render json: { success: true, message: 'Feedback recorded' }
+  end
+
+  def ai_optimization_insights
+    authorize @journey, :show?
+    
+    begin
+      ai_service = JourneyAiService.new(@journey, Current.user)
+      insights = ai_service.analyze_and_optimize
+      
+      respond_to do |format|
+        format.html { 
+          @optimization_insights = insights
+          render :optimization_insights 
+        }
+        format.json { render json: insights }
+      end
+    rescue StandardError => e
+      Rails.logger.error "Failed to generate optimization insights: #{e.message}"
+      respond_to do |format|
+        format.html { redirect_to @journey, alert: 'Failed to generate insights. Please try again.' }
+        format.json { render json: { error: e.message }, status: :internal_server_error }
+      end
+    end
+  end
+
+  def enable_ai_optimization
+    authorize @journey, :update?
+    
+    @journey.update!(ai_optimization_enabled: params[:enabled] == 'true')
+    
+    respond_to do |format|
+      format.html { redirect_to @journey, notice: "AI optimization #{@journey.ai_optimization_enabled? ? 'enabled' : 'disabled'}." }
+      format.json { render json: { enabled: @journey.ai_optimization_enabled? } }
+    end
+  end
+
+  def generate_with_ai
+    authorize @journey, :update?
+    
+    prompt = params[:prompt]
+    
+    if prompt.blank?
+      return render json: { error: 'No prompt provided' }, status: :bad_request
+    end
+    
+    begin
+      # Use natural language to generate journey steps
+      ai_service = JourneyAiService.new(@journey, Current.user)
+      result = ai_service.generate_from_natural_language(prompt)
+      
+      if result[:success]
+        respond_to do |format|
+          format.html { redirect_to @journey, notice: 'Journey steps generated from your description!' }
+          format.json { render json: result }
+        end
+      else
+        respond_to do |format|
+          format.html { redirect_to @journey, alert: "Generation failed: #{result[:error]}" }
+          format.json { render json: { error: result[:error] }, status: :unprocessable_entity }
+        end
+      end
+    rescue StandardError => e
+      Rails.logger.error "Failed to generate with AI: #{e.message}"
+      respond_to do |format|
+        format.html { redirect_to @journey, alert: 'Failed to generate journey. Please try again.' }
+        format.json { render json: { error: e.message }, status: :internal_server_error }
+      end
     end
   end
 
@@ -392,6 +550,68 @@ class JourneysController < ApplicationController
   end
 
   private
+
+  def parse_timing(timing_string)
+    return 'immediate' if timing_string.blank?
+    
+    case timing_string.downcase
+    when /immediate/i then 'immediate'
+    when /day|daily/i then 'time_based'
+    when /week/i then 'time_based'
+    when /trigger|event/i then 'event_based'
+    else 'manual'
+    end
+  end
+
+  def record_ai_suggestion_application(suggestion, step)
+    # Record in database for learning
+    if defined?(JourneyAiSuggestion)
+      JourneyAiSuggestion.create!(
+        journey: @journey,
+        user: Current.user,
+        brand_identity: Current.user.active_brand_identity,
+        suggestion_type: suggestion['step_type'],
+        content: suggestion,
+        brand_compliance_score: { score: suggestion['brand_compliance_score'] },
+        applied: true,
+        user_feedback: 'accepted',
+        llm_model_used: Rails.application.config.ai_journey_models[:suggestions]
+      )
+    end
+  rescue StandardError => e
+    Rails.logger.error "Failed to record AI suggestion: #{e.message}"
+  end
+
+  def record_feedback(suggestion_index, feedback)
+    # Store feedback for future learning
+    Rails.cache.write(
+      "journey_ai_feedback_#{@journey.id}_#{suggestion_index}",
+      { feedback: feedback, timestamp: Time.current },
+      expires_in: 30.days
+    )
+  end
+
+  def track_ai_suggestion_generation(suggestions)
+    # Track AI suggestion generation for analytics
+    return unless defined?(JourneyAiSuggestion)
+    
+    suggestions.each do |suggestion|
+      begin
+        JourneyAiSuggestion.create!(
+          journey: @journey,
+          user: Current.user,
+          brand_identity: Current.user.active_brand_identity,
+          suggestion_type: suggestion[:step_type],
+          content: suggestion,
+          brand_compliance_score: { score: suggestion[:brand_compliance_score] },
+          applied: false,
+          llm_model_used: Rails.application.config.ai_journey_models[:suggestions]
+        )
+      rescue StandardError => e
+        Rails.logger.error "Failed to track AI suggestion: #{e.message}"
+      end
+    end
+  end
 
   def set_journey
     @journey = policy_scope(Journey).find(params[:id])

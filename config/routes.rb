@@ -133,6 +133,12 @@ Rails.application.routes.draw do
       get :suggestions
       post :duplicate
       patch :archive
+      # AI-powered journey features
+      post :apply_ai_suggestion
+      post :ai_feedback
+      get :ai_optimization_insights
+      post :enable_ai_optimization
+      post :generate_with_ai
     end
     resources :journey_steps, except: [:show]
   end
