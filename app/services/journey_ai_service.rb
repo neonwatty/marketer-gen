@@ -15,7 +15,13 @@ class JourneyAiService < ApplicationService
 
   # Generate brand-consistent journey step suggestions using AI
   def generate_intelligent_suggestions(limit: 5)
-    return fallback_suggestions(limit) unless llm_service_available?
+    unless llm_service_available?
+      return {
+        success: false,
+        suggestions: fallback_suggestions(limit),
+        metadata: { fallback_used: true }
+      }
+    end
 
     begin
       prompt = build_suggestion_prompt(limit)
@@ -145,6 +151,26 @@ class JourneyAiService < ApplicationService
     end
   end
 
+  # Parse natural language into journey steps
+  def parse_natural_language_journey(description)
+    return { success: false, steps: [] } unless llm_service_available?
+    
+    begin
+      response = @llm_service.parse_natural_language_journey(description, @brand_context[:journey])
+      
+      {
+        success: true,
+        steps: response
+      }
+    rescue StandardError => e
+      {
+        success: false,
+        error: e.message,
+        steps: []
+      }
+    end
+  end
+
   private
 
   def build_brand_context
@@ -265,7 +291,7 @@ class JourneyAiService < ApplicationService
       #{@brand_context[:brand][:name]} - #{@brand_context[:brand][:voice]}
       
       JOURNEY STRUCTURE:
-      #{@journey.journey_steps.map(&:name).join(' -> ')}
+      #{@journey.journey_steps.map(&:title).join(' -> ')}
       
       Identify:
       1. Bottlenecks in the journey
@@ -319,17 +345,23 @@ class JourneyAiService < ApplicationService
     return [] unless response.present?
 
     begin
-      parsed = JSON.parse(response) rescue response
+      # Response might already be a hash (from mock service) or JSON string
+      parsed = response.is_a?(String) ? JSON.parse(response) : response
       
       suggestions = if parsed.is_a?(Hash) && parsed['suggestions']
                      parsed['suggestions']
+                   elsif parsed.is_a?(Hash) && parsed[:suggestions]
+                     parsed[:suggestions]
                    elsif parsed.is_a?(Array)
                      parsed
                    else
                      []
                    end
 
-      suggestions.map { |s| s.deep_symbolize_keys }
+      # Ensure suggestions is an array and symbolize keys
+      Array(suggestions).map do |s|
+        s.is_a?(Hash) ? s.deep_symbolize_keys : s
+      end
     rescue StandardError => e
       Rails.logger.error "Failed to parse LLM suggestions: #{e.message}"
       []
@@ -492,7 +524,14 @@ class JourneyAiService < ApplicationService
 
   def build_prediction_context
     {
-      current_steps: @journey.journey_steps.map(&:attributes),
+      current_steps: @journey.journey_steps.map { |step| 
+        {
+          title: step.title,
+          step_type: step.step_type,
+          channel: step.channel,
+          status: step.status
+        }
+      },
       performance: gather_performance_data,
       brand: @brand_context[:brand],
       audience: @journey.target_audience

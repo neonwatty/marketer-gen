@@ -65,7 +65,7 @@ class JourneyAiServiceTest < ActiveSupport::TestCase
   test "analyzes journey performance and suggests optimizations" do
     # Add some mock performance data
     @journey.journey_steps.create!(
-      name: "Test Step",
+      title: "Test Step",
       step_type: "email",
       ai_generated: true,
       performance_metrics: { engagement_rate: 45 }
@@ -139,7 +139,7 @@ class JourneyAiServiceTest < ActiveSupport::TestCase
   test "avoids duplicate suggestions" do
     # Add existing steps
     @journey.journey_steps.create!(
-      name: "Welcome Email",
+      title: "Welcome Email",
       step_type: "email"
     )
     

@@ -10,6 +10,10 @@ class MockLlmService
     @error_simulation_rate = 0.02 # 2% chance of simulated errors
   end
 
+  def healthy?
+    true # Mock service is always healthy
+  end
+
   def generate_social_media_content(params)
     simulate_delay
     simulate_error if should_simulate_error?
@@ -279,6 +283,97 @@ class MockLlmService
         generated_at: Time.current,
         service: 'mock'
       }
+    }
+  end
+
+  def generate_journey_suggestions(params)
+    # Mock implementation for journey suggestions
+    {
+      suggestions: [
+        {
+          title: "Welcome Email Sequence",
+          description: "Send a personalized welcome email series to new subscribers",
+          step_type: "email",
+          priority: "high",
+          estimated_effort: "low",
+          timing: "immediate",
+          channels: ["email"],
+          brand_compliance_score: 92,
+          reasoning: "Essential for onboarding and establishing brand connection"
+        },
+        {
+          title: "Educational Content Series",
+          description: "Share valuable content addressing customer pain points",
+          step_type: "content",
+          priority: "medium",
+          estimated_effort: "medium",
+          timing: "3_days",
+          channels: ["email", "blog"],
+          brand_compliance_score: 88,
+          reasoning: "Builds trust and demonstrates expertise"
+        },
+        {
+          title: "Social Media Engagement",
+          description: "Launch targeted social media campaign to build community",
+          step_type: "social",
+          priority: "medium",
+          estimated_effort: "medium",
+          timing: "1_week",
+          channels: ["social"],
+          brand_compliance_score: 85,
+          reasoning: "Increases reach and engagement"
+        }
+      ]
+    }
+  end
+
+  def parse_natural_language_journey(description, context)
+    # Mock natural language parsing
+    [
+      {
+        title: "Welcome Email",
+        description: "Initial welcome message to new subscribers",
+        step_type: "email",
+        channels: ["email"],
+        timing: "immediate",
+        estimated_effort: "low"
+      },
+      {
+        title: "Product Tour",
+        description: "Interactive product demonstration",
+        step_type: "content",
+        channels: ["web"],
+        timing: "1_day",
+        estimated_effort: "medium"
+      },
+      {
+        title: "Check-in Email",
+        description: "Follow-up to ensure customer satisfaction",
+        step_type: "email",
+        channels: ["email"],
+        timing: "3_days",
+        estimated_effort: "low"
+      }
+    ]
+  end
+
+  def predict_next_action(params)
+    {
+      action: "Send follow-up email",
+      reasoning: "Based on engagement patterns",
+      confidence: 0.85
+    }
+  end
+
+  def analyze_performance(params)
+    {
+      optimizations: [
+        "Improve email subject lines",
+        "Add more personalization",
+        "Test different send times"
+      ],
+      predicted_improvement: 15,
+      confidence_score: 0.8
     }
   end
 

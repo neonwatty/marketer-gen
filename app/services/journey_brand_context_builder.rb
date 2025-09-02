@@ -106,11 +106,11 @@ class JourneyBrandContextBuilder < ApplicationService
 
   def build_industry_context
     {
-      industry: brand_identity.industry || detect_industry,
-      competitors: brand_identity.known_competitors || [],
-      market_position: brand_identity.market_position,
-      seasonal_factors: detect_seasonal_factors,
-      trending_approaches: get_industry_trends
+      industry: detect_industry,
+      competitors: [],
+      market_position: 'standard',
+      seasonal_factors: [],
+      trending_approaches: []
     }
   end
 
@@ -275,9 +275,9 @@ class JourneyBrandContextBuilder < ApplicationService
         id: step.id,
         title: step.title,
         step_type: step.step_type,
-        channels: step.channels || [],
+        channel: step.channel,
         position: step.sequence_order,
-        timing_trigger_type: step.timing_trigger_type
+        status: step.status
       }
     end
   end
