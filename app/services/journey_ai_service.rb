@@ -178,8 +178,9 @@ class JourneyAiService < ApplicationService
   end
 
   def initialize_llm_service
-    # Use mock service in test/development unless USE_REAL_LLM is set
-    if Rails.env.test? || (Rails.env.development? && !ENV['USE_REAL_LLM'])
+    # Always use mock service in test environment
+    # In development, use mock unless explicitly configured to use real LLM
+    if Rails.env.test? || (Rails.env.development? && ENV['USE_REAL_LLM'] != 'force')
       MockLlmService.new
     elsif ENV['OPENAI_API_KEY'].present? || ENV['ANTHROPIC_API_KEY'].present?
       # Initialize real LLM service with available API key
@@ -306,18 +307,21 @@ class JourneyAiService < ApplicationService
 
   def format_brand_context
     return "No brand context available" unless @brand_context[:brand]
+    
+    brand = @brand_context[:brand]
+    brand_assets = @brand_context[:brand_assets] || {}
 
     <<~CONTEXT
-      Brand Name: #{@brand_context[:brand][:name]}
-      Brand Voice: #{@brand_context[:brand][:voice]}
-      Core Values: #{@brand_context[:brand][:core_values]}
-      Unique Selling Points: #{@brand_context[:brand][:unique_selling_points]}
+      Brand Name: #{brand[:name]}
+      Brand Voice: #{brand[:voice]}
+      Core Values: #{brand[:core_values]}
+      Unique Selling Points: #{brand[:unique_selling_points]}
       
       Visual Identity:
-      - Primary Colors: #{@brand_context[:brand_assets][:color_palette]}
-      - Typography: #{@brand_context[:brand_assets][:typography]}
+      - Primary Colors: #{brand_assets[:color_palette] || 'Not specified'}
+      - Typography: #{brand_assets[:typography] || 'Not specified'}
       
-      Restrictions: #{@brand_context[:brand][:restrictions].join(', ')}
+      Restrictions: #{(brand[:restrictions] || []).join(', ')}
     CONTEXT
   end
 
@@ -325,19 +329,19 @@ class JourneyAiService < ApplicationService
     return "No existing steps" unless @brand_context[:journey][:existing_steps].any?
 
     @brand_context[:journey][:existing_steps].map do |step|
-      "#{step[:step_type]}: #{step[:name]}"
+      "#{step[:step_type]}: #{step[:title]}"
     end.join(", ")
   end
 
   def format_performance_insights
-    perf = @brand_context[:historical_performance]
+    perf = @brand_context[:historical_performance] || {}
     return "No historical performance data available" if perf.empty?
 
     <<~INSIGHTS
       Similar Successful Journeys: #{perf[:similar_journeys]&.count || 0}
-      Top Performing Content Types: #{perf[:brand_content_performance][:top_performing_types]&.join(', ')}
-      Best Channels: #{perf[:channel_effectiveness]&.keys&.join(', ')}
-      Optimal Timing: #{perf[:audience_engagement_patterns][:peak_engagement_hours]&.join(', ')}
+      Top Performing Content Types: #{perf.dig(:brand_content_performance, :top_performing_types)&.join(', ') || 'Not available'}
+      Best Channels: #{perf[:channel_effectiveness]&.keys&.join(', ') || 'Not available'}
+      Optimal Timing: #{perf.dig(:audience_engagement_patterns, :peak_engagement_hours)&.join(', ') || 'Not available'}
     INSIGHTS
   end
 
