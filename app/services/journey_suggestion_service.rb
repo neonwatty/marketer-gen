@@ -1,15 +1,24 @@
 # Service for AI-powered journey step suggestions based on campaign objectives
 class JourneySuggestionService
-  attr_reader :campaign_type, :template_type, :current_stage, :existing_steps
+  attr_reader :campaign_type, :template_type, :current_stage, :existing_steps, :user, :journey
 
-  def initialize(campaign_type:, template_type: nil, current_stage: nil, existing_steps: [])
+  def initialize(campaign_type:, template_type: nil, current_stage: nil, existing_steps: [], user: nil, journey: nil)
     @campaign_type = campaign_type
     @template_type = template_type
     @current_stage = current_stage
     @existing_steps = existing_steps
+    @user = user
+    @journey = journey
   end
 
   def suggest_steps(limit: 5)
+    # Try AI-powered suggestions first if journey and user are available
+    if @journey && @user && ai_service_available?
+      ai_suggestions = generate_ai_suggestions(limit)
+      return ai_suggestions if ai_suggestions.any?
+    end
+    
+    # Fall back to rule-based suggestions
     base_suggestions = get_base_suggestions_for_campaign_type
     stage_specific_suggestions = get_stage_specific_suggestions
     template_suggestions = get_template_specific_suggestions
@@ -61,6 +70,13 @@ class JourneySuggestionService
   end
 
   def suggest_content_for_step(step_type, stage)
+    # Try AI-powered content generation first
+    if @journey && @user && ai_service_available?
+      ai_content = generate_ai_content_for_step(step_type, stage)
+      return ai_content if ai_content.present?
+    end
+    
+    # Fall back to rule-based content suggestions
     content_suggestions = {
       'email' => generate_email_content_suggestions(stage),
       'social_post' => generate_social_content_suggestions(stage),
@@ -75,6 +91,67 @@ class JourneySuggestionService
   end
 
   private
+
+  def ai_service_available?
+    # Check if AI service is enabled and available
+    Rails.application.config.respond_to?(:ai_journey_suggestions_enabled) &&
+      Rails.application.config.ai_journey_suggestions_enabled
+  end
+
+  def generate_ai_suggestions(limit)
+    begin
+      ai_service = JourneyAiService.new(@journey, @user)
+      result = ai_service.generate_intelligent_suggestions(limit: limit)
+      
+      if result[:success]
+        # Transform AI suggestions to match expected format
+        result[:suggestions].map do |suggestion|
+          {
+            step_type: suggestion[:step_type],
+            title: suggestion[:title],
+            description: suggestion[:description],
+            priority: suggestion[:priority] || 'medium',
+            estimated_effort: map_impact_to_effort(suggestion[:estimated_impact]),
+            channels: suggestion[:channels],
+            timing: suggestion[:timing],
+            brand_compliance_score: suggestion[:brand_compliance_score]
+          }
+        end
+      else
+        Rails.logger.warn "AI suggestions failed: #{result[:error]}"
+        []
+      end
+    rescue StandardError => e
+      Rails.logger.error "AI suggestion error: #{e.message}"
+      []
+    end
+  end
+
+  def generate_ai_content_for_step(step_type, stage)
+    begin
+      ai_service = JourneyAiService.new(@journey, @user)
+      result = ai_service.generate_step_content(step_type, { current_stage: stage })
+      
+      if result[:success]
+        result[:content]
+      else
+        Rails.logger.warn "AI content generation failed: #{result[:error]}"
+        nil
+      end
+    rescue StandardError => e
+      Rails.logger.error "AI content generation error: #{e.message}"
+      nil
+    end
+  end
+
+  def map_impact_to_effort(impact)
+    case impact
+    when 8..10 then 'high'
+    when 5..7 then 'medium'
+    when 1..4 then 'low'
+    else 'medium'
+    end
+  end
 
   def get_base_suggestions_for_campaign_type
     case campaign_type

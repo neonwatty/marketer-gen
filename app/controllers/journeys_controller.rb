@@ -215,12 +215,14 @@ class JourneysController < ApplicationController
     stage_param = params[:stage].is_a?(Array) ? params[:stage].first : params[:stage]
     current_stage = stage_param || @journey.stages&.first
     
-    # Initialize suggestion service
+    # Initialize suggestion service with AI support
     suggestion_service = JourneySuggestionService.new(
       campaign_type: @journey.campaign_type,
       template_type: @journey.template_type,
       current_stage: current_stage,
-      existing_steps: existing_steps
+      existing_steps: existing_steps,
+      user: Current.user,
+      journey: @journey
     )
     
     # Get suggestions with safe limit parameter handling

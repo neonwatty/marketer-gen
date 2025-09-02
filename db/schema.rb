@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_31_174124) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_02_153331) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -93,6 +93,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_174124) do
     t.index ["touchpoint_id", "model_type"], name: "index_attribution_models_on_touchpoint_id_and_model_type"
     t.index ["touchpoint_id"], name: "index_attribution_models_on_touchpoint_id"
     t.index ["user_id"], name: "index_attribution_models_on_user_id"
+  end
+
+  create_table "brand_content_performance", force: :cascade do |t|
+    t.integer "brand_identity_id"
+    t.integer "generated_content_id"
+    t.integer "journey_step_id"
+    t.decimal "compliance_score", precision: 3, scale: 2
+    t.json "engagement_metrics", default: {}
+    t.json "conversion_metrics", default: {}
+    t.json "brand_elements_performance", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_identity_id", "created_at"], name: "idx_on_brand_identity_id_created_at_2e60e470f4"
+    t.index ["brand_identity_id"], name: "index_brand_content_performance_on_brand_identity_id"
+    t.index ["compliance_score"], name: "index_brand_content_performance_on_compliance_score"
+    t.index ["generated_content_id"], name: "index_brand_content_performance_on_generated_content_id"
+    t.index ["journey_step_id"], name: "index_brand_content_performance_on_journey_step_id"
   end
 
   create_table "brand_identities", force: :cascade do |t|
@@ -527,6 +544,45 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_174124) do
     t.index ["version_number"], name: "index_generated_contents_on_version_number"
   end
 
+  create_table "journey_ai_suggestions", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.integer "user_id", null: false
+    t.integer "brand_identity_id"
+    t.string "suggestion_type", null: false
+    t.json "content", default: {}
+    t.json "brand_compliance_score", default: {}
+    t.json "brand_elements_used", default: {}
+    t.decimal "confidence_score", precision: 3, scale: 2
+    t.string "user_feedback"
+    t.boolean "applied", default: false
+    t.json "performance_metrics", default: {}
+    t.string "llm_model_used"
+    t.text "prompt_hash"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_identity_id"], name: "index_journey_ai_suggestions_on_brand_identity_id"
+    t.index ["journey_id", "created_at"], name: "index_journey_ai_suggestions_on_journey_id_and_created_at"
+    t.index ["journey_id"], name: "index_journey_ai_suggestions_on_journey_id"
+    t.index ["prompt_hash"], name: "index_journey_ai_suggestions_on_prompt_hash"
+    t.index ["user_id", "suggestion_type"], name: "index_journey_ai_suggestions_on_user_id_and_suggestion_type"
+    t.index ["user_id"], name: "index_journey_ai_suggestions_on_user_id"
+  end
+
+  create_table "journey_learning_data", force: :cascade do |t|
+    t.integer "journey_id", null: false
+    t.json "performance_data", default: {}
+    t.json "patterns_identified", default: {}
+    t.json "recommendations_generated", default: {}
+    t.integer "successful_conversions", default: 0
+    t.integer "total_interactions", default: 0
+    t.decimal "conversion_rate", precision: 5, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversion_rate"], name: "index_journey_learning_data_on_conversion_rate"
+    t.index ["journey_id", "created_at"], name: "index_journey_learning_data_on_journey_id_and_created_at"
+    t.index ["journey_id"], name: "index_journey_learning_data_on_journey_id"
+  end
+
   create_table "journey_steps", force: :cascade do |t|
     t.integer "journey_id", null: false
     t.string "title", null: false
@@ -539,6 +595,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_174124) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status", default: "draft", null: false
+    t.boolean "ai_generated", default: false
+    t.decimal "brand_compliance_score", precision: 3, scale: 2
+    t.decimal "ai_performance_score", precision: 3, scale: 2
+    t.json "ai_metadata", default: {}
+    t.index ["ai_generated"], name: "index_journey_steps_on_ai_generated"
+    t.index ["brand_compliance_score"], name: "index_journey_steps_on_brand_compliance_score"
     t.index ["channel"], name: "index_journey_steps_on_channel"
     t.index ["journey_id", "sequence_order"], name: "index_journey_steps_on_journey_id_and_sequence_order", unique: true
     t.index ["journey_id"], name: "index_journey_steps_on_journey_id"
@@ -578,6 +640,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_174124) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "target_audience"
+    t.boolean "ai_optimization_enabled", default: false
+    t.integer "ai_suggestions_count", default: 0
+    t.integer "ai_applied_count", default: 0
+    t.decimal "brand_consistency_score", precision: 3, scale: 2
+    t.index ["ai_optimization_enabled"], name: "index_journeys_on_ai_optimization_enabled"
+    t.index ["brand_consistency_score"], name: "index_journeys_on_brand_consistency_score"
     t.index ["campaign_type"], name: "index_journeys_on_campaign_type"
     t.index ["status"], name: "index_journeys_on_status"
     t.index ["template_type"], name: "index_journeys_on_template_type"
@@ -930,6 +998,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_174124) do
   add_foreign_key "attribution_models", "journeys"
   add_foreign_key "attribution_models", "touchpoints"
   add_foreign_key "attribution_models", "users"
+  add_foreign_key "brand_content_performance", "brand_identities"
+  add_foreign_key "brand_content_performance", "generated_contents"
+  add_foreign_key "brand_content_performance", "journey_steps"
   add_foreign_key "brand_identities", "users"
   add_foreign_key "brand_variants", "brand_identities"
   add_foreign_key "brand_variants", "personas"
@@ -969,6 +1040,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_174124) do
   add_foreign_key "generated_contents", "generated_contents", column: "original_content_id"
   add_foreign_key "generated_contents", "users", column: "approved_by_id"
   add_foreign_key "generated_contents", "users", column: "created_by_id"
+  add_foreign_key "journey_ai_suggestions", "brand_identities"
+  add_foreign_key "journey_ai_suggestions", "journeys"
+  add_foreign_key "journey_ai_suggestions", "users"
+  add_foreign_key "journey_learning_data", "journeys"
   add_foreign_key "journey_steps", "journeys"
   add_foreign_key "journeys", "users"
   add_foreign_key "optimization_executions", "optimization_rules"
